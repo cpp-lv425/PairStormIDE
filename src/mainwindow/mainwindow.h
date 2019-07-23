@@ -8,8 +8,8 @@ class MainWindow;
 }
 
 QT_BEGIN_NAMESPACE
-class QDockWidget;
 class QFileSystemModel;
+class QDockWidget;
 class QMdiArea;
 QT_END_NAMESPACE
 
@@ -23,7 +23,7 @@ public:
 
 private:
     Ui::MainWindow *ui;
-    QDockWidget *mpExplorerDock;
+    QDockWidget *mpProjectViewerDock;
     QDockWidget *mpChatWindowDock;
     QDockWidget *mpBottomPanelDock;
     QMdiArea *mpDocsArea;
