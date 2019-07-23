@@ -24,28 +24,42 @@ void MainWindow::setMainMenu()
 {
     // file menu
     QMenu *fileMenu = new QMenu("&File");
+    // working with files
     fileMenu->addAction("&New file", this, &MainWindow::newFileTriggered, Qt::CTRL + Qt::Key_N);
     fileMenu->addAction("&Open file...", this, &MainWindow::openFileTriggered, Qt::CTRL + Qt::Key_O);
     fileMenu->addAction("Open &folder...", this, &MainWindow::openFolderTriggered);
+    fileMenu->addSeparator();
+
+    // opening start page
     fileMenu->addAction("Start &Page...", this, &MainWindow::openStartPage);
     fileMenu->addSeparator();
+
+    // saving files
     fileMenu->addAction("&Save...", this, &MainWindow::saveFileTriggered, Qt::CTRL + Qt::Key_S);
     fileMenu->addAction("Save &As...", this, &MainWindow::saveFileAsTriggered, Qt::CTRL + Qt::Key_S);
     fileMenu->addAction("Save A&ll...", this, &MainWindow::saveAllFilesTriggered, Qt::CTRL + Qt::SHIFT + Qt::Key_S);
     fileMenu->addSeparator();
+
+    // closing docs & exiting the program
     fileMenu->addAction("&Close file", this, &MainWindow::closeFileTriggered, Qt::CTRL + Qt::Key_W);
     fileMenu->addAction("&Exit", this, &MainWindow::close, Qt::ALT + Qt::Key_F4);
 
     // edit menu
     QMenu *editMenu = new QMenu("&Edit");
+
+    // undo / redo
     editMenu->addAction("&Undo", this, &MainWindow::undoTriggered, Qt::CTRL + Qt::Key_Z);
     editMenu->addAction("&Redo", this, &MainWindow::redoTriggered, Qt::CTRL + Qt::Key_Y);
     editMenu->addSeparator();
+
+    // working with clipboard
     editMenu->addAction("Cu&t", this, &MainWindow::cutTriggered, Qt::CTRL + Qt::Key_X);
     editMenu->addAction("&Copy", this, &MainWindow::copyTriggered, Qt::CTRL + Qt::Key_C);
     editMenu->addAction("&Paste", this, &MainWindow::pasteTriggered, Qt::CTRL + Qt::Key_V);
     editMenu->addAction("Select &All", this, &MainWindow::selectAllTriggered, Qt::CTRL + Qt::Key_A);
     editMenu->addSeparator();
+
+    // find patterns in docs
     editMenu->addAction("&Find/Replace...", this, &MainWindow::findTriggered, Qt::CTRL + Qt::Key_F);
 
     // view menu
@@ -56,26 +70,46 @@ void MainWindow::setMainMenu()
 
     // tools menu
     QMenu *toolsMenu = new QMenu("&Tools");
+
+    // opening refactoring toolbar
     toolsMenu->addAction("&Refactor...", this, &MainWindow::refactorTriggered);
     toolsMenu->addSeparator();
+
+    // opening chat window
     toolsMenu->addAction("&Connect...", this, &MainWindow::connectTriggered);
     toolsMenu->addSeparator();
+
+    // buidling solution
     QMenu *buildSubMenu = new QMenu("&Build");
     toolsMenu->addMenu(buildSubMenu);
+
+    // debugging program
     QMenu *debugSubMenu = new QMenu("&Debug");
     toolsMenu->addMenu(debugSubMenu);
+
+    // git
     QMenu *gitSubMenu = new QMenu("&Git");
     toolsMenu->addMenu(gitSubMenu);
     toolsMenu->addSeparator();
+
+    // opening settings window
     toolsMenu->addAction("&Settings...", this, &MainWindow::settingsTriggered);
 
     // help menu
     QMenu *helpMenu = new QMenu("&Help");
+
+    // info about program
     helpMenu->addAction("&About...", this, &MainWindow::aboutTriggered);
     helpMenu->addSeparator();
+
+    // opening reference window
     helpMenu->addAction("&Reference Assistant...", this, &MainWindow::referenceTriggered, Qt::CTRL + Qt::Key_F1);
+
+    // user guide
     helpMenu->addAction("User &Guide...", this, &MainWindow::userGuideTriggered, Qt::Key_F1);
     helpMenu->addSeparator();
+
+    // checking updates
     helpMenu->addAction("Check for &Updates...", this, &MainWindow::checkUpdatesTriggered);
 
     // adding all menus to MainMenuBar
