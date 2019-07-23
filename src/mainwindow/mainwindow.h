@@ -32,37 +32,37 @@ private:
 
 private slots:
     // file menu actions
-    void newFileTriggered();
-    void openFileTriggered();
-    void openFolderTriggered();
-    void openStartPage();
-    void saveFileTriggered();
-    void saveFileAsTriggered();
-    void saveAllFilesTriggered();
-    void closeFileTriggered();
+    void onNewFileTriggered();
+    void onOpenFileTriggered();
+    void onOpenFolderTriggered();
+    void onOpenStartPage();
+    void onSaveFileTriggered();
+    void onSaveFileAsTriggered();
+    void onSaveAllFilesTriggered();
+    void onCloseFileTriggered();
 
     // edit menu actions
-    void undoTriggered();
-    void redoTriggered();
-    void cutTriggered();
-    void copyTriggered();
-    void pasteTriggered();
-    void selectAllTriggered();
-    void findTriggered();
+    void onUndoTriggered();
+    void onRedoTriggered();
+    void onCutTriggered();
+    void onCopyTriggered();
+    void onPasteTriggered();
+    void onSelectAllTriggered();
+    void onFindTriggered();
 
     // view menu
-    void fullScreenTriggered();
+    void onFullScreenTriggered();
 
     // tools menu
-    void refactorTriggered();
-    void connectTriggered();
-    void settingsTriggered();
+    void onRefactorTriggered();
+    void onConnectTriggered();
+    void onSettingsTriggered();
 
     // help menu
-    void aboutTriggered();
-    void referenceTriggered();
-    void userGuideTriggered();
-    void checkUpdatesTriggered();
+    void onAboutTriggered();
+    void onReferenceTriggered();
+    void onUserGuideTriggered();
+    void onCheckUpdatesTriggered();
 };
 
 #endif // MAINWINDOW_H

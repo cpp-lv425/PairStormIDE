@@ -24,46 +24,46 @@ void MainWindow::setMainMenu()
     // file menu
     QMenu *fileMenu = new QMenu("&File");
     // working with files
-    fileMenu->addAction("&New file", this, &MainWindow::newFileTriggered, Qt::CTRL + Qt::Key_N);
-    fileMenu->addAction("&Open file...", this, &MainWindow::openFileTriggered, Qt::CTRL + Qt::Key_O);
-    fileMenu->addAction("Open &folder...", this, &MainWindow::openFolderTriggered);
+    fileMenu->addAction("&New file", this, &MainWindow::onNewFileTriggered, Qt::CTRL + Qt::Key_N);
+    fileMenu->addAction("&Open file...", this, &MainWindow::onOpenFileTriggered, Qt::CTRL + Qt::Key_O);
+    fileMenu->addAction("Open &folder...", this, &MainWindow::onOpenFolderTriggered);
     fileMenu->addSeparator();
 
     // opening start page
-    fileMenu->addAction("Start &Page...", this, &MainWindow::openStartPage);
+    fileMenu->addAction("Start &Page...", this, &MainWindow::onOpenStartPage);
     fileMenu->addSeparator();
 
     // saving files
-    fileMenu->addAction("&Save...", this, &MainWindow::saveFileTriggered, Qt::CTRL + Qt::Key_S);
-    fileMenu->addAction("Save &As...", this, &MainWindow::saveFileAsTriggered, Qt::CTRL + Qt::Key_S);
-    fileMenu->addAction("Save A&ll...", this, &MainWindow::saveAllFilesTriggered, Qt::CTRL + Qt::SHIFT + Qt::Key_S);
+    fileMenu->addAction("&Save...", this, &MainWindow::onSaveFileTriggered, Qt::CTRL + Qt::Key_S);
+    fileMenu->addAction("Save &As...", this, &MainWindow::onSaveFileAsTriggered, Qt::CTRL + Qt::Key_S);
+    fileMenu->addAction("Save A&ll...", this, &MainWindow::onSaveAllFilesTriggered, Qt::CTRL + Qt::SHIFT + Qt::Key_S);
     fileMenu->addSeparator();
 
     // closing docs & exiting the program
-    fileMenu->addAction("&Close file", this, &MainWindow::closeFileTriggered, Qt::CTRL + Qt::Key_W);
+    fileMenu->addAction("&Close file", this, &MainWindow::onCloseFileTriggered, Qt::CTRL + Qt::Key_W);
     fileMenu->addAction("&Exit", this, &MainWindow::close, Qt::ALT + Qt::Key_F4);
 
     // edit menu
     QMenu *editMenu = new QMenu("&Edit");
 
     // undo / redo
-    editMenu->addAction("&Undo", this, &MainWindow::undoTriggered, Qt::CTRL + Qt::Key_Z);
-    editMenu->addAction("&Redo", this, &MainWindow::redoTriggered, Qt::CTRL + Qt::Key_Y);
+    editMenu->addAction("&Undo", this, &MainWindow::onUndoTriggered, Qt::CTRL + Qt::Key_Z);
+    editMenu->addAction("&Redo", this, &MainWindow::onRedoTriggered, Qt::CTRL + Qt::Key_Y);
     editMenu->addSeparator();
 
     // working with clipboard
-    editMenu->addAction("Cu&t", this, &MainWindow::cutTriggered, Qt::CTRL + Qt::Key_X);
-    editMenu->addAction("&Copy", this, &MainWindow::copyTriggered, Qt::CTRL + Qt::Key_C);
-    editMenu->addAction("&Paste", this, &MainWindow::pasteTriggered, Qt::CTRL + Qt::Key_V);
-    editMenu->addAction("Select &All", this, &MainWindow::selectAllTriggered, Qt::CTRL + Qt::Key_A);
+    editMenu->addAction("Cu&t", this, &MainWindow::onCutTriggered, Qt::CTRL + Qt::Key_X);
+    editMenu->addAction("&Copy", this, &MainWindow::onCopyTriggered, Qt::CTRL + Qt::Key_C);
+    editMenu->addAction("&Paste", this, &MainWindow::onPasteTriggered, Qt::CTRL + Qt::Key_V);
+    editMenu->addAction("Select &All", this, &MainWindow::onSelectAllTriggered, Qt::CTRL + Qt::Key_A);
     editMenu->addSeparator();
 
     // find patterns in docs
-    editMenu->addAction("&Find/Replace...", this, &MainWindow::findTriggered, Qt::CTRL + Qt::Key_F);
+    editMenu->addAction("&Find/Replace...", this, &MainWindow::onFindTriggered, Qt::CTRL + Qt::Key_F);
 
     // view menu
     QMenu *viewMenu = new QMenu("&View");
-    viewMenu->addAction("&Full screen", this, &MainWindow::fullScreenTriggered, Qt::CTRL + Qt::SHIFT + Qt::Key_F11);
+    viewMenu->addAction("&Full screen", this, &MainWindow::onFullScreenTriggered, Qt::CTRL + Qt::SHIFT + Qt::Key_F11);
     QMenu *scaleSubMenu = new QMenu("&Scale");
     viewMenu->addMenu(scaleSubMenu);
 
@@ -71,11 +71,11 @@ void MainWindow::setMainMenu()
     QMenu *toolsMenu = new QMenu("&Tools");
 
     // opening refactoring toolbar
-    toolsMenu->addAction("&Refactor...", this, &MainWindow::refactorTriggered);
+    toolsMenu->addAction("&Refactor...", this, &MainWindow::onRefactorTriggered);
     toolsMenu->addSeparator();
 
     // opening chat window
-    toolsMenu->addAction("&Connect...", this, &MainWindow::connectTriggered);
+    toolsMenu->addAction("&Connect...", this, &MainWindow::onConnectTriggered);
     toolsMenu->addSeparator();
 
     // buidling solution
@@ -92,24 +92,24 @@ void MainWindow::setMainMenu()
     toolsMenu->addSeparator();
 
     // opening settings window
-    toolsMenu->addAction("&Settings...", this, &MainWindow::settingsTriggered);
+    toolsMenu->addAction("&Settings...", this, &MainWindow::onSettingsTriggered);
 
     // help menu
     QMenu *helpMenu = new QMenu("&Help");
 
     // info about program
-    helpMenu->addAction("&About...", this, &MainWindow::aboutTriggered);
+    helpMenu->addAction("&About...", this, &MainWindow::onAboutTriggered);
     helpMenu->addSeparator();
 
     // opening reference window
-    helpMenu->addAction("&Reference Assistant...", this, &MainWindow::referenceTriggered, Qt::CTRL + Qt::Key_F1);
+    helpMenu->addAction("&Reference Assistant...", this, &MainWindow::onReferenceTriggered, Qt::CTRL + Qt::Key_F1);
 
     // user guide
-    helpMenu->addAction("User &Guide...", this, &MainWindow::userGuideTriggered, Qt::Key_F1);
+    helpMenu->addAction("User &Guide...", this, &MainWindow::onUserGuideTriggered, Qt::Key_F1);
     helpMenu->addSeparator();
 
     // checking updates
-    helpMenu->addAction("Check for &Updates...", this, &MainWindow::checkUpdatesTriggered);
+    helpMenu->addAction("Check for &Updates...", this, &MainWindow::onCheckUpdatesTriggered);
 
     // adding all menus to MainMenuBar
     menuBar()->addMenu(fileMenu);
@@ -119,117 +119,117 @@ void MainWindow::setMainMenu()
     menuBar()->addMenu(helpMenu);
 }
 
-void MainWindow::newFileTriggered()
+void MainWindow::onNewFileTriggered()
 {
     qDebug() << "newFileTriggered";
 }
 
-void MainWindow::openFileTriggered()
+void MainWindow::onOpenFileTriggered()
 {
     qDebug() << "open file";
 }
 
-void MainWindow::openFolderTriggered()
+void MainWindow::onOpenFolderTriggered()
 {
     qDebug() << "open folder";
 }
 
-void MainWindow::openStartPage()
+void MainWindow::onOpenStartPage()
 {
     qDebug() << "open start page";
 }
 
-void MainWindow::saveFileTriggered()
+void MainWindow::onSaveFileTriggered()
 {
     qDebug() << "save file";
 }
 
-void MainWindow::saveFileAsTriggered()
+void MainWindow::onSaveFileAsTriggered()
 {
     qDebug() << "save as";
 }
 
-void MainWindow::saveAllFilesTriggered()
+void MainWindow::onSaveAllFilesTriggered()
 {
     qDebug() << "save all";
 }
 
-void MainWindow::closeFileTriggered()
+void MainWindow::onCloseFileTriggered()
 {
     qDebug() << "close file";
 }
 
-void MainWindow::undoTriggered()
+void MainWindow::onUndoTriggered()
 {
     qDebug() << "undo";
 }
 
-void MainWindow::redoTriggered()
+void MainWindow::onRedoTriggered()
 {
     qDebug() << "redo";
 }
 
-void MainWindow::cutTriggered()
+void MainWindow::onCutTriggered()
 {
     qDebug() << "cut";
 }
 
-void MainWindow::copyTriggered()
+void MainWindow::onCopyTriggered()
 {
     qDebug() << "copy";
 }
 
-void MainWindow::pasteTriggered()
+void MainWindow::onPasteTriggered()
 {
     qDebug() << "paste";
 }
 
-void MainWindow::selectAllTriggered()
+void MainWindow::onSelectAllTriggered()
 {
     qDebug() << "select all";
 }
 
-void MainWindow::findTriggered()
+void MainWindow::onFindTriggered()
 {
     qDebug() << "find";
 }
 
-void MainWindow::fullScreenTriggered()
+void MainWindow::onFullScreenTriggered()
 {
     qDebug() << "full screen";
 }
 
-void MainWindow::refactorTriggered()
+void MainWindow::onRefactorTriggered()
 {
     qDebug() << "refactor";
 }
 
-void MainWindow::connectTriggered()
+void MainWindow::onConnectTriggered()
 {
     qDebug() << "connect";
 }
 
-void MainWindow::settingsTriggered()
+void MainWindow::onSettingsTriggered()
 {
     qDebug() << "settings";
 }
 
-void MainWindow::aboutTriggered()
+void MainWindow::onAboutTriggered()
 {
     qDebug() << "about";
 }
 
-void MainWindow::referenceTriggered()
+void MainWindow::onReferenceTriggered()
 {
     qDebug() << "reference";
 }
 
-void MainWindow::userGuideTriggered()
+void MainWindow::onUserGuideTriggered()
 {
     qDebug() << "user guide";
 }
 
-void MainWindow::checkUpdatesTriggered()
+void MainWindow::onCheckUpdatesTriggered()
 {
     qDebug() << "check updates";
 }
