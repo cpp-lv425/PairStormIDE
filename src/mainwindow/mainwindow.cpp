@@ -19,7 +19,6 @@ MainWindow::MainWindow(QWidget *parent) :
     setMainMenu();
 }
 
-
 void MainWindow::setMainMenu()
 {
     // file menu
@@ -239,5 +238,3 @@ MainWindow::~MainWindow()
 {
     delete ui;
 }
-
-
