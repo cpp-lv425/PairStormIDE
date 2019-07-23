@@ -15,4 +15,6 @@ if (!(Test-Path "PSScriptRoot\res\cppref.zip"))
 
 	Expand-Archive "$PSScriptRoot\res\cppref.zip"
 	Remove-Item "$PSScriptRoot\res\cppref.zip"
+	Move-Item -Path $PSScriptRoot\cppref\reference -Destination $path
+	Remove-Item -LiteralPath "$PSScriptRoot\cppref" -Force -Recurse
 }
