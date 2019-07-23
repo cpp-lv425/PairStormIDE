@@ -7,6 +7,12 @@ namespace Ui {
 class MainWindow;
 }
 
+QT_BEGIN_NAMESPACE
+class QDockWidget;
+class QFileSystemModel;
+class QMdiArea;
+QT_END_NAMESPACE
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -17,6 +23,46 @@ public:
 
 private:
     Ui::MainWindow *ui;
+    QDockWidget *mpExplorerDock;
+    QDockWidget *mpChatWindowDock;
+    QDockWidget *mpBottomPanelDock;
+    QMdiArea *mpDocsArea;
+
+    void setMainMenu();
+
+private slots:
+    // file menu actions
+    void onNewFileTriggered();
+    void onOpenFileTriggered();
+    void onOpenFolderTriggered();
+    void onOpenStartPage();
+    void onSaveFileTriggered();
+    void onSaveFileAsTriggered();
+    void onSaveAllFilesTriggered();
+    void onCloseFileTriggered();
+
+    // edit menu actions
+    void onUndoTriggered();
+    void onRedoTriggered();
+    void onCutTriggered();
+    void onCopyTriggered();
+    void onPasteTriggered();
+    void onSelectAllTriggered();
+    void onFindTriggered();
+
+    // view menu
+    void onFullScreenTriggered();
+
+    // tools menu
+    void onRefactorTriggered();
+    void onConnectTriggered();
+    void onSettingsTriggered();
+
+    // help menu
+    void onAboutTriggered();
+    void onReferenceTriggered();
+    void onUserGuideTriggered();
+    void onCheckUpdatesTriggered();
 };
 
 #endif // MAINWINDOW_H
