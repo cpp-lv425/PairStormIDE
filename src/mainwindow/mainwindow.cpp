@@ -56,7 +56,7 @@ void MainWindow::setMainMenu()
 
     // closing docs & exiting the program
     fileMenu->addAction("&Close file", this, &MainWindow::onCloseFileTriggered, Qt::CTRL + Qt::Key_W);
-    fileMenu->addAction("&Exit", this, &MainWindow::close, Qt::ALT + Qt::Key_F4);
+    fileMenu->addAction("&Exit", this, &MainWindow::onExitTriggered, Qt::ALT + Qt::Key_F4);
 
     // edit menu
     QMenu *editMenu = new QMenu("&Edit");
@@ -136,13 +136,16 @@ void MainWindow::setMainMenu()
 
 void MainWindow::onNewFileTriggered()
 {
-    createNewDoc()->show();
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Enter new filename"), QDir::homePath());
+    QWidget *newDoc = createNewDoc();
+    newDoc->setWindowTitle(fileName);
+    createFile(fileName);
+    newDoc->show();
 }
 
 void MainWindow::onOpenFileTriggered()
 {
     QWidget *newDoc = createNewDoc();
-
     QString readResult = loadFile();
 
     // current interface is not implemented by Code Editor Widget yet
@@ -191,6 +194,11 @@ void MainWindow::onSaveAllFilesTriggered()
 void MainWindow::onCloseFileTriggered()
 {
     qDebug() << "close file";
+}
+
+void MainWindow::onExitTriggered()
+{
+
 }
 
 void MainWindow::onUndoTriggered()
@@ -272,9 +280,7 @@ QWidget* MainWindow::createNewDoc()
 {
     QWidget *newDoc = new QWidget;
     mpDocsArea->addSubWindow(newDoc);
-
     newDoc->setAttribute(Qt::WA_DeleteOnClose);
-    newDoc->setWindowTitle("Unnamed Document");
 
     return newDoc;
 }
@@ -302,6 +308,19 @@ QString MainWindow::loadFile()
         QMessageBox::warning(this, tr("Error"), tr("Unable to open specified file."));
         return QString();
     }
+}
+
+void MainWindow::createFile(const QString& fname)
+{
+    QFile file(fname);
+
+    if (file.open(QIODevice::WriteOnly))
+    {
+        file.close();
+        return;
+    }
+
+    QMessageBox::warning(this, tr("Error"), tr("Unable to create file."));
 }
 
 MainWindow::~MainWindow()

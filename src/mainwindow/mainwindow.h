@@ -40,6 +40,7 @@ private slots:
     void onSaveFileAsTriggered();
     void onSaveAllFilesTriggered();
     void onCloseFileTriggered();
+    void onExitTriggered();
 
     // edit menu actions
     void onUndoTriggered();
@@ -66,6 +67,7 @@ private slots:
 
     QWidget* createNewDoc();
     QString loadFile();
+    void createFile(const QString& fname);
 };
 
 #endif // MAINWINDOW_H
