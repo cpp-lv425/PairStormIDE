@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 
 #include <QPlainTextEdit> // temporarily included
+#include <QMdiSubWindow>
 #include <QStyleFactory>
 #include <QFileDialog>
 #include <QMessageBox>
@@ -11,6 +12,7 @@
 #include <QFile>
 
 #include "projectviewerdock.h"
+#include "filemanager.h"
 #include "mdiarea.h"
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -139,10 +141,17 @@ void MainWindow::onNewFileTriggered()
 {
     QString fileName = QFileDialog::getSaveFileName
             (this, tr("Enter new filename"), QDir::homePath());
-    QWidget *newDoc = createNewDoc();
-    newDoc->setWindowTitle(fileName);
-    createFile(fileName);
-    newDoc->show();
+    try
+    {
+        FileManager().createFile(fileName);
+        QWidget *newDoc = createNewDoc();
+        newDoc->setWindowTitle(fileName);
+        newDoc->show();
+    } catch (const QException& e)
+    {
+        QMessageBox::warning(this, tr("Error"),
+                             tr("Unable to create file."));
+    }
 }
 
 void MainWindow::onOpenFileTriggered()
@@ -151,7 +160,7 @@ void MainWindow::onOpenFileTriggered()
     QString readResult;
     try
     {
-        readResult = loadFile(fileName);
+        readResult = FileManager().loadFile(fileName);
     } catch (const QException& e)
     {
         QMessageBox::warning(this, tr("Error"),
@@ -188,7 +197,7 @@ void MainWindow::onOpenFolderTriggered()
         QString readResult;
         try
         {
-            readResult = loadFile(dirName + '/' + file);
+            readResult = FileManager().loadFile(dirName + '/' + file);
         } catch (const QException& e)
         {
             QMessageBox::warning(this, tr("Error"),
@@ -215,7 +224,13 @@ void MainWindow::onOpenStartPage()
 
 void MainWindow::onSaveFileTriggered()
 {
-    qDebug() << "save file";
+    QMdiSubWindow *pCurrentSubWdw =
+            mpDocsArea->currentSubWindow();
+
+    // get filename
+    QString filename;
+    // write to file
+    //writeToFile(filename, pCurrentDoc->toPlainText());
 }
 
 void MainWindow::onSaveFileAsTriggered()
@@ -235,7 +250,7 @@ void MainWindow::onCloseFileTriggered()
 
 void MainWindow::onExitTriggered()
 {
-
+    QApplication::closeAllWindows();
 }
 
 void MainWindow::onUndoTriggered()
@@ -320,33 +335,6 @@ QWidget* MainWindow::createNewDoc()
     newDoc->setAttribute(Qt::WA_DeleteOnClose);
 
     return newDoc;
-}
-
-QString MainWindow::loadFile(const QString& fileName)
-{
-    QFile file(fileName);
-
-    if (file.open(QIODevice::ReadOnly))
-    {
-        QTextStream stream(&file);
-        QString readResult = stream.readAll();
-        file.close();
-        return readResult;
-    }
-    throw QException();
-}
-
-void MainWindow::createFile(const QString& fname)
-{
-    QFile file(fname);
-
-    if (file.open(QIODevice::WriteOnly))
-    {
-        file.close();
-        return;
-    }
-
-    QMessageBox::warning(this, tr("Error"), tr("Unable to create file."));
 }
 
 MainWindow::~MainWindow()

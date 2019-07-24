@@ -34,3 +34,4 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 include($$PWD/mainwindow/mainwindow.pri)
 include($$PWD/projectviewer/projectviewer.pri)
 include($$PWD/mdiarea/mdiarea.pri)
+include($$PWD/filemanager/filemanager.pri)
