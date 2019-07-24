@@ -6,6 +6,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QVBoxLayout> // temporarily included
+#include <QException> // temporarily included
 #include <QDebug> // temporarily included
 #include <QFile>
 
@@ -136,7 +137,8 @@ void MainWindow::setMainMenu()
 
 void MainWindow::onNewFileTriggered()
 {
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Enter new filename"), QDir::homePath());
+    QString fileName = QFileDialog::getSaveFileName
+            (this, tr("Enter new filename"), QDir::homePath());
     QWidget *newDoc = createNewDoc();
     newDoc->setWindowTitle(fileName);
     createFile(fileName);
@@ -145,30 +147,65 @@ void MainWindow::onNewFileTriggered()
 
 void MainWindow::onOpenFileTriggered()
 {
-    QWidget *newDoc = createNewDoc();
-    QString readResult = loadFile();
+    QString fileName = QFileDialog::getOpenFileName();
+    QString readResult;
+    try
+    {
+        readResult = loadFile(fileName);
+    } catch (const QException& e)
+    {
+        QMessageBox::warning(this, tr("Error"),
+                             tr("Unable to open specified file."));
+        return;
+    }
 
     // current interface is not implemented by Code Editor Widget yet
 
-//    if(!readResult.isEmpty())
-//        newDoc->setText(readResult);
+    //    if(!readResult.isEmpty())
+    //        newDoc->setText(readResult);
 
-    // current block will be removed when Code Editor Widget will be implemented
-    if(!readResult.isEmpty())
-    {
-        QPlainTextEdit *pTextEdit = new QPlainTextEdit;
-        pTextEdit->setPlainText(readResult);
-        QVBoxLayout *pLayout = new QVBoxLayout;
-        pLayout->addWidget(pTextEdit);
-        newDoc->setLayout(pLayout);
-    }
+    // current block will be changed when Code Editor Widget will be implemented
 
+    QWidget *newDoc = createNewDoc();
+    QPlainTextEdit *pTextEdit = new QPlainTextEdit;
+    pTextEdit->setPlainText(readResult);
+    QVBoxLayout *pLayout = new QVBoxLayout;
+    pLayout->addWidget(pTextEdit);
+    newDoc->setLayout(pLayout);
     newDoc->show();
 }
 
 void MainWindow::onOpenFolderTriggered()
 {
-    qDebug() << "open folder";
+    QString dirName = QFileDialog::getExistingDirectory
+            (this, "Select directory", QDir::homePath());
+    QDir selectedDir(dirName);
+
+    QStringList filesList = selectedDir.entryList(QDir::Files);
+
+    for (const QString& file : filesList)
+    {
+        QString readResult;
+        try
+        {
+            readResult = loadFile(dirName + '/' + file);
+        } catch (const QException& e)
+        {
+            QMessageBox::warning(this, tr("Error"),
+                                 tr("Unable to open file from specified directory"));
+            return;
+        }
+
+        QWidget *newDoc = createNewDoc();
+        newDoc->setWindowTitle(file);
+
+        QPlainTextEdit *pTextEdit = new QPlainTextEdit;
+        pTextEdit->setPlainText(readResult);
+        QVBoxLayout *pLayout = new QVBoxLayout;
+        pLayout->addWidget(pTextEdit);
+        newDoc->setLayout(pLayout);
+        newDoc->show();
+    }
 }
 
 void MainWindow::onOpenStartPage()
@@ -285,15 +322,8 @@ QWidget* MainWindow::createNewDoc()
     return newDoc;
 }
 
-QString MainWindow::loadFile()
+QString MainWindow::loadFile(const QString& fileName)
 {
-    QString fileName = QFileDialog::getOpenFileName();
-
-    if (fileName.isEmpty())
-    {
-        return QString();
-    }
-
     QFile file(fileName);
 
     if (file.open(QIODevice::ReadOnly))
@@ -303,11 +333,7 @@ QString MainWindow::loadFile()
         file.close();
         return readResult;
     }
-    else
-    {
-        QMessageBox::warning(this, tr("Error"), tr("Unable to open specified file."));
-        return QString();
-    }
+    throw QException();
 }
 
 void MainWindow::createFile(const QString& fname)

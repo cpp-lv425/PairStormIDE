@@ -66,7 +66,7 @@ private slots:
     void onCheckUpdatesTriggered();
 
     QWidget* createNewDoc();
-    QString loadFile();
+    QString loadFile(const QString& fileName);
     void createFile(const QString& fname);
 };
 
