@@ -14,3 +14,4 @@ ProjectViewerModel::ProjectViewerModel(const QDir &directory, const QStringList 
     setNameFilterDisables(false);
     setNameFilters(filters);
 }
+
