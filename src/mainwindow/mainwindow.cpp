@@ -4,6 +4,8 @@
 #include <QStyleFactory>
 #include <QDebug>
 
+#include <projectviewerdock.h>
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -17,6 +19,8 @@ MainWindow::MainWindow(QWidget *parent) :
     QApplication::setStyle(QStyleFactory::create("Fusion"));
 
     setMainMenu();
+
+    mpProjectViewerDock = new ProjectViewerDock(this);
 }
 
 void MainWindow::setMainMenu()
