@@ -2,8 +2,14 @@ DEPENDPATH += $$PWD
 INCLUDEPATH += $$PWD
 
 SOURCES += \
-        $$PWD/networking.cpp
+        $$PWD/apiparser.cpp \
+        $$PWD/connectionserviceprovider.cpp \
+        $$PWD/tcpservice.cpp \
+        $$PWD/udpservice.cpp
 
 HEADERS += \
-    $$PWD/networking.h
+    $$PWD/apiparser.h \
+    $$PWD/connectionserviceprovider.h \
+    $$PWD/tcpservice.h \
+    $$PWD/udpservice.h
 
