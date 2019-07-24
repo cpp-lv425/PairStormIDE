@@ -4,7 +4,8 @@
 #include <QStyleFactory>
 #include <QDebug>
 
-#include <projectviewerdock.h>
+#include "projectviewerdock.h"
+#include "mdiarea.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -20,7 +21,12 @@ MainWindow::MainWindow(QWidget *parent) :
 
     setMainMenu();
 
+    // create instance of Project Viewer
     mpProjectViewerDock = new ProjectViewerDock(this);
+
+    // create instance of MDIArea
+    mpDocsArea = new MDIArea(this);
+    setCentralWidget(mpDocsArea);
 }
 
 void MainWindow::setMainMenu()

@@ -10,7 +10,7 @@ class MainWindow;
 QT_BEGIN_NAMESPACE
 class QFileSystemModel;
 class QDockWidget;
-class QMdiArea;
+class MDIArea;
 QT_END_NAMESPACE
 
 class MainWindow : public QMainWindow
@@ -26,7 +26,7 @@ private:
     QDockWidget *mpProjectViewerDock;
     QDockWidget *mpChatWindowDock;
     QDockWidget *mpBottomPanelDock;
-    QMdiArea *mpDocsArea;
+    MDIArea *mpDocsArea;
 
     void setMainMenu();
 
