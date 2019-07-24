@@ -131,7 +131,7 @@ void MainWindow::setMainMenu()
 
 void MainWindow::onNewFileTriggered()
 {
-    qDebug() << "newFileTriggered";
+    createNewDoc()->show();
 }
 
 void MainWindow::onOpenFileTriggered()
@@ -242,6 +242,17 @@ void MainWindow::onUserGuideTriggered()
 void MainWindow::onCheckUpdatesTriggered()
 {
     qDebug() << "check updates";
+}
+
+QWidget* MainWindow::createNewDoc()
+{
+    QWidget *newDoc = new QWidget;
+    mpDocsArea->addSubWindow(newDoc);
+
+    newDoc->setAttribute(Qt::WA_DeleteOnClose);
+    newDoc->setWindowTitle("Unnamed Document");
+
+    return newDoc;
 }
 
 MainWindow::~MainWindow()

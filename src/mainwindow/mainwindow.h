@@ -63,6 +63,8 @@ private slots:
     void onReferenceTriggered();
     void onUserGuideTriggered();
     void onCheckUpdatesTriggered();
+
+    QWidget* createNewDoc();
 };
 
 #endif // MAINWINDOW_H
