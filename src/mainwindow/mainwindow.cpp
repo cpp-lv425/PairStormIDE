@@ -1,8 +1,13 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include <QPlainTextEdit> // temporarily included
 #include <QStyleFactory>
-#include <QDebug>
+#include <QFileDialog>
+#include <QMessageBox>
+#include <QVBoxLayout> // temporarily included
+#include <QDebug> // temporarily included
+#include <QFile>
 
 #include "projectviewerdock.h"
 #include "mdiarea.h"
@@ -136,7 +141,26 @@ void MainWindow::onNewFileTriggered()
 
 void MainWindow::onOpenFileTriggered()
 {
-    qDebug() << "open file";
+    QWidget *newDoc = createNewDoc();
+
+    QString readResult = loadFile();
+
+    // current interface is not implemented by Code Editor Widget yet
+
+//    if(!readResult.isEmpty())
+//        newDoc->setText(readResult);
+
+    // current block will be removed when Code Editor Widget will be implemented
+    if(!readResult.isEmpty())
+    {
+        QPlainTextEdit *pTextEdit = new QPlainTextEdit;
+        pTextEdit->setPlainText(readResult);
+        QVBoxLayout *pLayout = new QVBoxLayout;
+        pLayout->addWidget(pTextEdit);
+        newDoc->setLayout(pLayout);
+    }
+
+    newDoc->show();
 }
 
 void MainWindow::onOpenFolderTriggered()
@@ -253,6 +277,31 @@ QWidget* MainWindow::createNewDoc()
     newDoc->setWindowTitle("Unnamed Document");
 
     return newDoc;
+}
+
+QString MainWindow::loadFile()
+{
+    QString fileName = QFileDialog::getOpenFileName();
+
+    if (fileName.isEmpty())
+    {
+        return QString();
+    }
+
+    QFile file(fileName);
+
+    if (file.open(QIODevice::ReadOnly))
+    {
+        QTextStream stream(&file);
+        QString readResult = stream.readAll();
+        file.close();
+        return readResult;
+    }
+    else
+    {
+        QMessageBox::warning(this, tr("Error"), tr("Unable to open specified file."));
+        return QString();
+    }
 }
 
 MainWindow::~MainWindow()

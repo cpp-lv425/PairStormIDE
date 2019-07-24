@@ -65,6 +65,7 @@ private slots:
     void onCheckUpdatesTriggered();
 
     QWidget* createNewDoc();
+    QString loadFile();
 };
 
 #endif // MAINWINDOW_H
