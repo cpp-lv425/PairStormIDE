@@ -13,9 +13,10 @@ public:
     ProjectViewerModel(QObject *parent);
     ProjectViewerModel(const QDir &directory,const QStringList &filters, QObject *parent = nullptr);
     void setFilters(const QStringList &list);
-private:
-    QIcon dirIcon;
-    QIcon myFileIcon;
+
+    // QAbstractItemModel interface
+public:
+    QVariant data(const QModelIndex &index, int role) const;
 };
 
 #endif // PROJECTVIEWERMODEL_H
