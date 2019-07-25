@@ -10,7 +10,7 @@ static int counter = 0;
 
 CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
 {
-
+    //test comment
 }
 
 
