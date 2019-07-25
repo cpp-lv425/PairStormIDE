@@ -28,44 +28,22 @@ void CodeEditor::keyPressEvent(QKeyEvent *e)
            return;
         }
 
-        /*if((e->key() == Qt::Key_Enter || e->key() == Qt::Key_Plus))
+        if((e->key() == Qt::Key_Plus && e->modifiers() & Qt::ControlModifier)
+                && currentZoom <=200)
         {
-            this->zoomIn(20);
-            //return;
-             setViewportMargins(lineNumberArea->width(), 0, 0, 0);
-             return;
+            this->zoomIn(5);
+            currentZoom +=5;
+            setViewportMargins(lineNumberAreaWidth(), 0,0 ,0);
+            return;
         }
 
-        if((e->key() == Qt::Key_Enter || e->key() == Qt::Key_Minus))
+        if((e->key() == Qt::Key_Minus && e->modifiers() & Qt::ControlModifier)
+                && currentZoom >=50)
         {
-            this->zoomOut(20);
-            //return;
-             setViewportMargins(lineNumberArea->width(), 0, 0, 0);
-             return;
-        }*/
-
-
-            //this->zoomIn(2);
-        /*if(e->key()== Qt::Key_)
-        {
-            QPlainTextEdit::keyPressEvent(e);
-            this->insertPlainText(")");
-            this->moveCursor(QTextCursor::Left);
-            this->verticalScrollBar();
+            this->zoomOut(5);
+            currentZoom -=5;
+            setViewportMargins(lineNumberAreaWidth(), 0,0 ,0);
             return;
-        }*/
-        /*QWheelEvent *wheel = static_cast<QWheelEvent*>(event);
-            if(wheel->modifiers() == Qt::ControlModifier)
-                if(wheel->delta() > 0)
-                {
-                    this->zoomIn(20);
-                    //this->lineNumberArea->resize(lineNumberAreaWidth()+20, 0);
-                     setViewportMargins(lineNumberArea->width(), 0, 0, 0);
-                }
-                else
-                {
-                    this->zoomOut(20);
-                   //this->lineNumberArea->resize(lineNumberAreaWidth()-20, 0);
-                     setViewportMargins(lineNumberArea->width(), 0, 0, 0);*/
+        }
         QPlainTextEdit::keyPressEvent(e);
 }

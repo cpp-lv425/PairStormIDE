@@ -1,14 +1,9 @@
 #ifndef CODEEDITOR_H
 #define CODEEDITOR_H
-#define TAB_SPACE 4
-#define MAX_SUPPORTED_DIGITS 5
 
 #include <QPlainTextEdit>
 #include <QObject>
-#include<QEvent>
-#include<QKeyEvent>
-#include"ideconfiguration.h"
-//#include"somefunction.h"
+#include "ideconfiguration.h"
 
 class QPaintEvent;
 class QResizeEvent;
@@ -26,19 +21,21 @@ public:
     CodeEditor(QWidget *parent = nullptr);
     void lineNumberAreaPaintEvent(QPaintEvent *event);
     int lineNumberAreaWidth();
+
 protected:
-    void resizeEvent(QResizeEvent *event);
-  // void CodeEditor::wheelEvent(QWheelEvent *event);
+    void resizeEvent(QResizeEvent *event)override;
 
 private slots:
-   void updateLineNumberAreaWidth(int newBlockCount);
+   void updateLineNumberAreaWidth();
    void highlightCurrentLine();
-   void updateLineNumberArea();
+   void updateLineNumberArea(const QRect &rect, int dy);
+
 public slots:
    void keyPressEvent(QKeyEvent *e) override;
 private:
    QWidget *lineNumberArea;
    ConfigParams configParam;
+   int currentZoom = 100;
 };
 
 
