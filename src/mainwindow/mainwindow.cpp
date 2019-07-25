@@ -13,6 +13,7 @@
 #include <QSettings>
 
 #include "projectviewerdock.h"
+#include "bottompaneldock.h"
 #include "filemanager.h"
 #include "codeeditor.h"
 #include "mdiarea.h"
@@ -40,6 +41,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // create instance of MDIArea
     mpDocsArea = new MDIArea(this);
+
+    // create instance of Bottom Panel
+    mpBottomPanelDock = new BottomPanelDock(this);
+
     setCentralWidget(mpDocsArea);
 }
 

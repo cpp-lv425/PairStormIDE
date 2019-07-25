@@ -32,7 +32,9 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 include($$PWD/mainwindow/mainwindow.pri)
+include($$PWD/projectviewermodel/projectviewermodel.pri)
 include($$PWD/projectviewer/projectviewer.pri)
 include($$PWD/mdiarea/mdiarea.pri)
 include($$PWD/filemanager/filemanager.pri)
 include($$PWD/editor/editor.pri)
+include($$PWD/bottompanel/bottompanel.pri)
