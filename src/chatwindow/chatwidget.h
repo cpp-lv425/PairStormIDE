@@ -1,11 +1,19 @@
 #ifndef CHATWIDGET_H
 #define CHATWIDGET_H
 
+#include <QWidget>
 
-class ChatWidget
+class QPlainTextEdit;
+class QLineEdit;
+
+class ChatWidget: public QWidget
 {
+    Q_OBJECT
+
+    QPlainTextEdit *pFeed;
+    QLineEdit *pEnterLine;
 public:
-    ChatWidget();
+    ChatWidget(QWidget *pParent = nullptr);
 };
 
 #endif // CHATWIDGET_H

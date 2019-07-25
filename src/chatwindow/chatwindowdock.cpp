@@ -3,11 +3,12 @@
 #include <QException> // temp
 
 #include "mainwindow.h"
+#include "chatwidget.h"
 
 ChatWindowDock::ChatWindowDock(QWidget *pParent): QDockWidget (pParent)
 {
     setWindowTitle("Chat");
-    pChatWidget = new QWidget;
+    pChatWidget = new ChatWidget;
     setWidget(pChatWidget);
     auto pMainWindow = qobject_cast<MainWindow*>(pParent);
 

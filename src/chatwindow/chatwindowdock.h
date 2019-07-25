@@ -3,9 +3,13 @@
 
 #include <QDockWidget>
 
+class ChatWidget;
+
 class ChatWindowDock: public QDockWidget
 {
-    QWidget *pChatWidget;
+    Q_OBJECT
+
+    ChatWidget *pChatWidget;
 public:
     ChatWindowDock(QWidget *pParent = nullptr);
 };
