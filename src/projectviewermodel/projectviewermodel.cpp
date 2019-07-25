@@ -1,6 +1,6 @@
 #include "projectviewermodel.h"
 
-#include <QIcon>
+#include <QImage>
 #include <QApplication>
 
 ProjectViewerModel::ProjectViewerModel(QObject *parent)
@@ -37,11 +37,15 @@ QVariant ProjectViewerModel::data(const QModelIndex &index, int role) const
     case Qt::DecorationRole:
         if(isDir(index))
         {
-          //  return *dir;
+
+            QImage img;
+
+           return QVariant();
+           // return *dir;
         }
         else
         {
-//            return *cpp;
+           // return *cpp;
         }
     }
     return QVariant();

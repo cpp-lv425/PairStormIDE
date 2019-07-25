@@ -6,7 +6,6 @@ SOURCES += \
 
 HEADERS += \
     $$PWD/projectviewermodel.h
-
 RESOURCES += \
     $$PWD/projectviewerimages.qrc
 

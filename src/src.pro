@@ -25,8 +25,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += c++14
 
 SOURCES += \
-        main.cpp \
-        projectviewermodel.cpp
+        main.cpp
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
@@ -34,6 +33,3 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 include($$PWD/mainwindow/mainwindow.pri)
 include($$PWD/projectviewermodel/projectviewermodel.pri)
-
-HEADERS += \
-    projectviewermodel.h

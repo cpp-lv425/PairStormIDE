@@ -23,7 +23,7 @@ public:
     QVariant data(const QModelIndex &index, int role) const;
 
 private:
-    QVector<std::unique_ptr<QIcon>> images;
+   // QVector<std::unique_ptr<QIcon>> images;
 };
 
 #endif // PROJECTVIEWERMODEL_H
