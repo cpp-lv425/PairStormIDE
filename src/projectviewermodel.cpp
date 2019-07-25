@@ -12,6 +12,8 @@ ProjectViewerModel::ProjectViewerModel(QObject *parent)
 ProjectViewerModel::ProjectViewerModel(const QDir &directory, const QStringList &filters, QObject *parent)
     : QFileSystemModel (parent)
 {
+    dir = new QIcon("DIR2.png");
+    cpp = new QIcon("CPP2.png");
     setRootPath(directory.path());
     setFilter(QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot);
     setNameFilterDisables(false);
@@ -35,13 +37,11 @@ QVariant ProjectViewerModel::data(const QModelIndex &index, int role) const
     case Qt::DecorationRole:
         if(isDir(index))
         {
-            QIcon icon("dir.png");
-            return icon;
+            return *dir;
         }
         else
         {
-            QIcon icon("icon.png");
-            return icon;
+            return *cpp;
         }
     }
     return QVariant();

@@ -2,7 +2,7 @@
 #define PROJECTVIEWERMODEL_H
 
 #include <QFileSystemModel>
-
+#include <QIcon>
 QT_BEGIN_NAMESPACE
 class QStringList;
 QT_END_NAMESPACE
@@ -17,6 +17,8 @@ public:
     // QAbstractItemModel interface
 public:
     QVariant data(const QModelIndex &index, int role) const;
+    QIcon *dir;
+    QIcon *cpp;
 };
 
 #endif // PROJECTVIEWERMODEL_H

@@ -10,9 +10,10 @@ int main(int argc, char *argv[])
 //    w.show();
 
     QTreeView view;
+    view.setIconSize(QSize(24,30));
     QStringList filters;
     filters << "*.txt"<<"*.cpp"<<"*.h"<<"*.json"<<"*.c"<<"*.hpp";
-    QDir dir("C:\\Users\\igord\\Desktop\\PairStormIDE");
+    QDir dir("/home/igor/Desktop/PairStormIDE/");
     ProjectViewerModel* fileSystemModel = new ProjectViewerModel(dir,filters);
     view.setModel(fileSystemModel);
     view.setRootIndex(fileSystemModel->index(fileSystemModel->rootPath()));
