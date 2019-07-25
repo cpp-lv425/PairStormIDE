@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 
+#include "startpage.h"
+
 namespace Ui {
 class MainWindow;
 }
@@ -21,6 +23,7 @@ class MainWindow : public QMainWindow
 
 public:
     explicit MainWindow(QWidget *parent = nullptr);
+    void showStartPage();
     ~MainWindow();
 
 private:
@@ -28,7 +31,7 @@ private:
     QDockWidget *mpProjectViewerDock;
     QDockWidget *mpChatWindowDock;
     BottomPanelDock *mpBottomPanelDock;
-    MDIArea *mpDocsArea;
+    MDIArea *mpDocsArea;    
 
     void setupMainMenu();
 

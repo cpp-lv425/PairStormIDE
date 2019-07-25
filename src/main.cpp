@@ -1,13 +1,18 @@
-#include <QApplication>
-#include <QDebug>
 #include "mainwindow.h"
-#include "projectviewermodel.h"
+
+#include <QApplication>
 #include <QTreeView>
+#include <QDebug>
+
+#include "projectviewermodel.h"
+#include "startpage.h"
+
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     MainWindow w;
     w.show();
+    w.showStartPage();
 
     QStringList filters;
     filters << "*.txt"<<"*.cpp"<<"*.h"<<"*.json"<<"*.c"<<"*.hpp";

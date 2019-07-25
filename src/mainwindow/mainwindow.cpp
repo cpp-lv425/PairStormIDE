@@ -15,6 +15,7 @@
 #include "bottompaneldock.h"
 #include "filemanager.h"
 #include "codeeditor.h"
+
 #include "mdiarea.h"
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -27,7 +28,7 @@ MainWindow::MainWindow(QWidget *parent) :
     setWindowState(Qt::WindowMaximized);
 
     // set Fusion style globally - TEMP SOLUTION
-    QApplication::setStyle(QStyleFactory::create("Fusion"));
+    QApplication::setStyle(QStyleFactory::create("Fusion"));    
 
     setupMainMenu();
 
@@ -41,6 +42,12 @@ MainWindow::MainWindow(QWidget *parent) :
     mpBottomPanelDock = new BottomPanelDock(this);
 
     setCentralWidget(mpDocsArea);
+
+}
+
+void MainWindow::showStartPage()
+{
+    StartPage sp;
 }
 
 void MainWindow::setupMainMenu()
