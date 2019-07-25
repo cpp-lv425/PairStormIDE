@@ -10,6 +10,7 @@
 #include <QDebug>
 
 #include "projectviewerdock.h"
+#include "bottompaneldock.h"
 #include "chatwindowdock.h"
 #include "filemanager.h"
 #include "codeeditor.h"
@@ -38,8 +39,10 @@ MainWindow::MainWindow(QWidget *parent) :
     addDockWidget(Qt::RightDockWidgetArea, mpChatWindowDock);
 
     // create instance of MDIArea
-    mpDocsArea = new MDIArea(this);    
+    mpDocsArea = new MDIArea(this);   
 
+    // create instance of Bottom Panel
+    mpBottomPanelDock = new BottomPanelDock(this);
     setCentralWidget(mpDocsArea);
 }
 

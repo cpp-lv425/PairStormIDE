@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/projectviewermodel"/>
+    <qresource prefix="/">
+        <file>img/c.png</file>
+        <file>img/cpp.png</file>
+        <file>img/dir.png</file>
+        <file>img/h.png</file>
+        <file>img/hpp.png</file>
+        <file>img/json.png</file>
+        <file>img/txt.png</file>
+    </qresource>
+</RCC>
