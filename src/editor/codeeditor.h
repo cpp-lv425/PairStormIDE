@@ -35,7 +35,30 @@ public slots:
 private:
    QWidget *lineNumberArea;
    ConfigParams configParam;
+<<<<<<< HEAD
    int currentZoom = 100;
+=======
+/*public slots:
+    void keyPressEvent(QKeyEvent *e) override;
+
+protected:
+    void resizeEvent(QResizeEvent *event) override;
+    void wheelEvent(QWheelEvent *event)override;
+  //  void wheelEvent(QWheelEvent *event)override;
+private slots:
+    void highlightCurrentLine();
+    void updateLineNumberArea(QRect rect, int dy);
+
+private:
+    QWidget *lineNumberArea;
+    ConfigParams configParam;
+signals:
+    void returnPressed();
+    void backspacePressed();
+    void ctrlPlusVPressed();
+    void wheelScroled();
+    void ctrlPlusVPressed();*/
+>>>>>>> b136e5bd2c07ae69e4ae75fe38213344e370dbdc
 };
 
 

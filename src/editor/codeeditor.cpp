@@ -13,6 +13,7 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     setLineWrapMode(QPlainTextEdit::NoWrap);
     lineNumberArea = new LineNumberArea(this);
 
+<<<<<<< HEAD
     connect(this, SIGNAL(blockCountChanged(int)), this, SLOT(updateLineNumberAreaWidth(int)));
     connect(this, SIGNAL(updateRequest(QRect,int)), this, SLOT(updateLineNumberArea(QRect,int)));
     connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(highlightCurrentLine()));
@@ -20,6 +21,32 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     updateLineNumberAreaWidth();
     //setViewportMargins(lineNumberArea->width(), 0, 0, 0);
     highlightCurrentLine();
+=======
+    //connect(this, SIGNAL(blockCountChanged(int)), this, SLOT(updateLineNumberAreaWidth(int)));
+   // connect(this, SIGNAL(updateRequest(QRect,int)), this, SLOT(updateLineNumberArea(QRect, int)));
+   // connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(highlightCurrentLine()));
+        connect(this, SIGNAL(blockCountChanged(int)), this, SLOT(updateLineNumberAreaWidth(int)));
+        connect(this, SIGNAL(textChanged()), this, SLOT(updateLineNumberArea()));
+        connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(highlightCurrentLine()));
+   /* connect(this,SIGNAL(returnPressed()), this, SLOT(updateLineNumberArea()));
+    connect(this,SIGNAL(backspacePressed()), this, SLOT(updateLineNumberArea()));
+    connect(this,SIGNAL(ctrlPlusVPressed()), this, SLOT(updateLineNumberArea()));
+    connect(this,SIGNAL(wheelScroled()),this,SLOT(updateLineNumberArea()));
+    connect(this,SIGNAL(ctrlPlusVPressed()), this, SLOT(updateLineNumberArea()));*/
+        updateLineNumberAreaWidth(0);
+          highlightCurrentLine();
+
+
+    QFont font;
+    font.setFamily(this->configParam.mTextStyle);
+    font.setPointSize(this->configParam.mFontSize);
+    font.setBold(false);
+    font.setItalic(false);
+    this->setFont(font);
+    this->setTabStopDistance(TAB_SPACE * fontMetrics().width(QLatin1Char('0')));
+    this->lineNumberArea->resize(fontMetrics().width(QLatin1Char('0')) * MAX_SUPPORTED_DIGITS, 0);
+    setViewportMargins(lineNumberArea->width(), 0, 0, 0);
+>>>>>>> b136e5bd2c07ae69e4ae75fe38213344e370dbdc
 }
 
 
@@ -62,6 +89,29 @@ void CodeEditor::resizeEvent(QResizeEvent *e)
     lineNumberArea->setGeometry(QRect(cr.left(), cr.top(), lineNumberAreaWidth(), cr.height()));
 }
 
+<<<<<<< HEAD
+=======
+void CodeEditor::wheelEvent(QWheelEvent *event)
+{
+    emit wheelScroled();
+    /*QWheelEvent *wheel = static_cast<QWheelEvent*>(event);
+    if(wheel->modifiers() == Qt::ControlModifier)
+        if(wheel->delta() > 0)
+        {
+            this->zoomIn(20);
+            //this->lineNumberArea->resize(lineNumberAreaWidth()+20, 0);
+             setViewportMargins(lineNumberArea->width(), 0, 0, 0);
+        }
+        else
+        {
+            this->zoomOut(20);
+           //this->lineNumberArea->resize(lineNumberAreaWidth()-20, 0);
+             setViewportMargins(lineNumberArea->width(), 0, 0, 0);
+
+        }*/
+}
+
+>>>>>>> b136e5bd2c07ae69e4ae75fe38213344e370dbdc
 void CodeEditor::highlightCurrentLine()
 {
     QList<QTextEdit::ExtraSelection> extraSelections;
