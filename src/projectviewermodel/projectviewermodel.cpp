@@ -1,9 +1,7 @@
 #include "projectviewermodel.h"
 
 #include <QImage>
-#include <QDebug>
-#include <QFile>
-#include <QApplication>
+#include <QStringList>
 
 ProjectViewerModel::ProjectViewerModel(const QDir &directory, const QStringList &filters, QObject *parent)
     : QFileSystemModel (parent)
@@ -18,6 +16,14 @@ ProjectViewerModel::ProjectViewerModel(const QDir &directory, const QStringList 
     {
         it.next();
         mImages.insert(it.fileInfo().baseName().toStdString(),new QIcon(it.fileName()));
+    }
+}
+
+ProjectViewerModel::~ProjectViewerModel()
+{
+    foreach(auto &temp,mImages)
+    {
+        delete temp;
     }
 }
 

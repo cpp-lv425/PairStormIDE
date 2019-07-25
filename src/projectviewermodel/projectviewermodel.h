@@ -16,6 +16,7 @@ class ProjectViewerModel : public QFileSystemModel
 {
 public:
     ProjectViewerModel(const QDir &directory,const QStringList &filters, QObject *parent = nullptr);
+    ~ProjectViewerModel();
     void setFilters(const QStringList &list);
 
     // QAbstractItemModel interface
