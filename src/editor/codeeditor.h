@@ -44,6 +44,7 @@ private:
 
 protected:
     void resizeEvent(QResizeEvent *event) override;
+    void wheelEvent(QWheelEvent *event)override;
   //  void wheelEvent(QWheelEvent *event)override;
 private slots:
     void highlightCurrentLine();
@@ -55,6 +56,8 @@ private:
 signals:
     void returnPressed();
     void backspacePressed();
+    void ctrlPlusVPressed();
+    void wheelScroled();
     void ctrlPlusVPressed();*/
 };
 
