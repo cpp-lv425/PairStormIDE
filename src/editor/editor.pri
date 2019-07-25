@@ -11,6 +11,7 @@ SOURCES += \
 
 HEADERS += \
         $$PWD/codeeditor.h \
+        $$PWD/ideconfiguration.h \
         $$PWD/ilexer.h \
         $$PWD/lexercpp.h \
         $$PWD/linenumberarea.h \
