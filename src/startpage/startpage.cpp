@@ -33,17 +33,31 @@ StartPage::StartPage(QWidget *parent) :
     mpStartPageList->item(4)->setIcon(style()->
                                       standardIcon(QStyle::SP_BrowserReload));
 
-    setGeometry(geometry().x(), geometry().y(), 400, 200);
+
+
+    QGroupBox *pGroupBox = new QGroupBox("");
+    QVBoxLayout *pGroupLayout = new QVBoxLayout;
+    pGroupLayout->addWidget(mpStartPageList);
+    pGroupBox->setLayout(pGroupLayout);
+
+    QHBoxLayout *pMiddleLayout = new QHBoxLayout;
+    pMiddleLayout->addSpacing(50);
+    pMiddleLayout->addWidget(pGroupBox);
+    pMiddleLayout->addSpacing(50);
+
+    QVBoxLayout *pWdwLayout = new QVBoxLayout;
+    pWdwLayout->addStretch(1);
+    pWdwLayout->addLayout(pMiddleLayout);
+    pWdwLayout->addStretch(1);
+    setLayout(pWdwLayout);
+
+    setGeometry(geometry().x(), geometry().y(), 500, 300);
 
     QPoint cntr = parent->geometry().center();
     int x = cntr.x() - width() / 2;
     int y = cntr.y() - height() / 2;
     move(x, y);
 
-    QVBoxLayout *pWdwLayout = new QVBoxLayout;
-    pWdwLayout->addWidget(mpStartPageList);
-
-    setLayout(pWdwLayout);
     exec();
 }
 
