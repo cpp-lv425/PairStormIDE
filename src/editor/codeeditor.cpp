@@ -17,7 +17,7 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     connect(this,SIGNAL(returnPressed()), this, SLOT(updateLineNumberArea()));
     connect(this,SIGNAL(backspacePressed()), this, SLOT(updateLineNumberArea()));
     connect(this,SIGNAL(ctrlPlusVPressed()), this, SLOT(updateLineNumberArea()));
-
+    connect(this,SIGNAL(wheelScroled()),this,SLOT(updateLineNumberArea()));
 
     QFont font;
     font.setFamily(this->configParam.mTextStyle);
@@ -53,9 +53,10 @@ void CodeEditor::resizeEvent(QResizeEvent *e)
     QPlainTextEdit::resizeEvent(e);
 }
 
-/*void CodeEditor::wheelEvent(QWheelEvent *event)
+void CodeEditor::wheelEvent(QWheelEvent *event)
 {
-    QWheelEvent *wheel = static_cast<QWheelEvent*>(event);
+    emit wheelScroled();
+    /*QWheelEvent *wheel = static_cast<QWheelEvent*>(event);
     if(wheel->modifiers() == Qt::ControlModifier)
         if(wheel->delta() > 0)
         {
@@ -69,8 +70,8 @@ void CodeEditor::resizeEvent(QResizeEvent *e)
            //this->lineNumberArea->resize(lineNumberAreaWidth()-20, 0);
              setViewportMargins(lineNumberArea->width(), 0, 0, 0);
 
-        }
-}*/
+        }*/
+}
 
 void CodeEditor::highlightCurrentLine()
 {

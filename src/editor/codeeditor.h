@@ -32,7 +32,7 @@ public slots:
 
 protected:
     void resizeEvent(QResizeEvent *event) override;
-    //void wheelEvent(QWheelEvent *event)override;
+    void wheelEvent(QWheelEvent *event)override;
 private slots:
     void highlightCurrentLine();
     void updateLineNumberArea();
@@ -44,6 +44,7 @@ signals:
     void returnPressed();
     void backspacePressed();
     void ctrlPlusVPressed();
+    void wheelScroled();
 };
 
 
