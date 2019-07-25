@@ -1,10 +1,20 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include <QPlainTextEdit> // temporarily included
+#include <QMdiSubWindow>
 #include <QStyleFactory>
-#include <QDebug>
+#include <QFileDialog>
+#include <QMessageBox>
+#include <QVBoxLayout> // temporarily included
+#include <QException> // temporarily included
+#include <QDebug> // temporarily included
+#include <QFile>
 
-#include <projectviewerdock.h>
+#include "projectviewerdock.h"
+#include "filemanager.h"
+#include "codeeditor.h"
+#include "mdiarea.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -18,12 +28,17 @@ MainWindow::MainWindow(QWidget *parent) :
     // set Fusion style globally - TEMP SOLUTION
     QApplication::setStyle(QStyleFactory::create("Fusion"));
 
-    setMainMenu();
+    setupMainMenu();
 
+    // create instance of Project Viewer
     mpProjectViewerDock = new ProjectViewerDock(this);
+
+    // create instance of MDIArea
+    mpDocsArea = new MDIArea(this);
+    setCentralWidget(mpDocsArea);
 }
 
-void MainWindow::setMainMenu()
+void MainWindow::setupMainMenu()
 {
     // file menu
     QMenu *fileMenu = new QMenu("&File");
@@ -45,7 +60,7 @@ void MainWindow::setMainMenu()
 
     // closing docs & exiting the program
     fileMenu->addAction("&Close file", this, &MainWindow::onCloseFileTriggered, Qt::CTRL + Qt::Key_W);
-    fileMenu->addAction("&Exit", this, &MainWindow::close, Qt::ALT + Qt::Key_F4);
+    fileMenu->addAction("&Exit", this, &MainWindow::onExitTriggered, Qt::ALT + Qt::Key_F4);
 
     // edit menu
     QMenu *editMenu = new QMenu("&Edit");
@@ -125,17 +140,71 @@ void MainWindow::setMainMenu()
 
 void MainWindow::onNewFileTriggered()
 {
-    qDebug() << "newFileTriggered";
+    QString fileName = QFileDialog::getSaveFileName
+            (this, tr("Enter new filename"), QDir::homePath());
+    try
+    {
+        FileManager().createFile(fileName);
+        CodeEditor *newDoc = createNewDoc();
+        newDoc->setWindowTitle(fileName);
+        newDoc->show();
+    } catch (const QException& e)
+    {
+        QMessageBox::warning(this, tr("Error"),
+                             tr("Unable to create new file."));
+    }
 }
 
 void MainWindow::onOpenFileTriggered()
 {
-    qDebug() << "open file";
+    QString fileName = QFileDialog::getOpenFileName();
+    QString readResult;
+    try
+    {
+        readResult = FileManager().readFromFile(fileName);
+    } catch (const QException& e)
+    {
+        QMessageBox::warning(this, tr("Error"),
+                             tr("Unable to open specified file."));
+        return;
+    }    
+
+    CodeEditor *newDoc = createNewDoc();
+    newDoc->setPlainText(readResult);
+    newDoc->show();
 }
 
 void MainWindow::onOpenFolderTriggered()
 {
-    qDebug() << "open folder";
+    QString dirName = QFileDialog::getExistingDirectory
+            (this, "Select directory", QDir::homePath());
+    QDir selectedDir(dirName);
+
+    QStringList filesList = selectedDir.entryList(QDir::Files);
+
+    for (const QString& file : filesList)
+    {
+        QString readResult;
+        try
+        {
+            readResult = FileManager().readFromFile(dirName + '/' + file);
+        } catch (const QException& e)
+        {
+            QMessageBox::warning(this, tr("Error"),
+                                 tr("Unable to open file from specified directory"));
+            return;
+        }
+
+        QWidget *newDoc = createNewDoc();
+        newDoc->setWindowTitle(file);
+
+        QPlainTextEdit *pTextEdit = new QPlainTextEdit;
+        pTextEdit->setPlainText(readResult);
+        QVBoxLayout *pLayout = new QVBoxLayout;
+        pLayout->addWidget(pTextEdit);
+        newDoc->setLayout(pLayout);
+        newDoc->show();
+    }
 }
 
 void MainWindow::onOpenStartPage()
@@ -145,7 +214,13 @@ void MainWindow::onOpenStartPage()
 
 void MainWindow::onSaveFileTriggered()
 {
-    qDebug() << "save file";
+    QMdiSubWindow *pCurrentSubWdw =
+            mpDocsArea->currentSubWindow();
+
+    // get filename
+    QString filename;
+    // write to file
+    //writeToFile(filename, pCurrentDoc->toPlainText());
 }
 
 void MainWindow::onSaveFileAsTriggered()
@@ -161,6 +236,11 @@ void MainWindow::onSaveAllFilesTriggered()
 void MainWindow::onCloseFileTriggered()
 {
     qDebug() << "close file";
+}
+
+void MainWindow::onExitTriggered()
+{
+    QApplication::closeAllWindows();
 }
 
 void MainWindow::onUndoTriggered()
@@ -236,6 +316,15 @@ void MainWindow::onUserGuideTriggered()
 void MainWindow::onCheckUpdatesTriggered()
 {
     qDebug() << "check updates";
+}
+
+CodeEditor* MainWindow::createNewDoc()
+{
+    CodeEditor *newDoc = new CodeEditor;
+    mpDocsArea->addSubWindow(newDoc);
+    newDoc->setAttribute(Qt::WA_DeleteOnClose);
+
+    return newDoc;
 }
 
 MainWindow::~MainWindow()

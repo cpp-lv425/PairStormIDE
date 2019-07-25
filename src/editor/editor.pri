@@ -7,7 +7,6 @@ SOURCES += \
         $$PWD/ilexer.cpp \
         $$PWD/lexercpp.cpp \
         $$PWD/linenumberarea.cpp \
-        $$PWD/main.cpp \
         $$PWD/widget.cpp
 
 HEADERS += \
