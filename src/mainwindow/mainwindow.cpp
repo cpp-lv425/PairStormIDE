@@ -47,7 +47,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 void MainWindow::showStartPage()
 {
-    StartPage sp;
+    StartPage sp(this);
 }
 
 void MainWindow::setupMainMenu()
