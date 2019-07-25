@@ -2,6 +2,7 @@
 
 #include <QImage>
 #include <QStringList>
+#include <QDebug>
 
 ProjectViewerModel::ProjectViewerModel(const QDir &directory, const QStringList &filters, QObject *parent)
     : QFileSystemModel (parent)
@@ -42,6 +43,7 @@ QVariant ProjectViewerModel::data(const QModelIndex &index, int role) const
         return info.fileName();
     }
     case Qt::DecorationRole:
+        qDebug()<<"decoration";
         if(isDir(index))
         {
             return *mImages["dir"];
