@@ -4,7 +4,8 @@
 #include <QStyleFactory>
 #include <QDebug>
 
-#include <projectviewerdock.h>
+#include "projectviewerdock.h"
+#include "chatwindowdock.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -21,6 +22,7 @@ MainWindow::MainWindow(QWidget *parent) :
     setMainMenu();
 
     mpProjectViewerDock = new ProjectViewerDock(this);
+    mpChatWindowDock = new ChatWindowDock(this);
 }
 
 void MainWindow::setMainMenu()

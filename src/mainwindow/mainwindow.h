@@ -9,6 +9,7 @@ class MainWindow;
 
 QT_BEGIN_NAMESPACE
 class QFileSystemModel;
+class ChatWindowDock;
 class QDockWidget;
 class QMdiArea;
 QT_END_NAMESPACE
