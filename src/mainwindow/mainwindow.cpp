@@ -13,6 +13,7 @@
 
 #include "projectviewerdock.h"
 #include "filemanager.h"
+#include "codeeditor.h"
 #include "mdiarea.h"
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -144,7 +145,7 @@ void MainWindow::onNewFileTriggered()
     try
     {
         FileManager().createFile(fileName);
-        QWidget *newDoc = createNewDoc();
+        CodeEditor *newDoc = createNewDoc();
         newDoc->setWindowTitle(fileName);
         newDoc->show();
     } catch (const QException& e)
@@ -166,21 +167,10 @@ void MainWindow::onOpenFileTriggered()
         QMessageBox::warning(this, tr("Error"),
                              tr("Unable to open specified file."));
         return;
-    }
+    }    
 
-    // current interface is not implemented by Code Editor Widget yet
-
-    //    if(!readResult.isEmpty())
-    //        newDoc->setText(readResult);
-
-    // current block will be changed when Code Editor Widget will be implemented
-
-    QWidget *newDoc = createNewDoc();
-    QPlainTextEdit *pTextEdit = new QPlainTextEdit;
-    pTextEdit->setPlainText(readResult);
-    QVBoxLayout *pLayout = new QVBoxLayout;
-    pLayout->addWidget(pTextEdit);
-    newDoc->setLayout(pLayout);
+    CodeEditor *newDoc = createNewDoc();
+    newDoc->setPlainText(readResult);
     newDoc->show();
 }
 
@@ -328,9 +318,9 @@ void MainWindow::onCheckUpdatesTriggered()
     qDebug() << "check updates";
 }
 
-QWidget* MainWindow::createNewDoc()
+CodeEditor* MainWindow::createNewDoc()
 {
-    QWidget *newDoc = new QWidget;
+    CodeEditor *newDoc = new CodeEditor;
     mpDocsArea->addSubWindow(newDoc);
     newDoc->setAttribute(Qt::WA_DeleteOnClose);
 

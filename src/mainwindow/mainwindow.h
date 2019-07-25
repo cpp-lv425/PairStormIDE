@@ -10,6 +10,7 @@ class MainWindow;
 QT_BEGIN_NAMESPACE
 class QFileSystemModel;
 class QDockWidget;
+class CodeEditor;
 class MDIArea;
 QT_END_NAMESPACE
 
@@ -66,7 +67,7 @@ private slots:
     void onCheckUpdatesTriggered();
 
     // creates new doc in MDIArea
-    QWidget* createNewDoc();    
+    CodeEditor* createNewDoc();
 };
 
 #endif // MAINWINDOW_H
