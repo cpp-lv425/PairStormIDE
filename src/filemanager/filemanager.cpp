@@ -4,13 +4,9 @@
 #include <QException> // temp
 #include <QFile>
 
-FileManager::FileManager()
+QString FileManager::readFromFile(const QString& fname)
 {
-}
-
-QString FileManager::loadFile(const QString& fileName)
-{
-    QFile file(fileName);
+    QFile file(fname);
 
     if (file.open(QIODevice::ReadOnly))
     {
@@ -45,6 +41,5 @@ void FileManager::writeToFile(const QString &fname,
         file.close();
         return;
     }
-
     throw QException();
 }

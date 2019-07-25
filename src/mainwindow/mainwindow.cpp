@@ -27,7 +27,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // set Fusion style globally - TEMP SOLUTION
     QApplication::setStyle(QStyleFactory::create("Fusion"));
 
-    setMainMenu();
+    setupMainMenu();
 
     // create instance of Project Viewer
     mpProjectViewerDock = new ProjectViewerDock(this);
@@ -37,7 +37,7 @@ MainWindow::MainWindow(QWidget *parent) :
     setCentralWidget(mpDocsArea);
 }
 
-void MainWindow::setMainMenu()
+void MainWindow::setupMainMenu()
 {
     // file menu
     QMenu *fileMenu = new QMenu("&File");
@@ -150,7 +150,7 @@ void MainWindow::onNewFileTriggered()
     } catch (const QException& e)
     {
         QMessageBox::warning(this, tr("Error"),
-                             tr("Unable to create file."));
+                             tr("Unable to create new file."));
     }
 }
 
@@ -160,7 +160,7 @@ void MainWindow::onOpenFileTriggered()
     QString readResult;
     try
     {
-        readResult = FileManager().loadFile(fileName);
+        readResult = FileManager().readFromFile(fileName);
     } catch (const QException& e)
     {
         QMessageBox::warning(this, tr("Error"),
@@ -197,7 +197,7 @@ void MainWindow::onOpenFolderTriggered()
         QString readResult;
         try
         {
-            readResult = FileManager().loadFile(dirName + '/' + file);
+            readResult = FileManager().readFromFile(dirName + '/' + file);
         } catch (const QException& e)
         {
             QMessageBox::warning(this, tr("Error"),

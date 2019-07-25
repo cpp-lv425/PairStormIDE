@@ -28,7 +28,7 @@ private:
     QDockWidget *mpBottomPanelDock;
     MDIArea *mpDocsArea;
 
-    void setMainMenu();
+    void setupMainMenu();
 
 private slots:
     // file menu actions
@@ -65,11 +65,8 @@ private slots:
     void onUserGuideTriggered();
     void onCheckUpdatesTriggered();
 
-    QWidget* createNewDoc();
-    QString loadFile(const QString& fileName);
-    void createFile(const QString& fname);
-    void writeToFile(const QString& fname,
-                     const QString& content);
+    // creates new doc in MDIArea
+    QWidget* createNewDoc();    
 };
 
 #endif // MAINWINDOW_H

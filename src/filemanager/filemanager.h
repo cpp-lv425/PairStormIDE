@@ -5,9 +5,8 @@ class QString;
 
 class FileManager
 {
-public:
-    FileManager();
-    QString loadFile(const QString& fileName);
+public:    
+    QString readFromFile(const QString& fname);
     void createFile(const QString& fname);
     void writeToFile(const QString& fname,
                      const QString& content);
