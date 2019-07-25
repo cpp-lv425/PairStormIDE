@@ -33,6 +33,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 include($$PWD/mainwindow/mainwindow.pri)
+include($$PWD/projectviewermodel/projectviewermodel.pri)
 
 HEADERS += \
     projectviewermodel.h

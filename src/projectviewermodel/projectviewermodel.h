@@ -1,8 +1,12 @@
 #ifndef PROJECTVIEWERMODEL_H
 #define PROJECTVIEWERMODEL_H
 
-#include <QFileSystemModel>
+#include <memory>
+
 #include <QIcon>
+#include <QVector>
+#include <QFileSystemModel>
+
 QT_BEGIN_NAMESPACE
 class QStringList;
 QT_END_NAMESPACE
@@ -17,8 +21,9 @@ public:
     // QAbstractItemModel interface
 public:
     QVariant data(const QModelIndex &index, int role) const;
-    QIcon *dir;
-    QIcon *cpp;
+
+private:
+    QVector<std::unique_ptr<QIcon>> images;
 };
 
 #endif // PROJECTVIEWERMODEL_H
