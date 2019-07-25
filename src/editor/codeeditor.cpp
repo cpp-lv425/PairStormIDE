@@ -88,8 +88,9 @@ void CodeEditor::resizeEvent(QResizeEvent *e)
            //this->lineNumberArea->resize(lineNumberAreaWidth()-20, 0);
              setViewportMargins(lineNumberArea->width(), 0, 0, 0);
         }
-}*/
-
+    //CodeEditor::wheelEvent(event);
+}
+*/
 void CodeEditor::highlightCurrentLine()
 {
     QList<QTextEdit::ExtraSelection> extraSelections;

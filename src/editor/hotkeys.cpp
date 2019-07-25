@@ -28,7 +28,7 @@ void CodeEditor::keyPressEvent(QKeyEvent *e)
            return;
         }
 
-        if((e->key() == Qt::Key_Enter || e->key() == Qt::Key_Plus))
+        /*if((e->key() == Qt::Key_Enter || e->key() == Qt::Key_Plus))
         {
             this->zoomIn(20);
             //return;
@@ -42,7 +42,7 @@ void CodeEditor::keyPressEvent(QKeyEvent *e)
             //return;
              setViewportMargins(lineNumberArea->width(), 0, 0, 0);
              return;
-        }
+        }*/
 
 
             //this->zoomIn(2);

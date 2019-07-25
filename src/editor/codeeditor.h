@@ -28,7 +28,7 @@ public:
     int lineNumberAreaWidth();
 protected:
     void resizeEvent(QResizeEvent *event);
-   //void CodeEditor::wheelEvent(QWheelEvent *event);
+  // void CodeEditor::wheelEvent(QWheelEvent *event);
 
 private slots:
    void updateLineNumberAreaWidth(int newBlockCount);
@@ -39,23 +39,6 @@ public slots:
 private:
    QWidget *lineNumberArea;
    ConfigParams configParam;
-/*public slots:
-    void keyPressEvent(QKeyEvent *e) override;
-
-protected:
-    void resizeEvent(QResizeEvent *event) override;
-  //  void wheelEvent(QWheelEvent *event)override;
-private slots:
-    void highlightCurrentLine();
-    void updateLineNumberArea(QRect rect, int dy);
-
-private:
-    QWidget *lineNumberArea;
-    ConfigParams configParam;
-signals:
-    void returnPressed();
-    void backspacePressed();
-    void ctrlPlusVPressed();*/
 };
 
 
