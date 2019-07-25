@@ -9,15 +9,15 @@ StartPage::StartPage(QWidget *parent) :
     ui(new Ui::StartPage)
 {
     ui->setupUi(this);
-    pStartPageList = new QListWidget;
-    pStartPageList->addItem(tr("Create new file"));
-    pStartPageList->addItem(tr("Open existing file"));
-    pStartPageList->addItem(tr("Open project directory"));
-    pStartPageList->addItem(tr("Open Reference Assistant"));
-    pStartPageList->addItem(tr("Configure IDE"));
+    mpStartPageList = new QListWidget;
+    mpStartPageList->addItem(tr("Create new file"));
+    mpStartPageList->addItem(tr("Open existing file"));
+    mpStartPageList->addItem(tr("Open project directory"));
+    mpStartPageList->addItem(tr("Open Reference Assistant"));
+    mpStartPageList->addItem(tr("Configure IDE"));
     QVBoxLayout *pLayout = new QVBoxLayout;
-    pLayout->addWidget(pStartPageList);
-    pStartPageList->show();
+    pLayout->addWidget(mpStartPageList);
+    mpStartPageList->show();
 }
 
 StartPage::~StartPage()

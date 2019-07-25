@@ -13,7 +13,7 @@ class StartPage : public QDialog
 {
     Q_OBJECT
 
-    QListWidget *pStartPageList;
+    QListWidget *mpStartPageList;
 public:
     explicit StartPage(QWidget *parent = nullptr);
     ~StartPage();
