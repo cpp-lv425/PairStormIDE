@@ -10,6 +10,8 @@ QT_END_NAMESPACE
 
 class ProjectViewerDock: public QDockWidget
 {
+    Q_OBJECT
+
     QTreeView *pTreeViewer;
 public:
     ProjectViewerDock(QWidget *pParent = nullptr);
