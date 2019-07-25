@@ -3,18 +3,18 @@
 
 #include <memory>
 
-#include <QIcon>
+#include <QPair>
 #include <QVector>
 #include <QFileSystemModel>
 
 QT_BEGIN_NAMESPACE
 class QStringList;
+class QIcon;
 QT_END_NAMESPACE
 
 class ProjectViewerModel : public QFileSystemModel
 {
 public:
-    ProjectViewerModel(QObject *parent);
     ProjectViewerModel(const QDir &directory,const QStringList &filters, QObject *parent = nullptr);
     void setFilters(const QStringList &list);
 
@@ -23,7 +23,7 @@ public:
     QVariant data(const QModelIndex &index, int role) const;
 
 private:
-   // QVector<std::unique_ptr<QIcon>> images;
+    QVector<QPair<QString*,QIcon*>> mImages;
 };
 
 #endif // PROJECTVIEWERMODEL_H
