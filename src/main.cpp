@@ -6,22 +6,12 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-//    MainWindow w;
-//    w.show();
+    MainWindow w;
+    w.show();
 
-    QTreeView view;
-    view.setIconSize(QSize(24,30));
     QStringList filters;
     filters << "*.txt"<<"*.cpp"<<"*.h"<<"*.json"<<"*.c"<<"*.hpp";
     QDir dir("/home/igor/Desktop/PairStormIDE/");
     ProjectViewerModel* fileSystemModel = new ProjectViewerModel(dir,filters);
-    view.setModel(fileSystemModel);
-    view.setRootIndex(fileSystemModel->index(fileSystemModel->rootPath()));
-
-    //view.sortByColumn(0,Qt::SortOrder::DescendingOrder);
-    view.hideColumn(1);
-    view.hideColumn(2);
-    view.hideColumn(3);
-    view.show();
     return a.exec();
 }

@@ -17,11 +17,7 @@ ProjectViewerModel::ProjectViewerModel(const QDir &directory, const QStringList 
     while (it.hasNext())
     {
         it.next();
-        mImages.push_back(QPair<QString*,QIcon*>(new QString(it.fileInfo().baseName()),new QIcon(it.fileName())));
-    }
-    for(auto a : mImages)
-    {
-        qDebug()<<*a.first;
+        mImages.insert(it.fileInfo().baseName().toStdString(),new QIcon(it.fileName()));
     }
 }
 
@@ -42,23 +38,11 @@ QVariant ProjectViewerModel::data(const QModelIndex &index, int role) const
     case Qt::DecorationRole:
         if(isDir(index))
         {
-            foreach(const auto & temp, mImages)
-            {
-                if(*temp.first == "dir")
-                {
-                    return *temp.second;
-                }
-            }
+            return *mImages["dir"];
         }
         else
         {
-            foreach(const auto & temp, mImages)
-            {
-                if(fileInfo(index).suffix() == *temp.first)
-                {
-                    return *temp.second;
-                }
-            }
+            return *mImages[fileInfo(index).suffix().toStdString()];
         }
     }
     return QVariant();

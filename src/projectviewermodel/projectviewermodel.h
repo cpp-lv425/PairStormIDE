@@ -2,9 +2,9 @@
 #define PROJECTVIEWERMODEL_H
 
 #include <memory>
+#include <string>
 
-#include <QPair>
-#include <QVector>
+#include <QMap>
 #include <QFileSystemModel>
 
 QT_BEGIN_NAMESPACE
@@ -23,7 +23,7 @@ public:
     QVariant data(const QModelIndex &index, int role) const;
 
 private:
-    QVector<QPair<QString*,QIcon*>> mImages;
+    QMap<std::string,QIcon*> mImages;
 };
 
 #endif // PROJECTVIEWERMODEL_H
