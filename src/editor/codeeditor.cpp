@@ -20,7 +20,6 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     connect(this, SIGNAL(updateRequest(QRect,int)), this, SLOT(updateLineNumberArea(QRect,int)));
 
     connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(highlightCurrentLine()));
-
     // start typing from correct position (in the first line it doesn't consider weight of lineCounter)
     //that's why we need to set this position
     updateLineNumberAreaWidth();

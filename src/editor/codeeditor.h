@@ -22,7 +22,8 @@ public:
     CodeEditor(QWidget *parent = nullptr);
     void lineNumberAreaPaintEvent(QPaintEvent *event);
     int lineNumberAreaWidth();
-
+    bool insidebracket();
+    static QString tabs;
 protected:
     void resizeEvent(QResizeEvent *event)override;
 
@@ -33,13 +34,15 @@ private slots:
 
 public slots:
    void keyPressEvent(QKeyEvent *e) override;
+   void autotab();
+
 private:
    QWidget *lineNumberArea;
    ConfigParams configParam;
    int currentZoom = 100;
    QFont font;
-};
 
+};
 
 
 #endif // CODEEDITOR_H
