@@ -22,6 +22,7 @@ class MainWindow : public QMainWindow
 
 public:
     explicit MainWindow(QWidget *parent = nullptr);
+    QStringList getFileExtensions()const;
     ~MainWindow();
 
 private:

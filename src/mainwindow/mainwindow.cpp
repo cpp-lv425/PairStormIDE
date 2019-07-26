@@ -14,6 +14,7 @@
 #include "projectviewerdock.h"
 #include "bottompaneldock.h"
 #include "chatwindowdock.h"
+#include "newfilewizard.h"
 #include "filemanager.h"
 #include "codeeditor.h"
 #include "mdiarea.h"
@@ -55,6 +56,11 @@ MainWindow::MainWindow(QWidget *parent) :
     mpBottomPanelDock->setObjectName("mpBottomPanelDock");
 
     setCentralWidget(mpDocsArea);
+}
+
+QStringList MainWindow::getFileExtensions() const
+{
+    return QStringList() << ".c" << ".cpp" << ".h" << ".hpp" << ".txt" << ".json";
 }
 
 void MainWindow::setupMainMenu()
@@ -159,19 +165,22 @@ void MainWindow::setupMainMenu()
 
 void MainWindow::onNewFileTriggered()
 {
-    QString fileName = QFileDialog::getSaveFileName
-            (this, tr("Enter new filename"), QDir::homePath());
-    try
-    {
-        FileManager().createFile(fileName);
-        CodeEditor *newDoc = createNewDoc();
-        newDoc->setWindowTitle(fileName);
-        newDoc->show();
-    } catch (const QException& e)
-    {
-        QMessageBox::warning(this, tr("Error"),
-                             tr("Unable to create new file."));
-    }
+    QStringList fileExtensions = getFileExtensions();
+    NewFileWizard newFileWizard(fileExtensions);
+    newFileWizard.exec();
+//    QString fileName = QFileDialog::getSaveFileName
+//            (this, tr("Enter new filename"), QDir::homePath());
+//    try
+//    {
+//        FileManager().createFile(fileName);
+//        CodeEditor *newDoc = createNewDoc();
+//        newDoc->setWindowTitle(fileName);
+//        newDoc->show();
+//    } catch (const QException& e)
+//    {
+//        QMessageBox::warning(this, tr("Error"),
+//                             tr("Unable to create new file."));
+//    }
 }
 
 void MainWindow::onOpenFileTriggered()
