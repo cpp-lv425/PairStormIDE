@@ -17,51 +17,31 @@ StartPage::StartPage(QWidget *parent) :
     ui->setupUi(this);
     setWindowTitle("Start Page");    
 
-//    auto stylesList = QStyleFactory::keys();
-//    setStyle(QStyleFactory::create(stylesList[0]));
-//    mpStartPageList = new QListWidget;
-//    mpStartPageList->setFont(QFont("Verdana", 16));
+    pNewBtn = new QPushButton(tr("   New File"));
+    pNewBtn->setIcon(style()->standardIcon(QStyle::SP_FileIcon));
+    pNewBtn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    pNewBtn->setMaximumWidth(200);
+    connect(pNewBtn, &QPushButton::pressed, this, &StartPage::newBtnPressed);
 
-//    mpStartPageList->addItem(tr("Create new file"));
-//    mpStartPageList->addItem(tr("Open existing file"));
-//    mpStartPageList->addItem(tr("Open project directory"));
-//    mpStartPageList->addItem(tr("Open Reference Assistant"));
-//    mpStartPageList->addItem(tr("Configure IDE"));
+    pOpenBtn = new QPushButton(tr("   Open File"));
+    pOpenBtn->setMaximumWidth(200);
+    pOpenBtn->setIcon(style()->standardIcon(QStyle::SP_DialogOpenButton));
+    pOpenBtn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-//    mpStartPageList->item(0)->setIcon(style()->
-//                                      standardIcon(QStyle::SP_FileIcon));
-//    mpStartPageList->item(1)->setIcon(style()->
-//                                      standardIcon(QStyle::SP_DialogOpenButton));
-//    mpStartPageList->item(2)->setIcon(style()->
-//                                      standardIcon(QStyle::SP_DirHomeIcon));
-//    mpStartPageList->item(3)->setIcon(style()->
-//                                      standardIcon(QStyle::SP_DialogHelpButton));
-//    mpStartPageList->item(4)->setIcon(style()->
-//                                      standardIcon(QStyle::SP_BrowserReload));
+    pOpenDirBtn = new QPushButton(tr("   Open Folder"));
+    pOpenDirBtn->setMaximumWidth(200);
+    pOpenDirBtn->setIcon(style()->standardIcon(QStyle::SP_DirHomeIcon));
+    pOpenDirBtn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-//    QGroupBox *pGroupBox = new QGroupBox("");
-//    QVBoxLayout *pGroupLayout = new QVBoxLayout;
-//    pGroupLayout->addWidget(mpStartPageList);
-//    pGroupBox->setLayout(pGroupLayout);
+    pReferenceBtn = new QPushButton(tr("   Reference Assistant"));
+    pReferenceBtn->setMaximumWidth(200);
+    pReferenceBtn->setIcon(style()->standardIcon(QStyle::SP_DialogHelpButton));
+    pReferenceBtn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-//    QHBoxLayout *pMiddleLayout = new QHBoxLayout;
-//    pMiddleLayout->addSpacing(50);
-//    pMiddleLayout->addWidget(pGroupBox);
-//    pMiddleLayout->addSpacing(50);
-
-//    QVBoxLayout *pWdwLayout = new QVBoxLayout;
-//    pWdwLayout->addStretch(1);
-//    pWdwLayout->addLayout(pMiddleLayout);
-//    pWdwLayout->addStretch(1);
-//    setLayout(pWdwLayout);
-
-    ////////////////////////////////////////
-
-    QPushButton *pNewBtn = new QPushButton(tr("New File"));
-    QPushButton *pOpenBtn = new QPushButton(tr("Open File"));
-    QPushButton *pOpenDirBtn = new QPushButton(tr("Open Folder"));
-    QPushButton *pReferenceBtn = new QPushButton(tr("Reference Assistant"));
-    QPushButton *pSettingsBtn = new QPushButton(tr("Settings"));
+    pSettingsBtn = new QPushButton(tr("   Settings"));
+    pSettingsBtn->setMaximumWidth(200);
+    pSettingsBtn->setIcon(style()->standardIcon(QStyle::SP_BrowserReload));
+    pSettingsBtn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     QVBoxLayout *pBtnLayout = new QVBoxLayout;
     pBtnLayout->addWidget(pNewBtn);
@@ -71,10 +51,16 @@ StartPage::StartPage(QWidget *parent) :
     pBtnLayout->addWidget(pSettingsBtn);
 
     QLabel *pNewLbl = new QLabel(tr("Create new file"));
+    pNewLbl->setAlignment(Qt::AlignCenter);
     QLabel *pOpenLbl = new QLabel(tr("Open existing file"));
+    pOpenLbl->setAlignment(Qt::AlignCenter);
     QLabel *pOpenDirLbl = new QLabel(tr("Open existing project directory"));
+    pOpenDirLbl->setAlignment(Qt::AlignCenter);
     QLabel *pReferenceLbl = new QLabel(tr("Open Reference Assistant"));
+    pReferenceLbl->setAlignment(Qt::AlignCenter);
     QLabel *pSettingsLbl = new QLabel(tr("Configure IDE"));
+    pSettingsLbl->setAlignment(Qt::AlignCenter);
+
     QVBoxLayout *pLblLayout = new QVBoxLayout;
     pLblLayout->addWidget(pNewLbl);
     pLblLayout->addWidget(pOpenLbl);
@@ -101,6 +87,31 @@ StartPage::StartPage(QWidget *parent) :
 StartPage::~StartPage()
 {
     delete ui;
+}
+
+void StartPage::newBtnPressed()
+{
+    emit onNewBtnPressed();
+}
+
+void StartPage::openBtnPressed()
+{
+    emit onOpenBtnPressed();
+}
+
+void StartPage::openDirPressed()
+{
+    emit onOpenDirPressed();
+}
+
+void StartPage::referenceBtnPressed()
+{
+    emit onReferenceBtnPressed();
+}
+
+void StartPage::settingsBtnPressed()
+{
+    emit onSettingsBtnPressed();
 }
 
 

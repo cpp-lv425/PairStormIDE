@@ -20,6 +20,25 @@ public:
 
 private:
     Ui::StartPage *ui;
+    QPushButton *pNewBtn;
+    QPushButton *pOpenBtn;
+    QPushButton *pOpenDirBtn;
+    QPushButton *pReferenceBtn;
+    QPushButton *pSettingsBtn;
+
+private slots:
+    void newBtnPressed();
+    void openBtnPressed();
+    void openDirPressed();
+    void referenceBtnPressed();
+    void settingsBtnPressed();
+
+signals:
+    void onNewBtnPressed();
+    void onOpenBtnPressed();
+    void onOpenDirPressed();
+    void onReferenceBtnPressed();
+    void onSettingsBtnPressed();
 };
 
 #endif // STARTPAGE_H

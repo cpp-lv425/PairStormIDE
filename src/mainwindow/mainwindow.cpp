@@ -47,7 +47,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
 void MainWindow::showStartPage()
 {
-    StartPage sp(this);
+    StartPage startPage(this);
+    connect(&startPage, &StartPage::onOpenBtnPressed, this, &MainWindow::onOpenFileTriggered);
 }
 
 void MainWindow::setupMainMenu()
