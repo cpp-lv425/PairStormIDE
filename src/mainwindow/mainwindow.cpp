@@ -166,8 +166,14 @@ void MainWindow::setupMainMenu()
 void MainWindow::onNewFileTriggered()
 {
     QStringList fileExtensions = getFileExtensions();
-    NewFileWizard newFileWizard(fileExtensions);
-    newFileWizard.exec();
+    //NewFileWizard newFileWizard(fileExtensions);
+    //newFileWizard.exec();
+
+    NewFileDialog d(fileExtensions, this);
+    d.exec();
+
+
+
 //    QString fileName = QFileDialog::getSaveFileName
 //            (this, tr("Enter new filename"), QDir::homePath());
 //    try
