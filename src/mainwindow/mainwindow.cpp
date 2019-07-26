@@ -38,9 +38,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // create instance of Project Viewer
     mpProjectViewerDock = new ProjectViewerDock(this);
+    addDockWidget(Qt::LeftDockWidgetArea, mpProjectViewerDock);
     mpProjectViewerDock->setObjectName("mpProjectViewerDock");
     mpProjectViewerDock->restoreGeometry(settings.value("mpProjectViewerDockGeometry").toByteArray());
-    addDockWidget(Qt::LeftDockWidgetArea, mpProjectViewerDock);
 
     // create instance of Chat Window
     mpChatWindowDock = new ChatWindowDock(this);
