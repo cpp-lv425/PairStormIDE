@@ -9,8 +9,11 @@ class MainWindow;
 
 QT_BEGIN_NAMESPACE
 class QFileSystemModel;
+class BottomPanelDock;
+class ChatWindowDock;
 class QDockWidget;
-class QMdiArea;
+class CodeEditor;
+class MDIArea;
 QT_END_NAMESPACE
 
 class MainWindow : public QMainWindow
@@ -25,10 +28,10 @@ private:
     Ui::MainWindow *ui;
     QDockWidget *mpProjectViewerDock;
     QDockWidget *mpChatWindowDock;
-    QDockWidget *mpBottomPanelDock;
-    QMdiArea *mpDocsArea;
+    BottomPanelDock *mpBottomPanelDock;
+    MDIArea *mpDocsArea;
 
-    void setMainMenu();
+    void setupMainMenu();
 
 private slots:
     // file menu actions
@@ -40,6 +43,7 @@ private slots:
     void onSaveFileAsTriggered();
     void onSaveAllFilesTriggered();
     void onCloseFileTriggered();
+    void onExitTriggered();
 
     // edit menu actions
     void onUndoTriggered();
@@ -63,6 +67,9 @@ private slots:
     void onReferenceTriggered();
     void onUserGuideTriggered();
     void onCheckUpdatesTriggered();
+
+    // creates new doc in MDIArea
+    CodeEditor* createNewDoc();
 };
 
 #endif // MAINWINDOW_H
