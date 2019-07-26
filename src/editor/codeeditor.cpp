@@ -46,6 +46,16 @@ int CodeEditor::lineNumberAreaWidth()
     return fontMetrics().maxWidth() * digits;// wight of one symbol(in our case number) * count of digits
 }
 
+QString &CodeEditor::getFileName()
+{
+    return fileName;
+}
+
+void CodeEditor::setFileName(const QString &fileName)
+{
+    this->fileName = fileName;
+}
+
 void CodeEditor::updateLineNumberAreaWidth()
 {
     // reset start position for typing (according new linecounter position)

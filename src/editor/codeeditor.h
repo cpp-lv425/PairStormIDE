@@ -24,6 +24,9 @@ public:
     int lineNumberAreaWidth();
     bool insidebracket();
     static QString tabs;
+
+    QString& getFileName();
+    void setFileName(const QString &flename);
 protected:
     void resizeEvent(QResizeEvent *event)override;
 
@@ -36,13 +39,15 @@ public slots:
    void keyPressEvent(QKeyEvent *e) override;
    void autotab();
 
+
 private:
    QWidget *lineNumberArea;
    ConfigParams configParam;
    int currentZoom = 100;
    QFont font;
-
+   QString fileName;
 };
+
 
 
 #endif // CODEEDITOR_H
