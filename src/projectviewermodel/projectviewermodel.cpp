@@ -11,11 +11,11 @@ ProjectViewerModel::ProjectViewerModel(const QDir &directory, const QStringList 
     setNameFilterDisables(false);
     setNameFilters(filters);
 
-    QDirIterator it(":/img/", QDirIterator::FollowSymlinks);
+    QDirIterator it(":/img/", QDirIterator::Subdirectories);
     while (it.hasNext())
     {
         it.next();
-        mImages.insert(it.fileInfo().baseName().toStdString(),new QIcon(it.fileName()));
+        mImages.insert(it.fileInfo().baseName().toStdString(),new QIcon(it.path()+it.fileName()));
     }
 }
 
@@ -29,18 +29,16 @@ ProjectViewerModel::~ProjectViewerModel()
 
 QVariant ProjectViewerModel::data(const QModelIndex &index, int role) const
 {
+
     if(!index.isValid())
     {
         return QVariant();
     }
+    QFileInfo info = fileInfo(index);
+
 
     switch (role)
     {
-    case Qt::DisplayRole:
-    {
-        QFileInfo info = fileInfo(index);
-        return info.fileName();
-    }
     case Qt::DecorationRole:
         if(isDir(index))
         {
@@ -50,6 +48,7 @@ QVariant ProjectViewerModel::data(const QModelIndex &index, int role) const
         {
             return *mImages[fileInfo(index).suffix().toStdString()];
         }
+    default:
+         return  QFileSystemModel::data(index,role);
     }
-    return QVariant();
 }
