@@ -4,6 +4,7 @@
 #include<QAbstractScrollArea>
 #include <QPlainTextEdit>
 #include <QObject>
+#include "lexercpp.h"
 #include "ideconfiguration.h"
 
 class QPaintEvent;
@@ -30,6 +31,7 @@ private slots:
    void updateLineNumberAreaWidth();
    void highlightCurrentLine();
    void updateLineNumberArea(const QRect &rect, int dy);
+   void runLexer();
 
 public slots:
    void keyPressEvent(QKeyEvent *e) override;
@@ -38,6 +40,8 @@ private:
    ConfigParams configParam;
    int currentZoom = 100;
    QFont font;
+   LexerCPP lexer;
+   QVector<Token> tokens;
 };
 
 

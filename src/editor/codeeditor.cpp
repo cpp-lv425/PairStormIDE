@@ -18,7 +18,7 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     //If the text is scrolled, rect will cover the entire viewport area.
     //If the text is scrolled vertically, dy carries the amount of pixels the viewport was scrolled.
     connect(this, SIGNAL(updateRequest(QRect,int)), this, SLOT(updateLineNumberArea(QRect,int)));
-
+    connect(this, SIGNAL(textChanged()), this, SLOT(runLexer()));
     connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(highlightCurrentLine()));
 
     // start typing from correct position (in the first line it doesn't consider weight of lineCounter)
@@ -32,6 +32,12 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     font.setBold(false);
     font.setItalic(false);
     this->setFont(font);
+}
+
+void CodeEditor::runLexer()
+{
+    lexer.lexicalAnalysis(toPlainText());
+    tokens = lexer.getTokens();
 }
 
 int CodeEditor::lineNumberAreaWidth()

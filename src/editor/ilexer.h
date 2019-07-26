@@ -7,7 +7,7 @@
 
 class iLexer
 {
-private:
+protected:
     QVector<Token> tokens;
     States state;
     QTextStream stream;
@@ -15,7 +15,7 @@ private:
 public:
     iLexer();
     virtual ~iLexer() = 0;
-    virtual void lexicalAnalysis() = 0;
+    virtual void lexicalAnalysis(QString) = 0;
     QVector<Token> getTokens();
 };
 
