@@ -7,6 +7,8 @@ class ProjectViewerModel;
 
 class ProjectTreeView : public QTreeView
 {
+public:
+    ProjectTreeView(QWidget * parent = nullptr);
     // QWidget interface
 protected:
     //virtual void keyPressEvent(QKeyEvent *event) override;

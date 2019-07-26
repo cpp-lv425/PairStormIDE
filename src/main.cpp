@@ -11,10 +11,10 @@ int main(int argc, char *argv[])
 
     QStringList filters;
     filters << "*.txt"<<"*.cpp"<<"*.h"<<"*.json"<<"*.c"<<"*.hpp";
-    QDir dir("C:\\Users\\igord\\Desktop\\PairStormIDE\\");
+    QDir dir("/home/igor/Desktop/PairStormIDE");
     ProjectViewerModel* fileSystemModel = new ProjectViewerModel(dir,filters);
-    QTreeView view;
-    view.setIconSize(QSize(10,14));
+    ProjectTreeView view;
+    view.setIconSize(QSize(20,28));
     view.setModel(fileSystemModel);
     view.setRootIndex(fileSystemModel->index(fileSystemModel->rootPath()));
     view.setVisible(true);
