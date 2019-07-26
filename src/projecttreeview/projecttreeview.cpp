@@ -3,18 +3,39 @@
 #include "projectviewermodel.h"
 #include <QDebug>
 
-ProjectTreeView::ProjectTreeView(QWidget *parent)
+ProjectTreeView::ProjectTreeView(ProjectViewerModel *model,QWidget *parent)
     : QTreeView(parent)
 {
     setSelectionMode(QAbstractItemView::SingleSelection);
+    setModel(model);
+    this->mPrModel = model;
+    foreach(const auto &temp, model->mFilesInfo)
+    {
+        qDebug()<<*temp;
+    }
 }
 
-void ProjectTreeView::mouseDoubleClickEvent(QMouseEvent *event)
+void ProjectTreeView::keyPressEvent(QKeyEvent *event)
+{
+    if(selectedIndexes().size() == 0)
+    {
+        qDebug()<<"no";
+    }
+    else
+    {
+        qDebug()<<mPrModel->fileInfo(selectedIndexes().at(0));
+        QTreeView::keyPressEvent(event);
+    }
+
+}
+/*void ProjectTreeView::mouseClickEvent(QMouseEvent *event)
 {
     ProjectViewerModel *model = dynamic_cast<ProjectViewerModel *>(selectionModel());
    // if(model->isDir(selectedIndexes().first()))
    // {
-        qDebug()<<model->fileName(selectedIndexes().at(0));
+    //QDir dir = model->
    // }
-    QTreeView::mouseDoubleClickEvent(event);
-}
+    //qDebug()<<*model->mFilesInfo[model->fileName(selectedIndexes().first())];
+
+    //QTreeView::mo*///useDoubleClickEvent(event);
+//}

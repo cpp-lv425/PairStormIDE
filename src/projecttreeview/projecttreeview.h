@@ -8,13 +8,17 @@ class ProjectViewerModel;
 class ProjectTreeView : public QTreeView
 {
 public:
-    ProjectTreeView(QWidget * parent = nullptr);
+    ProjectTreeView(ProjectViewerModel *mPrModel,QWidget * parent = nullptr);
     // QWidget interface
 protected:
     //virtual void keyPressEvent(QKeyEvent *event) override;
-    virtual void mouseDoubleClickEvent(QMouseEvent * event) override;
+    //virtual void mouseClickEvent(QMouseEvent * event) override;
 private:
-    ProjectViewerModel *mModel;
+    ProjectViewerModel *mPrModel;
+
+    // QWidget interface
+protected:
+    void keyPressEvent(QKeyEvent *event);
 };
 
 #endif // PROJECTTREEVIEW_H
