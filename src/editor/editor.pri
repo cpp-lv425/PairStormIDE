@@ -12,11 +12,17 @@ SOURCES += \
 
 HEADERS += \
         $$PWD/codeeditor.h \
+        $$PWD/fmstates.h \
         $$PWD/highlightercpp.h \
         $$PWD/ideconfiguration.h \
         $$PWD/ilexer.h \
+        $$PWD/keywords.h \
         $$PWD/lexercpp.h \
         $$PWD/linenumberarea.h \
+        $$PWD/operators.h \
+        $$PWD/spaces.h \
+        $$PWD/token.h \
+        $$PWD/type.h \
         $$PWD/widget.h
 
 FORMS += \
