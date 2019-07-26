@@ -4,16 +4,17 @@
 #include <QPlainTextEdit> // temporarily included
 #include <QMdiSubWindow>
 #include <QStyleFactory>
-#include <QFileDialog>
 #include <QMessageBox>
-#include <QVBoxLayout> // temporarily included
+#include <QFileDialog>
 #include <QException> // temporarily included
 #include <QDebug> // temporarily included
 #include <QFile>
 #include <QSettings>
 
+
 #include "projectviewerdock.h"
 #include "bottompaneldock.h"
+#include "chatwindowdock.h"
 #include "filemanager.h"
 #include "codeeditor.h"
 #include "mdiarea.h"
@@ -38,13 +39,17 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // create instance of Project Viewer
     mpProjectViewerDock = new ProjectViewerDock(this);
+    addDockWidget(Qt::LeftDockWidgetArea, mpProjectViewerDock);
+
+    // create instance of Chat Window
+    mpChatWindowDock = new ChatWindowDock(this);
+    addDockWidget(Qt::RightDockWidgetArea, mpChatWindowDock);
 
     // create instance of MDIArea
-    mpDocsArea = new MDIArea(this);
+    mpDocsArea = new MDIArea(this);   
 
     // create instance of Bottom Panel
     mpBottomPanelDock = new BottomPanelDock(this);
-
     setCentralWidget(mpDocsArea);
 }
 
@@ -186,35 +191,35 @@ void MainWindow::onOpenFileTriggered()
 
 void MainWindow::onOpenFolderTriggered()
 {
-    QString dirName = QFileDialog::getExistingDirectory
-            (this, "Select directory", QDir::homePath());
-    QDir selectedDir(dirName);
+//    QString dirName = QFileDialog::getExistingDirectory
+//            (this, "Select directory", QDir::homePath());
+//    QDir selectedDir(dirName);
 
-    QStringList filesList = selectedDir.entryList(QDir::Files);
+//    QStringList filesList = selectedDir.entryList(QDir::Files);
 
-    for (const QString& file : filesList)
-    {
-        QString readResult;
-        try
-        {
-            readResult = FileManager().readFromFile(dirName + '/' + file);
-        } catch (const QException& e)
-        {
-            QMessageBox::warning(this, tr("Error"),
-                                 tr("Unable to open file from specified directory"));
-            return;
-        }
+//    for (const QString& file : filesList)
+//    {
+//        QString readResult;
+//        try
+//        {
+//            readResult = FileManager().readFromFile(dirName + '/' + file);
+//        } catch (const QException& e)
+//        {
+//            QMessageBox::warning(this, tr("Error"),
+//                                 tr("Unable to open file from specified directory"));
+//            return;
+//        }
 
-        QWidget *newDoc = createNewDoc();
-        newDoc->setWindowTitle(file);
+//        QWidget *newDoc = createNewDoc();
+//        newDoc->setWindowTitle(file);
 
-        QPlainTextEdit *pTextEdit = new QPlainTextEdit;
-        pTextEdit->setPlainText(readResult);
-        QVBoxLayout *pLayout = new QVBoxLayout;
-        pLayout->addWidget(pTextEdit);
-        newDoc->setLayout(pLayout);
-        newDoc->show();
-    }
+//        QPlainTextEdit *pTextEdit = new QPlainTextEdit;
+//        pTextEdit->setPlainText(readResult);
+
+//        pLayout->addWidget(pTextEdit);
+//        newDoc->setLayout(pLayout);
+//        newDoc->show();
+//    }
 }
 
 void MainWindow::onOpenStartPage()
