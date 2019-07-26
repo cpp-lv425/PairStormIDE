@@ -226,7 +226,7 @@ void MainWindow::onOpenFolderTriggered()
 
 void MainWindow::onOpenStartPage()
 {
-    qDebug() << "open start page";
+    showStartPage();
 }
 
 void MainWindow::onSaveFileTriggered()
