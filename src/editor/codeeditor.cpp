@@ -4,114 +4,76 @@
 #include<QDebug>
 #include<QTextCursor>
 #include<QPainter>
-static int counter = 0;
 
 
 CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
 {
-    configParam.setConfigParams("Consolas", "20", "WHTE");
-    setLineWrapMode(QPlainTextEdit::NoWrap);
+    // just for test. in the future it'll read config parametrs from JSON file
+    configParam.setConfigParams("Consolas", "12", "WHITE");
+    setLineWrapMode(QPlainTextEdit::NoWrap);// don't move cursor to the next line where it's out of visible scope
+
     lineNumberArea = new LineNumberArea(this);
 
-<<<<<<< HEAD
-    connect(this, SIGNAL(blockCountChanged(int)), this, SLOT(updateLineNumberAreaWidth(int)));
+    //This signal is emitted when the text document needs an update of the specified rect.
+    //If the text is scrolled, rect will cover the entire viewport area.
+    //If the text is scrolled vertically, dy carries the amount of pixels the viewport was scrolled.
     connect(this, SIGNAL(updateRequest(QRect,int)), this, SLOT(updateLineNumberArea(QRect,int)));
+
     connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(highlightCurrentLine()));
 
+    // start typing from correct position (in the first line it doesn't consider weight of lineCounter)
+    //that's why we need to set this position
     updateLineNumberAreaWidth();
-    //setViewportMargins(lineNumberArea->width(), 0, 0, 0);
     highlightCurrentLine();
-=======
-    //connect(this, SIGNAL(blockCountChanged(int)), this, SLOT(updateLineNumberAreaWidth(int)));
-   // connect(this, SIGNAL(updateRequest(QRect,int)), this, SLOT(updateLineNumberArea(QRect, int)));
-   // connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(highlightCurrentLine()));
-        connect(this, SIGNAL(blockCountChanged(int)), this, SLOT(updateLineNumberAreaWidth(int)));
-        connect(this, SIGNAL(textChanged()), this, SLOT(updateLineNumberArea()));
-        connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(highlightCurrentLine()));
-   /* connect(this,SIGNAL(returnPressed()), this, SLOT(updateLineNumberArea()));
-    connect(this,SIGNAL(backspacePressed()), this, SLOT(updateLineNumberArea()));
-    connect(this,SIGNAL(ctrlPlusVPressed()), this, SLOT(updateLineNumberArea()));
-    connect(this,SIGNAL(wheelScroled()),this,SLOT(updateLineNumberArea()));
-    connect(this,SIGNAL(ctrlPlusVPressed()), this, SLOT(updateLineNumberArea()));*/
-        updateLineNumberAreaWidth(0);
-          highlightCurrentLine();
 
-
-    QFont font;
-    font.setFamily(this->configParam.mTextStyle);
-    font.setPointSize(this->configParam.mFontSize);
+    //fonts and colors configurations
+    font.setPointSize(configParam.mFontSize);
+    font.setFamily(configParam.mTextStyle);
     font.setBold(false);
     font.setItalic(false);
     this->setFont(font);
-    this->setTabStopDistance(TAB_SPACE * fontMetrics().width(QLatin1Char('0')));
-    this->lineNumberArea->resize(fontMetrics().width(QLatin1Char('0')) * MAX_SUPPORTED_DIGITS, 0);
-    setViewportMargins(lineNumberArea->width(), 0, 0, 0);
->>>>>>> b136e5bd2c07ae69e4ae75fe38213344e370dbdc
 }
-
 
 int CodeEditor::lineNumberAreaWidth()
 {
     int digits = 1;
-        int max = qMax(1, blockCount());
-        while (max >= 10) {
-            max /= 10;
-            ++digits;
-        }
+    int currLineNumber = qMax(1, blockCount());
+    while (currLineNumber >= 10)
+    {
+        currLineNumber /= 10;
+        ++digits;
+    }
 
-        int space = 20 + fontMetrics().width(QLatin1Char('0')) * digits;
-        return space;
+    return fontMetrics().maxWidth() * digits;// wight of one symbol(in our case number) * count of digits
 }
 
 void CodeEditor::updateLineNumberAreaWidth()
 {
+    // reset start position for typing (according new linecounter position)
     setViewportMargins(lineNumberAreaWidth(), 0, 0, 0);
 }
 
-void CodeEditor::updateLineNumberArea(const QRect &rect, int dy)
+void CodeEditor::updateLineNumberArea(const QRect &rect, int dy)// rectangle of current block and Y-Axis changing
 {
-    if(dy)
+    if(dy)// when not all of the text is in the visible area (we scrolled it)
     {
-        lineNumberArea->scroll(0,dy);
+        lineNumberArea->scroll(0, dy);// we should scroll lines numbers in following direction
     }
     else
     {
-        lineNumberArea->update(0, 0, lineNumberArea->width(), rect.height());
+        lineNumberArea->update(0, 0, lineNumberArea->width(), rect.height());//set position to the new block (area for line number)
     }
-    if(rect.contains(viewport()->rect()))
+    if(rect.contains(viewport()->rect()))//when one covers other (text is under line counter)
         updateLineNumberAreaWidth();
 }
 
 void CodeEditor::resizeEvent(QResizeEvent *e)
 {
     QPlainTextEdit::resizeEvent(e);
-    QRect cr = contentsRect();
-    lineNumberArea->setGeometry(QRect(cr.left(), cr.top(), lineNumberAreaWidth(), cr.height()));
+    QRect cr = contentsRect();//whole area inside widget's margins
+    lineNumberArea->setGeometry(QRect(0, 0, lineNumberAreaWidth(), cr.height()));//set the same height as codeEditor for lineCouter
 }
 
-<<<<<<< HEAD
-=======
-void CodeEditor::wheelEvent(QWheelEvent *event)
-{
-    emit wheelScroled();
-    /*QWheelEvent *wheel = static_cast<QWheelEvent*>(event);
-    if(wheel->modifiers() == Qt::ControlModifier)
-        if(wheel->delta() > 0)
-        {
-            this->zoomIn(20);
-            //this->lineNumberArea->resize(lineNumberAreaWidth()+20, 0);
-             setViewportMargins(lineNumberArea->width(), 0, 0, 0);
-        }
-        else
-        {
-            this->zoomOut(20);
-           //this->lineNumberArea->resize(lineNumberAreaWidth()-20, 0);
-             setViewportMargins(lineNumberArea->width(), 0, 0, 0);
-
-        }*/
-}
-
->>>>>>> b136e5bd2c07ae69e4ae75fe38213344e370dbdc
 void CodeEditor::highlightCurrentLine()
 {
     QList<QTextEdit::ExtraSelection> extraSelections;
@@ -121,7 +83,6 @@ void CodeEditor::highlightCurrentLine()
     selection.format.setBackground(lineColor);
     selection.format.setProperty(QTextFormat::FullWidthSelection, true);
     selection.cursor = textCursor();
-    selection.cursor.clearSelection();
     extraSelections.append(selection);
     setExtraSelections(extraSelections);
 }
@@ -129,24 +90,24 @@ void CodeEditor::highlightCurrentLine()
 void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event)
 {
     QPainter painter(lineNumberArea);
-    painter.fillRect(event->rect(), Qt::lightGray);
+    painter.fillRect(event->rect(), configParam.mLineCounterAreaColor);
 
 
-    QTextBlock block = firstVisibleBlock();
-    int blockNumber = block.blockNumber();
-    int top = static_cast<int>(blockBoundingGeometry(block).translated(contentOffset()).top());
-    int bottom = top + static_cast<int>(blockBoundingRect(block).height());
+    QTextBlock block = firstVisibleBlock();//area of first numeration block from linecounter
+    int blockNumber = block.blockNumber();//get line number (start from 0)
+    int top = static_cast<int>(blockBoundingGeometry(block).translated(contentOffset()).top());//top of currentblock 0
+    int bottom = top + static_cast<int>(blockBoundingRect(block).height());//bottom of current block                 -
 
-    while (block.isValid())
+    while (block.isValid())//we have blocks (have lines numbers)
     {
         QString number = QString::number(blockNumber + 1);
-        painter.setPen(Qt::black);
-        painter.drawText(0, top, lineNumberArea->width(), fontMetrics().height(),
+        painter.setPen(configParam.mCodeTextColor);
+        painter.drawText(0, top, lineNumberArea->width(), fontMetrics().height(),//drat line count
                          Qt::AlignCenter, number);
         block = block.next();
-        int temp = top;
-        top = bottom;
-        bottom += bottom - temp;
+        int temp = top;//save current top position
+        top = bottom;//refresh the top bottom (next block top == this block bottom)
+        bottom += bottom - temp;// bottom - temp = dy which is block height
         ++blockNumber;
     }
 }

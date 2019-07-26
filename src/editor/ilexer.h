@@ -1,7 +1,6 @@
 #ifndef ILEXER_H
 #define ILEXER_H
 
-
 class iLexer
 {
 public:
