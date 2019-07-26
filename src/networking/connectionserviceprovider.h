@@ -2,13 +2,26 @@
 #define CONNECTIONSERVICEPROVIDER_H
 
 #include <QObject>
-#include "udpservice.h"
+#include "apiparser.h"
 
 class ConnectionServiceProvider : public QObject
 {
     Q_OBJECT
-public:
+
+    std::shared_ptr<ApiParser> m_apiParser;
+
+    std::string m_userName;
+
     explicit ConnectionServiceProvider(QObject *parent = nullptr);
+
+public:
+
+    // Also copying is restricted for singletons
+    ConnectionServiceProvider(ConnectionServiceProvider const&) = delete;
+    ConnectionServiceProvider& operator=(ConnectionServiceProvider const&) = delete;
+
+    // Singleton instance generator
+    static std::shared_ptr<ConnectionServiceProvider> getInstance();
 
 signals:
 

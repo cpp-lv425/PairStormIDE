@@ -11,5 +11,6 @@ HEADERS += \
     $$PWD/apiparser.h \
     $$PWD/connectionserviceprovider.h \
     $$PWD/tcpservice.h \
+    $$PWD/tcpudphelpers.h \
     $$PWD/udpservice.h
 

@@ -2,68 +2,62 @@
 
 UdpService::UdpService(QObject *qObject) : QObject(qObject)
 {
-    // Create udpSocket instance
+    // Configure standard UDP port number and empty datagram
+    m_pendingDatagram = decltype(m_pendingDatagram) ();
+
+
+    // Create & configure QUdpSocket
     m_udpSocketPtr = std::make_unique<QUdpSocket>(new QUdpSocket(this));
+    m_udpSocketPtr->bind(QHostAddress::LocalHost, m_portNumber);
 
-    // Configure port number for udp transmission
-    m_udpPortNumber = static_cast<PortNumberType>(32807);
-
-    // Create empty pending datagram
-    m_receivedBeaconDatagram = decltype(m_receivedBeaconDatagram)();
-
-    // Configure udpSocket instance
-    m_udpSocketPtr->bind(QHostAddress::LocalHost, m_udpPortNumber);
-
-    // Uniquely connect readyRead signal to the processBeacondDatagram slot
+    // Save datagram on readyRead
     connect(
-        m_udpSocketPtr.get(),   &QUdpSocket::readyRead,
-        this,                   &UdpService::receiveBeaconDatagram,
-        Qt::UniqueConnection
-    );
+        m_udpSocketPtr.get(), &QUdpSocket::readyRead,
+        this,                 &UdpService::saveDatagramOnReceival,
+        Qt::UniqueConnection);
 }
 
-std::shared_ptr<UdpService> UdpService::getInstance()
+std::shared_ptr<UdpService> UdpService::getService()
 {
-    static std::shared_ptr<UdpService> instance(new UdpService);
-    return instance;
+    static std::shared_ptr<UdpService>
+            serviceInstance(new UdpService);
+    return serviceInstance;
 }
 
-void UdpService::broadcastBeaconDatagram()
+void UdpService::broadcastDatagram(QString data)
 {
-    QByteArray beaconDatagram;
-    beaconDatagram.append("Hello from PairStorm application");
-
-    m_udpSocketPtr->writeDatagram(beaconDatagram, QHostAddress::Broadcast, m_udpPortNumber);
-    return;
+    QByteArray datagram;
+    datagram.append(data);
+    // Broadcast datagram bytes
+    m_udpSocketPtr->writeDatagram(
+                datagram,
+                QHostAddress::Broadcast,
+                m_portNumber);
 }
 
-QString UdpService::getReceivedDatagram() const
+Datagram UdpService::getReceivedDatagram() const
 {
-    return m_receivedBeaconDatagram;
+    return m_pendingDatagram;
 }
 
-void UdpService::receiveBeaconDatagram()
+void UdpService::saveDatagramOnReceival()
 {
-    // Create beaconDatagram of appropriate size
-    QByteArray beaconDatagram;
-    beaconDatagram.resize(
-        static_cast<int>(m_udpSocketPtr->pendingDatagramSize())
-    );
+    // Get size of the datagram
+    qint64 size(m_udpSocketPtr->pendingDatagramSize());
 
-    // Create temporar
-    QHostAddress hostIP;
-    PortNumberType hostPortNumber;
-
+    // Create & fill datagram attiributes
+    QByteArray   data(static_cast<qint32>(size), ' ');
+    QHostAddress ip;
+    PortNumType  port;
     m_udpSocketPtr->readDatagram(
-        beaconDatagram.data(), beaconDatagram.size(),
-        &hostIP,
-        &hostPortNumber
-    );
+        data.data(), data.size(),
+        &ip,
+        &port);
 
-    // Embed host ip into the datagram
-    beaconDatagram.append("\nIP(" + hostIP.toString() + ")");
+    // Save datagram
+    m_pendingDatagram.m_data = data;
+    m_pendingDatagram.m_ip   = ip;
+    m_pendingDatagram.m_port = port;
 
-    // Push datagram to the received datagrams
-    m_receivedBeaconDatagram = beaconDatagram;
-    emit processReceivedDatagram();
+    emit newDatagramSaved();
 }

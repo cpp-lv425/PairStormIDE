@@ -4,46 +4,43 @@
 #include <memory>
 #include <QObject>
 #include <QUdpSocket>
+#include "tcpudphelpers.h"
 
-// Udp service provider singleton
+// SINGLETON
+// UDP service provider
 class UdpService : public QObject
 {
-    typedef quint16 PortNumberType;
-    // Allow using signals and slots
-    Q_OBJECT
+    Q_OBJECT // for signals and slots
 
-    // Compose QUdpSocket
+
+    // QUdpSocket composition
     std::unique_ptr<QUdpSocket> m_udpSocketPtr;
 
-    // Port number
-    PortNumberType m_udpPortNumber;
 
-    // Received datagrams on the port m_udpPortNumber
-    QString m_receivedBeaconDatagram;
+    // Standard port number for UDP communication
+    // Received datagrams using the port m_portNumber
+    const PortNumType m_portNumber = g_defaultUdpPortNumber;
+    Datagram    m_pendingDatagram;
 
-    // Singleton means that default constructor is private
     explicit UdpService(QObject *qObject = nullptr);
 
 public:
-
-    // Also copying is restricted for singletons
     UdpService(UdpService const&) = delete;
     UdpService& operator=(UdpService const&) = delete;
 
-    // Singleton instance generator
-    static std::shared_ptr<UdpService> getInstance();
+    // Service getter generator
+    static std::shared_ptr<UdpService> getService();
 
-    // Beacon broadcaster
-    void broadcastBeaconDatagram();
+    // Datagram broadcaster
+    void broadcastDatagram(QString datagram);
 
-    QString getReceivedDatagram() const;
+    Datagram getReceivedDatagram() const;
 
 signals:
-    void processReceivedDatagram();
+    void newDatagramSaved();
 
 public slots:
-    // Receive beaconDatagram
-    void receiveBeaconDatagram();
+    void saveDatagramOnReceival();
 };
 
 #endif // UPDSERVICE_H
