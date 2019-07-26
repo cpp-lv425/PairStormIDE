@@ -11,7 +11,6 @@
 #include <QFile>
 #include <QSettings>
 
-
 #include "projectviewerdock.h"
 #include "bottompaneldock.h"
 #include "chatwindowdock.h"
@@ -39,10 +38,13 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // create instance of Project Viewer
     mpProjectViewerDock = new ProjectViewerDock(this);
+    mpProjectViewerDock->setObjectName("mpProjectViewerDock");
+    mpProjectViewerDock->restoreGeometry(settings.value("mpProjectViewerDockGeometry").toByteArray());
     addDockWidget(Qt::LeftDockWidgetArea, mpProjectViewerDock);
 
     // create instance of Chat Window
     mpChatWindowDock = new ChatWindowDock(this);
+    mpChatWindowDock->setObjectName("mpChatWindowDock");
     addDockWidget(Qt::RightDockWidgetArea, mpChatWindowDock);
 
     // create instance of MDIArea
@@ -50,6 +52,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // create instance of Bottom Panel
     mpBottomPanelDock = new BottomPanelDock(this);
+    mpBottomPanelDock->setObjectName("mpBottomPanelDock");
+
     setCentralWidget(mpDocsArea);
 }
 

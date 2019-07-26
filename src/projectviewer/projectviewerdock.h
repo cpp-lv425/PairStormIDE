@@ -15,6 +15,7 @@ class ProjectViewerDock: public QDockWidget
     QTreeView *pTreeViewer;
 public:
     ProjectViewerDock(QWidget *pParent = nullptr);
+    ~ProjectViewerDock();
 };
 
 #endif // PROJECTVIEWERDOCK_H
