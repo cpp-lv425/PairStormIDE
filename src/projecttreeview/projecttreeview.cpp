@@ -10,6 +10,12 @@ ProjectTreeView::ProjectTreeView(ProjectViewerModel *model,QWidget *parent)
     setSelectionMode(QAbstractItemView::SingleSelection);
     setModel(model);
     mPrModel = model;
+    setIconSize(QSize(20,28));
+    setRootIndex(model->index(model->rootPath()));
+    setVisible(true);
+    hideColumn(1);
+    hideColumn(2);
+    hideColumn(3);
 }
 
 void ProjectTreeView::keyPressEvent(QKeyEvent *event)
