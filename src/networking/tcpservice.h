@@ -7,7 +7,7 @@
 #include <QObject>
 #include <QTcpServer>
 #include <QNetworkSession>
-#include "networkbasestructures.h"
+#include "networkbase.h"
 
 // SINGLETON
 // TCP service provider

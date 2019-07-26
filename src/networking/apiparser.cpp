@@ -12,39 +12,21 @@ ApiParser::ApiParser() : BaseApiParser()
 
     connect(
         m_udpService.get(), &UdpService::newDatagramSaved,
-        this,               &ApiParser::processUdpDatagramOnReceive,
+        this,               &ApiParser::addServerFromUdpDatagramOnReceive,
         Qt::UniqueConnection
     );
     // TODO connect configureServerOnLogin to the login signal
 }
 
-std::shared_ptr<ApiParser> ApiParser::getInstance()
+std::shared_ptr<ApiParser> ApiParser::getParser()
 {
     static std::shared_ptr<ApiParser> instance(new ApiParser);
     return instance;
 }
 
-void ApiParser::setUserName(const QString & userName)
+void ApiParser::boradcastServerAttributes()
 {
-    m_userName = userName;
-}
-
-void ApiParser::testSendDatagram()
-{
-    //m_udpService->broadcastDatagram(QString("hello from program"));
-    configureServerOnLogin();
-    shareServerData();
-}
-
-void ApiParser::testSendSegmentToUser(const QString & userName)
-{
-    QHostAddress ip = QHostAddress::LocalHost; // TODO parse user name to user ip
-    m_tcpService->sendToHost("Hello", ip);
-}
-
-void ApiParser::shareServerData()
-{
-    QString serverData(m_tcpServerDataThis.toJsonQString());
+    QString serverData(m_launchedTcpServerAttrib.toJsonQString());
     /*
     serverData.append("{name : \"");
     serverData.append(m_tcpServerData.m_name);
@@ -70,7 +52,7 @@ void ApiParser::configureServerOnLogin()
     m_userName = "";    // TODO get username from other class
     QString serverName = m_userName;
     m_tcpService->giveNameToServer(serverName);
-    m_tcpServerDataThis = m_tcpService->getServerData();
+    m_launchedTcpServerAttrib = m_tcpService->getServerData();
 
     connect(
         m_tcpService.get(), &TcpService::newSegmentSaved,
@@ -79,22 +61,47 @@ void ApiParser::configureServerOnLogin()
     );
 }
 
-void ApiParser::processUdpDatagramOnReceive()
+void ApiParser::addServerFromUdpDatagramOnReceive()
 {
-    qDebug() << "udp datagram in api parser:";
-    qDebug() << "____________________________________________________________";
-    auto data = m_udpService->getReceivedDatagram();
+    // Read received datagram
+    Datagram data = m_udpService->getReceivedDatagram();
+    // Fill information about server from datagram
     ServerData server_info;
     server_info.fromJsonQString(data.m_data);
+    // Save information about server
+    m_discoveredTcpServerAttribs.push_back(server_info);
+
+
+    qDebug() << "add server from udp datagram in api parser:";
+    qDebug() << "____________________________________________________________";
     qDebug() << data.m_data;
     qDebug() << "____________________________________________________________";
 }
 
 void ApiParser::processTcpSegmentOnReceive()
 {
+    Segment data = m_tcpService->getReceivedSegment();
+    // TODO processing
+
+
     qDebug() << "tcp segment in api parser:";
     qDebug() << "____________________________________________________________";
-    auto data = m_tcpService->getReceivedSegment();
     qDebug() << data.m_data;
     qDebug() << "____________________________________________________________";
 }
+
+
+
+
+#ifdef CUSTOM_DEBUG
+void ApiParser::testBroadcastServerInfoDatagram()
+{
+    configureServerOnLogin();
+    boradcastServerAttributes();
+}
+
+void ApiParser::testSendSegmentToLocalHost()
+{
+    m_tcpService->sendToHost("Hello, Pair Storm is here", QHostAddress::LocalHost);
+}
+#endif //CUSTOM_DEBUG

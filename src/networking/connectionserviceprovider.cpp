@@ -2,7 +2,7 @@
 
 ConnectionServiceProvider::ConnectionServiceProvider(QObject *parent) : QObject(parent)
 {
-    m_apiParser = ApiParser::getInstance();
+    m_apiParser = ApiParser::getParser();
 
 }
 
