@@ -4,6 +4,7 @@
 #include <QException>
 #include <QTreeView>
 #include <QWidget>
+#include <QSettings>
 #include <QDir>
 
 #include "mainwindow.h"
@@ -21,5 +22,11 @@ ProjectViewerDock::ProjectViewerDock(QWidget *pParent): QDockWidget(pParent)
     ProjectViewerModel* fileSystemModel = new ProjectViewerModel(dir,filters);
     pTreeViewer = new ProjectTreeView(fileSystemModel);
     setWidget(pTreeViewer);
-    auto pMainWindow = dynamic_cast<MainWindow*>(pParent);    
+    auto pMainWindow = dynamic_cast<MainWindow*>(pParent);
+
+}
+ProjectViewerDock::~ProjectViewerDock()
+{
+    QSettings settings("425", "PairStorm");
+    settings.setValue("ProjectViewerDockGeometry", saveGeometry());
 }

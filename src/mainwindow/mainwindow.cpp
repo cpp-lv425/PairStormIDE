@@ -7,7 +7,9 @@
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QException> // temporarily included
-#include <QDebug>
+#include <QDebug> // temporarily included
+#include <QFile>
+#include <QSettings>
 
 #include "projectviewerdock.h"
 #include "bottompaneldock.h"
@@ -25,6 +27,10 @@ MainWindow::MainWindow(QWidget *parent) :
     // when first started main window is maximized
     setWindowState(Qt::WindowMaximized);
 
+    QSettings settings("425", "PairStorm");
+    restoreGeometry(settings.value("mainWindowGeometry").toByteArray());
+    restoreState(settings.value("mainWindowState").toByteArray());
+
     // set Fusion style globally - TEMP SOLUTION
     QApplication::setStyle(QStyleFactory::create("Fusion"));
 
@@ -33,9 +39,12 @@ MainWindow::MainWindow(QWidget *parent) :
     // create instance of Project Viewer
     mpProjectViewerDock = new ProjectViewerDock(this);
     addDockWidget(Qt::LeftDockWidgetArea, mpProjectViewerDock);
+    mpProjectViewerDock->setObjectName("mpProjectViewerDock");
+    mpProjectViewerDock->restoreGeometry(settings.value("mpProjectViewerDockGeometry").toByteArray());
 
     // create instance of Chat Window
     mpChatWindowDock = new ChatWindowDock(this);
+    mpChatWindowDock->setObjectName("mpChatWindowDock");
     addDockWidget(Qt::RightDockWidgetArea, mpChatWindowDock);
 
     // create instance of MDIArea
@@ -43,6 +52,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // create instance of Bottom Panel
     mpBottomPanelDock = new BottomPanelDock(this);
+    mpBottomPanelDock->setObjectName("mpBottomPanelDock");
+
     setCentralWidget(mpDocsArea);
 }
 
@@ -337,5 +348,8 @@ CodeEditor* MainWindow::createNewDoc()
 
 MainWindow::~MainWindow()
 {
+    QSettings settings("425", "PairStorm");
+    settings.setValue("mainWindowGeometry", saveGeometry());
+    settings.setValue("mainWindowState", saveState());
     delete ui;
 }
