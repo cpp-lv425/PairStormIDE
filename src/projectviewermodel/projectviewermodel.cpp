@@ -2,7 +2,6 @@
 
 #include <QImage>
 #include <QStringList>
-#include <QDebug>
 
 ProjectViewerModel::ProjectViewerModel(const QDir &directory, const QStringList &filters, QObject *parent)
     : QFileSystemModel (parent)

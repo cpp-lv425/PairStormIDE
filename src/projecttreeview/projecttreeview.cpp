@@ -1,6 +1,7 @@
 #include "projecttreeview.h"
 
 #include "projectviewermodel.h"
+#include <QKeyEvent>
 #include <QDebug>
 
 ProjectTreeView::ProjectTreeView(ProjectViewerModel *model,QWidget *parent)
@@ -8,34 +9,27 @@ ProjectTreeView::ProjectTreeView(ProjectViewerModel *model,QWidget *parent)
 {
     setSelectionMode(QAbstractItemView::SingleSelection);
     setModel(model);
-    this->mPrModel = model;
-    foreach(const auto &temp, model->mFilesInfo)
-    {
-        qDebug()<<*temp;
-    }
+    mPrModel = model;
 }
 
 void ProjectTreeView::keyPressEvent(QKeyEvent *event)
 {
-    if(selectedIndexes().size() == 0)
+    if(event->key() == Qt::Key_Enter && selectedIndexes().size() != 0)
     {
-        qDebug()<<"no";
+        QString filename = mPrModel->fileInfo(selectedIndexes().at(0)).path() + mPrModel->fileInfo(selectedIndexes().at(0)).fileName();
+        emit codeFileSelected(filename);
+        qDebug()<<filename;
     }
-    else
-    {
-        qDebug()<<mPrModel->fileInfo(selectedIndexes().at(0));
-        QTreeView::keyPressEvent(event);
-    }
-
+    QTreeView::keyPressEvent(event);
 }
-/*void ProjectTreeView::mouseClickEvent(QMouseEvent *event)
-{
-    ProjectViewerModel *model = dynamic_cast<ProjectViewerModel *>(selectionModel());
-   // if(model->isDir(selectedIndexes().first()))
-   // {
-    //QDir dir = model->
-   // }
-    //qDebug()<<*model->mFilesInfo[model->fileName(selectedIndexes().first())];
 
-    //QTreeView::mo*///useDoubleClickEvent(event);
-//}
+void ProjectTreeView::mouseDoubleClickEvent(QMouseEvent *event)
+{
+    if(selectedIndexes().size() != 0)
+    {
+        QString filename = mPrModel->fileInfo(selectedIndexes().at(0)).path() + mPrModel->fileInfo(selectedIndexes().at(0)).fileName();
+        emit codeFileSelected(filename);
+        qDebug()<<filename;
+    }
+    QTreeView::mouseDoubleClickEvent(event);
+}
