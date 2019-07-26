@@ -4,7 +4,7 @@
 enum States {
     ST,
     OPER,
-    KEYWORD,
+    KW,
     ID,
     NUM,
     FNUM,

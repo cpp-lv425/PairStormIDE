@@ -3,7 +3,7 @@
 
 enum Type {
     IDENTIFIER,
-    KW,
+    KEYWORD,
     NUMBER,
     FLOAT_NUMBER,
     OPERATOR,
