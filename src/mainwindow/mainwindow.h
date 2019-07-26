@@ -33,6 +33,8 @@ private:
 
     void setupMainMenu();
 
+    void SaveState();
+    void RestoreState();
 private slots:
     // file menu actions
     void onNewFileTriggered();

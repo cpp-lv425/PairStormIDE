@@ -27,10 +27,6 @@ MainWindow::MainWindow(QWidget *parent) :
     // when first started main window is maximized
     setWindowState(Qt::WindowMaximized);
 
-    QSettings settings("425", "PairStorm");
-    restoreGeometry(settings.value("mainWindowGeometry").toByteArray());
-    restoreState(settings.value("mainWindowState").toByteArray());
-
     // set Fusion style globally - TEMP SOLUTION
     QApplication::setStyle(QStyleFactory::create("Fusion"));
 
@@ -40,7 +36,6 @@ MainWindow::MainWindow(QWidget *parent) :
     mpProjectViewerDock = new ProjectViewerDock(this);
     addDockWidget(Qt::LeftDockWidgetArea, mpProjectViewerDock);
     mpProjectViewerDock->setObjectName("mpProjectViewerDock");
-    mpProjectViewerDock->restoreGeometry(settings.value("mpProjectViewerDockGeometry").toByteArray());
 
     // create instance of Chat Window
     mpChatWindowDock = new ChatWindowDock(this);
@@ -55,6 +50,8 @@ MainWindow::MainWindow(QWidget *parent) :
     mpBottomPanelDock->setObjectName("mpBottomPanelDock");
 
     setCentralWidget(mpDocsArea);
+
+    RestoreState();
 }
 
 void MainWindow::setupMainMenu()
@@ -348,8 +345,20 @@ CodeEditor* MainWindow::createNewDoc()
 
 MainWindow::~MainWindow()
 {
+    SaveState();
+    delete ui;
+}
+
+void MainWindow::SaveState()
+{
     QSettings settings("425", "PairStorm");
     settings.setValue("mainWindowGeometry", saveGeometry());
     settings.setValue("mainWindowState", saveState());
-    delete ui;
+}
+
+void MainWindow::RestoreState()
+{
+    QSettings settings("425", "PairStorm");
+    restoreGeometry(settings.value("mainWindowGeometry").toByteArray());
+    restoreState(settings.value("mainWindowState").toByteArray());
 }

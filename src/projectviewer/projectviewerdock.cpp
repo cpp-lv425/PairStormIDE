@@ -25,8 +25,4 @@ ProjectViewerDock::ProjectViewerDock(QWidget *pParent): QDockWidget(pParent)
     auto pMainWindow = dynamic_cast<MainWindow*>(pParent);
 
 }
-ProjectViewerDock::~ProjectViewerDock()
-{
-    QSettings settings("425", "PairStorm");
-    settings.setValue("ProjectViewerDockGeometry", saveGeometry());
-}
+
