@@ -1,14 +1,10 @@
 #include "startpage.h"
 #include "ui_startpage.h"
 
-#include <QStyleFactory>
-#include <QListWidget>
 #include <QVBoxLayout>
 #include <QPushButton>
-#include <QGroupBox>
 #include <QLabel>
 #include <QStyle>
-#include <QDebug>
 
 StartPage::StartPage(QWidget *parent) :
     QDialog(parent),
@@ -27,21 +23,25 @@ StartPage::StartPage(QWidget *parent) :
     pOpenBtn->setMaximumWidth(200);
     pOpenBtn->setIcon(style()->standardIcon(QStyle::SP_DialogOpenButton));
     pOpenBtn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    connect(pOpenBtn, &QPushButton::pressed, this, &StartPage::openBtnPressed);
 
     pOpenDirBtn = new QPushButton(tr("   Open Folder"));
     pOpenDirBtn->setMaximumWidth(200);
     pOpenDirBtn->setIcon(style()->standardIcon(QStyle::SP_DirHomeIcon));
     pOpenDirBtn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    connect(pOpenDirBtn, &QPushButton::pressed, this, &StartPage::openDirPressed);
 
     pReferenceBtn = new QPushButton(tr("   Reference Assistant"));
     pReferenceBtn->setMaximumWidth(200);
     pReferenceBtn->setIcon(style()->standardIcon(QStyle::SP_DialogHelpButton));
     pReferenceBtn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    connect(pReferenceBtn, &QPushButton::pressed, this, &StartPage::referenceBtnPressed);
 
     pSettingsBtn = new QPushButton(tr("   Settings"));
     pSettingsBtn->setMaximumWidth(200);
     pSettingsBtn->setIcon(style()->standardIcon(QStyle::SP_BrowserReload));
     pSettingsBtn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    connect(pSettingsBtn, &QPushButton::pressed, this, &StartPage::settingsBtnPressed);
 
     QVBoxLayout *pBtnLayout = new QVBoxLayout;
     pBtnLayout->addWidget(pNewBtn);
@@ -79,8 +79,11 @@ StartPage::StartPage(QWidget *parent) :
     QPoint cntr = parent->geometry().center();
     int x = cntr.x() - width() / 2;
     int y = cntr.y() - height() / 2;
-    move(x, y);
+    move(x, y);    
+}
 
+void StartPage::showStartPage()
+{
     exec();
 }
 
@@ -113,5 +116,3 @@ void StartPage::settingsBtnPressed()
 {
     emit onSettingsBtnPressed();
 }
-
-

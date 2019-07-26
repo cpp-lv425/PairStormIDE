@@ -3,8 +3,6 @@
 
 #include <QDialog>
 
-class QListWidget;
-
 namespace Ui {
 class StartPage;
 }
@@ -13,9 +11,9 @@ class StartPage : public QDialog
 {
     Q_OBJECT
 
-    QListWidget *mpStartPageList;
 public:
     explicit StartPage(QWidget *parent = nullptr);
+    void showStartPage();
     ~StartPage();
 
 private:

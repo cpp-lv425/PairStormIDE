@@ -42,13 +42,17 @@ MainWindow::MainWindow(QWidget *parent) :
     mpBottomPanelDock = new BottomPanelDock(this);
 
     setCentralWidget(mpDocsArea);
-
 }
 
 void MainWindow::showStartPage()
 {
     StartPage startPage(this);
+    connect(&startPage, &StartPage::onNewBtnPressed, this, &MainWindow::onNewFileTriggered);
     connect(&startPage, &StartPage::onOpenBtnPressed, this, &MainWindow::onOpenFileTriggered);
+    connect(&startPage, &StartPage::onOpenDirPressed, this, &MainWindow::onOpenFolderTriggered);
+    connect(&startPage, &StartPage::onReferenceBtnPressed, this, &MainWindow::onReferenceTriggered);
+    connect(&startPage, &StartPage::onSettingsBtnPressed, this, &MainWindow::onSettingsTriggered);
+    startPage.showStartPage();
 }
 
 void MainWindow::setupMainMenu()
