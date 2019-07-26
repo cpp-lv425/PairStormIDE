@@ -14,7 +14,7 @@ QT_END_NAMESPACE
 
 class ProjectViewerModel : public QFileSystemModel
 {
-    friend class ProjectTreeView;
+    Q_OBJECT
 public:
     ProjectViewerModel(const QDir &directory,const QStringList &filters, QObject *parent = nullptr);
     ~ProjectViewerModel();
