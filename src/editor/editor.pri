@@ -3,6 +3,7 @@ INCLUDEPATH += $$PWD
 
 SOURCES += \
         $$PWD/codeeditor.cpp \
+        $$PWD/highlightercpp.cpp \
         $$PWD/hotkeys.cpp \
         $$PWD/ilexer.cpp \
         $$PWD/lexercpp.cpp \
@@ -11,6 +12,8 @@ SOURCES += \
 
 HEADERS += \
         $$PWD/codeeditor.h \
+        $$PWD/highlightercpp.h \
+        $$PWD/ideconfiguration.h \
         $$PWD/ilexer.h \
         $$PWD/lexercpp.h \
         $$PWD/linenumberarea.h \
