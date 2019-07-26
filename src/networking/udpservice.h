@@ -4,7 +4,7 @@
 #include <memory>
 #include <QObject>
 #include <QUdpSocket>
-#include "tcpudphelpers.h"
+#include "networkbasestructures.h"
 
 // SINGLETON
 // UDP service provider

@@ -54,7 +54,18 @@ std::shared_ptr<TcpService> TcpService::getService()
     return serviceInstance;
 }
 
-void TcpService::sendToClient(QString data, QHostAddress ip)
+ServerData TcpService::getServerData()
+{
+    ServerData serverData;
+    serverData.m_name = m_serverName;
+    for (const auto & ip : QNetworkInterface::allAddresses())
+        serverData.m_ips.push_back(ip);
+    serverData.m_port = m_tcpServerPtr->serverPort();
+
+    return serverData;
+}
+
+void TcpService::sendToHost(QString data, QHostAddress ip)
 {
     // Find client with specified ip address
     auto clientSocket = std::find_if(
@@ -98,7 +109,25 @@ QString TcpService::getServerNameByIp(QHostAddress ip)
     return m_ipToServerName[ip.toString().toStdString()];
 }
 
-Segment TcpService::getSavedSegment()
+void TcpService::giveNameToServer(QString name)
+{
+    m_serverName = name;
+}
+
+void TcpService::connectToTcpServer()
+{
+    QByteArray data; // <-- fill with data
+
+    //_pSocket = new QTcpSocket( this ); // <-- needs to be a member variable: QTcpSocket * _pSocket;
+    //connect( _pSocket, SIGNAL(readyRead()), SLOT(readTcpData()) );
+
+    //_pSocket->connectToHost("127.0.0.1", 9000);
+    //if( _pSocket->waitForConnected() ) {
+    //    _pSocket->write( data );
+    //}
+}
+
+Segment TcpService::getReceivedSegment()
 {
     return m_pendingSegment;
 }

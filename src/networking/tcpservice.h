@@ -7,7 +7,7 @@
 #include <QObject>
 #include <QTcpServer>
 #include <QNetworkSession>
-#include "tcpudphelpers.h"
+#include "networkbasestructures.h"
 
 // SINGLETON
 // TCP service provider
@@ -30,6 +30,8 @@ class TcpService : public QObject
     const PortNumType m_portNumber = g_defaultTcpPortNumber;
     Segment m_pendingSegment;
 
+    QString m_serverName;
+
     std::unordered_map<std::string, QString> m_ipToServerName;
 
     explicit TcpService(QObject *qObject = nullptr);
@@ -42,14 +44,20 @@ public:
     // Service getter
     static std::shared_ptr<TcpService> getService();
 
-    void sendToClient(QString data, QHostAddress ip);
+    ServerData getServerData();
+
+    void sendToHost(QString data, QHostAddress ip);
     void disconnectClient(QHostAddress ip);
 
     void addIpServerNameRelation(QHostAddress ip, QString serverName);
     QString getServerNameByIp(QHostAddress ip);
 
-    Segment getSavedSegment();
 
+
+    void giveNameToServer(QString name);
+
+    void connectToTcpServer();
+    Segment getReceivedSegment();
 
 signals:
     void newSegmentSaved();

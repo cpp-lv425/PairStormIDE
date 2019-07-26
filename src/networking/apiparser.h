@@ -5,7 +5,7 @@
 #include <QObject>
 #include "udpservice.h"
 #include "tcpservice.h"
-#include "tcpudphelpers.h"
+#include "networkbasestructures.h"
 
 class BaseApiParser : public QObject
 {
@@ -13,9 +13,13 @@ class BaseApiParser : public QObject
 
 protected:
     std::shared_ptr<UdpService> m_udpService;
-    //std::shared_ptr<TcpService> m_tcpService;
-    //ServerData                  m_serverData;
-    bool                        m_isServerDataConfigured;
+    std::shared_ptr<TcpService> m_tcpService;
+    QString                     m_userName;
+
+    ServerData                  m_tcpServerDataThis;
+    QVector<QString>            m_tcpServerDataNeighbors;
+
+    //bool                        m_isServerDataConfigured;
 
     explicit BaseApiParser(QObject *qObject = nullptr);
 public:
@@ -28,16 +32,18 @@ public:
     static std::shared_ptr<UdpService> getInstance();
 
     virtual void testSendDatagram() = 0;
-    virtual void configureServerData() = 0;
-    virtual void shareServerData() = 0;
+    virtual void testSendSegmentToUser(const QString & userName) = 0;
+    virtual void setUserName(const QString & userName) = 0;
 
 signals:
-    //virtual void messageReceived() = 0;
+    //virtual void messageReceived() = 0;v
     //virtual void changeReceived() = 0;
 
 public slots:
-    virtual void shareServerDataOnLogin() = 0;
+    virtual void configureServerOnLogin() = 0;
+    virtual void shareServerData() = 0;
     virtual void processUdpDatagramOnReceive() = 0;
+    virtual void processTcpSegmentOnReceive() = 0;
 };
 
 class ApiParser : public BaseApiParser
@@ -55,18 +61,20 @@ public:
     // Singleton instance generator
     static std::shared_ptr<ApiParser> getInstance();
 
-    virtual void testSendDatagram() override;
+    virtual void setUserName(const QString & userName) override;
 
-    virtual void configureServerData() override;
-    virtual void shareServerData() override;
+    virtual void testSendDatagram() override;
+    virtual void testSendSegmentToUser(const QString & userName) override;
 
 signals:
     //void messageReceived() override;
     //void changeReceived() override;
 
 public slots:
-    virtual void shareServerDataOnLogin() override;
+    virtual void configureServerOnLogin() override;
+    virtual void shareServerData() override;
     virtual void processUdpDatagramOnReceive() override;
+    virtual void processTcpSegmentOnReceive() override;
 };
 
 #endif // APIPARSER_H

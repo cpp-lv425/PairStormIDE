@@ -10,7 +10,7 @@ SOURCES += \
 HEADERS += \
     $$PWD/apiparser.h \
     $$PWD/connectionserviceprovider.h \
+    $$PWD/networkbasestructures.h \
     $$PWD/tcpservice.h \
-    $$PWD/tcpudphelpers.h \
     $$PWD/udpservice.h
 
