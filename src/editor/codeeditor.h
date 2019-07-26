@@ -1,13 +1,10 @@
 #ifndef CODEEDITOR_H
 #define CODEEDITOR_H
 
-
-#define TAB_SPACE 4
-
+#include<QAbstractScrollArea>
 #include <QPlainTextEdit>
 #include <QObject>
-#include<QEvent>
-#include<QKeyEvent>
+#include "ideconfiguration.h"
 
 class QPaintEvent;
 class QResizeEvent;
@@ -22,22 +19,31 @@ class CodeEditor : public QPlainTextEdit
     Q_OBJECT
 
 public:
-    CodeEditor(QWidget *parent = 0);
+    CodeEditor(QWidget *parent = nullptr);
     void lineNumberAreaPaintEvent(QPaintEvent *event);
     int lineNumberAreaWidth();
-    void keyPressEvent(QKeyEvent *e) override;
-protected:
+    QString& getFileName();
+    void setFileName(const QString &flename);
 
-    void resizeEvent(QResizeEvent *event) override;
+protected:
+    void resizeEvent(QResizeEvent *event)override;
 
 private slots:
-    void updateLineNumberAreaWidth(int newBlockCount);
-    void highlightCurrentLine();
-    void updateLineNumberArea(const QRect &, int);
+   void updateLineNumberAreaWidth();
+   void highlightCurrentLine();
+   void updateLineNumberArea(const QRect &rect, int dy);
 
+public slots:
+   void keyPressEvent(QKeyEvent *e) override;
 
 private:
-    QWidget *lineNumberArea;
+   QWidget *lineNumberArea;
+   ConfigParams configParam;
+   int currentZoom = 100;
+   QFont font;
+   QString fileName;
 };
+
+
 
 #endif // CODEEDITOR_H
