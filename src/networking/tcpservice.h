@@ -54,17 +54,19 @@ public:
     ServerData getServerData();
 
     void sendThroughSocket(const QString & data, std::shared_ptr<QTcpSocket> receiver);
-    void disconnectClient(QHostAddress ip);
+    void disconnectSocket(std::shared_ptr<QTcpSocket> socket);
 
     void addIpServerNameRelation(QHostAddress ip, QString serverName);
     QString getServerNameByIp(QHostAddress ip);
 
 
 
-    void giveNameToServer(QString name);
+    void giveNameToLocalServer(QString name);
 
     void connectToTcpServer(QHostAddress ip, PortNumType port);
     Segment getReceivedSegment();
+
+    ~TcpService();
 
 signals:
     void newSegmentSaved();
@@ -73,6 +75,7 @@ public slots:
     void sessionOpened();
     void processServerConnectionOnRequest();
     void processClientConnectionOnRequest();
+    void informAboutStatusOnDisconnected();
     void saveSegmentOnReceival();
 
 };

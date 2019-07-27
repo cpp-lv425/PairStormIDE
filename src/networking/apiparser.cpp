@@ -46,7 +46,7 @@ void ApiParser::configureServerOnLogin()
 
     m_userName = "";    // TODO get username from other class
     QString serverName = m_userName;
-    m_tcpService->giveNameToServer(serverName);
+    m_tcpService->giveNameToLocalServer(serverName);
     m_launchedTcpServerAttrib = m_tcpService->getServerData();
 
     connect(

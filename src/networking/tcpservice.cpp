@@ -50,6 +50,22 @@ TcpService::TcpService(QObject *qObject) : QObject(qObject)
         Qt::UniqueConnection);
 }
 
+TcpService::~TcpService()
+{
+    // Close all opened sockets
+    std::for_each(m_clientSocketPtrs.begin(), m_clientSocketPtrs.end(),
+        [](std::shared_ptr<QTcpSocket> socket)
+        {
+            socket->close();
+        });
+    std::for_each(m_serverSocketPtrs.begin(), m_serverSocketPtrs.end(),
+        [](std::shared_ptr<QTcpSocket> socket)
+        {
+            socket->close();
+        });
+    m_tcpServerPtr->close();
+}
+
 void TcpService::sessionOpened()
 {
     //=============================================================================================
@@ -70,9 +86,9 @@ void TcpService::sessionOpened()
     }
     //=============================================================================================
 
-    // Launch the only QTcpServer instance
+    // Launch the only QTcpServer instance on the m_portNumber port
     m_tcpServerPtr = std::make_unique<QTcpServer>(new QTcpServer(this));
-    if (!m_tcpServerPtr->listen())
+    if (!m_tcpServerPtr->listen(QHostAddress::Any, m_portNumber))
     {
         qDebug() << "Failure: server hasn't been started";
         m_tcpServerPtr->close();
@@ -103,6 +119,7 @@ ServerData TcpService::getServerData()
 void TcpService::sendThroughSocket(const QString & data, std::shared_ptr<QTcpSocket> receiver)
 {
     receiver->write(data.toUtf8());
+    receiver->flush();
     /*
     // Find client with specified ip address & return if failed
     auto clientSocket = std::find_if(
@@ -124,8 +141,10 @@ void TcpService::sendThroughSocket(const QString & data, std::shared_ptr<QTcpSoc
     */
 }
 
-void TcpService::disconnectClient(QHostAddress ip)
+void TcpService::disconnectSocket(std::shared_ptr<QTcpSocket> socket)
 {
+    socket->disconnectFromHost();
+    /*
     // Find client with specified ip address
     auto clientSocket = std::find_if(
                 m_clientSocketPtrs.begin(), m_clientSocketPtrs.end(),
@@ -135,45 +154,28 @@ void TcpService::disconnectClient(QHostAddress ip)
                 });
     // Disconnect found client from server
     (*clientSocket)->disconnectFromHost();
+    */
 }
 
-void TcpService::addIpServerNameRelation(QHostAddress ip, QString serverName)
-{
-    m_ipToServerName[ip.toString().toStdString()] = serverName;
-}
-
-QString TcpService::getServerNameByIp(QHostAddress ip)
-{
-    if(m_ipToServerName.find(ip.toString().toStdString()) == m_ipToServerName.end())
-    {
-        return QString();
-    }
-    return m_ipToServerName[ip.toString().toStdString()];
-}
-
-void TcpService::giveNameToServer(QString name)
+void TcpService::giveNameToLocalServer(QString name)
 {
     m_serverName = name;
 }
 
 void TcpService::connectToTcpServer(QHostAddress ip, PortNumType port)
 {
-    // Get brand new client' socket and save its ptr
+    // Create new empty server socket & save its ptr
     std::shared_ptr<QTcpSocket>
             serverSocketPtr(new QTcpSocket(this));
     m_serverSocketPtrs.push_back(serverSocketPtr);
 
-    // Trigger saving received segments on readyRead
-    connect(
-        serverSocketPtr.get(), &QTcpSocket::readyRead,
-        this,                  &TcpService::saveSegmentOnReceival,
-        Qt::AutoConnection);
-    // Trigger connection' configuration
+    // Trigger processing in case of successful connection
     connect(
         serverSocketPtr.get(), &QTcpSocket::connected,
         this,                  &TcpService::processServerConnectionOnRequest,
         Qt::AutoConnection);
 
+    // And try to connect
     serverSocketPtr->connectToHost(ip, port);
 }
 
@@ -186,14 +188,28 @@ void TcpService::processServerConnectionOnRequest()
 {
     // Get connected host' socket ptr
     std::shared_ptr<QTcpSocket>
-            connectedSocketPtr(qobject_cast<QTcpSocket*>(sender()));
+            serverSocketPtr(qobject_cast<QTcpSocket*>(sender()));
 
-    // Send hello message to the socket
-    sendThroughSocket(
-        "hello, you are connected to me now",
-        connectedSocketPtr);
+    // Trigger saving received segments on readyRead
+    connect(
+        serverSocketPtr.get(), &QTcpSocket::readyRead,
+        this,                  &TcpService::saveSegmentOnReceival,
+        Qt::AutoConnection);
+
+    // Trigger informing about disconnected hosts
+    connect(
+        serverSocketPtr.get(), &QTcpSocket::disconnected,
+        this,                  &TcpService::informAboutStatusOnDisconnected,
+        Qt::AutoConnection);
+
 
     // TODO establish normal connection
+
+
+    // Send hello message to the server
+    sendThroughSocket(
+        "Hello, my server, I am connected to you now",
+        serverSocketPtr);
 }
 
 void TcpService::processClientConnectionOnRequest()
@@ -208,6 +224,34 @@ void TcpService::processClientConnectionOnRequest()
         clientSocketPtr.get(), &QTcpSocket::readyRead,
         this,                  &TcpService::saveSegmentOnReceival,
         Qt::AutoConnection);
+
+    // Trigger informing about disconnected hosts
+    connect(
+        clientSocketPtr.get(), &QTcpSocket::disconnected,
+        this,                  &TcpService::informAboutStatusOnDisconnected,
+        Qt::AutoConnection);
+
+
+    // TODO establish normal connection
+
+
+    // Send hello message to the client
+    sendThroughSocket(
+        "Hello, my client, you are connected to me now",
+        clientSocketPtr);
+}
+
+void TcpService::informAboutStatusOnDisconnected()
+{
+    // Get disconnected socket
+    std::shared_ptr<QTcpSocket>
+            disconnectedSocketPtr(qobject_cast<QTcpSocket*>(sender()));
+
+    qDebug() << "Host has been disconnected:";
+    qDebug() << "    ip   -> " << disconnectedSocketPtr->peerAddress().toString();
+    qDebug() << "    port -> " << disconnectedSocketPtr->peerPort();
+
+    // TODO emit signal of socket disconnection
 }
 
 void TcpService::saveSegmentOnReceival()
@@ -228,6 +272,23 @@ void TcpService::saveSegmentOnReceival()
 
     // Inform about segment receival
     emit newSegmentSaved();
+}
+
+
+
+
+void TcpService::addIpServerNameRelation(QHostAddress ip, QString serverName)
+{
+    m_ipToServerName[ip.toString().toStdString()] = serverName;
+}
+
+QString TcpService::getServerNameByIp(QHostAddress ip)
+{
+    if(m_ipToServerName.find(ip.toString().toStdString()) == m_ipToServerName.end())
+    {
+        return QString();
+    }
+    return m_ipToServerName[ip.toString().toStdString()];
 }
 
 /*
