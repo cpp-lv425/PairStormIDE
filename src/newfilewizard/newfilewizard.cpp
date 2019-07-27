@@ -60,7 +60,7 @@ NewFileDialog::NewFileDialog(QStringList &fileExtensions,
     QPushButton *pOkBtn = new QPushButton(tr("Create File"));
     QPushButton *pCancelBtn = new QPushButton(tr("Cancel"));
     connect(pOkBtn, &QPushButton::clicked, this, &NewFileDialog::onCreateFile);
-    connect(pCancelBtn, &QPushButton::clicked, this, &NewFileDialog::onCancel);
+    connect(pCancelBtn, &QPushButton::clicked, this, &NewFileDialog::reject);
 
     QHBoxLayout *pStdBtnLayout = new QHBoxLayout;
     pStdBtnLayout->addStretch(1);
@@ -77,6 +77,12 @@ NewFileDialog::NewFileDialog(QStringList &fileExtensions,
     int x = cntr.x() - width() / 2;
     int y = cntr.y() - height() / 2;
     move(x, y);
+}
+
+QString NewFileDialog::start()
+{
+    exec();
+    return mFileName;
 }
 
 void NewFileDialog::onSelectDirectory()
@@ -115,10 +121,6 @@ void NewFileDialog::onCreateFile()
         return;
     }
     QMessageBox::information(this, "File Created", "Specified file has been successfully created.");
+    mFileName = dirName + '/' + fileName;
     accept();
-}
-
-void NewFileDialog::onCancel()
-{
-    reject();
 }

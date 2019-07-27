@@ -166,27 +166,13 @@ void MainWindow::setupMainMenu()
 void MainWindow::onNewFileTriggered()
 {
     QStringList fileExtensions = getFileExtensions();
-    //NewFileWizard newFileWizard(fileExtensions);
-    //newFileWizard.exec();
+    NewFileDialog newFileDialog(fileExtensions, this);
 
-    NewFileDialog d(fileExtensions, this);
-    d.exec();
-
-
-
-//    QString fileName = QFileDialog::getSaveFileName
-//            (this, tr("Enter new filename"), QDir::homePath());
-//    try
-//    {
-//        FileManager().createFile(fileName);
-//        CodeEditor *newDoc = createNewDoc();
-//        newDoc->setWindowTitle(fileName);
-//        newDoc->show();
-//    } catch (const QException& e)
-//    {
-//        QMessageBox::warning(this, tr("Error"),
-//                             tr("Unable to create new file."));
-//    }
+    QString newFileName = newFileDialog.start();
+    CodeEditor *newDoc = createNewDoc();
+    newDoc->setFileName(newFileName);
+    newDoc->setWindowTitle(newFileName);
+    newDoc->show();
 }
 
 void MainWindow::onOpenFileTriggered()
