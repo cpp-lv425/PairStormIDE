@@ -48,9 +48,10 @@ void ChangesManager::applyChange(QString & newFile, const Change & change, const
 {
     if (static_cast<int>(fileId) < m_currentFiles.size()) return;
     QString currentFile = m_currentFiles[static_cast<int>(fileId)];
-    std::replace(currentFile.begin() + change.m_index, currentFile.end(),
-                 change.m_before,
-                 change.m_after);
+    currentFile.replace(static_cast<int>(change.m_index), change.m_before.length(), change.m_after);
+    //std::replace(currentFile.begin() + change.m_index, currentFile.end(),
+    //             change.m_before,
+    //             change.m_after); // TODO correct QString to QChar incompatibility
     newFile = currentFile;
 }
 
