@@ -25,6 +25,13 @@ class TcpService : public QObject
     QVector<std::shared_ptr<QTcpSocket>> m_clientSocketPtrs;
 
 
+
+
+    QVector<std::shared_ptr<QTcpSocket>> m_serverSocketPtrs;
+
+
+
+
     // Standard port number for TCP communication
     // Received segments using the port m_portNumber
     const PortNumType m_portNumber = g_defaultTcpPortNumber;
@@ -46,7 +53,7 @@ public:
 
     ServerData getServerData();
 
-    void sendToHost(QString data, QHostAddress ip);
+    void sendThroughSocket(const QString & data, std::shared_ptr<QTcpSocket> receiver);
     void disconnectClient(QHostAddress ip);
 
     void addIpServerNameRelation(QHostAddress ip, QString serverName);
@@ -56,7 +63,7 @@ public:
 
     void giveNameToServer(QString name);
 
-    void connectToTcpServer();
+    void connectToTcpServer(QHostAddress ip, PortNumType port);
     Segment getReceivedSegment();
 
 signals:
@@ -64,7 +71,8 @@ signals:
 
 public slots:
     void sessionOpened();
-    void serveConnectionOnAppearance();
+    void processServerConnectionOnRequest();
+    void processClientConnectionOnRequest();
     void saveSegmentOnReceival();
 
 };

@@ -9,13 +9,13 @@ TcpService::TcpService(QObject *qObject) : QObject(qObject)
     // Create QTcpSocket
     m_tcpServerPtr = std::make_unique<QTcpServer>(new QTcpServer(this));
 
+    //=============================================================================================
+    //                                                                    TODO: REFACTOR THIS STUFF
     QNetworkConfigurationManager manager;
     if (manager.capabilities() & QNetworkConfigurationManager::NetworkSessionRequired)
     {
         // Get saved network configuration
-        QSettings settings(QSettings::UserScope,
-                           QLatin1String("cpp-lv425"),
-                           QLatin1String("PairStorm"));
+        QSettings settings(QSettings::UserScope, g_orgLabel, g_appLabel);
 
         settings.beginGroup(QLatin1String("PSnet"));
         const QString configId = settings.value(QLatin1String("DefaultNetworkConfiguration")).toString();
@@ -30,7 +30,8 @@ TcpService::TcpService(QObject *qObject) : QObject(qObject)
         }
 
         // Establish session
-        m_netSession = new QNetworkSession(configData, this);//std::make_shared<QNetworkSession>(new QNetworkSession(configData, this));
+        m_netSession = new QNetworkSession(configData, this);
+        //std::make_shared<QNetworkSession>(new QNetworkSession(configData, this));
         //connect(m_netSession.get(), &QNetworkSession::opened, this, &TcpService::sessionOpened);
         connect(m_netSession, &QNetworkSession::opened, this, &TcpService::sessionOpened);
 
@@ -40,11 +41,44 @@ TcpService::TcpService(QObject *qObject) : QObject(qObject)
     {
         sessionOpened();
     }
+    //=============================================================================================
 
+    // Trigger processing of the connections, requested by clients
     connect(
         m_tcpServerPtr.get(), &QTcpServer::newConnection,
-        this,                 &TcpService::serveConnectionOnAppearance,
+        this,                 &TcpService::processClientConnectionOnRequest,
         Qt::UniqueConnection);
+}
+
+void TcpService::sessionOpened()
+{
+    //=============================================================================================
+    //                                                                    TODO: REFACTOR THIS STUFF
+    // Save the used configuration
+    if (m_netSession != nullptr)
+    {
+        QNetworkConfiguration configData = m_netSession->configuration();
+        QString id = (configData.type() == QNetworkConfiguration::UserChoice) ?
+            m_netSession->sessionProperty(QLatin1String("UserChoiceConfiguration")).toString() :
+            configData.identifier();
+
+        QSettings settings(QSettings::UserScope, g_orgLabel, g_appLabel);
+
+        settings.beginGroup(QLatin1String("PSnet"));
+        settings.setValue(QLatin1String("DefaultNetworkConfiguration"), id);
+        settings.endGroup();
+    }
+    //=============================================================================================
+
+    // Launch the only QTcpServer instance
+    m_tcpServerPtr = std::make_unique<QTcpServer>(new QTcpServer(this));
+    if (!m_tcpServerPtr->listen())
+    {
+        qDebug() << "Failure: server hasn't been started";
+        m_tcpServerPtr->close();
+        return;
+    }
+    qDebug() << "Success: server has been started on port: " << m_tcpServerPtr->serverPort();
 }
 
 std::shared_ptr<TcpService> TcpService::getService()
@@ -57,6 +91,7 @@ std::shared_ptr<TcpService> TcpService::getService()
 ServerData TcpService::getServerData()
 {
     ServerData serverData;
+
     serverData.m_name = m_serverName;
     for (const auto & ip : QNetworkInterface::allAddresses())
         serverData.m_ips.push_back(ip);
@@ -65,21 +100,28 @@ ServerData TcpService::getServerData()
     return serverData;
 }
 
-void TcpService::sendToHost(QString data, QHostAddress ip)
+void TcpService::sendThroughSocket(const QString & data, std::shared_ptr<QTcpSocket> receiver)
 {
-    // Find client with specified ip address
+    receiver->write(data.toUtf8());
+    /*
+    // Find client with specified ip address & return if failed
     auto clientSocket = std::find_if(
-                m_clientSocketPtrs.begin(), m_clientSocketPtrs.end(),
-                [ip](std::shared_ptr<QTcpSocket> clientSock)
+                m_clientSocketPtrs.begin(),
+                m_clientSocketPtrs.end(),
+                [ip] (std::shared_ptr<QTcpSocket> clientSock)
                 {
                     return clientSock->peerAddress() == ip;
                 });
-
+    if (clientSocket == m_clientSocketPtrs.end())
+    {
+        return;
+    }
     // Create & fill TCP segment with data
     QByteArray segment;
     segment.append(data);
     // Send TCP segment towards the client
     (*clientSocket)->write(segment);
+    */
 }
 
 void TcpService::disconnectClient(QHostAddress ip)
@@ -114,17 +156,25 @@ void TcpService::giveNameToServer(QString name)
     m_serverName = name;
 }
 
-void TcpService::connectToTcpServer()
+void TcpService::connectToTcpServer(QHostAddress ip, PortNumType port)
 {
-    QByteArray data; // <-- fill with data
+    // Get brand new client' socket and save its ptr
+    std::shared_ptr<QTcpSocket>
+            serverSocketPtr(new QTcpSocket(this));
+    m_serverSocketPtrs.push_back(serverSocketPtr);
 
-    //_pSocket = new QTcpSocket( this ); // <-- needs to be a member variable: QTcpSocket * _pSocket;
-    //connect( _pSocket, SIGNAL(readyRead()), SLOT(readTcpData()) );
+    // Trigger saving received segments on readyRead
+    connect(
+        serverSocketPtr.get(), &QTcpSocket::readyRead,
+        this,                  &TcpService::saveSegmentOnReceival,
+        Qt::AutoConnection);
+    // Trigger connection' configuration
+    connect(
+        serverSocketPtr.get(), &QTcpSocket::connected,
+        this,                  &TcpService::processServerConnectionOnRequest,
+        Qt::AutoConnection);
 
-    //_pSocket->connectToHost("127.0.0.1", 9000);
-    //if( _pSocket->waitForConnected() ) {
-    //    _pSocket->write( data );
-    //}
+    serverSocketPtr->connectToHost(ip, port);
 }
 
 Segment TcpService::getReceivedSegment()
@@ -132,38 +182,21 @@ Segment TcpService::getReceivedSegment()
     return m_pendingSegment;
 }
 
-void TcpService::sessionOpened()
+void TcpService::processServerConnectionOnRequest()
 {
-    // Save the used configuration
-    if (m_netSession != nullptr) {
-        QNetworkConfiguration configData = m_netSession->configuration();
-        QString id = (configData.type() == QNetworkConfiguration::UserChoice) ?
-            m_netSession->sessionProperty(QLatin1String("UserChoiceConfiguration")).toString() :
-            configData.identifier();
+    // Get connected host' socket ptr
+    std::shared_ptr<QTcpSocket>
+            connectedSocketPtr(qobject_cast<QTcpSocket*>(sender()));
 
-        QSettings settings(QSettings::UserScope,
-                           QLatin1String("cpp-lv425"),
-                           QLatin1String("PairStorm"));
+    // Send hello message to the socket
+    sendThroughSocket(
+        "hello, you are connected to me now",
+        connectedSocketPtr);
 
-        settings.beginGroup(QLatin1String("PSnet"));
-        settings.setValue(QLatin1String("DefaultNetworkConfiguration"), id);
-        settings.endGroup();
-    }
-    // Launch TcpServer
-    m_tcpServerPtr = std::make_unique<QTcpServer>(new QTcpServer(this));
-    if (!m_tcpServerPtr->listen())
-    {
-        qDebug() << "Failure: server hasn't been started";
-        return;
-    }
-
-    qDebug() << "TCP server ip addresses: ";
-    for (const auto & ip : QNetworkInterface::allAddresses())
-        qDebug() << "    ip: " << ip.toString();
-    qDebug() << "TCP server port: " << m_tcpServerPtr->serverPort();
+    // TODO establish normal connection
 }
 
-void TcpService::serveConnectionOnAppearance()
+void TcpService::processClientConnectionOnRequest()
 {
     // Get brand new client' socket and save its ptr
     std::shared_ptr<QTcpSocket>
@@ -179,18 +212,21 @@ void TcpService::serveConnectionOnAppearance()
 
 void TcpService::saveSegmentOnReceival()
 {
-    QTcpSocket* readSocket = qobject_cast<QTcpSocket*>(sender());
+    // Get source' socket ptr
+    std::shared_ptr<QTcpSocket>
+            senderSocketPtr(qobject_cast<QTcpSocket*>(sender()));
 
-    // Get received data & source IP
-    QByteArray   data(readSocket->readAll());
-    QHostAddress ip(readSocket->peerAddress());
-    PortNumType  port(readSocket->peerPort());
-    // Save segment attributes
+    // Get received data & socket attributes, i.e. IP and port
+    QByteArray   data (senderSocketPtr->readAll());
+    QHostAddress ip   (senderSocketPtr->peerAddress());
+    PortNumType  port (senderSocketPtr->peerPort());
+
+    // Save attributes of the segment
     m_pendingSegment.m_data = data;
     m_pendingSegment.m_ip   = ip;
     m_pendingSegment.m_port = port;
 
-
+    // Inform about segment receival
     emit newSegmentSaved();
 }
 

@@ -30,7 +30,7 @@ protected:
 
     // Attributes of the launched TCP server & discovered TCP servers
     ServerData          m_launchedTcpServerAttrib;
-    QVector<ServerData> m_discoveredTcpServerAttribs;
+    QVector<ServerData> m_discoveredTcpServersAttrib;
 
 public:
 
@@ -38,12 +38,12 @@ public:
     BaseApiParser& operator=(BaseApiParser const&) = delete;
 
     virtual QVector<QString> getOnlineUsers() const = 0;
-    virtual void shareWithUser(QString userName) = 0;
+    //virtual void shareWithUser(QString userName) = 0;
 
 signals:
-    virtual void sharingRequested();
-    virtual void messageReceived();
-    virtual void changeReceived();
+    void sharingRequested();
+    void messageReceived();
+    void changeReceived();
 
 public slots:
     //====================== On internal signals ======================
@@ -53,7 +53,7 @@ public slots:
     virtual void processTcpSegmentOnReceive()        = 0;
 
     // When documents synchronization is needed between users
-    virtual void requireFullTextDocumentOnNeed();
+    //virtual void requireFullTextDocumentOnNeed();
 
     //====================== On external signals ======================
 
@@ -64,8 +64,15 @@ public slots:
     virtual void boradcastServerAttributes() = 0;
 
     // When editor emits change or chat emits message
-    virtual void informAttachedHostsAboutChanges() = 0;
-    virtual void sendMessageToAttachedHosts()      = 0;
+    //virtual void informAttachedHostsAboutChanges() = 0;
+    //virtual void sendMessageToAttachedHosts()      = 0;
+
+
+#ifdef CUSTOM_DEBUG
+public:
+    virtual void testBroadcastServerInfoDatagram() = 0;
+    virtual void testSendSegmentToLocalHost()      = 0;
+#endif //CUSTOM_DEBUG
 };
 
 
@@ -94,35 +101,33 @@ public:
 
 
     virtual QVector<QString> getOnlineUsers() const override;
-    virtual void shareWithUser(QString userName) override;
+    //virtual void shareWithUser(QString userName) override;
 
 
 signals:
-    void sharingRequested() override;
-    void messageReceived() override;
-    void changeReceived() override;
+    // All signals are in the base class
 
 public slots:
 
     virtual void addServerFromUdpDatagramOnReceive() override;
     virtual void processTcpSegmentOnReceive() override;
 
-    virtual void requireFullTextDocumentOnNeed() override;
+    //virtual void requireFullTextDocumentOnNeed() override;
 
 
     virtual void configureServerOnLogin() override;
 
     virtual void boradcastServerAttributes() override;
 
-    virtual void informAttachedHostsAboutChanges() override;
-    virtual void sendMessageToAttachedHosts() override;
+    //virtual void informAttachedHostsAboutChanges() override;
+    //virtual void sendMessageToAttachedHosts() override;
 
 
 
 #ifdef CUSTOM_DEBUG
 public:
-    virtual void testBroadcastServerInfoDatagram();
-    virtual void testSendSegmentToLocalHost();
+    virtual void testBroadcastServerInfoDatagram() override;
+    virtual void testSendSegmentToLocalHost() override;
 #endif //CUSTOM_DEBUG
 };
 

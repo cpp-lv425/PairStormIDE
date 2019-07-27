@@ -24,23 +24,18 @@ std::shared_ptr<ApiParser> ApiParser::getParser()
     return instance;
 }
 
+QVector<QString> ApiParser::getOnlineUsers() const
+{
+    QVector<QString> userNames;
+    for (const auto & serverAttrib : m_discoveredTcpServersAttrib)
+        userNames.push_back(serverAttrib.m_name);
+    return userNames;
+}
+
 void ApiParser::boradcastServerAttributes()
 {
+    // Push attributes to the Json bearer string & broadcast it
     QString serverData(m_launchedTcpServerAttrib.toJsonQString());
-    /*
-    serverData.append("{name : \"");
-    serverData.append(m_tcpServerData.m_name);
-    serverData.append("\"; ips : [");
-    for (const auto & ip : m_tcpServerData.m_ips)
-    {
-        serverData.append("\"");
-        serverData.append(ip.toString());
-        serverData.append("\", ");
-    }
-    serverData.append("]; port : ");
-    serverData.append(m_tcpServerData.m_port);
-    serverData.append("}");
-    */
     m_udpService->broadcastDatagram(serverData);
 }
 
@@ -66,16 +61,26 @@ void ApiParser::addServerFromUdpDatagramOnReceive()
     // Read received datagram
     Datagram data = m_udpService->getReceivedDatagram();
     // Fill information about server from datagram
-    ServerData server_info;
-    server_info.fromJsonQString(data.m_data);
+    ServerData serverInfo;
+    serverInfo.fromJsonQString(data.m_data);
     // Save information about server
-    m_discoveredTcpServerAttribs.push_back(server_info);
+    m_discoveredTcpServersAttrib.push_back(serverInfo);
 
 
+#ifdef CUSTOM_DEBUG
     qDebug() << "add server from udp datagram in api parser:";
     qDebug() << "____________________________________________________________";
-    qDebug() << data.m_data;
+    qDebug() << "SERVER INFO";
+    qDebug() << "name ->" << serverInfo.m_name;
+    qDebug() << "port ->" << serverInfo.m_port;
+    for(const auto & ip : serverInfo.m_ips)
+        qDebug() << "ip -> " << ip.toString();
     qDebug() << "____________________________________________________________";
+    qDebug() << "datagram: " << data.m_data;
+    qDebug() << "ip: " << data.m_ip.toString();
+    qDebug() << "port: " << data.m_port;
+    qDebug() << "____________________________________________________________";
+#endif // CUSTOM_DEBUG
 }
 
 void ApiParser::processTcpSegmentOnReceive()
@@ -102,6 +107,6 @@ void ApiParser::testBroadcastServerInfoDatagram()
 
 void ApiParser::testSendSegmentToLocalHost()
 {
-    m_tcpService->sendToHost("Hello, Pair Storm is here", QHostAddress::LocalHost);
+    //m_tcpService->sendThroughSocket("Hello, Pair Storm is here", QHostAddress::LocalHost);
 }
 #endif //CUSTOM_DEBUG
