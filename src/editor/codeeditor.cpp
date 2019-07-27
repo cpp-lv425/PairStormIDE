@@ -4,7 +4,8 @@
 #include<QDebug>
 #include<QTextCursor>
 #include<QPainter>
-
+#include<QMessageBox>
+#include<iostream>
 
 CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
 {
@@ -22,7 +23,7 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(highlightCurrentLine()));
     connect(timer, SIGNAL(timeout()), this, SLOT(saveStateInTheHistory()));
 
-    timer->start(5000);
+    timer->start(CHANGE_SAVE_TIME);//save text by this time
 
     // start typing from correct position (in the first line it doesn't consider weight of lineCounter)
     //that's why we need to set this position
@@ -127,6 +128,6 @@ void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event)
 
 void CodeEditor::saveStateInTheHistory()
 {
-    qDebug()<<"saved";
-    changesManager.writeChange(this->toPlainText().toUtf8().constData());
+    std::string str = this->toPlainText().toUtf8().constData();
+    changesManager.writeChange(str);
 }

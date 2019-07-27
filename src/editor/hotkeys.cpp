@@ -46,15 +46,16 @@ void CodeEditor::keyPressEvent(QKeyEvent *e)
 
         if(e->key() == Qt::Key_Z && e->modifiers() & Qt::ControlModifier)
         {
-            QString before = QString::fromStdString(changesManager.changesHistory.back().before);
-            QString after = QString::fromStdString(changesManager.changesHistory.back().after);
 
-            qDebug()<< "begin = "<< changesManager.changesHistory.back().begin_change_pos;
-            qDebug()<< "before = "<< before;
-            qDebug()<< "after = "<< after;
-            QString text = QString::fromStdString(this->changesManager.returnToPreviousState());
+            QString text = QString::fromStdString(this->changesManager.undo());
             this->document()->setPlainText(text);
+        }
 
+        if(e->key() == Qt::Key_Y && e->modifiers() & Qt::ControlModifier)
+        {
+
+            QString text = QString::fromStdString(this->changesManager.redo());
+            this->document()->setPlainText(text);
         }
         QPlainTextEdit::keyPressEvent(e);
 }

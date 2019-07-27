@@ -7,6 +7,8 @@
 #include"ideconfiguration.h"
 #include"changesmanager.h"
 
+#define CHANGE_SAVE_TIME 3000
+
 class QPaintEvent;
 class QResizeEvent;
 class QSize;
