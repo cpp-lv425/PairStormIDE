@@ -51,7 +51,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     setCentralWidget(mpDocsArea);
 
-    RestoreState();
+    restoreMainWindowState();
 }
 
 void MainWindow::setupMainMenu()
@@ -345,18 +345,20 @@ CodeEditor* MainWindow::createNewDoc()
 
 MainWindow::~MainWindow()
 {
-    SaveState();
+    saveMainWindowState();
     delete ui;
 }
 
-void MainWindow::SaveState()
+// save to configuration file current state and geometry of mainwindow's toolbars and dockwidgets
+void MainWindow::saveMainWindowState()
 {
     QSettings settings("425", "PairStorm");
     settings.setValue("mainWindowGeometry", saveGeometry());
     settings.setValue("mainWindowState", saveState());
 }
 
-void MainWindow::RestoreState()
+// restore state and geometry of mainwindow's toolbars and dockwidgets from last session
+void MainWindow::restoreMainWindowState()
 {
     QSettings settings("425", "PairStorm");
     restoreGeometry(settings.value("mainWindowGeometry").toByteArray());
