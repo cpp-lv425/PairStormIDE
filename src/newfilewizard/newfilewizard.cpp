@@ -90,6 +90,13 @@ void NewFileDialog::onCreateFile()
     QString fileName = mpLine->text() + mpExtensionsList->currentItem()->text();
     QString dirName = mpDirLbl->text();
 
+    if(dirName.isEmpty())
+    {
+        QMessageBox::warning(this, "Wrong directory",
+                             "Please specify correct file directory.");
+        return;
+    }
+
     QDir dir(dirName);
 
     if(dir.exists(fileName))
