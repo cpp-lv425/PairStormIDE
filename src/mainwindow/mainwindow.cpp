@@ -177,8 +177,9 @@ void MainWindow::onNewFileTriggered()
 
     // new doc is created & shown
     CodeEditor *newDoc = createNewDoc();
+    int position = newFileName.lastIndexOf(QChar{'/'});
     newDoc->setFileName(newFileName);
-    newDoc->setWindowTitle(newFileName);
+    newDoc->setWindowTitle(newFileName.mid(position + 1));
     newDoc->show();
 }
 

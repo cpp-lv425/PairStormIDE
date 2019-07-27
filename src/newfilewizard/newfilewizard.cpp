@@ -33,7 +33,7 @@ NewFileDialog::NewFileDialog(QStringList &fileExtensions,
 
     // filename lineEdit
     mpLine = new QLineEdit;
-    mpLine->setText("Unnamed document");
+    mpLine->setText("Unnamed");
     QHBoxLayout *pLineEditLayout = new QHBoxLayout;
     pLineEditLayout->addWidget(pFileNameLbl);
     pLineEditLayout->addWidget(mpLine);
