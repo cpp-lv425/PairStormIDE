@@ -1,5 +1,5 @@
 #include "codeeditor.h"
-
+#include<QDebug>
 void CodeEditor::keyPressEvent(QKeyEvent *e)
 {
         if((e->key() == Qt::Key_Enter || e->key() == Qt::Key_Return) &&// shift + enter
@@ -42,6 +42,19 @@ void CodeEditor::keyPressEvent(QKeyEvent *e)
             currentZoom -= 1;
             setViewportMargins(lineNumberAreaWidth(), 0, 0, 0);// reset text margin in accordance to linecouter change
             return;
+        }
+
+        if(e->key() == Qt::Key_Z && e->modifiers() & Qt::ControlModifier)
+        {
+            QString before = QString::fromStdString(changesManager.changesHistory.back().before);
+            QString after = QString::fromStdString(changesManager.changesHistory.back().after);
+
+            qDebug()<< "begin = "<< changesManager.changesHistory.back().begin_change_pos;
+            qDebug()<< "before = "<< before;
+            qDebug()<< "after = "<< after;
+            QString text = QString::fromStdString(this->changesManager.returnToPreviousState());
+            this->document()->setPlainText(text);
+
         }
         QPlainTextEdit::keyPressEvent(e);
 }

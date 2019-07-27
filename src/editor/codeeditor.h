@@ -1,10 +1,11 @@
 #ifndef CODEEDITOR_H
 #define CODEEDITOR_H
 
-#include<QAbstractScrollArea>
-#include <QPlainTextEdit>
-#include <QObject>
-#include "ideconfiguration.h"
+
+#include<QPlainTextEdit>
+#include<QObject>
+#include"ideconfiguration.h"
+#include"changesmanager.h"
 
 class QPaintEvent;
 class QResizeEvent;
@@ -35,6 +36,7 @@ private slots:
 
 public slots:
    void keyPressEvent(QKeyEvent *e) override;
+   void saveStateInTheHistory();
 
 private:
    QWidget *lineNumberArea;
@@ -42,6 +44,8 @@ private:
    int currentZoom = 100;
    QFont font;
    QString fileName;
+   ChangesManager changesManager;
+   QTimer *timer;
 };
 
 

@@ -13,13 +13,16 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     setLineWrapMode(QPlainTextEdit::NoWrap);// don't move cursor to the next line where it's out of visible scope
 
     lineNumberArea = new LineNumberArea(this);
+    timer = new QTimer;
 
     //This signal is emitted when the text document needs an update of the specified rect.
     //If the text is scrolled, rect will cover the entire viewport area.
     //If the text is scrolled vertically, dy carries the amount of pixels the viewport was scrolled.
     connect(this, SIGNAL(updateRequest(QRect,int)), this, SLOT(updateLineNumberArea(QRect,int)));
-
     connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(highlightCurrentLine()));
+    connect(timer, SIGNAL(timeout()), this, SLOT(saveStateInTheHistory()));
+
+    timer->start(5000);
 
     // start typing from correct position (in the first line it doesn't consider weight of lineCounter)
     //that's why we need to set this position
@@ -112,7 +115,7 @@ void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event)
     {
         QString number = QString::number(blockNumber + 1);
         painter.setPen(configParam.mCodeTextColor);
-        painter.drawText(0, top, lineNumberArea->width(), fontMetrics().height(),//drat line count
+        painter.drawText(0, top, lineNumberArea->width(), fontMetrics().height(),//draw line count
                          Qt::AlignCenter, number);
         block = block.next();
         int temp = top;//save current top position
@@ -120,4 +123,10 @@ void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event)
         bottom += bottom - temp;// bottom - temp = dy which is block height
         ++blockNumber;
     }
+}
+
+void CodeEditor::saveStateInTheHistory()
+{
+    qDebug()<<"saved";
+    changesManager.writeChange(this->toPlainText().toUtf8().constData());
 }
