@@ -9,7 +9,6 @@
 #include <QException>
 #include <QLineEdit>
 #include <QLabel>
-#include <QDebug>
 #include <QDir>
 
 #include "filemanager.h"
@@ -19,6 +18,7 @@ NewFileDialog::NewFileDialog(QStringList &fileExtensions,
 {
     setWindowTitle("New File");
 
+    // info label
     QLabel *pLabel = new QLabel(tr("Please specify file name, file extension and project directory."));
     pLabel->setWordWrap(true);
     QFont lblFont("Segoe UI", 12);
@@ -28,17 +28,23 @@ NewFileDialog::NewFileDialog(QStringList &fileExtensions,
     palette.setColor(QPalette::WindowText, Qt::blue);
     pLabel->setPalette(palette);
 
+    // filename label
     QLabel *pFileNameLbl = new QLabel(tr("File Name"));
+
+    // filename lineEdit
     mpLine = new QLineEdit;
+    mpLine->setText("Unnamed document");
     QHBoxLayout *pLineEditLayout = new QHBoxLayout;
     pLineEditLayout->addWidget(pFileNameLbl);
     pLineEditLayout->addWidget(mpLine);
 
+    // file extensions list
     mpExtensionsList = new QListWidget;
     for(const auto& item: fileExtensions)
         mpExtensionsList->addItem(item);
     mpExtensionsList->setCurrentRow(0);
 
+    // laying out wgts
     QVBoxLayout *pLayout = new QVBoxLayout;
     pLayout->addSpacing(50);
     pLayout->addWidget(pLabel);
@@ -47,21 +53,25 @@ NewFileDialog::NewFileDialog(QStringList &fileExtensions,
     pLayout->addSpacing(20);
     pLayout->addWidget(mpExtensionsList);
 
+    // directory lineEdit
     mpDirLbl = new QLineEdit(QDir::homePath());
     mpDirLbl->setReadOnly(true);
+
+    // browse button
     QPushButton *pBrowseBtn = new QPushButton(tr("Browse"));
     connect(pBrowseBtn, &QPushButton::clicked, this, &NewFileDialog::onSelectDirectory);
     QHBoxLayout *pBrowseLayout = new QHBoxLayout;
     pBrowseLayout->addWidget(mpDirLbl);
     pBrowseLayout->addWidget(pBrowseBtn);
-
     pLayout->addLayout(pBrowseLayout);
 
+    // create file & cancel buttons
     QPushButton *pOkBtn = new QPushButton(tr("Create File"));
     QPushButton *pCancelBtn = new QPushButton(tr("Cancel"));
     connect(pOkBtn, &QPushButton::clicked, this, &NewFileDialog::onCreateFile);
     connect(pCancelBtn, &QPushButton::clicked, this, &NewFileDialog::reject);
 
+    // laying out wgts
     QHBoxLayout *pStdBtnLayout = new QHBoxLayout;
     pStdBtnLayout->addStretch(1);
     pStdBtnLayout->addWidget(pOkBtn);
@@ -71,8 +81,10 @@ NewFileDialog::NewFileDialog(QStringList &fileExtensions,
 
     setLayout(pLayout);
 
+    // specifying initial dialog size
     setGeometry(geometry().x(), geometry().y(), 700, 500);
 
+    // centring dialog
     QPoint cntr = pParent->geometry().center();
     int x = cntr.x() - width() / 2;
     int y = cntr.y() - height() / 2;
@@ -82,6 +94,7 @@ NewFileDialog::NewFileDialog(QStringList &fileExtensions,
 QString NewFileDialog::start()
 {
     exec();
+    // full filename is returned to the caller
     return mFileName;
 }
 
@@ -96,6 +109,7 @@ void NewFileDialog::onCreateFile()
     QString fileName = mpLine->text() + mpExtensionsList->currentItem()->text();
     QString dirName = mpDirLbl->text();
 
+    // check if directory is not empty
     if(dirName.isEmpty())
     {
         QMessageBox::warning(this, "Wrong directory",
@@ -103,8 +117,8 @@ void NewFileDialog::onCreateFile()
         return;
     }
 
+    // preventing overwriting existing files
     QDir dir(dirName);
-
     if(dir.exists(fileName))
     {
         QMessageBox::warning(this, "File exists",
@@ -112,6 +126,7 @@ void NewFileDialog::onCreateFile()
                              "Please select other file name.");
         return;
     }
+    // creating new file
     try
     {
         FileManager().createFile(dirName + '/' + fileName);

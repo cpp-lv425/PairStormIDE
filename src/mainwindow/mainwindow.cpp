@@ -168,7 +168,14 @@ void MainWindow::onNewFileTriggered()
     QStringList fileExtensions = getFileExtensions();
     NewFileDialog newFileDialog(fileExtensions, this);
 
+    // new file dialog is called
+    // name of newly created file is received
     QString newFileName = newFileDialog.start();
+
+    if(newFileName.isEmpty())
+        return;
+
+    // new doc is created & shown
     CodeEditor *newDoc = createNewDoc();
     newDoc->setFileName(newFileName);
     newDoc->setWindowTitle(newFileName);
