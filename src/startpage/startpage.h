@@ -14,6 +14,8 @@ class StartPage : public QDialog
 public:
     explicit StartPage(QWidget *parent = nullptr);
     void showStartPage();
+    void setupButton(QPushButton *pButton,
+                     QIcon icon, int maxWidth);
     ~StartPage();
 
 private:

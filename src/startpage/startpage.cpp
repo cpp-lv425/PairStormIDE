@@ -13,36 +13,34 @@ StartPage::StartPage(QWidget *parent) :
     ui->setupUi(this);
     setWindowTitle("Start Page");    
 
+    int maxButtonsWidth = 200;
+
+    // creating & configuring new file button
     pNewBtn = new QPushButton(tr("   New File"));
-    pNewBtn->setIcon(style()->standardIcon(QStyle::SP_FileIcon));
-    pNewBtn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    pNewBtn->setMaximumWidth(200);
+    setupButton(pNewBtn, style()->standardIcon(QStyle::SP_FileIcon), maxButtonsWidth);
     connect(pNewBtn, &QPushButton::pressed, this, &StartPage::newBtnPressed);
 
+    // creating & configuring open file button
     pOpenBtn = new QPushButton(tr("   Open File"));
-    pOpenBtn->setMaximumWidth(200);
-    pOpenBtn->setIcon(style()->standardIcon(QStyle::SP_DialogOpenButton));
-    pOpenBtn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    setupButton(pOpenBtn, style()->standardIcon(QStyle::SP_DialogOpenButton), maxButtonsWidth);
     connect(pOpenBtn, &QPushButton::pressed, this, &StartPage::openBtnPressed);
 
+    // creating & configuring open folder button
     pOpenDirBtn = new QPushButton(tr("   Open Folder"));
-    pOpenDirBtn->setMaximumWidth(200);
-    pOpenDirBtn->setIcon(style()->standardIcon(QStyle::SP_DirHomeIcon));
-    pOpenDirBtn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    setupButton(pOpenDirBtn, style()->standardIcon(QStyle::SP_DirHomeIcon), maxButtonsWidth);
     connect(pOpenDirBtn, &QPushButton::pressed, this, &StartPage::openDirPressed);
 
+    // creating & configuring reference call button
     pReferenceBtn = new QPushButton(tr("   Reference Assistant"));
-    pReferenceBtn->setMaximumWidth(200);
-    pReferenceBtn->setIcon(style()->standardIcon(QStyle::SP_DialogHelpButton));
-    pReferenceBtn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    setupButton(pReferenceBtn, style()->standardIcon(QStyle::SP_DialogHelpButton), maxButtonsWidth);
     connect(pReferenceBtn, &QPushButton::pressed, this, &StartPage::referenceBtnPressed);
 
+    // creating & configuring settings call button
     pSettingsBtn = new QPushButton(tr("   Settings"));
-    pSettingsBtn->setMaximumWidth(200);
-    pSettingsBtn->setIcon(style()->standardIcon(QStyle::SP_BrowserReload));
-    pSettingsBtn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    setupButton(pSettingsBtn, style()->standardIcon(QStyle::SP_BrowserReload), maxButtonsWidth);
     connect(pSettingsBtn, &QPushButton::pressed, this, &StartPage::settingsBtnPressed);
 
+    // bindong buttons
     QVBoxLayout *pBtnLayout = new QVBoxLayout;
     pBtnLayout->addWidget(pNewBtn);
     pBtnLayout->addWidget(pOpenBtn);
@@ -50,6 +48,7 @@ StartPage::StartPage(QWidget *parent) :
     pBtnLayout->addWidget(pReferenceBtn);
     pBtnLayout->addWidget(pSettingsBtn);
 
+    // creating & laying out labels
     QLabel *pNewLbl = new QLabel(tr("Create new file"));
     pNewLbl->setAlignment(Qt::AlignCenter);
     QLabel *pOpenLbl = new QLabel(tr("Open existing file"));
@@ -68,14 +67,15 @@ StartPage::StartPage(QWidget *parent) :
     pLblLayout->addWidget(pReferenceLbl);
     pLblLayout->addWidget(pSettingsLbl);
 
+    // window lay out
     QHBoxLayout *pWdwLayout = new QHBoxLayout;
     pWdwLayout->addLayout(pBtnLayout);
     pWdwLayout->addLayout(pLblLayout);
 
     setLayout(pWdwLayout);
 
+    // resizing & centring dialog
     setGeometry(geometry().x(), geometry().y(), 500, 300);
-
     QPoint cntr = parent->geometry().center();
     int x = cntr.x() - width() / 2;
     int y = cntr.y() - height() / 2;
@@ -85,6 +85,17 @@ StartPage::StartPage(QWidget *parent) :
 void StartPage::showStartPage()
 {
     exec();
+}
+
+void StartPage::setupButton(QPushButton *pButton,
+                            QIcon icon,
+                            int maxWidth)
+{
+    pButton->setIcon(icon);
+    pButton->setMaximumWidth(maxWidth);
+    pButton->setSizePolicy(QSizePolicy::Expanding,
+                           QSizePolicy::Expanding);
+
 }
 
 StartPage::~StartPage()
