@@ -49,7 +49,7 @@ MainWindow::MainWindow(QWidget *parent) :
     addDockWidget(Qt::RightDockWidgetArea, mpChatWindowDock);
 
     // create instance of MDIArea
-    mpDocsArea = new MDIArea(this);   
+    mpDocsArea = new MDIArea(this);
 
     // create instance of Bottom Panel
     mpBottomPanelDock = new BottomPanelDock(this);
@@ -185,54 +185,65 @@ void MainWindow::onNewFileTriggered()
 
 void MainWindow::onOpenFileTriggered()
 {
-    QString fileName = QFileDialog::getOpenFileName();
+    QString fileName = QFileDialog::getOpenFileName
+            (
+                this,
+                "Open File",
+                QDir::currentPath(),
+                "C++/C files (*.h *.hpp *.cpp *.c) ;; Text Files (*.txt) ;; JSON Files (*.json) ;; All files (*.*)"
+                );
     QString readResult;
+
     try
     {
         readResult = FileManager().readFromFile(fileName);
-    } catch (const QException& e)
+    } catch (const QException&)
     {
         QMessageBox::warning(this, tr("Error"),
                              tr("Unable to open specified file."));
         return;
-    }    
+    }
 
+    // creating new doc & passing file content to it
     CodeEditor *newDoc = createNewDoc();
+    newDoc->setFileName(fileName);
+    int position = fileName.lastIndexOf(QChar{'/'});
+    newDoc->setWindowTitle(fileName.mid(position + 1));
     newDoc->setPlainText(readResult);
     newDoc->show();
 }
 
 void MainWindow::onOpenFolderTriggered()
 {
-//    QString dirName = QFileDialog::getExistingDirectory
-//            (this, "Select directory", QDir::homePath());
-//    QDir selectedDir(dirName);
+    //    QString dirName = QFileDialog::getExistingDirectory
+    //            (this, "Select directory", QDir::homePath());
+    //    QDir selectedDir(dirName);
 
-//    QStringList filesList = selectedDir.entryList(QDir::Files);
+    //    QStringList filesList = selectedDir.entryList(QDir::Files);
 
-//    for (const QString& file : filesList)
-//    {
-//        QString readResult;
-//        try
-//        {
-//            readResult = FileManager().readFromFile(dirName + '/' + file);
-//        } catch (const QException& e)
-//        {
-//            QMessageBox::warning(this, tr("Error"),
-//                                 tr("Unable to open file from specified directory"));
-//            return;
-//        }
+    //    for (const QString& file : filesList)
+    //    {
+    //        QString readResult;
+    //        try
+    //        {
+    //            readResult = FileManager().readFromFile(dirName + '/' + file);
+    //        } catch (const QException& e)
+    //        {
+    //            QMessageBox::warning(this, tr("Error"),
+    //                                 tr("Unable to open file from specified directory"));
+    //            return;
+    //        }
 
-//        QWidget *newDoc = createNewDoc();
-//        newDoc->setWindowTitle(file);
+    //        QWidget *newDoc = createNewDoc();
+    //        newDoc->setWindowTitle(file);
 
-//        QPlainTextEdit *pTextEdit = new QPlainTextEdit;
-//        pTextEdit->setPlainText(readResult);
+    //        QPlainTextEdit *pTextEdit = new QPlainTextEdit;
+    //        pTextEdit->setPlainText(readResult);
 
-//        pLayout->addWidget(pTextEdit);
-//        newDoc->setLayout(pLayout);
-//        newDoc->show();
-//    }
+    //        pLayout->addWidget(pTextEdit);
+    //        newDoc->setLayout(pLayout);
+    //        newDoc->show();
+    //    }
 }
 
 void MainWindow::onOpenStartPage()
