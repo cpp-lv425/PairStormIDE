@@ -5,6 +5,7 @@
 #include <QDebug>
 
 #include "projectviewermodel.h"
+#include "projecttreeview.h"
 #include "startpage.h"
 
 int main(int argc, char *argv[])
@@ -14,9 +15,5 @@ int main(int argc, char *argv[])
     w.show();
     w.showStartPage();
 
-    QStringList filters;
-    filters << "*.txt"<<"*.cpp"<<"*.h"<<"*.json"<<"*.c"<<"*.hpp";
-    QDir dir("/home/igor/Desktop/PairStormIDE/");
-    ProjectViewerModel* fileSystemModel = new ProjectViewerModel(dir,filters);
     return a.exec();
 }
