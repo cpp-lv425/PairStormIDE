@@ -16,6 +16,7 @@
 #include "chatwindowdock.h"
 #include "filemanager.h"
 #include "codeeditor.h"
+
 #include "mdiarea.h"
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -32,7 +33,7 @@ MainWindow::MainWindow(QWidget *parent) :
     restoreState(settings.value("mainWindowState").toByteArray());
 
     // set Fusion style globally - TEMP SOLUTION
-    QApplication::setStyle(QStyleFactory::create("Fusion"));
+    QApplication::setStyle(QStyleFactory::create("Fusion"));    
 
     setupMainMenu();
 
@@ -55,6 +56,17 @@ MainWindow::MainWindow(QWidget *parent) :
     mpBottomPanelDock->setObjectName("mpBottomPanelDock");
 
     setCentralWidget(mpDocsArea);
+}
+
+void MainWindow::showStartPage()
+{
+    StartPage startPage(this);
+    connect(&startPage, &StartPage::onNewBtnPressed, this, &MainWindow::onNewFileTriggered);
+    connect(&startPage, &StartPage::onOpenBtnPressed, this, &MainWindow::onOpenFileTriggered);
+    connect(&startPage, &StartPage::onOpenDirPressed, this, &MainWindow::onOpenFolderTriggered);
+    connect(&startPage, &StartPage::onReferenceBtnPressed, this, &MainWindow::onReferenceTriggered);
+    connect(&startPage, &StartPage::onSettingsBtnPressed, this, &MainWindow::onSettingsTriggered);
+    startPage.showStartPage();
 }
 
 void MainWindow::setupMainMenu()
@@ -228,7 +240,7 @@ void MainWindow::onOpenFolderTriggered()
 
 void MainWindow::onOpenStartPage()
 {
-    qDebug() << "open start page";
+    showStartPage();
 }
 
 void MainWindow::onSaveFileTriggered()
