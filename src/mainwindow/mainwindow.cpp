@@ -190,7 +190,7 @@ void MainWindow::onOpenFileTriggered()
                 this,
                 "Open File",
                 QDir::currentPath(),
-                "C++/C files (*.h *.hpp *.cpp *.c) ;; Text Files (*.txt) ;; JSON Files (*.json) ;; All files (*.*)"
+                "C++/C files (*.h *.hpp *.cpp *.c) ;; Text Files (*.txt) ;; JSON Files (*.json)"
                 );
     QString readResult;
 
@@ -215,35 +215,7 @@ void MainWindow::onOpenFileTriggered()
 
 void MainWindow::onOpenFolderTriggered()
 {
-    //    QString dirName = QFileDialog::getExistingDirectory
-    //            (this, "Select directory", QDir::homePath());
-    //    QDir selectedDir(dirName);
-
-    //    QStringList filesList = selectedDir.entryList(QDir::Files);
-
-    //    for (const QString& file : filesList)
-    //    {
-    //        QString readResult;
-    //        try
-    //        {
-    //            readResult = FileManager().readFromFile(dirName + '/' + file);
-    //        } catch (const QException& e)
-    //        {
-    //            QMessageBox::warning(this, tr("Error"),
-    //                                 tr("Unable to open file from specified directory"));
-    //            return;
-    //        }
-
-    //        QWidget *newDoc = createNewDoc();
-    //        newDoc->setWindowTitle(file);
-
-    //        QPlainTextEdit *pTextEdit = new QPlainTextEdit;
-    //        pTextEdit->setPlainText(readResult);
-
-    //        pLayout->addWidget(pTextEdit);
-    //        newDoc->setLayout(pLayout);
-    //        newDoc->show();
-    //    }
+    //
 }
 
 void MainWindow::onOpenStartPage()
@@ -253,13 +225,7 @@ void MainWindow::onOpenStartPage()
 
 void MainWindow::onSaveFileTriggered()
 {
-    QMdiSubWindow *pCurrentSubWdw =
-            mpDocsArea->currentSubWindow();
-
-    // get filename
-    QString filename;
-    // write to file
-    //writeToFile(filename, pCurrentDoc->toPlainText());
+    //
 }
 
 void MainWindow::onSaveFileAsTriggered()
