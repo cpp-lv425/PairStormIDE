@@ -1,5 +1,6 @@
 #ifndef LEXERCPP_H
 #define LEXERCPP_H
+#include <QTextBlock>
 #include "ilexer.h"
 #include "keywords.h"
 #include "spaces.h"
@@ -13,7 +14,7 @@ public:
     ~LexerCPP() override;
     void addLexem();
     void lexicalAnalysis(QString) override;
-    void changeState(States, char);
+    void changeState(States, QChar);
     bool isKeyword(QString);
     bool isIdentifier(QString);
     bool isNumber(QString);
@@ -23,9 +24,10 @@ public:
     bool isStringLiteral(QString);
     bool isOneLineComment(QString);
     bool isBlockComments(QString);
-    bool isAlpha(char);
-    bool isDigit(char);
-    bool isSpace(char);
+    bool isAlpha(QChar);
+    bool isDigit(QChar);
+    bool isSpace(QChar);
+    void clear();
 };
 
 #endif // LEXERCPP_H

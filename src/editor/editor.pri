@@ -24,7 +24,6 @@ HEADERS += \
         $$PWD/operators.h \
         $$PWD/spaces.h \
         $$PWD/token.h \
-        $$PWD/type.h \
         $$PWD/widget.h
 
 FORMS += \

@@ -14,6 +14,7 @@
 #include<QAbstractScrollArea>
 #include <QPlainTextEdit>
 #include <QObject>
+#include "highlightercpp.h"
 #include "lexercpp.h"
 #include "ideconfiguration.h"
 
@@ -71,12 +72,14 @@ private:
    ConfigParams configParam;
    int currentZoom = 100;
    QFont font;
+
    QString fileName;
    ChangeManager changeManager;
    QTimer *timer;
    LexerCPP lexer;
    QVector<Token> tokens;
-
+   Highlightercpp *hcpp;
+   LexerCPP *lcpp;
 };
 
 

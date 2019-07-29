@@ -20,6 +20,9 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     lineNumberArea = new LineNumberArea(this);
     timer = new QTimer;
 
+    hcpp = new Highlightercpp(document());
+    lcpp = new LexerCPP();
+
     //This signal is emitted when the text document needs an update of the specified rect.
     //If the text is scrolled, rect will cover the entire viewport area.
     //If the text is scrolled vertically, dy carries the amount of pixels the viewport was scrolled.
@@ -49,8 +52,11 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
 
 void CodeEditor::runLexer()
 {
-    lexer.lexicalAnalysis(toPlainText());
-    tokens = lexer.getTokens();
+    lcpp->clear();
+    lcpp->lexicalAnalysis(document()->toPlainText());
+    tokens = lcpp->getTokens();
+    for(auto it = tokens.begin(); it < tokens.end(); ++it)
+        qDebug() << it->name << " "  << it->begin << " " << it->end << " " << it->linesCount << '\n';
 }
 
 int CodeEditor::lineNumberAreaWidth()
