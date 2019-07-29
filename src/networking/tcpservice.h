@@ -6,11 +6,15 @@
 #include <QString>
 #include <QObject>
 #include <QTcpServer>
+#include <QtNetwork>
+#include <QtCore>
 #include <QNetworkSession>
 #include "networkbase.h"
 
-// SINGLETON
-// TCP service provider
+// ==========================================================================================
+//                                                                                   SNGLETON
+//                                                                       TCP service provider
+// ==========================================================================================
 class TcpService : public QObject
 {
     Q_OBJECT // for signals and slots
@@ -19,8 +23,8 @@ class TcpService : public QObject
     // Network session if needed
     // Composition of the TCP server
     // Set of the connected TCP
-    QNetworkSession*                    m_netSession = nullptr;
-    //std::shared_ptr<QNetworkSession>     m_netSession;
+    //QNetworkSession*                     m_netSession = nullptr;
+    std::unique_ptr<QNetworkSession>     m_netSession;
     std::unique_ptr<QTcpServer>          m_tcpServerPtr;
     QVector<std::shared_ptr<QTcpSocket>> m_clientSocketPtrs;
 
@@ -62,7 +66,7 @@ public:
 
 
 
-    void giveNameToLocalServer(QString name);
+    void setServerName(const QString & name);
 
     void connectToTcpServer(QHostAddress ip, PortNumType port);
     Segment getReceivedSegment();
@@ -73,7 +77,7 @@ signals:
     void newSegmentSaved();
 
 public slots:
-    void sessionOpened();
+    void configureServer();
     void processServerConnectionOnRequest();
     void processClientConnectionOnRequest();
     void informAboutStatusOnDisconnected();
