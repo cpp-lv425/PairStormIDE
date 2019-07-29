@@ -66,4 +66,5 @@ void ProjectTreeView::setFilters(const QStringList &filters)
 void ProjectTreeView::setDirectory(const QDir &directory)
 {
     mProjectModel->setDir(directory);
+    setRootIndex(mProjectModel->index(mProjectModel->rootPath()));
 }

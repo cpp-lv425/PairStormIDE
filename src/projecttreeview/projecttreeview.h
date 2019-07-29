@@ -25,6 +25,7 @@ signals:
 protected:
     void keyPressEvent(QKeyEvent *event);
     void mouseDoubleClickEvent(QMouseEvent *event);
+
 private:
     ProjectViewerModel *mProjectModel;
 };

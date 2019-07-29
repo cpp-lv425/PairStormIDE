@@ -49,7 +49,6 @@ void ProjectViewerModel::setFilters(const QStringList &filters)
 
 void ProjectViewerModel::setDir(const QDir &directory)
 {
-    qDebug()<<directory;
     setRootPath(directory.path());
 }
 
