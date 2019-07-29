@@ -1,18 +1,20 @@
 #include "codeeditor.h"
 
 #include <QRegularExpression>
-#include <QDebug>
+
 QString CodeEditor::tabs="";
 
 bool CodeEditor::insidebracket(){
     QTextCursor cursor = this->textCursor();
-    cursor.movePosition(QTextCursor::PreviousCharacter);
-    int currentpos = cursor.position();
-    QString prev =this->document()->toPlainText().at(currentpos);
-    cursor.movePosition(QTextCursor::NextCharacter);
-    currentpos = cursor.position();
-    QString next = this->document()->toPlainText().at(currentpos);
-    if(prev=="{" && next=="}")return true;
+    if(cursor.position()!=this->document()->toPlainText().size()){
+        cursor.movePosition(QTextCursor::PreviousCharacter);
+        int currentpos = cursor.position();
+        QString prev =this->document()->toPlainText().at(currentpos);
+        cursor.movePosition(QTextCursor::NextCharacter);
+        currentpos = cursor.position();
+        QString next = this->document()->toPlainText().at(currentpos);
+        if(prev=="{" && next=="}")return true;
+    }
     return false;
 }
 
