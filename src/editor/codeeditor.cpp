@@ -4,7 +4,7 @@
 #include<QDebug>
 #include<QTextCursor>
 #include<QPainter>
-
+#define TAB_SPACE 4
 
 CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
 {
@@ -24,7 +24,7 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     //that's why we need to set this position
     updateLineNumberAreaWidth();
     highlightCurrentLine();
-
+    this->setTabStopDistance(TAB_SPACE * fontMetrics().width(QLatin1Char('0')));//set tab distance
     //fonts and colors configurations
     font.setPointSize(configParam.mFontSize);
     font.setFamily(configParam.mTextStyle);

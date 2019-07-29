@@ -1,11 +1,20 @@
 #include "codeeditor.h"
 #include <QRegularExpression>
-
+#include <QDebug>
 QString CodeEditor::tabs="";
 
 bool CodeEditor::insidebracket(){
-    return true;
+    QTextCursor cursor = this->textCursor();
+    cursor.movePosition(QTextCursor::PreviousCharacter);
+    int currentpos = cursor.position();
+    QString prev =this->document()->toPlainText().at(currentpos);
+    cursor.movePosition(QTextCursor::NextCharacter);
+    currentpos = cursor.position();
+    QString next = this->document()->toPlainText().at(currentpos);
+    if(prev=="{" && next=="}")return true;
+    return false;
 }
+
 
 
 void CodeEditor::autotab(){
@@ -35,7 +44,18 @@ void CodeEditor::keyPressEvent(QKeyEvent *e)
         {
             e = new QKeyEvent(e->type(), e->key(), e->modifiers()&Qt::MetaModifier &Qt::KeypadModifier);
         }
+
         if(e->key() == Qt::Key_Enter || e->key() == Qt::Key_Return){
+            if(insidebracket()){
+               this->insertPlainText("\n\n");
+               emit autotab();
+               tabs.resize(tabs.size()-1);
+               this->insertPlainText(tabs);
+               this->moveCursor(QTextCursor::Up);
+               emit autotab();
+               this->insertPlainText(tabs);
+               return;
+            }
             QPlainTextEdit::keyPressEvent(e);
             emit autotab();
             this->insertPlainText(tabs);
