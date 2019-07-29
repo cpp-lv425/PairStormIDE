@@ -243,8 +243,7 @@ void MainWindow::onOpenFileTriggered()
 }
 
 void MainWindow::onOpenFolderTriggered()
-{#	src/mainwindow/mainwindow.cpp
-
+{
     QString dirName = QFileDialog::getExistingDirectory(this, "Open Directory", QDir::currentPath());
     mpProjectViewerDock->setDir(dirName);
 }
