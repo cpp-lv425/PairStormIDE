@@ -24,6 +24,7 @@ class MainWindow : public QMainWindow
 
 public:
     explicit MainWindow(QWidget *parent = nullptr);
+    QStringList getFileExtensions()const;
     void showStartPage();
     ~MainWindow();
 
@@ -35,6 +36,7 @@ private:
     MDIArea *mpDocsArea;    
 
     void setupMainMenu();
+    void saveDocument(CodeEditor* pDoc);
 
 private slots:
     // file menu actions

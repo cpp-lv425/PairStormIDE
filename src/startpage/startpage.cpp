@@ -106,24 +106,29 @@ StartPage::~StartPage()
 void StartPage::newBtnPressed()
 {
     emit onNewBtnPressed();
+    accept();
 }
 
 void StartPage::openBtnPressed()
 {
     emit onOpenBtnPressed();
+    accept();
 }
 
 void StartPage::openDirPressed()
 {
     emit onOpenDirPressed();
+    accept();
 }
 
 void StartPage::referenceBtnPressed()
 {
     emit onReferenceBtnPressed();
+    accept();
 }
 
 void StartPage::settingsBtnPressed()
 {
     emit onSettingsBtnPressed();
+    accept();
 }
