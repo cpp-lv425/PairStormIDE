@@ -174,6 +174,18 @@ void MainWindow::setupMainMenu()
     menuBar()->addMenu(helpMenu);
 }
 
+void MainWindow::saveChangesToDocument(CodeEditor *pDoc)
+{
+    try
+    {
+        // writing to file
+        FileManager().writeToFile(pDoc->getFileName(), pDoc->toPlainText());
+    } catch (const QException&)
+    {
+        QMessageBox::warning(this, "Error", "Unable to open file");
+    }
+}
+
 void MainWindow::onNewFileTriggered()
 {
     QStringList fileExtensions = getFileExtensions();
@@ -236,7 +248,26 @@ void MainWindow::onOpenStartPage()
 
 void MainWindow::onSaveFileTriggered()
 {
-    //
+    // if there are no opened docs
+    if(!mpDocsArea || !mpDocsArea->currentSubWindow())
+    {
+        QMessageBox::information(this, "Save", "There are no opened documents to save.");
+        return;
+    }
+
+    auto curDoc = qobject_cast<CodeEditor*>
+            (mpDocsArea->currentSubWindow()->widget());
+
+    // if ptr to current document is not valid
+    if(!curDoc)
+       return;
+
+    // if doc wasn't modified yet
+    if(!curDoc->document()->isModified())
+        return;
+
+    // saving doc
+    saveChangesToDocument(curDoc);
 }
 
 void MainWindow::onSaveFileAsTriggered()

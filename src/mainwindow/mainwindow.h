@@ -36,6 +36,7 @@ private:
     MDIArea *mpDocsArea;    
 
     void setupMainMenu();
+    void saveChangesToDocument(CodeEditor* pDoc);
 
 private slots:
     // file menu actions
