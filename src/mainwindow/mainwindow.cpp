@@ -176,6 +176,7 @@ void MainWindow::setupMainMenu()
 
 void MainWindow::saveDocument(CodeEditor *pDoc, QString fileName)
 {
+    qDebug() << "saving";
     try
     {
         // writing to file
@@ -315,19 +316,28 @@ void MainWindow::onSaveAllFilesTriggered()
     if(!mpDocsArea)
         return;
 
-    auto docsList = mpDocsArea->subWindowList();
+    // getting all docs
+    auto docsList = mpDocsArea->subWindowList();    
 
+    // if there are no docs
     if(docsList.empty())
     {
         QMessageBox::information(this, "Save", "There are no opened documents to save.");
         return;
     }
 
-    for(const auto& doc: docsList)
+    // if doc is modified then it is saved
+    for (int i = 0; i < docsList.size(); ++i)
     {
-
+        auto curDoc = qobject_cast<CodeEditor*>(docsList[i]->widget());
+        if(!curDoc)
+            qDebug() << "invalid ptr";
+        if(curDoc && curDoc->document()->isModified())
+        {
+            qDebug() << curDoc->getFileName();
+            saveDocument(curDoc, curDoc->getFileName());
+        }
     }
-
 }
 
 void MainWindow::onCloseFileTriggered()

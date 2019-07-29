@@ -27,9 +27,7 @@ ProjectViewerDock::ProjectViewerDock(QWidget *pParent): QDockWidget(pParent)
         item.push_front('*');
 
     mpViewerModel = new ProjectViewerModel(this);
-    mpTreeViewer = new ProjectTreeView(mpViewerModel,this);
-    //for testing use own path
-    //QDir dir = QDir::currentPath();
+    mpTreeViewer = new ProjectTreeView(mpViewerModel,this);    
 
     setDir(QDir::current());
     setFilters(filters);
@@ -38,7 +36,6 @@ ProjectViewerDock::ProjectViewerDock(QWidget *pParent): QDockWidget(pParent)
 
     connect(mpTreeViewer, &ProjectTreeView::codeFileSelected,
             pMainWindow, &MainWindow::onOpenFileFromProjectViewer);
-
 }
 
 void ProjectViewerDock::setFilters(QStringList filters)
