@@ -6,6 +6,8 @@
 #include <QWidget>
 #include <QSettings>
 #include <QDir>
+#include <thread>
+#include <chrono>
 
 #include "mainwindow.h"
 #include "projectviewermodel.h"
@@ -22,6 +24,7 @@ ProjectViewerDock::ProjectViewerDock(QWidget *pParent): QDockWidget(pParent)
     ProjectViewerModel* fileSystemModel = new ProjectViewerModel(dir,filters);
     pTreeViewer = new ProjectTreeView(fileSystemModel);
     setWidget(pTreeViewer);
+
 
 }
 ProjectViewerDock::~ProjectViewerDock()
