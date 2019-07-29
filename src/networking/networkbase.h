@@ -23,7 +23,8 @@ struct ServerData {
     QVector<QHostAddress> m_ips;
     PortNumType           m_port;
 
-    QString toJsonQString() const {
+    QString toJsonQString() const
+    {
         // Create Json object and set its API
         QJsonObject json;
         json["app"] = g_appLabel;
@@ -44,7 +45,8 @@ struct ServerData {
         return QString(docData);
     }
 
-    void fromJsonQString(QString str) {
+    void fromJsonQString(QString str)
+    {
         // Decompose the Json bearer string
         QJsonDocument doc = QJsonDocument::fromJson(str.toUtf8());
         QJsonObject json = doc.object();
@@ -73,6 +75,11 @@ struct ServerData {
             QString str = ip.toString();
             m_ips.push_back(QHostAddress(str));
         }
+    }
+
+    bool empty()
+    {
+        return m_name != QString("");
     }
 };
 

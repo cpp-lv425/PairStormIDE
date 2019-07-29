@@ -44,7 +44,7 @@ public:
 signals:
 
     //========================== To the  GUI ==========================
-    void sharingRequested();
+    void sharingRequested(QString userName);
     void newUserDiscovered();
 
     //======================= To  Editor & Chat =======================
@@ -58,6 +58,8 @@ public slots:
     // When either UDP datagram or TCP segment has been received
     virtual void addServerFromUdpDatagramOnReceive() = 0;
     virtual void processTcpSegmentOnReceive()        = 0;
+
+    virtual void processConnectionOnRequest(std::shared_ptr<QTcpSocket> clientSocketPtr)        = 0;
 
     // When documents synchronization is needed between users
     //virtual void requireFullTextDocumentOnNeed();
@@ -120,6 +122,8 @@ public slots:
     virtual void processTcpSegmentOnReceive() override;
 
     //virtual void requireFullTextDocumentOnNeed() override;
+
+    virtual void processConnectionOnRequest(std::shared_ptr<QTcpSocket> clientSocketPtr) override;
 
 
     virtual void configureServerOnLogin(const QString & userName) override;

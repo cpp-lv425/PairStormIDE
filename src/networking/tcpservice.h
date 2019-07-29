@@ -1,15 +1,17 @@
 #ifndef TCPSERVICE_H
 #define TCPSERVICE_H
 
+// Base features and structures for the networking module
+#include "networkbase.h"
+
 #include <memory>
-#include <unordered_map>
+#include <QtCore>
 #include <QString>
 #include <QObject>
-#include <QTcpServer>
 #include <QtNetwork>
-#include <QtCore>
+#include <QTcpServer>
+#include <unordered_map>
 #include <QNetworkSession>
-#include "networkbase.h"
 
 // ==========================================================================================
 //                                                                                   SNGLETON
@@ -23,16 +25,11 @@ class TcpService : public QObject
     // Network session if needed
     // Composition of the TCP server
     // Set of the connected TCP
-    //QNetworkSession*                     m_netSession = nullptr;
     std::unique_ptr<QNetworkSession>     m_netSession;
     std::unique_ptr<QTcpServer>          m_tcpServerPtr;
-    QVector<std::shared_ptr<QTcpSocket>> m_clientSocketPtrs;
 
 
-
-
-    QVector<std::shared_ptr<QTcpSocket>> m_serverSocketPtrs;
-
+    QVector<std::shared_ptr<QTcpSocket>> m_connectedSockets;
 
 
 
@@ -66,24 +63,28 @@ public:
     void addIpServerNameRelation(QHostAddress ip, QString serverName);
     QString getServerNameByIp(QHostAddress ip);
 */
+    void setUserNameSocketRelation(const std::shared_ptr<QTcpSocket> & userSocket, const QString & userName);
     bool resolveSocketByUserName(std::shared_ptr<QTcpSocket> & userSocket, const QString & userName);
+    bool resolveUserNameBySocket(const std::shared_ptr<QTcpSocket> & userSocket, QString & userName);
 
 
     void setServerName(const QString & name);
 
     void connectToTcpServer(const ServerData & serverData);//QHostAddress ip, PortNumType port);
-    Segment getReceivedSegment();
+    Segment getReceivedSegment() const;
 
     ~TcpService();
 
 signals:
+    void clientRequestConnection(std::shared_ptr<QTcpSocket> clientSocketPtr);
+    void socketDisconnected();
     void newSegmentSaved();
 
 public slots:
     void configureServer();
-    void processServerConnectionOnRequest();
-    void processClientConnectionOnRequest();
-    void informAboutStatusOnDisconnected();
+    void configureSocketOnServerConnection();
+    void configureSocketOnClientConnection();
+    void removeSocketOnDisconnected();
     void saveSegmentOnReceival();
 
 };

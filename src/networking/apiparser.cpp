@@ -13,8 +13,8 @@ ApiParser::ApiParser() : BaseApiParser()
     connect(
         m_udpService.get(), &UdpService::newDatagramSaved,
         this,               &ApiParser::addServerFromUdpDatagramOnReceive,
-        Qt::UniqueConnection
-    );
+        Qt::UniqueConnection);
+
     // TODO connect configureServerOnLogin to the login signal
 }
 
@@ -34,7 +34,17 @@ QVector<QString> ApiParser::getOnlineUsers() const
 
 void ApiParser::shareWithUser(QString userName)
 {
-    return;
+    auto usersServerData =
+            std::find_if(m_discoveredTcpServersAttrib.begin(),
+                         m_discoveredTcpServersAttrib.end(),
+                         [userName] (const ServerData & serverData)
+                         {
+                             return serverData.m_name == userName;
+                         });
+    // Return if not found any server with a given userName
+    if (usersServerData == m_discoveredTcpServersAttrib.end()) return;
+    // Else try to establish connection with server
+    m_tcpService->connectToTcpServer(*usersServerData);
 }
 
 void ApiParser::boradcastServerAttributes()
@@ -55,6 +65,12 @@ void ApiParser::configureServerOnLogin(const QString & userName)
     m_launchedTcpServerAttrib = m_tcpService->getServerData();
 
 
+
+    connect(
+        m_tcpService.get(), &TcpService::clientRequestConnection,
+        this,               &ApiParser::processConnectionOnRequest,
+        Qt::UniqueConnection);
+
     connect(
         m_tcpService.get(), &TcpService::newSegmentSaved,
         this,               &ApiParser::processTcpSegmentOnReceive,
@@ -67,33 +83,71 @@ void ApiParser::addServerFromUdpDatagramOnReceive()
     // Read received datagram
     Datagram data = m_udpService->getReceivedDatagram();
     // Fill information about server from datagram
-    ServerData serverInfo;
-    serverInfo.fromJsonQString(data.m_data);
-    // Save information about server
-    m_discoveredTcpServersAttrib.push_back(serverInfo);
+    ServerData serverData;
+    serverData.fromJsonQString(data.m_data);
+
 
 
 #ifdef CUSTOM_DEBUG
     qDebug() << "____________________________________________________________";
     qDebug() << "SERVER IS DISCOVERED THROUGH UDP DISCOVERY PROTOCOL:";
-    qDebug() << "name ->" << serverInfo.m_name;
-    qDebug() << "port ->" << serverInfo.m_port;
-    for(const auto & ip : serverInfo.m_ips)
+    qDebug() << "name ->" << serverData.m_name;
+    qDebug() << "port ->" << serverData.m_port;
+    for(const auto & ip : serverData.m_ips)
         qDebug() << "ip -> " << ip.toString();
     qDebug() << "____________________________________________________________";
 #endif // CUSTOM_DEBUG
+
+
+
+    // If datagram was corrupted
+    if (serverData.empty()) return;
+
+    // If discovered server has the name of the current user
+    if (serverData.m_name == m_userName) return;
+
+    // If datagram has already been saved
+    auto attribPtr = std::find_if(m_discoveredTcpServersAttrib.cbegin(),
+                                  m_discoveredTcpServersAttrib.cend(),
+                                  [serverData] (const ServerData & inServerData)
+    {
+        return inServerData.m_name != serverData.m_name;
+    });
+    if (attribPtr != m_discoveredTcpServersAttrib.cend()) return;
+
+    // Finally, save information about server
+    m_discoveredTcpServersAttrib.push_back(serverData);
 }
+
+
 
 void ApiParser::processTcpSegmentOnReceive()
 {
     Segment data = m_tcpService->getReceivedSegment();
+
+
     // TODO processing
 
 
-    qDebug() << "tcp segment in api parser:";
+
+
+#ifdef CUSTOM_DEBUG
     qDebug() << "____________________________________________________________";
-    qDebug() << data.m_data;
+    qDebug() << "TCP SEGMENT HAS BEEN RECEIVED: ";
+    qDebug() << "data ->" << data.m_data;
+    qDebug() << "ip -> " << data.m_ip.toString();
+    qDebug() << "port ->" << data.m_port;
     qDebug() << "____________________________________________________________";
+#endif // CUSTOM_DEBUG
+}
+
+void ApiParser::processConnectionOnRequest(std::shared_ptr<QTcpSocket> clientSocketPtr)
+{
+    // TODO process connection
+
+    QString userName;
+
+    emit sharingRequested(userName);
 }
 
 
