@@ -1,7 +1,7 @@
 #include "udpservice.h"
 // ==========================================================================================
 // ==========================================================================================
-//                                                                 GET LAST RECEIVED DATAGRAM
+//                                                                    UDP SERVICE CONSTRUCTOR
 UdpService::UdpService(QObject *qObject) : QObject(qObject)
 {
     configureSocket();
@@ -19,7 +19,7 @@ UdpService::UdpService(QObject *qObject) : QObject(qObject)
 void UdpService::configureSocket()
 {
     // Create & configure QUdpSocket
-    m_udpSocketPtr = std::make_unique<QUdpSocket>(new QUdpSocket(this));
+    m_udpSocketPtr = std::make_unique<QUdpSocket>(this);
     m_udpSocketPtr->bind(m_portNumber);
 
     // Establish broadcast addresses for each interface
