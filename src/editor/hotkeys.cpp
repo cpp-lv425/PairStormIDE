@@ -1,4 +1,5 @@
 #include "codeeditor.h"
+
 #include <QRegularExpression>
 #include <QDebug>
 QString CodeEditor::tabs="";
@@ -131,6 +132,20 @@ void CodeEditor::keyPressEvent(QKeyEvent *e)
             currentZoom -= 1;
             setViewportMargins(lineNumberAreaWidth(), 0, 0, 0);// reset text margin in accordance to linecouter change
             return;
+        }
+
+        if(e->key() == Qt::Key_Z && e->modifiers() & Qt::ControlModifier)
+        {
+
+            QString text = QString::fromStdString(this->changeManager.undo());
+            this->document()->setPlainText(text);
+        }
+
+        if(e->key() == Qt::Key_Y && e->modifiers() & Qt::ControlModifier)
+        {
+
+            QString text = QString::fromStdString(this->changeManager.redo());
+            this->document()->setPlainText(text);
         }
         QPlainTextEdit::keyPressEvent(e);
 }

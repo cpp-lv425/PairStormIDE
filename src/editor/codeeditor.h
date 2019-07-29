@@ -1,10 +1,14 @@
 #ifndef CODEEDITOR_H
 #define CODEEDITOR_H
 
-#include<QAbstractScrollArea>
-#include <QPlainTextEdit>
-#include <QObject>
-#include "ideconfiguration.h"
+
+#include<QPlainTextEdit>
+#include<QObject>
+#include"ideconfiguration.h"
+#include"changemanager.h"
+#include<utility>
+
+#define CHANGE_SAVE_TIME 3000
 
 class QPaintEvent;
 class QResizeEvent;
@@ -26,7 +30,13 @@ public:
     static QString tabs;
 
     QString& getFileName();
+
     void setFileName(const QString &flename);
+
+    std::pair<const QString &, const QString &> getChangedFileInfo();
+
+
+
 protected:
     void resizeEvent(QResizeEvent *event)override;
 
@@ -35,9 +45,16 @@ private slots:
    void highlightCurrentLine();
    void updateLineNumberArea(const QRect &rect, int dy);
 
-public slots:
+public
+slots:
    void keyPressEvent(QKeyEvent *e) override;
+
    void autotab();
+
+
+   void saveStateInTheHistory();
+signals:
+   void changesAppeared();
 
 
 private:
@@ -46,6 +63,8 @@ private:
    int currentZoom = 100;
    QFont font;
    QString fileName;
+   ChangeManager changeManager;
+   QTimer *timer;
 };
 
 

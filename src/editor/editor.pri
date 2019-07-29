@@ -2,6 +2,7 @@ DEPENDPATH += $$PWD
 INCLUDEPATH += $$PWD
 
 SOURCES += \
+        $$PWD/changesmanager.cpp \
         $$PWD/codeeditor.cpp \
         $$PWD/highlightercpp.cpp \
         $$PWD/hotkeys.cpp \
@@ -11,6 +12,7 @@ SOURCES += \
         $$PWD/widget.cpp
 
 HEADERS += \
+        $$PWD/changemanager.h \
         $$PWD/codeeditor.h \
         $$PWD/highlightercpp.h \
         $$PWD/ideconfiguration.h \
