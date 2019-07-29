@@ -37,6 +37,7 @@ private:
 
     void setupMainMenu();
     void saveDocument(CodeEditor* pDoc, QString fileName);
+    void openDoc(QString fileName);
 
 private slots:
     // file menu actions
@@ -73,8 +74,13 @@ private slots:
     void onUserGuideTriggered();
     void onCheckUpdatesTriggered();
 
+public slots:
+    void onOpenFileFromProjectViewer(QString fileName);
+
+private:
     // creates new doc in MDIArea
     CodeEditor* createNewDoc();
+
 };
 
 #endif // MAINWINDOW_H

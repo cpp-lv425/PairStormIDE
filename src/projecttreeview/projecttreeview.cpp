@@ -30,7 +30,7 @@ void ProjectTreeView::keyPressEvent(QKeyEvent *event)
 void ProjectTreeView::mouseDoubleClickEvent(QMouseEvent *event)
 {
     if(selectedIndexes().size() != 0)
-    {
+    {        
         emit codeFileSelected(mPrModel->fileInfo(selectedIndexes().at(0)).filePath());
     }
     QTreeView::mouseDoubleClickEvent(event);

@@ -186,6 +186,29 @@ void MainWindow::saveDocument(CodeEditor *pDoc, QString fileName)
     }
 }
 
+void MainWindow::openDoc(QString fileName)
+{
+    QString readResult;
+
+    try
+    {
+        readResult = FileManager().readFromFile(fileName);
+    } catch (const QException&)
+    {
+        QMessageBox::warning(this, tr("Error"),
+                             tr("Unable to open specified file."));
+        return;
+    }
+
+    // creating new doc & passing file content to it
+    CodeEditor *newDoc = createNewDoc();
+    newDoc->setFileName(fileName);
+    int position = fileName.lastIndexOf(QChar{'/'});
+    newDoc->setWindowTitle(fileName.mid(position + 1));
+    newDoc->setPlainText(readResult);
+    newDoc->show();
+}
+
 void MainWindow::onNewFileTriggered()
 {
     QStringList fileExtensions = getFileExtensions();
@@ -215,25 +238,7 @@ void MainWindow::onOpenFileTriggered()
                 QDir::currentPath(),
                 "C++/C files (*.h *.hpp *.cpp *.c) ;; Text Files (*.txt) ;; JSON Files (*.json)"
                 );
-    QString readResult;
-
-    try
-    {
-        readResult = FileManager().readFromFile(fileName);
-    } catch (const QException&)
-    {
-        QMessageBox::warning(this, tr("Error"),
-                             tr("Unable to open specified file."));
-        return;
-    }
-
-    // creating new doc & passing file content to it
-    CodeEditor *newDoc = createNewDoc();
-    newDoc->setFileName(fileName);
-    int position = fileName.lastIndexOf(QChar{'/'});
-    newDoc->setWindowTitle(fileName.mid(position + 1));
-    newDoc->setPlainText(readResult);
-    newDoc->show();
+    openDoc(fileName);
 }
 
 void MainWindow::onOpenFolderTriggered()
@@ -306,7 +311,19 @@ void MainWindow::onSaveFileAsTriggered()
 
 void MainWindow::onSaveAllFilesTriggered()
 {
-    qDebug() << "save all";
+    if(!mpDocsArea)
+        return;
+
+    auto docsList = mpDocsArea->subWindowList();
+
+    if(docsList.empty())
+    {
+        QMessageBox::information(this, "Save", "There are no opened documents to save.");
+        return;
+    }
+    //for(const auto& doc: docsList)
+
+
 }
 
 void MainWindow::onCloseFileTriggered()
@@ -392,6 +409,11 @@ void MainWindow::onUserGuideTriggered()
 void MainWindow::onCheckUpdatesTriggered()
 {
     qDebug() << "check updates";
+}
+
+void MainWindow::onOpenFileFromProjectViewer(QString fileName)
+{
+    openDoc(fileName);
 }
 
 CodeEditor* MainWindow::createNewDoc()

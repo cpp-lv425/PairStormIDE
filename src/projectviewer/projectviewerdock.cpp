@@ -7,9 +7,9 @@
 #include <QSettings>
 #include <QDir>
 
-#include "mainwindow.h"
 #include "projectviewermodel.h"
 #include "projecttreeview.h"
+#include "mainwindow.h"
 
 ProjectViewerDock::ProjectViewerDock(QWidget *pParent): QDockWidget(pParent)
 {
@@ -18,11 +18,18 @@ ProjectViewerDock::ProjectViewerDock(QWidget *pParent): QDockWidget(pParent)
     filters << "*.txt"<<"*.cpp"<<"*.h"<<"*.json"<<"*.c"<<"*.hpp";
 
     //for testing use own path
-    QDir dir("C:\\Users\\igord\\Desktop\\PairStormIDE");
+    QDir dir = QDir::currentPath();
     ProjectViewerModel* fileSystemModel = new ProjectViewerModel(dir,filters);
     pTreeViewer = new ProjectTreeView(fileSystemModel);
     setWidget(pTreeViewer);
-    auto pMainWindow = dynamic_cast<MainWindow*>(pParent);
+
+    auto pMainWindow = qobject_cast<MainWindow*>(pParent);
+
+    if(!pMainWindow)
+        return;
+
+    connect(pTreeViewer, &ProjectTreeView::codeFileSelected,
+            pMainWindow, &MainWindow::onOpenFileFromProjectViewer);
 
 }
 ProjectViewerDock::~ProjectViewerDock()
