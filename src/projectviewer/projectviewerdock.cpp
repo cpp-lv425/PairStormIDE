@@ -6,6 +6,8 @@
 #include <QWidget>
 #include <QSettings>
 #include <QDir>
+#include <thread>
+#include <chrono>
 
 #include "projectviewermodel.h"
 #include "projecttreeview.h"
@@ -30,7 +32,6 @@ ProjectViewerDock::ProjectViewerDock(QWidget *pParent): QDockWidget(pParent)
 
     connect(pTreeViewer, &ProjectTreeView::codeFileSelected,
             pMainWindow, &MainWindow::onOpenFileFromProjectViewer);
-
 }
 ProjectViewerDock::~ProjectViewerDock()
 {

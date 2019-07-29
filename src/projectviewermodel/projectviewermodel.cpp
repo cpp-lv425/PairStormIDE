@@ -3,6 +3,19 @@
 #include <QImage>
 #include <QStringList>
 
+ProjectViewerModel::ProjectViewerModel()
+{
+    setFilter(QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot);
+    setNameFilterDisables(false);
+
+    QDirIterator it(":/img/", QDirIterator::Subdirectories);
+    while (it.hasNext())
+    {
+        it.next();
+        mImages.insert(it.fileInfo().baseName().toStdString(),new QIcon(it.path()+it.fileName()));
+    }
+}
+
 ProjectViewerModel::ProjectViewerModel(const QDir &directory, const QStringList &filters, QObject *parent)
     : QFileSystemModel (parent)
 {
@@ -25,6 +38,16 @@ ProjectViewerModel::~ProjectViewerModel()
     {
         delete temp;
     }
+}
+
+void ProjectViewerModel::setFilters(const QStringList &filters)
+{
+    setNameFilters(filters);
+}
+
+void ProjectViewerModel::setDir(const QDir &directory)
+{
+    setRootPath(directory.path());
 }
 
 QVariant ProjectViewerModel::data(const QModelIndex &index, int role) const
