@@ -44,7 +44,7 @@ void ApiParser::boradcastServerAttributes()
     m_udpService->broadcastDatagram(serverData);
 }
 
-void ApiParser::configureServerOnLogin(const QString userName)
+void ApiParser::configureServerOnLogin(const QString & userName)
 {
     // Create TCP server
     m_tcpService = TcpService::getService();

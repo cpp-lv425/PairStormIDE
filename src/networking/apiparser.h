@@ -65,7 +65,7 @@ public slots:
     //====================== On external signals ======================
 
     // When the uer has recently logged in to the application
-    virtual void configureServerOnLogin(const QString userName) = 0;
+    virtual void configureServerOnLogin(const QString & userName) = 0;
 
     // Each second when the counter emits signal
     virtual void boradcastServerAttributes() = 0;
@@ -122,7 +122,7 @@ public slots:
     //virtual void requireFullTextDocumentOnNeed() override;
 
 
-    virtual void configureServerOnLogin(const QString userName) override;
+    virtual void configureServerOnLogin(const QString & userName) override;
 
     virtual void boradcastServerAttributes() override;
 

@@ -8,13 +8,12 @@ TcpService::TcpService(QObject *qObject) : QObject(qObject)
     QNetworkConfigurationManager confManager;
     // Check if additional network configuration is needed
     bool isNetConfigurationNeeded =
-            confManager.capabilities() & QNetworkConfigurationManager::NetworkSessionRequired;
+            (confManager.capabilities() & QNetworkConfigurationManager::NetworkSessionRequired);
     if (isNetConfigurationNeeded)
     {
-        // Get saved network configuration
+        // Get previously saved network configuration from the registry
         QSettings netSettings(QSettings::UserScope, g_orgLabel, g_appLabel);
-
-        netSettings.beginGroup(QLatin1String("PSnet"));
+        netSettings.beginGroup(QString("PSnet"));
         const QString configId =
                 netSettings.value(QString("DefaultNetworkConfiguration")).toString();
         netSettings.endGroup();
@@ -59,23 +58,20 @@ TcpService::TcpService(QObject *qObject) : QObject(qObject)
 
 void TcpService::configureServer()
 {
-    //=============================================================================================
-    //                                                                    TODO: REFACTOR THIS STUFF
-    // If no configuration has been done
-    if (!m_netSession)
+    // Case, if additional configuration has been previously done
+    if (m_netSession)
     {
         QNetworkConfiguration configData = m_netSession->configuration();
-        QString id = (configData.type() == QNetworkConfiguration::UserChoice) ?
-            m_netSession->sessionProperty(QLatin1String("UserChoiceConfiguration")).toString() :
+        QString configId = (configData.type() == QNetworkConfiguration::UserChoice) ?
+            m_netSession->sessionProperty(QString("UserChoiceConfiguration")).toString() :
             configData.identifier();
 
+        // Save network configurations to the registry
         QSettings settings(QSettings::UserScope, g_orgLabel, g_appLabel);
-
-        settings.beginGroup(QLatin1String("PSnet"));
-        settings.setValue(QLatin1String("DefaultNetworkConfiguration"), id);
+        settings.beginGroup(QString("PSnet"));
+        settings.setValue(QString("DefaultNetworkConfiguration"), configId);
         settings.endGroup();
     }
-    //=============================================================================================
 
     // Launch QTcpServer on the m_portNumber
     m_tcpServerPtr = std::make_unique<QTcpServer>(new QTcpServer(this));
@@ -103,21 +99,28 @@ std::shared_ptr<TcpService> TcpService::getService()
 //                                                                     TCP SERVICE DESTRUCTOR
 TcpService::~TcpService()
 {
-    // Disconnect current sockets
-    std::for_each(m_clientSocketPtrs.begin(), m_clientSocketPtrs.end(),
-        [this](std::shared_ptr<QTcpSocket> socket)
-        {
-            disconnectSocket(socket);
-            //socket->close();
-        });
-    m_clientSocketPtrs.clear();
-    std::for_each(m_serverSocketPtrs.begin(), m_serverSocketPtrs.end(),
-        [](std::shared_ptr<QTcpSocket> socket)
-        {
-            socket->close();
-        });
     // Close launched server
     m_tcpServerPtr->close();
+
+    // Disconnect active sockets
+    std::for_each(m_clientSocketPtrs.begin(), m_clientSocketPtrs.end(),
+                  [this](std::shared_ptr<QTcpSocket> socket)
+                  {
+                      disconnectSocket(socket);
+                  });
+    std::for_each(m_serverSocketPtrs.begin(), m_serverSocketPtrs.end(),
+                  [this](std::shared_ptr<QTcpSocket> socket)
+                  {
+                      disconnectSocket(socket);
+                  });
+}
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
+//                                                     CONFIGURE NAME OF THE LOCAL TCP SERVER
+void TcpService::setServerName(const QString & name)
+{
+    m_serverName = name;
 }
 // ==========================================================================================
 // ==========================================================================================
@@ -162,6 +165,7 @@ void TcpService::sendThroughSocket(const QString & data,
     // Create & fill TCP segment with data
     QByteArray segment;
     segment.append(data);
+
     // Send TCP segment through socket
     receiver->write(segment);
     receiver->flush();
@@ -178,25 +182,26 @@ void TcpService::disconnectSocket(std::shared_ptr<QTcpSocket> socket)
 // ==========================================================================================
 // ==========================================================================================
 // ==========================================================================================
-//                                                          GET SOCKET OF THE GIVEN USER NAME
+//                                                      GET SOCKET OUT OF THE GIVEN USER NAME
 bool TcpService::resolveSocketByUserName(std::shared_ptr<QTcpSocket> & userSocket,
                                          const QString & userName)
 {
-    if(m_nameToSocket.find(userName.toStdString()) == m_nameToSocket.end())
+    const auto socketPtr = m_nameToSocket.find(userName.toStdString());
+    if(socketPtr == m_nameToSocket.end())
     {
         return false;
     }
-    userSocket = m_nameToSocket[userName.toStdString()];
+    userSocket = socketPtr->second;
+    //userSocket = m_nameToSocket[userName.toStdString()];
     return true;
 }
-
-void TcpService::setServerName(const QString & name)
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
+//                                                      GET SOCKET OUT OF THE GIVEN USER NAME
+void TcpService::connectToTcpServer(const ServerData & serverData)// QHostAddress ip, PortNumType port)
 {
-    m_serverName = name;
-}
-
-void TcpService::connectToTcpServer(QHostAddress ip, PortNumType port)
-{
+    // TODO: establish function
     // Create new empty server socket & save its ptr
     std::shared_ptr<QTcpSocket>
             serverSocketPtr(new QTcpSocket(this));
@@ -209,7 +214,7 @@ void TcpService::connectToTcpServer(QHostAddress ip, PortNumType port)
         Qt::AutoConnection);
 
     // And try to connect
-    serverSocketPtr->connectToHost(ip, port);
+    //serverSocketPtr->connectToHost(ip, port);
 }
 
 Segment TcpService::getReceivedSegment()

@@ -45,6 +45,8 @@ class TcpService : public QObject
 
     std::unordered_map<std::string, QString> m_ipToServerName;
 
+    std::unordered_map<std::string, std::shared_ptr<QTcpSocket>> m_nameToSocket;
+
     explicit TcpService(QObject *qObject = nullptr);
 
 public:
@@ -60,15 +62,16 @@ public:
     void sendThroughSocket(const QString & data, std::shared_ptr<QTcpSocket> receiver);
     void disconnectSocket(std::shared_ptr<QTcpSocket> socket);
 
-
+/*
     void addIpServerNameRelation(QHostAddress ip, QString serverName);
     QString getServerNameByIp(QHostAddress ip);
-
+*/
+    bool resolveSocketByUserName(std::shared_ptr<QTcpSocket> & userSocket, const QString & userName);
 
 
     void setServerName(const QString & name);
 
-    void connectToTcpServer(QHostAddress ip, PortNumType port);
+    void connectToTcpServer(const ServerData & serverData);//QHostAddress ip, PortNumType port);
     Segment getReceivedSegment();
 
     ~TcpService();
