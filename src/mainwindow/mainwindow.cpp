@@ -33,7 +33,7 @@ MainWindow::MainWindow(QWidget *parent) :
     restoreState(settings.value("mainWindowState").toByteArray());
 
     // set Fusion style globally - TEMP SOLUTION
-    QApplication::setStyle(QStyleFactory::create("Fusion"));    
+    QApplication::setStyle(QStyleFactory::create("Fusion"));
 
     setupMainMenu();
 
@@ -174,15 +174,15 @@ void MainWindow::setupMainMenu()
     menuBar()->addMenu(helpMenu);
 }
 
-void MainWindow::saveDocument(CodeEditor *pDoc)
+void MainWindow::saveDocument(CodeEditor *pDoc, QString fileName)
 {
     try
     {
         // writing to file
-        FileManager().writeToFile(pDoc->getFileName(), pDoc->toPlainText());
+        FileManager().writeToFile(fileName, pDoc->toPlainText());
     } catch (const QException&)
     {
-        QMessageBox::warning(this, "Error", "Unable to open file");
+        QMessageBox::warning(this, "Error", "Unable to open file for saving");
     }
 }
 
@@ -260,14 +260,14 @@ void MainWindow::onSaveFileTriggered()
 
     // if ptr to current document is not valid
     if(!curDoc)
-       return;
+        return;
 
     // if doc wasn't modified yet
     if(!curDoc->document()->isModified())
         return;
 
     // saving doc
-    saveDocument(curDoc);
+    saveDocument(curDoc, curDoc->getFileName());
 }
 
 void MainWindow::onSaveFileAsTriggered()
@@ -284,18 +284,24 @@ void MainWindow::onSaveFileAsTriggered()
 
     // if ptr to current document is not valid
     if(!curDoc)
-       return;
+        return;
+
+    QString extension;
 
     QString fileName = QFileDialog::getSaveFileName
             (
                 this,
                 "Save As",
-                QDir::currentPath(),
-                "C++/C files (*.h *.hpp *.cpp *.c) ;; Text Files (*.txt) ;; JSON Files (*.json)"
+                QDir::currentPath() + "/Unnamed",
+                "*.h ;; *.hpp ;; *.cpp ;; *.c ;; *.txt ;; *.json",
+                &extension
                 );
 
+    int position = fileName.indexOf(QChar{'.'});
+    fileName += extension.mid(position + 1);
+
     // saving doc
-    saveDocument(curDoc);
+    saveDocument(curDoc, fileName);
 }
 
 void MainWindow::onSaveAllFilesTriggered()

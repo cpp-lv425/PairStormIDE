@@ -36,7 +36,7 @@ private:
     MDIArea *mpDocsArea;    
 
     void setupMainMenu();
-    void saveDocument(CodeEditor* pDoc);
+    void saveDocument(CodeEditor* pDoc, QString fileName);
 
 private slots:
     // file menu actions
