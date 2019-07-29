@@ -1,4 +1,6 @@
 #include "udpservice.h"
+#include <QHostInfo>
+#include <QNetworkInterface>
 
 UdpService::UdpService(QObject *qObject) : QObject(qObject)
 {
@@ -8,7 +10,7 @@ UdpService::UdpService(QObject *qObject) : QObject(qObject)
 
     // Create & configure QUdpSocket
     m_udpSocketPtr = std::make_unique<QUdpSocket>(new QUdpSocket(this));
-    m_udpSocketPtr->bind(m_portNumber, QUdpSocket::ShareAddress);
+    m_udpSocketPtr->bind(m_portNumber);//, QUdpSocket::ShareAddress);
 
     // Save datagram on readyRead
     connect(
@@ -28,12 +30,30 @@ void UdpService::broadcastDatagram(QString data)
 {
     QByteArray datagram;
     datagram.append(data);
+/*
     // Broadcast datagram bytes
     m_udpSocketPtr->writeDatagram(
                 datagram,
-                QHostAddress::Broadcast,
-                //QHostAddress("192.168.43.77"),
+                //QHostAddress::Broadcast,
+                QHostAddress("192.168.103.255"),
                 m_portNumber);
+*/
+    foreach (const QNetworkInterface &netInterface, QNetworkInterface::allInterfaces()) {
+        QNetworkInterface::InterfaceFlags flags = netInterface.flags();
+        if( (bool)(flags & QNetworkInterface::IsRunning) && !(bool)(flags & QNetworkInterface::IsLoopBack)){
+            foreach (const QNetworkAddressEntry &address, netInterface.addressEntries()) {
+                if(address.ip().protocol() == QAbstractSocket::IPv4Protocol)
+                    qDebug() << address.ip().toString();
+                    qDebug() << address.broadcast().toString();
+                    m_udpSocketPtr->writeDatagram(
+                                datagram,
+                                //QHostAddress::Broadcast,
+                                //QHostAddress("192.168.103.255"),
+                                address.broadcast(),
+                                m_portNumber);
+            }
+        }
+    }
 }
 
 Datagram UdpService::getReceivedDatagram() const

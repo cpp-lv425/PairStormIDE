@@ -109,10 +109,23 @@ ServerData TcpService::getServerData()
     ServerData serverData;
 
     serverData.m_name = m_serverName;
+    /*
     for (const auto & ip : QNetworkInterface::allAddresses())
         serverData.m_ips.push_back(ip);
     serverData.m_port = m_tcpServerPtr->serverPort();
-
+    */
+    foreach (const QNetworkInterface &netInterface, QNetworkInterface::allInterfaces()) {
+        QNetworkInterface::InterfaceFlags flags = netInterface.flags();
+        if( (bool)(flags & QNetworkInterface::IsRunning) && !(bool)(flags & QNetworkInterface::IsLoopBack)){
+            foreach (const QNetworkAddressEntry &address, netInterface.addressEntries()) {
+                if(address.ip().protocol() == QAbstractSocket::IPv4Protocol)
+                    //qDebug() << address.ip().toString();
+                    //qDebug() << address.broadcast().toString();
+                    serverData.m_ips.push_back(address.ip());
+            }
+        }
+    }
+    serverData.m_port = m_tcpServerPtr->serverPort();
     return serverData;
 }
 
