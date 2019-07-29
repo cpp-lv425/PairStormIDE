@@ -81,7 +81,6 @@ public slots:
 private:
     // creates new doc in MDIArea
     CodeEditor* createNewDoc();
-
 };
 
 #endif // MAINWINDOW_H

@@ -5,6 +5,7 @@
 #include <QSettings>
 #include <QTreeView>
 #include <QWidget>
+#include <QDebug>
 #include <QDir>
 
 #include "projectviewermodel.h"
@@ -15,8 +16,15 @@ ProjectViewerDock::ProjectViewerDock(QWidget *pParent): QDockWidget(pParent)
 {
     setWindowTitle("Project Viewer");
 
-    QStringList filters;
-    filters << "*.txt"<<"*.cpp"<<"*.h"<<"*.json"<<"*.c"<<"*.hpp";
+    auto pMainWindow = qobject_cast<MainWindow*>(pParent);
+
+    if(!pMainWindow)
+        return;
+
+    // constructing filters
+    QStringList filters = pMainWindow->getFileExtensions();
+    for(auto& item: filters)
+        item.push_front('*');
 
     mpViewerModel = new ProjectViewerModel(this);
     mpTreeViewer = new ProjectTreeView(mpViewerModel,this);
@@ -26,16 +34,10 @@ ProjectViewerDock::ProjectViewerDock(QWidget *pParent): QDockWidget(pParent)
     setDir(QDir::current());
     setFilters(filters);
 
-    setWidget(mpTreeViewer);
-
-    auto pMainWindow = qobject_cast<MainWindow*>(pParent);
-
-    if(!pMainWindow)
-        return;
+    setWidget(mpTreeViewer);    
 
     connect(mpTreeViewer, &ProjectTreeView::codeFileSelected,
             pMainWindow, &MainWindow::onOpenFileFromProjectViewer);
-
 
 }
 

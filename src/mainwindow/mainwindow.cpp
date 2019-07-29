@@ -243,8 +243,8 @@ void MainWindow::onOpenFileTriggered()
 
 void MainWindow::onOpenFolderTriggered()
 {
-    qDebug()<<"OK";
-    mpProjectViewerDock->setDir(QDir::home());
+    QString dirName = QFileDialog::getExistingDirectory(this, "Open Directory", QDir::currentPath());
+    mpProjectViewerDock->setDir(dirName);
 }
 
 void MainWindow::onOpenStartPage()
@@ -322,8 +322,11 @@ void MainWindow::onSaveAllFilesTriggered()
         QMessageBox::information(this, "Save", "There are no opened documents to save.");
         return;
     }
-    //for(const auto& doc: docsList)
 
+    for(const auto& doc: docsList)
+    {
+
+    }
 
 }
 
