@@ -75,7 +75,7 @@ private slots:
     void onCheckUpdatesTriggered();
 
 public slots:
-    void onOpenFileFromProjectViewer(QString fileName);
+    void onOpenFileFromProjectViewer(QString fileName);    
 
 private:
     // creates new doc in MDIArea

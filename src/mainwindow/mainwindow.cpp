@@ -413,7 +413,7 @@ void MainWindow::onRefactorTriggered()
 void MainWindow::onConnectTriggered()
 {
     LoginDialog loginDialog(this);
-    loginDialog.exec();
+    currentUserName = loginDialog.start();
 }
 
 void MainWindow::onSettingsTriggered()

@@ -1,5 +1,6 @@
 #include "logindialog.h"
 
+#include <QMessageBox>
 #include <QPushButton>
 #include <QBoxLayout>
 #include <QGroupBox>
@@ -24,7 +25,7 @@ LoginDialog::LoginDialog(QWidget *pParent): QDialog (pParent)
     // create user name label
     QLabel *pUserNameLbl = new QLabel("User Name");
     // create user name line edit
-    QLineEdit *pUserNameLineEdit = new QLineEdit;
+    pUserNameLineEdit = new QLineEdit;
     pUserNameLineEdit->setText("Unnamed");
     QHBoxLayout *pEditLayout = new QHBoxLayout;
     pEditLayout->addWidget(pUserNameLbl);
@@ -43,6 +44,8 @@ LoginDialog::LoginDialog(QWidget *pParent): QDialog (pParent)
     pButtonsLayout->addWidget(pCancel);
 
     // connecting buttons
+    connect(pCancel, &QPushButton::clicked, this, &LoginDialog::reject);
+    connect(pOk, &QPushButton::clicked, this, &LoginDialog::onOkButtonClicked);
 
     // laying out window
     QVBoxLayout *pWdwLayout = new QVBoxLayout;
@@ -59,4 +62,23 @@ LoginDialog::LoginDialog(QWidget *pParent): QDialog (pParent)
     int x = cntr.x() - width() / 2;
     int y = cntr.y() - height() / 2;
     move(x, y);
+}
+
+QString LoginDialog::start()
+{
+    exec();
+    // return user name
+    return userName;
+}
+
+void LoginDialog::onOkButtonClicked()
+{
+    // check if user left empty edit line
+    if(pUserNameLineEdit->text().isEmpty())
+    {
+        QMessageBox::warning(this, "User Name Input", "Please enter user name to proceed");
+        return;
+    }
+    userName = pUserNameLineEdit->text();
+    accept();
 }
