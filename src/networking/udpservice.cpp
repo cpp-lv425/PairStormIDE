@@ -8,7 +8,7 @@ UdpService::UdpService(QObject *qObject) : QObject(qObject)
 
     // Create & configure QUdpSocket
     m_udpSocketPtr = std::make_unique<QUdpSocket>(new QUdpSocket(this));
-    m_udpSocketPtr->bind(QHostAddress::LocalHost, m_portNumber);
+    m_udpSocketPtr->bind(m_portNumber, QUdpSocket::ShareAddress);
 
     // Save datagram on readyRead
     connect(
@@ -32,6 +32,7 @@ void UdpService::broadcastDatagram(QString data)
     m_udpSocketPtr->writeDatagram(
                 datagram,
                 QHostAddress::Broadcast,
+                //QHostAddress("192.168.43.77"),
                 m_portNumber);
 }
 
