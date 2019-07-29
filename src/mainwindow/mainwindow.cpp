@@ -17,7 +17,6 @@
 #include "newfilewizard.h"
 #include "filemanager.h"
 #include "codeeditor.h"
-
 #include "mdiarea.h"
 
 MainWindow::MainWindow(QWidget *parent) :
