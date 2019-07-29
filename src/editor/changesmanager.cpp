@@ -94,7 +94,6 @@ void ChangeManager::writeChange(std::string newFileState)
     currentState_it = changesHistory.end() - 1;// if we add new record to the history, set the iterator to the end
 }
 
-
 std::string ChangeManager::undo()
 {
     if(currentState_it == changesHistory.begin())
