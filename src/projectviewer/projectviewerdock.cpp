@@ -18,11 +18,10 @@ ProjectViewerDock::ProjectViewerDock(QWidget *pParent): QDockWidget(pParent)
     filters << "*.txt"<<"*.cpp"<<"*.h"<<"*.json"<<"*.c"<<"*.hpp";
 
     //for testing use own path
-    QDir dir("C:\\Users\\igord\\Desktop\\PairStormIDE");
+    QDir dir("/home/igor/Desktop/PairStormIDE");
     ProjectViewerModel* fileSystemModel = new ProjectViewerModel(dir,filters);
     pTreeViewer = new ProjectTreeView(fileSystemModel);
     setWidget(pTreeViewer);
-    auto pMainWindow = dynamic_cast<MainWindow*>(pParent);
 
 }
 ProjectViewerDock::~ProjectViewerDock()

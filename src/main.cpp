@@ -1,12 +1,6 @@
-#include "mainwindow.h"
-
 #include <QApplication>
-#include <QTreeView>
-#include <QDebug>
 
-#include "projectviewermodel.h"
-#include "projecttreeview.h"
-#include "startpage.h"
+#include "mainwindow.h"
 
 int main(int argc, char *argv[])
 {
