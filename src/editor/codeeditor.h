@@ -2,6 +2,7 @@
 #define CODEEDITOR_H
 
 
+
 #include<QPlainTextEdit>
 #include<QObject>
 #include"ideconfiguration.h"
@@ -9,6 +10,13 @@
 #include<utility>
 
 #define CHANGE_SAVE_TIME 3000
+
+#include<QAbstractScrollArea>
+#include <QPlainTextEdit>
+#include <QObject>
+#include "lexercpp.h"
+#include "ideconfiguration.h"
+
 
 class QPaintEvent;
 class QResizeEvent;
@@ -44,6 +52,7 @@ private slots:
    void updateLineNumberAreaWidth();
    void highlightCurrentLine();
    void updateLineNumberArea(const QRect &rect, int dy);
+   void runLexer();
 
 public
 slots:
@@ -65,6 +74,9 @@ private:
    QString fileName;
    ChangeManager changeManager;
    QTimer *timer;
+   LexerCPP lexer;
+   QVector<Token> tokens;
+
 };
 
 
