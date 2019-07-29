@@ -14,7 +14,7 @@ public:
 
     Highlightercpp(QTextDocument* parent);
     void setData(QVector<Token>);
-    void setCurrentLine(unsigned int line);
+   // void setCurrentLine(unsigned int line);
     void highlightBlock(const QString &text);
 
 };

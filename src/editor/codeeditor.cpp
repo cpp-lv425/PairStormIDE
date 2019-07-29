@@ -29,8 +29,7 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     connect(this, SIGNAL(updateRequest(QRect,int)), this, SLOT(updateLineNumberArea(QRect,int)));
     connect(this, SIGNAL(textChanged()), this, SLOT(runLexer()));
     connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(highlightCurrentLine()));
-
-
+   // connect(this,SIGNAL(textChanged()),this,SLOT(highlightBlock));
     connect(timer, SIGNAL(timeout()), this, SLOT(saveStateInTheHistory()));
     connect(this, SIGNAL(textChanged()), this, SLOT(changesAppeared()));
 
@@ -54,9 +53,12 @@ void CodeEditor::runLexer()
 {
     lcpp->clear();
     lcpp->lexicalAnalysis(document()->toPlainText());
+    hcpp->setCurrentLine(textCursor().blockNumber());
+    qDebug()<<textCursor().blockNumber();
     tokens = lcpp->getTokens();
-    for(auto it = tokens.begin(); it < tokens.end(); ++it)
-        qDebug() << it->name << " "  << it->begin << " " << it->end << " " << it->linesCount << '\n';
+    hcpp->setData(tokens);
+   /* for(auto it = tokens.begin(); it < tokens.end(); ++it)
+        qDebug() << it->name << " "  << it->begin << " " << it->end << " " << it->linesCount << '\n';*/
 }
 
 int CodeEditor::lineNumberAreaWidth()
