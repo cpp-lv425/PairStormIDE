@@ -1,11 +1,19 @@
 #ifndef HIGHLIGHTERCPP_H
 #define HIGHLIGHTERCPP_H
 #include <QSyntaxHighlighter>
+#include <QTextCharFormat>
+#include <token.h>
 
 class Highlightercpp: QSyntaxHighlighter
 {
+private:
+    unsigned int currentLine;
+    QVector<Token> data;
 public:
-   // Highlightercpp();
+    Highlightercpp(QTextDocument* parent);
+    void setData(QVector<Token>);
+    void setCurrentLine(unsigned int line);
+    void highlightBlock(const QString &text);
 };
 
 #endif // HIGHLIGHTERCPP_H

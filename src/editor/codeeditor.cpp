@@ -13,6 +13,8 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     setLineWrapMode(QPlainTextEdit::NoWrap);// don't move cursor to the next line where it's out of visible scope
 
     lineNumberArea = new LineNumberArea(this);
+    hcpp = new Highlightercpp(document());
+    lcpp = new LexerCPP();
 
     //This signal is emitted when the text document needs an update of the specified rect.
     //If the text is scrolled, rect will cover the entire viewport area.
@@ -36,8 +38,11 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
 
 void CodeEditor::runLexer()
 {
-    lexer.lexicalAnalysis(toPlainText());
-    tokens = lexer.getTokens();
+    lcpp->clear();
+    lcpp->lexicalAnalysis(document()->toPlainText());
+    tokens = lcpp->getTokens();
+    for(auto it = tokens.begin(); it < tokens.end(); ++it)
+        qDebug() << it->name << " "  << it->begin << " " << it->end << " " << it->linesCount << '\n';
 }
 
 int CodeEditor::lineNumberAreaWidth()
