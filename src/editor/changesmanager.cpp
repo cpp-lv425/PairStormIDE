@@ -1,5 +1,6 @@
 #include "changemanager.h"
-
+#include<algorithm>
+#include<QString>
 ChangeManager::ChangeManager() = default;
 
 void ChangeManager::limitCheck()
@@ -10,6 +11,7 @@ void ChangeManager::limitCheck()
 
 void ChangeManager::removeHistory()//it's not necessary to hold history if we returned to the start and didn't press ctrl + Y
 {
+    qDebug()<<"History removed!";
     if(!changesHistory.size())
         return;
     auto it_victim = changesHistory.end() - 1;// move from the end of list
@@ -47,15 +49,24 @@ ChangeManager::ChangeManager(const std::string &fileState)
 }
 
 ChangeManager::~ChangeManager() = default;
-
-void ChangeManager::writeChange(std::string newFileState)
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void ChangeManager::writeChange(std::string newFileState, QPlainTextEdit *codeEditor)
 {
     if(!fileChanged(newFileState))
         return;
 
     limitCheck();
-    removeHistory();
+    //removeHistory();
+    auto it_victim = changesHistory.end() - 1;
 
+        if (changesHistory.size())
+        {
+            while (it_victim != currentState_it)
+            {
+                it_victim--;
+                changesHistory.pop_back();
+            }
+        }
     IntegralChange change;
 
     //get the start of mismatch
@@ -84,6 +95,12 @@ void ChangeManager::writeChange(std::string newFileState)
 
     change.before = before;
     change.after = after;
+    //change.cursor = codeEditor->cursor().pos();
+    //qDebug()<<"cursor pos x= "<<change.cursor.x();
+   // qDebug()<<"cursor pos y= "<<change.cursor.y();
+   // codeEditor->cur
+    //std::cout<<before;
+   // std::cout<<after;
 
 
     change.begin_change_pos = static_cast<size_t>(std::distance(currentFileState.begin(),
@@ -92,31 +109,43 @@ void ChangeManager::writeChange(std::string newFileState)
     changesHistory.push_back(change);
     currentFileState = newFileState;
     currentState_it = changesHistory.end() - 1;// if we add new record to the history, set the iterator to the end
+    //currentState_it;
+    qDebug()<<"added. size = "<<changesHistory.size();
 }
 
-std::string ChangeManager::undo()
+
+
+
+std::string ChangeManager::undo(QPlainTextEdit *codeEditor)
 {
     if(currentState_it == changesHistory.begin())
     {
-        qDebug()<<"NOTHING TO UNDO";
+        //qDebug()<<"NOTHING TO UNDO";
+
         return currentFileState;
     }
+    //codeEditor->cursor().setPos(currentState_it->cursor);
 //in order to get previous position we should replace "before" with "after"
     auto pos = currentState_it->begin_change_pos;
     std::string from = currentState_it->after;
     std::string to = currentState_it->before;
     currentState_it--;
+    size_t distance = static_cast<size_t>(std::distance(changesHistory.begin(),
+                                                        currentState_it));
+    qDebug()<<"distance from the start = " << distance;
     currentFileState.replace(pos, from.length(), to);
+
     return currentFileState;
 }
 
-std::string ChangeManager::redo()
+std::string ChangeManager::redo(QPlainTextEdit *codeEditor)
 {
     if (currentState_it == (changesHistory.end() - 1))//if is no any record in the change history list
     {
-        qDebug()<<"NOTHING TO REDO!";
+        //qDebug()<<"NOTHING TO REDO!";
         return currentFileState;
     }
+    //codeEditor->cursor().setPos(currentState_it->cursor);
 // if oreder to get next position we should replace "after" from current record with "after" from next record
     std::string from = currentState_it->after;
     currentState_it++;
@@ -126,6 +155,6 @@ std::string ChangeManager::redo()
     currentFileState.replace(currentFileState.begin() + static_cast<int>(pos_start),
                              currentFileState.begin() + static_cast<int>(pos_end), to);
 
-    std::cout << "\nREDO: " << currentFileState;
+
     return currentFileState;
 }

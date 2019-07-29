@@ -16,14 +16,16 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     lineNumberArea = new LineNumberArea(this);
     timer = new QTimer;
 
+    saveStateInTheHistory();
     //This signal is emitted when the text document needs an update of the specified rect.
     //If the text is scrolled, rect will cover the entire viewport area.
     //If the text is scrolled vertically, dy carries the amount of pixels the viewport was scrolled.
     connect(this, SIGNAL(updateRequest(QRect,int)), this, SLOT(updateLineNumberArea(QRect,int)));
     connect(this, SIGNAL(textChanged()), this, SLOT(runLexer()));
     connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(highlightCurrentLine()));
+    //connect(timer, SIGNAL(timeout()), this, SLOT(saveStateInTheHistory()));
     connect(timer, SIGNAL(timeout()), this, SLOT(saveStateInTheHistory()));
-    connect(this, SIGNAL(textChanged()), this, SLOT(changesAppeared()));
+    //connect(this, SIGNAL(textChanged()), this, SLOT(changesAppeared()));
 
     timer->start(CHANGE_SAVE_TIME);//save text by this time
 
@@ -143,6 +145,9 @@ void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event)
 
 void CodeEditor::saveStateInTheHistory()
 {
-    std::string str = this->toPlainText().toUtf8().constData();
-    changeManager.writeChange(str);
+    //qDebug()<<"pk";
+    //std::string str = this->toPlainText().toUtf8().constData();
+   // changeManager.writeChange(str, this);
+    //qDebug()<<"before = " << (QString::fromStdString(changeManager.currentState_it->before));
+   // qDebug()<<"after = "<<(QString::fromStdString(changeManager.currentState_it->before));
 }

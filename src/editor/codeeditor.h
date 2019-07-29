@@ -1,7 +1,7 @@
 #ifndef CODEEDITOR_H
 #define CODEEDITOR_H
 
-#define CHANGE_SAVE_TIME 2000
+#define CHANGE_SAVE_TIME 500
 #define TAB_SPACE 4
 
 #include<QPlainTextEdit>

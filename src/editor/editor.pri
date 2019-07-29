@@ -28,4 +28,5 @@ HEADERS += \
         $$PWD/widget.h
 
 FORMS += \
+        $$PWD/inputcommentwidget.ui \
         $$PWD/widget.ui

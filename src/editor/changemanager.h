@@ -8,16 +8,19 @@
 #include <algorithm>
 #include<QDebug>
 #include<QThread>
+#include<QPlainTextEdit>
+#include<QCursor>
 struct IntegralChange
 {
     size_t begin_change_pos;// position where changed started
     std::string   before;
     std::string   after;
+    QPoint cursor;
 };
 
 class ChangeManager
 {
-private:
+public:
     std::deque<IntegralChange> changesHistory;
     std::string currentFileState;
     std::deque<IntegralChange>::iterator currentState_it;
@@ -31,9 +34,9 @@ public:
     ChangeManager();
     ChangeManager(const std::string &fileState);
     ~ChangeManager();
-    void writeChange(std::string newFileState);
-    std::string undo();
-    std::string redo();
+    void writeChange(std::string newFileState, QPlainTextEdit *codeEditor);
+    std::string undo(QPlainTextEdit *codeEditor);
+    std::string redo(QPlainTextEdit *codeEditor);
 };
 
 #endif // CHANGESMANAGER_H
