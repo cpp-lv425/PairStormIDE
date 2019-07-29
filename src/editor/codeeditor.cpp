@@ -62,6 +62,11 @@ void CodeEditor::setFileName(const QString &fileName)
     this->fileName = fileName;
 }
 
+std::pair<const QString &, const QString &> CodeEditor::getChangedFileInfo()
+{
+    return std::make_pair(this->toPlainText(), fileName);
+}
+
 void CodeEditor::updateLineNumberAreaWidth()
 {
     // reset start position for typing (according new linecounter position)

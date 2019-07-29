@@ -24,7 +24,7 @@ private:
     void limitCheck();
     void removeHistory();
     bool fileChanged(const std::string &newFileState);
-    std::string setStringFromMismatchIterators(std::string::iterator mismatch_range_begin,
+    std::string createStringFromMismatchIterators(std::string::iterator mismatch_range_begin,
                                                std::string::iterator fileStateEnd, long long end_pos);
 
 public:

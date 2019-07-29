@@ -6,6 +6,7 @@
 #include<QObject>
 #include"ideconfiguration.h"
 #include"changemanager.h"
+#include<utility>
 
 #define CHANGE_SAVE_TIME 3000
 
@@ -26,8 +27,8 @@ public:
     void lineNumberAreaPaintEvent(QPaintEvent *event);
     int lineNumberAreaWidth();
     QString& getFileName();
-    void setFileName(const QString &flename);
-    std::pair<const std::string &, const std::string &> getChangedFileInfo();
+    void setFileName(const QString &fileame);
+    std::pair<const QString &, const QString &> getChangedFileInfo();
 
 
 protected:
