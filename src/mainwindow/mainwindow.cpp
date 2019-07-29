@@ -15,6 +15,7 @@
 #include "bottompaneldock.h"
 #include "chatwindowdock.h"
 #include "newfilewizard.h"
+#include "logindialog.h"
 #include "filemanager.h"
 #include "codeeditor.h"
 #include "startpage.h"
@@ -355,6 +356,7 @@ void MainWindow::onCloseFileTriggered()
 
     auto reply = QMessageBox::question(this, "Save changes", "Do you want to save changes to current document?");
 
+    // !!! implement saving changes
     mpDocsArea->closeActiveSubWindow();
 }
 
@@ -410,7 +412,8 @@ void MainWindow::onRefactorTriggered()
 
 void MainWindow::onConnectTriggered()
 {
-    qDebug() << "connect";
+    LoginDialog loginDialog(this);
+    loginDialog.exec();
 }
 
 void MainWindow::onSettingsTriggered()

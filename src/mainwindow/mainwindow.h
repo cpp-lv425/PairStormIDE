@@ -32,7 +32,8 @@ private:
     ProjectViewerDock *mpProjectViewerDock;
     ChatWindowDock *mpChatWindowDock;
     BottomPanelDock *mpBottomPanelDock;
-    MDIArea *mpDocsArea;    
+    MDIArea *mpDocsArea;
+    QString currentUserName;
 
     void setupMainMenu();
     void saveDocument(CodeEditor* pDoc, QString fileName);
