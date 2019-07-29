@@ -26,6 +26,8 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
 
     timer->start(CHANGE_SAVE_TIME);//save text by this time
 
+    this->setTabStopDistance(TAB_SPACE * fontMetrics().width(QLatin1Char('0')));//set tab distance
+
     // start typing from correct position (in the first line it doesn't consider weight of lineCounter)
     //that's why we need to set this position
     updateLineNumberAreaWidth();

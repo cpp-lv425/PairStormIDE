@@ -9,6 +9,7 @@
 #include<utility>
 
 #define CHANGE_SAVE_TIME 3000
+#define TAB_SPACE 4
 
 class QPaintEvent;
 class QResizeEvent;
