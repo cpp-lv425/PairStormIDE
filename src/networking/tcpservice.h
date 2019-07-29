@@ -56,6 +56,7 @@ public:
     void sendThroughSocket(const QString & data, std::shared_ptr<QTcpSocket> receiver);
     void disconnectSocket(std::shared_ptr<QTcpSocket> socket);
 
+
     void addIpServerNameRelation(QHostAddress ip, QString serverName);
     QString getServerNameByIp(QHostAddress ip);
 
