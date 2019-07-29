@@ -1,45 +1,62 @@
 #ifndef UPDSERVICE_H
 #define UPDSERVICE_H
 
-#include <memory>
-#include <QObject>
-#include <QUdpSocket>
+// Base features and structures for the networking module
 #include "networkbase.h"
 
-// SINGLETON
-// UDP service provider
+#include <memory>
+#include <QObject>
+#include <QHostInfo>
+#include <QUdpSocket>
+#include <QNetworkInterface>
+
+// ==========================================================================================
+//                                                                                   SNGLETON
+//                                                                       UDP service provider
+// ==========================================================================================
 class UdpService : public QObject
 {
     Q_OBJECT // for signals and slots
 
 
+    // Standard port number for UDP communication
+    const PortNumType m_portNumber =
+            g_defaultUdpPortNumber;
+
     // QUdpSocket composition
     std::unique_ptr<QUdpSocket> m_udpSocketPtr;
+    // Received datagrams and broadcast IPv4 addresses
+    Datagram                    m_pendingDatagram;
+    QVector<QHostAddress>       m_broadcastIps;
 
+    explicit UdpService(QObject *qObject = nullptr); // Private!
 
-    // Standard port number for UDP communication
-    // Received datagrams using the port m_portNumber
-    const PortNumType m_portNumber = g_defaultUdpPortNumber;
-    Datagram    m_pendingDatagram;
-
-    explicit UdpService(QObject *qObject = nullptr);
+    // Socket configuration routine, have to be executed
+    // before using class - is called inside constructor
+    void configureSocket();
 
 public:
+
     UdpService(UdpService const&) = delete;
     UdpService& operator=(UdpService const&) = delete;
 
-    // Service getter generator
+    // Service instance generator
     static std::shared_ptr<UdpService> getService();
 
-    // Datagram broadcaster
-    void broadcastDatagram(QString datagram);
 
+
+    // Datagram broadcaster
+    void broadcastDatagram(const QString & datagram);
+
+    // Saved datagram getter
     Datagram getReceivedDatagram() const;
 
 signals:
+
     void newDatagramSaved();
 
 public slots:
+
     void saveDatagramOnReceival();
 };
 

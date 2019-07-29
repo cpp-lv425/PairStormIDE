@@ -1,66 +1,87 @@
 #include "udpservice.h"
-#include <QHostInfo>
-#include <QNetworkInterface>
-
+// ==========================================================================================
+// ==========================================================================================
+//                                                                 GET LAST RECEIVED DATAGRAM
 UdpService::UdpService(QObject *qObject) : QObject(qObject)
 {
-    // Configure standard UDP port number and empty datagram
-    m_pendingDatagram = decltype(m_pendingDatagram) ();
+    configureSocket();
 
-
-    // Create & configure QUdpSocket
-    m_udpSocketPtr = std::make_unique<QUdpSocket>(new QUdpSocket(this));
-    m_udpSocketPtr->bind(m_portNumber);//, QUdpSocket::ShareAddress);
-
-    // Save datagram on readyRead
+    // Save received datagrams on readyRead
     connect(
         m_udpSocketPtr.get(), &QUdpSocket::readyRead,
         this,                 &UdpService::saveDatagramOnReceival,
         Qt::UniqueConnection);
 }
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
+//                                               CONFIGURE SOCKET AND GET BROADCAST ADDRESSES
+void UdpService::configureSocket()
+{
+    // Create & configure QUdpSocket
+    m_udpSocketPtr = std::make_unique<QUdpSocket>(new QUdpSocket(this));
+    m_udpSocketPtr->bind(m_portNumber);
 
+    // Establish broadcast addresses for each interface
+    for (const auto & availableInt : QNetworkInterface::allInterfaces())
+    {
+        QNetworkInterface::InterfaceFlags intFlags = availableInt.flags();
+        bool isInterfaceRunning(intFlags & QNetworkInterface::IsRunning);
+        bool isInterfaceLoopBack(intFlags & QNetworkInterface::IsLoopBack);
+        // Omit interfaces that are LoopBack or are not active
+        if(!isInterfaceRunning || isInterfaceLoopBack) continue;
+
+        // Add all broadcast IPv4 addresses from this interface
+        for (const auto & ipEntry : availableInt.addressEntries())
+        {
+            if(ipEntry.ip().protocol() == QAbstractSocket::IPv4Protocol)
+            {
+                m_broadcastIps.push_back(ipEntry.broadcast());
+            }
+        }
+    }
+}
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
+//                                                   GET INSTANCE OF THE UDP SERVICE PROVIDER
 std::shared_ptr<UdpService> UdpService::getService()
 {
     static std::shared_ptr<UdpService>
             serviceInstance(new UdpService);
     return serviceInstance;
 }
-
-void UdpService::broadcastDatagram(QString data)
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
+//                                               BROADCAST GIVEN DATAGRAM FROM ALL INTERFACES
+void UdpService::broadcastDatagram(const QString & data)
 {
     QByteArray datagram;
     datagram.append(data);
-/*
-    // Broadcast datagram bytes
-    m_udpSocketPtr->writeDatagram(
-                datagram,
-                //QHostAddress::Broadcast,
-                QHostAddress("192.168.103.255"),
-                m_portNumber);
-*/
-    foreach (const QNetworkInterface &netInterface, QNetworkInterface::allInterfaces()) {
-        QNetworkInterface::InterfaceFlags flags = netInterface.flags();
-        if( (bool)(flags & QNetworkInterface::IsRunning) && !(bool)(flags & QNetworkInterface::IsLoopBack)){
-            foreach (const QNetworkAddressEntry &address, netInterface.addressEntries()) {
-                if(address.ip().protocol() == QAbstractSocket::IPv4Protocol)
-                    qDebug() << address.ip().toString();
-                    qDebug() << address.broadcast().toString();
-                    m_udpSocketPtr->writeDatagram(
-                                datagram,
-                                //QHostAddress::Broadcast,
-                                //QHostAddress("192.168.103.255"),
-                                address.broadcast(),
-                                m_portNumber);
-            }
-        }
+
+    // Broadcast through all broadcast Ip adresses
+    for (const QHostAddress & broadcastIp : m_broadcastIps)
+    {
+        // Broadcast datagram bytes
+        m_udpSocketPtr->writeDatagram(
+                    datagram,
+                    broadcastIp,
+                    m_portNumber);
     }
 }
-
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
+//                                                                 GET LAST RECEIVED DATAGRAM
 Datagram UdpService::getReceivedDatagram() const
 {
     return m_pendingDatagram;
 }
-
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
+//                                                               RECEIVE DATAGRAM AND SAVE IT
 void UdpService::saveDatagramOnReceival()
 {
     // Get size of the datagram
