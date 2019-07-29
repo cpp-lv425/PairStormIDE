@@ -174,7 +174,7 @@ void MainWindow::setupMainMenu()
     menuBar()->addMenu(helpMenu);
 }
 
-void MainWindow::saveChangesToDocument(CodeEditor *pDoc)
+void MainWindow::saveDocument(CodeEditor *pDoc)
 {
     try
     {
@@ -267,12 +267,35 @@ void MainWindow::onSaveFileTriggered()
         return;
 
     // saving doc
-    saveChangesToDocument(curDoc);
+    saveDocument(curDoc);
 }
 
 void MainWindow::onSaveFileAsTriggered()
 {
-    qDebug() << "save as";
+    // if there are no opened docs
+    if(!mpDocsArea || !mpDocsArea->currentSubWindow())
+    {
+        QMessageBox::information(this, "Save", "There are no opened documents to save.");
+        return;
+    }
+
+    auto curDoc = qobject_cast<CodeEditor*>
+            (mpDocsArea->currentSubWindow()->widget());
+
+    // if ptr to current document is not valid
+    if(!curDoc)
+       return;
+
+    QString fileName = QFileDialog::getSaveFileName
+            (
+                this,
+                "Save As",
+                QDir::currentPath(),
+                "C++/C files (*.h *.hpp *.cpp *.c) ;; Text Files (*.txt) ;; JSON Files (*.json)"
+                );
+
+    // saving doc
+    saveDocument(curDoc);
 }
 
 void MainWindow::onSaveAllFilesTriggered()
