@@ -8,7 +8,7 @@
 #include"changemanager.h"
 #include<utility>
 
-#define CHANGE_SAVE_TIME 3000
+#define CHANGE_SAVE_TIME 2000
 #define TAB_SPACE 4
 
 class QPaintEvent;
