@@ -47,14 +47,14 @@ void CodeEditor::keyPressEvent(QKeyEvent *e)
         if(e->key() == Qt::Key_Z && e->modifiers() & Qt::ControlModifier)
         {
 
-            QString text = QString::fromStdString(this->changesManager.undo());
+            QString text = QString::fromStdString(this->changeManager.undo());
             this->document()->setPlainText(text);
         }
 
         if(e->key() == Qt::Key_Y && e->modifiers() & Qt::ControlModifier)
         {
 
-            QString text = QString::fromStdString(this->changesManager.redo());
+            QString text = QString::fromStdString(this->changeManager.redo());
             this->document()->setPlainText(text);
         }
         QPlainTextEdit::keyPressEvent(e);

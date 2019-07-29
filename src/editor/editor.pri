@@ -12,7 +12,7 @@ SOURCES += \
         $$PWD/widget.cpp
 
 HEADERS += \
-        $$PWD/changesmanager.h \
+        $$PWD/changemanager.h \
         $$PWD/codeeditor.h \
         $$PWD/highlightercpp.h \
         $$PWD/ideconfiguration.h \

@@ -1,5 +1,7 @@
 #ifndef CHANGESMANAGER_H
 #define CHANGESMANAGER_H
+
+#define CHANGES_HISTORY_MAX_SIZE 100
 #include <string>
 #include <deque>
 #include <iostream>
@@ -13,16 +15,22 @@ struct IntegralChange
     std::string   after;
 };
 
-class ChangesManager
+class ChangeManager
 {
-public:
+private:
     std::deque<IntegralChange> changesHistory;
     std::string currentFileState;
     std::deque<IntegralChange>::iterator currentState_it;
+    void limitCheck();
+    void removeHistory();
+    bool fileChanged(const std::string &newFileState);
+    std::string setStringFromMismatchIterators(std::string::iterator mismatch_range_begin,
+                                               std::string::iterator fileStateEnd, long long end_pos);
+
 public:
-    ChangesManager();
-    ChangesManager(const std::string &fileState);
-    ~ChangesManager();
+    ChangeManager();
+    ChangeManager(const std::string &fileState);
+    ~ChangeManager();
     void writeChange(std::string newFileState);
     std::string undo();
     std::string redo();

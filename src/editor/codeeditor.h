@@ -5,7 +5,7 @@
 #include<QPlainTextEdit>
 #include<QObject>
 #include"ideconfiguration.h"
-#include"changesmanager.h"
+#include"changemanager.h"
 
 #define CHANGE_SAVE_TIME 3000
 
@@ -27,6 +27,8 @@ public:
     int lineNumberAreaWidth();
     QString& getFileName();
     void setFileName(const QString &flename);
+    std::pair<const std::string &, const std::string &> getChangedFileInfo();
+
 
 protected:
     void resizeEvent(QResizeEvent *event)override;
@@ -36,9 +38,12 @@ private slots:
    void highlightCurrentLine();
    void updateLineNumberArea(const QRect &rect, int dy);
 
-public slots:
+public
+slots:
    void keyPressEvent(QKeyEvent *e) override;
    void saveStateInTheHistory();
+signals:
+   void changesAppeared();
 
 private:
    QWidget *lineNumberArea;
@@ -46,7 +51,7 @@ private:
    int currentZoom = 100;
    QFont font;
    QString fileName;
-   ChangesManager changesManager;
+   ChangeManager changeManager;
    QTimer *timer;
 };
 

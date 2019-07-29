@@ -22,6 +22,7 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     connect(this, SIGNAL(updateRequest(QRect,int)), this, SLOT(updateLineNumberArea(QRect,int)));
     connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(highlightCurrentLine()));
     connect(timer, SIGNAL(timeout()), this, SLOT(saveStateInTheHistory()));
+    connect(this, SIGNAL(textChanged()), this, SLOT(changesAppeared()));
 
     timer->start(CHANGE_SAVE_TIME);//save text by this time
 
@@ -129,5 +130,5 @@ void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event)
 void CodeEditor::saveStateInTheHistory()
 {
     std::string str = this->toPlainText().toUtf8().constData();
-    changesManager.writeChange(str);
+    changeManager.writeChange(str);
 }
