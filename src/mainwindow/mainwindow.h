@@ -10,6 +10,7 @@ class MainWindow;
 }
 
 QT_BEGIN_NAMESPACE
+class ProjectViewerDock;
 class QFileSystemModel;
 class BottomPanelDock;
 class ChatWindowDock;
@@ -30,7 +31,7 @@ public:
 
 private:
     Ui::MainWindow *ui;
-    QDockWidget *mpProjectViewerDock;
+    ProjectViewerDock *mpProjectViewerDock;
     QDockWidget *mpChatWindowDock;
     BottomPanelDock *mpBottomPanelDock;
     MDIArea *mpDocsArea;    

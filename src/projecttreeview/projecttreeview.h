@@ -12,7 +12,7 @@ class ProjectTreeView : public QTreeView
 {
     Q_OBJECT
 public:
-    ProjectTreeView();
+    ProjectTreeView(QWidget * parent = nullptr);
     ProjectTreeView(ProjectViewerModel *model,QWidget * parent = nullptr);
     void setProjectModel(ProjectViewerModel *prModel);
     void setFilters(const QStringList &filters);

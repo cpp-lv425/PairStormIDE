@@ -243,7 +243,8 @@ void MainWindow::onOpenFileTriggered()
 
 void MainWindow::onOpenFolderTriggered()
 {
-    //
+    qDebug()<<"OK";
+    mpProjectViewerDock->setDir(QDir::home());
 }
 
 void MainWindow::onOpenStartPage()

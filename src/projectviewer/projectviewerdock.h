@@ -4,17 +4,22 @@
 #include <QDockWidget>
 
 QT_BEGIN_NAMESPACE
+class ProjectViewerModel;
 class ProjectTreeView;
 class QWidget;
+class QDir;
 QT_END_NAMESPACE
 
 class ProjectViewerDock: public QDockWidget
 {
     Q_OBJECT
 
-    ProjectTreeView *pTreeViewer;
+    ProjectTreeView *mpTreeViewer;
+    ProjectViewerModel *mpViewerModel;
 public:
-    ProjectViewerDock(QWidget *pParent = nullptr);    
+    ProjectViewerDock(QWidget *pParent = nullptr);
+    void setFilters(QStringList filters);
+    void setDir(QDir curDir);
     ~ProjectViewerDock();
 };
 

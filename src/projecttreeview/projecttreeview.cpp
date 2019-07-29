@@ -4,7 +4,8 @@
 #include <QKeyEvent>
 #include <QDebug>
 
-ProjectTreeView::ProjectTreeView()
+ProjectTreeView::ProjectTreeView(QWidget *parent)
+    : QTreeView(parent)
 {
     setSelectionMode(QAbstractItemView::SingleSelection);
     setIconSize(QSize(20,28));

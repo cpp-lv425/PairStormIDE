@@ -1,9 +1,11 @@
 #include "projectviewermodel.h"
 
+#include <QDebug>
 #include <QImage>
 #include <QStringList>
 
-ProjectViewerModel::ProjectViewerModel()
+ProjectViewerModel::ProjectViewerModel(QObject *parent)
+    : QFileSystemModel (parent)
 {
     setFilter(QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot);
     setNameFilterDisables(false);
@@ -47,6 +49,7 @@ void ProjectViewerModel::setFilters(const QStringList &filters)
 
 void ProjectViewerModel::setDir(const QDir &directory)
 {
+    qDebug()<<directory;
     setRootPath(directory.path());
 }
 
