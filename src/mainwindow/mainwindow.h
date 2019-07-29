@@ -3,8 +3,6 @@
 
 #include <QMainWindow>
 
-#include "startpage.h"
-
 namespace Ui {
 class MainWindow;
 }
@@ -32,7 +30,7 @@ public:
 private:
     Ui::MainWindow *ui;
     ProjectViewerDock *mpProjectViewerDock;
-    QDockWidget *mpChatWindowDock;
+    ChatWindowDock *mpChatWindowDock;
     BottomPanelDock *mpBottomPanelDock;
     MDIArea *mpDocsArea;    
 

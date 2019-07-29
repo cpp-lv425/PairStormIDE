@@ -17,6 +17,7 @@
 #include "newfilewizard.h"
 #include "filemanager.h"
 #include "codeeditor.h"
+#include "startpage.h"
 #include "mdiarea.h"
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -342,7 +343,19 @@ void MainWindow::onSaveAllFilesTriggered()
 
 void MainWindow::onCloseFileTriggered()
 {
-    qDebug() << "close file";
+    auto curDoc = qobject_cast<CodeEditor*>
+            (mpDocsArea->currentSubWindow()->widget());
+
+    // if ptr to current document is not valid
+    if(!curDoc)
+        return;
+
+    if(!curDoc->document()->isModified())
+        return;
+
+    auto reply = QMessageBox::question(this, "Save changes", "Do you want to save changes to current document?");
+
+    mpDocsArea->closeActiveSubWindow();
 }
 
 void MainWindow::onExitTriggered()
