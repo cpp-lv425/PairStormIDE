@@ -8,11 +8,11 @@
 #include "networkbase.h"
 
 
-//======================================================================================
-//                                                                              SNGLETON
-//                                                                             INTERFACE
-//                                                                        API interfacer
-//======================================================================================
+// ==========================================================================================
+//                                                                                   SNGLETON
+//                                                                                  INTERFACE
+//                                                                             API interfacer
+// ==========================================================================================
 class BaseApiParser : public QObject
 {
     Q_OBJECT
@@ -37,13 +37,20 @@ public:
     BaseApiParser(BaseApiParser const&)            = delete;
     BaseApiParser& operator=(BaseApiParser const&) = delete;
 
+
     virtual QVector<QString> getOnlineUsers() const = 0;
-    //virtual void shareWithUser(QString userName) = 0;
+    virtual void shareWithUser(QString userName) = 0;
 
 signals:
+
+    //========================== To the  GUI ==========================
     void sharingRequested();
+    void newUserDiscovered();
+
+    //======================= To  Editor & Chat =======================
     void messageReceived();
     void changeReceived();
+
 
 public slots:
     //====================== On internal signals ======================
@@ -58,7 +65,7 @@ public slots:
     //====================== On external signals ======================
 
     // When the uer has recently logged in to the application
-    virtual void configureServerOnLogin() = 0;
+    virtual void configureServerOnLogin(const QString userName) = 0;
 
     // Each second when the counter emits signal
     virtual void boradcastServerAttributes() = 0;
@@ -79,10 +86,10 @@ public:
 
 
 
-//======================================================================================
-//                                                                              SNGLETON
-//                                                                        API interfacer
-//======================================================================================
+// ==========================================================================================
+//                                                                                   SNGLETON
+//                                                                             API interfacer
+// ==========================================================================================
 class ApiParser : public BaseApiParser
 {
     Q_OBJECT
@@ -101,7 +108,7 @@ public:
 
 
     virtual QVector<QString> getOnlineUsers() const override;
-    //virtual void shareWithUser(QString userName) override;
+    virtual void shareWithUser(QString userName) override;
 
 
 signals:
@@ -115,7 +122,7 @@ public slots:
     //virtual void requireFullTextDocumentOnNeed() override;
 
 
-    virtual void configureServerOnLogin() override;
+    virtual void configureServerOnLogin(const QString userName) override;
 
     virtual void boradcastServerAttributes() override;
 

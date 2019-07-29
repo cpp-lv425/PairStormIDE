@@ -32,6 +32,11 @@ QVector<QString> ApiParser::getOnlineUsers() const
     return userNames;
 }
 
+void ApiParser::shareWithUser(QString userName)
+{
+    return;
+}
+
 void ApiParser::boradcastServerAttributes()
 {
     // Push attributes to the Json bearer string & broadcast it
@@ -39,15 +44,16 @@ void ApiParser::boradcastServerAttributes()
     m_udpService->broadcastDatagram(serverData);
 }
 
-void ApiParser::configureServerOnLogin()
+void ApiParser::configureServerOnLogin(const QString userName)
 {
-    // Broadcast server information to other
+    // Create TCP server
     m_tcpService = TcpService::getService();
 
-    m_userName = "";    // TODO get username from other class
-    QString serverName = m_userName;
-    m_tcpService->giveNameToLocalServer(serverName);
+    // Define server name with name of the user
+    // and save server informtation
+    m_tcpService->setServerName(userName);
     m_launchedTcpServerAttrib = m_tcpService->getServerData();
+
 
     connect(
         m_tcpService.get(), &TcpService::newSegmentSaved,
@@ -68,17 +74,12 @@ void ApiParser::addServerFromUdpDatagramOnReceive()
 
 
 #ifdef CUSTOM_DEBUG
-    qDebug() << "add server from udp datagram in api parser:";
     qDebug() << "____________________________________________________________";
-    qDebug() << "SERVER INFO";
+    qDebug() << "SERVER IS DISCOVERED THROUGH UDP DISCOVERY PROTOCOL:";
     qDebug() << "name ->" << serverInfo.m_name;
     qDebug() << "port ->" << serverInfo.m_port;
     for(const auto & ip : serverInfo.m_ips)
         qDebug() << "ip -> " << ip.toString();
-    qDebug() << "____________________________________________________________";
-    qDebug() << "datagram: " << data.m_data;
-    qDebug() << "ip: " << data.m_ip.toString();
-    qDebug() << "port: " << data.m_port;
     qDebug() << "____________________________________________________________";
 #endif // CUSTOM_DEBUG
 }
@@ -101,7 +102,7 @@ void ApiParser::processTcpSegmentOnReceive()
 #ifdef CUSTOM_DEBUG
 void ApiParser::testBroadcastServerInfoDatagram()
 {
-    configureServerOnLogin();
+    configureServerOnLogin("Valik");
     boradcastServerAttributes();
 }
 
