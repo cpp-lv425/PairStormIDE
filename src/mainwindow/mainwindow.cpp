@@ -558,7 +558,7 @@ void MainWindow::onConnectTriggered()
 {
     LoginDialog loginDialog(this);
     currentUserName = loginDialog.start();
-    mplocalConnector->configureServerOnLogin(currentUserName);
+    mplocalConnector->configureServiceOnLogin(currentUserName);
 }
 
 void MainWindow::onSettingsTriggered()

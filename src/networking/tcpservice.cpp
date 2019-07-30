@@ -156,7 +156,7 @@ ServerData TcpService::resolveServerAttributes() const
 // ==========================================================================================
 // ==========================================================================================
 //                                           CONNECT TO TCP SERVER BY GIVEN SERVER ATTRIBUTES
-void TcpService::connectToTcpServer(const ServerData & serverData)
+bool TcpService::connectToTcpServer(const ServerData & serverData)
 {
     // Create new empty server socket & save its ptr
     std::shared_ptr<QTcpSocket>
@@ -175,6 +175,11 @@ void TcpService::connectToTcpServer(const ServerData & serverData)
     const QHostAddress ip =   serverData.m_sourceIp;
 
     serverSocketPtr->connectToHost(ip, port);
+    if (serverSocketPtr->waitForConnected(1000))
+    {
+        return true;
+    }
+    return false;
 }
 // ==========================================================================================
 // ==========================================================================================

@@ -64,7 +64,7 @@ public:
 
     // Connect to TCP server with specified attributes
     // and create special socket or disconnect from given socket
-    void connectToTcpServer(const ServerData & serverData);
+    bool connectToTcpServer(const ServerData & serverData);
     void disconnectSocket(std::shared_ptr<QTcpSocket> socket);
 
 
