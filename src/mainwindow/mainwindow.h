@@ -77,6 +77,7 @@ private slots:
 
 public slots:
     void onOpenFileFromProjectViewer(QString fileName);    
+    void onCloseWindow(CodeEditor* curDoc);
 
 private:
     // creates new doc in MDIArea
