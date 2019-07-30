@@ -55,6 +55,7 @@ public:
     static std::shared_ptr<TcpService> getService();
 
     ServerData getServerData();
+    QString getServerName() const;
 
     void sendThroughSocket(const QString & data, std::shared_ptr<QTcpSocket> receiver);
     void disconnectSocket(std::shared_ptr<QTcpSocket> socket);
@@ -64,6 +65,7 @@ public:
     QString getServerNameByIp(QHostAddress ip);
 */
     void setUserNameSocketRelation(const std::shared_ptr<QTcpSocket> & userSocket, const QString & userName);
+    void removeUserNameSocketRelation(const QString & userName);
     bool resolveSocketByUserName(std::shared_ptr<QTcpSocket> & userSocket, const QString & userName);
     bool resolveUserNameBySocket(const std::shared_ptr<QTcpSocket> & userSocket, QString & userName);
 
@@ -77,7 +79,7 @@ public:
 
 signals:
     void clientRequestConnection(std::shared_ptr<QTcpSocket> clientSocketPtr);
-    void socketDisconnected();
+    void socketDisconnected(QString serverName);
     void newSegmentSaved();
 
 public slots:

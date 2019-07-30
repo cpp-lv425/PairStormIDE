@@ -119,6 +119,14 @@ void TcpService::setServerName(const QString & name)
 // ==========================================================================================
 // ==========================================================================================
 // ==========================================================================================
+//                                                            GET NAME OF THE LAUNCHED SERVER
+QString TcpService::getServerName() const
+{
+    return m_serverName;
+}
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
 //                                                 GET CONFIGURATIONS OF THE LOCAL TCP SERVER
 ServerData TcpService::getServerData()
 {
@@ -152,77 +160,6 @@ ServerData TcpService::getServerData()
 // ==========================================================================================
 // ==========================================================================================
 // ==========================================================================================
-//                                                             SEND DATA THROUGH GIVEN SOCKET
-void TcpService::sendThroughSocket(const QString & data,
-                                   std::shared_ptr<QTcpSocket> receiver)
-{
-    // Create & fill TCP segment with data
-    QByteArray segment;
-    segment.append(data);
-
-    // Send TCP segment through socket
-    receiver->write(segment);
-    receiver->flush();
-}
-// ==========================================================================================
-// ==========================================================================================
-// ==========================================================================================
-//                                                                    DISCONNECT GIVEN SOCKET
-void TcpService::disconnectSocket(std::shared_ptr<QTcpSocket> socket)
-{
-    socket->disconnectFromHost();
-
-}
-// ==========================================================================================
-// ==========================================================================================
-// ==========================================================================================
-//                                                                    DISCONNECT GIVEN SOCKET
-
-void TcpService::setUserNameSocketRelation(const std::shared_ptr<QTcpSocket> & userSocket,
-                                           const QString & userName)
-{
-    m_nameToSocket[userName.toStdString()] = userSocket;
-}
-// ==========================================================================================
-// ==========================================================================================
-// ==========================================================================================
-//                                                      GET SOCKET OUT OF THE GIVEN USER NAME
-bool TcpService::resolveSocketByUserName(std::shared_ptr<QTcpSocket> & userSocket,
-                                         const QString & userName)
-{
-    const auto socketPtr = m_nameToSocket.find(userName.toStdString());
-    if(socketPtr == m_nameToSocket.end())
-    {
-        return false;
-    }
-    userSocket = socketPtr->second;
-    return true;
-}
-// ==========================================================================================
-// ==========================================================================================
-// ==========================================================================================
-//                                                         GET USER NAME FOR THE GIVEN SOCKET
-bool TcpService::resolveUserNameBySocket(const std::shared_ptr<QTcpSocket> & userSocket,
-                                         QString & userName)
-{
-    const auto userNameAndSocket =
-            find_if(m_nameToSocket.begin(),
-                    m_nameToSocket.end(),
-                    [userSocket] (std::pair<std::string,
-                                  std::shared_ptr<QTcpSocket>> nameSocket)
-                    {
-                        return nameSocket.second == userSocket;
-                    });
-    if(userNameAndSocket == m_nameToSocket.end())
-    {
-        return false;
-    }
-    userName = QString(userNameAndSocket->first.c_str());
-    return true;
-}
-// ==========================================================================================
-// ==========================================================================================
-// ==========================================================================================
 //                                           CONNECT TO TCP SERVER BY GIVEN SERVER ATTRIBUTES
 void TcpService::connectToTcpServer(const ServerData & serverData)
 {
@@ -244,14 +181,6 @@ void TcpService::connectToTcpServer(const ServerData & serverData)
     {
         serverSocketPtr->connectToHost(ip, port);
     }
-}
-// ==========================================================================================
-// ==========================================================================================
-// ==========================================================================================
-//                                                                  GET LAST RECEIVED SEGMENT
-Segment TcpService::getReceivedSegment() const
-{
-    return m_pendingSegment;
 }
 // ==========================================================================================
 // ==========================================================================================
@@ -313,12 +242,76 @@ void TcpService::configureSocketOnClientConnection()
 // ==========================================================================================
 // ==========================================================================================
 // ==========================================================================================
+//                                                             SEND DATA THROUGH GIVEN SOCKET
+void TcpService::sendThroughSocket(const QString & data,
+                                   std::shared_ptr<QTcpSocket> receiver)
+{
+    // Create & fill TCP segment with data
+    QByteArray segment;
+    segment.append(data);
+
+    // Send TCP segment through socket
+    receiver->write(segment);
+    receiver->flush();
+}
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
+//                                                                 SAVE EACH RECEIVED SEGMENT
+void TcpService::saveSegmentOnReceival()
+{
+    // Get source' socket ptr
+    std::shared_ptr<QTcpSocket>
+            senderSocketPtr(qobject_cast<QTcpSocket*>(sender()));
+
+    // Get received data & socket attributes, i.e. IP and port
+    QByteArray   data (senderSocketPtr->readAll());
+    QHostAddress ip   (senderSocketPtr->peerAddress());
+    PortNumType  port (senderSocketPtr->peerPort());
+
+    // Save attributes of the segment
+    m_pendingSegment.m_data = data;
+    m_pendingSegment.m_ip   = ip;
+    m_pendingSegment.m_port = port;
+
+    // Inform about segment receival
+    emit newSegmentSaved();
+}
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
+//                                                                  GET LAST RECEIVED SEGMENT
+Segment TcpService::getReceivedSegment() const
+{
+    return m_pendingSegment;
+}
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
+//                                                                    DISCONNECT GIVEN SOCKET
+void TcpService::disconnectSocket(std::shared_ptr<QTcpSocket> socket)
+{
+    socket->disconnectFromHost();
+}
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
 //                                             REMOVE DISCONNECTED SOCKET FROM ACTIVE SOCKETS
 void TcpService::removeSocketOnDisconnected()
 {
     // Get disconnected socket
     std::shared_ptr<QTcpSocket>
             disconnectedSocketPtr(qobject_cast<QTcpSocket*>(sender()));
+
+    // Suppose that disconnected socket name is unknown
+    QString disconnectedSocketName("Unknown");
+    // Try to get real name of the server, described by the given socket
+    bool isNameResolved =
+            resolveUserNameBySocket(disconnectedSocketPtr, disconnectedSocketName);
+    if (isNameResolved)
+    {
+        removeUserNameSocketRelation(disconnectedSocketName);
+    }
 
     // Move socket away from active sockets
     auto newConnectedSocketsEnd =
@@ -350,28 +343,68 @@ void TcpService::removeSocketOnDisconnected()
 
 
     // Inform about socket disconnection
-    emit socketDisconnected();
+    emit socketDisconnected(disconnectedSocketName);
 }
 // ==========================================================================================
 // ==========================================================================================
 // ==========================================================================================
-//                                                      RECEIVE AND SAVE EACH ARRIVED SEGMENT
-void TcpService::saveSegmentOnReceival()
+//                                                        INSERT USERNAME TO SOCKET RELATION
+void TcpService::setUserNameSocketRelation(const std::shared_ptr<QTcpSocket> & userSocket,
+                                           const QString & userName)
 {
-    // Get source' socket ptr
-    std::shared_ptr<QTcpSocket>
-            senderSocketPtr(qobject_cast<QTcpSocket*>(sender()));
-
-    // Get received data & socket attributes, i.e. IP and port
-    QByteArray   data (senderSocketPtr->readAll());
-    QHostAddress ip   (senderSocketPtr->peerAddress());
-    PortNumType  port (senderSocketPtr->peerPort());
-
-    // Save attributes of the segment
-    m_pendingSegment.m_data = data;
-    m_pendingSegment.m_ip   = ip;
-    m_pendingSegment.m_port = port;
-
-    // Inform about segment receival
-    emit newSegmentSaved();
+    m_nameToSocket.insert(std::make_pair(userName.toStdString(), userSocket));
+    //m_nameToSocket[userName.toStdString()] = userSocket;
 }
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
+//                                                         REMOVE USERNAME TO SOCKET RELATION
+void TcpService::removeUserNameSocketRelation(const QString & userName)
+{
+    //m_nameToSocket.erase(m_nameToSocket.find(userName.toStdString()));
+    m_nameToSocket.erase(userName.toStdString());
+}
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
+//                                                      GET SOCKET OUT OF THE GIVEN USER NAME
+bool TcpService::resolveSocketByUserName(std::shared_ptr<QTcpSocket> & userSocket,
+                                         const QString & userName)
+{
+    // Try to find user name
+    const auto socketPtr = m_nameToSocket.find(userName.toStdString());
+    // Return false if not found
+    if(socketPtr == m_nameToSocket.end())
+    {
+        return false;
+    }
+    // Save socket and return true if found
+    userSocket = socketPtr->second;
+    return true;
+}
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
+//                                                         GET USER NAME FOR THE GIVEN SOCKET
+bool TcpService::resolveUserNameBySocket(const std::shared_ptr<QTcpSocket> & userSocket,
+                                         QString & userName)
+{
+    // Try to find given socket
+    const auto userNameAndSocket =
+            find_if(m_nameToSocket.begin(),
+                    m_nameToSocket.end(),
+                    [userSocket] (std::pair<std::string,
+                                  std::shared_ptr<QTcpSocket>> nameSocket)
+                    {
+                        return nameSocket.second == userSocket;
+                    });
+    // Return false if not found
+    if(userNameAndSocket == m_nameToSocket.end())
+    {
+        return false;
+    }
+    // Save user name and return true if found
+    userName = QString(userNameAndSocket->first.c_str());
+    return true;
+}
+
