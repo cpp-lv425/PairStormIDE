@@ -19,6 +19,7 @@
 #include "filemanager.h"
 #include "codeeditor.h"
 #include "startpage.h"
+#include "apiparser.h"
 #include "mdiarea.h"
 #include "storeconf.h"
 
@@ -26,6 +27,8 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
+    mplocalConnector = DefaultLocalConnector::generateConnector().get();
+
     ui->setupUi(this);
     {
         StoreConf conf(this);
@@ -552,6 +555,7 @@ void MainWindow::onConnectTriggered()
 {
     LoginDialog loginDialog(this);
     currentUserName = loginDialog.start();
+    mplocalConnector->configureServerOnLogin(currentUserName);
 }
 
 void MainWindow::onSettingsTriggered()

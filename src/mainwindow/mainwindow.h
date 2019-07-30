@@ -8,6 +8,7 @@ class MainWindow;
 }
 
 QT_BEGIN_NAMESPACE
+class LocalConnectorInterface;
 class ProjectViewerDock;
 class QFileSystemModel;
 class BottomPanelDock;
@@ -29,6 +30,7 @@ public:
     ~MainWindow();
 
 private:
+    LocalConnectorInterface * mplocalConnector;
     Ui::MainWindow *ui;
     ProjectViewerDock *mpProjectViewerDock;
     ChatWindowDock *mpChatWindowDock;
