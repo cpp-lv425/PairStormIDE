@@ -77,9 +77,9 @@ struct ServerData {
         }
     }
 
-    bool empty()
+    bool empty() const
     {
-        return m_name != QString("");
+        return m_name == QString();
     }
 };
 
