@@ -3,21 +3,31 @@
 
 #include <QTreeView>
 
+QT_BEGIN_NAMESPACE
+class QDir;
 class ProjectViewerModel;
+QT_END_NAMESPACE
 
 class ProjectTreeView : public QTreeView
 {
     Q_OBJECT
 public:
-    ProjectTreeView(ProjectViewerModel *mPrModel,QWidget * parent = nullptr);
+    ProjectTreeView(QWidget * parent = nullptr);
+    ProjectTreeView(ProjectViewerModel *model,QWidget * parent = nullptr);
+    void setProjectModel(ProjectViewerModel *prModel);
+    void setFilters(const QStringList &filters);
+    void setDirectory(const QDir &directory);
+
 signals:
     void codeFileSelected(QString);
+
     // QWidget interface
 protected:
     void keyPressEvent(QKeyEvent *event);
     void mouseDoubleClickEvent(QMouseEvent *event);
+
 private:
-    ProjectViewerModel *mPrModel;
+    ProjectViewerModel *mProjectModel;
 };
 
 #endif // PROJECTTREEVIEW_H

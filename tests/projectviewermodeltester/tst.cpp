@@ -11,10 +11,9 @@ private slots:
 
 void ViewerModelTests::test()
 {
-
-     QStringList filters;
+    QStringList filters;
     filters << "*.txt"<<"*.cpp"<<"*.h"<<"*.json"<<"*.c"<<"*.hpp";
-    QDir dir("C:\\Users\\igord\\Desktop\\PairStormIDE");
+    QDir dir(QDir::home());
     ProjectViewerModel* fileSystemModel = new ProjectViewerModel(dir,filters);
 
     QAbstractItemModelTester tester(fileSystemModel,QAbstractItemModelTester::FailureReportingMode::QtTest,this);
@@ -22,4 +21,4 @@ void ViewerModelTests::test()
 
 
 QTEST_MAIN(ViewerModelTests)
-#include "tst_projectviewermodel.moc"
+#include "tst.moc"
