@@ -23,7 +23,8 @@ private:
     QString analizerStyle           = "white";
     QString analizerFontSize        = "12";
     QString analizerFontName        = "Times New Roman";
-    QString cppExtentions           = "c;cpp;h;hpp";
+    QString cppExtentions           = "c;cpp;h;hpp;json;txt";
+    QStringList cppExtentionsL;
 
     void writeJson();
     void readJson();                //  read [confile] to [loadDoc]. status write to [readStatus]
