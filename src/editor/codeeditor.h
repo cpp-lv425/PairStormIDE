@@ -47,6 +47,7 @@ private:
    QVector<Token> tokens;
    Highlightercpp *hcpp;
    LexerCPP *lcpp;
+   QString fileName;
 };
 
 
