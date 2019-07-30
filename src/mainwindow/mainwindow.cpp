@@ -97,7 +97,7 @@ void MainWindow::setupMainMenu()
     fileMenu->addSeparator();
 
     // closing docs & exiting the program
-    fileMenu->addAction("&Close file", this, &MainWindow::onCloseFileTriggered, Qt::CTRL + Qt::Key_W);
+    fileMenu->addAction("&Close document", this, &MainWindow::onCloseFileTriggered, Qt::CTRL + Qt::Key_W);
     fileMenu->addAction("&Exit", this, &MainWindow::onExitTriggered, Qt::ALT + Qt::Key_F4);
 
     // edit menu
@@ -319,7 +319,7 @@ void MainWindow::onSaveAllFilesTriggered()
         return;
 
     // getting all docs
-    auto docsList = mpDocsArea->subWindowList();    
+    auto docsList = mpDocsArea->subWindowList();
 
     // if there are no docs
     if(docsList.empty())
@@ -351,12 +351,29 @@ void MainWindow::onCloseFileTriggered()
     if(!curDoc)
         return;
 
+    // if doc wasn't modified then just close doc
     if(!curDoc->document()->isModified())
+    {
+        mpDocsArea->closeActiveSubWindow();
         return;
+    }
 
-    auto reply = QMessageBox::question(this, "Save changes", "Do you want to save changes to current document?");
+    // ask user whether changes should be saved
+    QMessageBox::StandardButton reply
+            = QMessageBox::question
+            (
+                this,
+                "Save changes",
+                "Do you want to save changes to current document?",
+                QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No
+                );
 
-    // !!! implement saving changes
+    // checking user's answer
+    if(reply == QMessageBox::StandardButton::Yes)
+    {
+        saveDocument(curDoc, curDoc->getFileName());
+    }
+    // closing doc
     mpDocsArea->closeActiveSubWindow();
 }
 
