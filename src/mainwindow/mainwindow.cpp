@@ -34,8 +34,14 @@ MainWindow::MainWindow(QWidget *parent) :
     restoreGeometry(settings.value("mainWindowGeometry").toByteArray());
     restoreState(settings.value("mainWindowState").toByteArray());
 
+    QString styleName;
+
     // set Fusion style globally - TEMP SOLUTION
-    QApplication::setStyle(QStyleFactory::create("Fusion"));
+    if(QStyleFactory::keys().size() >= 3)
+    {
+        styleName = QStyleFactory::keys().at(2);
+    }
+    QApplication::setStyle(QStyleFactory::create(styleName));
 
     setupMainMenu();
 
