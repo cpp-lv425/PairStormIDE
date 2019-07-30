@@ -18,19 +18,18 @@
 #include "filemanager.h"
 #include "codeeditor.h"
 #include "mdiarea.h"
+#include "storeconf.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-
+    {
+        StoreConf conf(this);
+    }
     // when first started main window is maximized
     setWindowState(Qt::WindowMaximized);
-
-    QSettings settings("425", "PairStorm");
-    restoreGeometry(settings.value("mainWindowGeometry").toByteArray());
-    restoreState(settings.value("mainWindowState").toByteArray());
 
     // set Fusion style globally - TEMP SOLUTION
     QApplication::setStyle(QStyleFactory::create("Fusion"));
@@ -41,7 +40,6 @@ MainWindow::MainWindow(QWidget *parent) :
     mpProjectViewerDock = new ProjectViewerDock(this);
     addDockWidget(Qt::LeftDockWidgetArea, mpProjectViewerDock);
     mpProjectViewerDock->setObjectName("mpProjectViewerDock");
-    mpProjectViewerDock->restoreGeometry(settings.value("mpProjectViewerDockGeometry").toByteArray());
 
     // create instance of Chat Window
     mpChatWindowDock = new ChatWindowDock(this);
@@ -56,6 +54,8 @@ MainWindow::MainWindow(QWidget *parent) :
     mpBottomPanelDock->setObjectName("mpBottomPanelDock");
 
     setCentralWidget(mpDocsArea);
+
+    restoreMainWindowState();
 }
 
 QStringList MainWindow::getFileExtensions() const
@@ -441,8 +441,22 @@ CodeEditor* MainWindow::createNewDoc()
 
 MainWindow::~MainWindow()
 {
-    QSettings settings("425", "PairStorm");
+    saveMainWindowState();
+    delete ui;
+}
+
+// save to configuration file current state and geometry of mainwindow's toolbars and dockwidgets
+void MainWindow::saveMainWindowState()
+{
+    QSettings settings(QApplication::organizationName(), QApplication::applicationName());
     settings.setValue("mainWindowGeometry", saveGeometry());
     settings.setValue("mainWindowState", saveState());
-    delete ui;
+}
+
+// restore state and geometry of mainwindow's toolbars and dockwidgets from last session
+void MainWindow::restoreMainWindowState()
+{
+    QSettings settings(QApplication::organizationName(), QApplication::applicationName());
+    restoreGeometry(settings.value("mainWindowGeometry").toByteArray());
+    restoreState(settings.value("mainWindowState").toByteArray());
 }
