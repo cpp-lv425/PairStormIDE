@@ -493,9 +493,32 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
         if(curDoc && curDoc->document()->isModified())
         {
+
+            QMessageBox::StandardButton reply = QMessageBox::question
+                    (
+                        this,
+                        "Saving Changes",
+                        "Do you want to save changes to opened documents?",
+                        QMessageBox::Yes | QMessageBox::No
+                        );
+
+            if(reply == QMessageBox::No)
+                event->accept();
+            else
+                break;
+        }
+    }
+
+    for (int i = 0; i < docsList.size(); ++i)
+    {
+        auto curDoc = qobject_cast<CodeEditor*>(docsList[i]->widget());
+
+        if(curDoc && curDoc->document()->isModified())
+        {
             saveDocument(curDoc, curDoc->getFileName());
         }
     }
+    event->accept();
 }
 
 MainWindow::~MainWindow()
