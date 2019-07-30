@@ -1,17 +1,14 @@
 #ifndef DOCUMENTATIONSEARCH_H
 #define DOCUMENTATIONSEARCH_H
 
-#include <QObject>
+#include <QVector>
+#include <QFileInfo>
 
-class DocumentationSearch : public QObject
+class DocumentationSearch
 {
-    Q_OBJECT
 public:
-    explicit DocumentationSearch(QObject *parent = nullptr);
-
-signals:
-
-public slots:
+    static QVector<QFileInfo> search(const QDir &directory,const QString &keyword);
+    static QVector<QFileInfo> search(const QDir &directory,const QString &include, const QString &function);
 };
 
 #endif // DOCUMENTATIONSEARCH_H
