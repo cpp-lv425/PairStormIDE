@@ -56,3 +56,4 @@ ProjectViewerDock::~ProjectViewerDock()
     settings.setValue("ProjectViewerDockGeometry", saveGeometry());
     qDebug() << "~ProjectViewerDock()";
 }
+

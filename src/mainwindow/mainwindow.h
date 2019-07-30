@@ -45,6 +45,8 @@ private:
     void saveAllModifiedDocuments(QList<QMdiSubWindow*> &docsList);
     void createProjectViewer();
 
+    void saveMainWindowState();
+    void restoreMainWindowState();
 private slots:
     // file menu actions
     void onNewFileTriggered();

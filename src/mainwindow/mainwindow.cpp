@@ -20,19 +20,18 @@
 #include "codeeditor.h"
 #include "startpage.h"
 #include "mdiarea.h"
+#include "storeconf.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-
+    {
+        StoreConf conf(this);
+    }
     // when first started main window is maximized
     setWindowState(Qt::WindowMaximized);
-
-    QSettings settings("425", "PairStorm");
-    restoreGeometry(settings.value("mainWindowGeometry").toByteArray());
-    restoreState(settings.value("mainWindowState").toByteArray());
 
     QString styleName;
 
@@ -46,7 +45,7 @@ MainWindow::MainWindow(QWidget *parent) :
     setupMainMenu();
 
     // create instance of Project Viewer
-    createProjectViewer();
+    createProjectViewer();    
 
     // create instance of Chat Window
     mpChatWindowDock = new ChatWindowDock(this);
@@ -61,6 +60,8 @@ MainWindow::MainWindow(QWidget *parent) :
     mpBottomPanelDock->setObjectName("mpBottomPanelDock");
 
     setCentralWidget(mpDocsArea);
+
+    restoreMainWindowState();
 }
 
 QStringList MainWindow::getFileExtensions() const
@@ -668,8 +669,22 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 MainWindow::~MainWindow()
 {
-    QSettings settings("425", "PairStorm");
+    saveMainWindowState();
+    delete ui;
+}
+
+// save to configuration file current state and geometry of mainwindow's toolbars and dockwidgets
+void MainWindow::saveMainWindowState()
+{
+    QSettings settings(QApplication::organizationName(), QApplication::applicationName());
     settings.setValue("mainWindowGeometry", saveGeometry());
     settings.setValue("mainWindowState", saveState());
-    delete ui;
+}
+
+// restore state and geometry of mainwindow's toolbars and dockwidgets from last session
+void MainWindow::restoreMainWindowState()
+{
+    QSettings settings(QApplication::organizationName(), QApplication::applicationName());
+    restoreGeometry(settings.value("mainWindowGeometry").toByteArray());
+    restoreState(settings.value("mainWindowState").toByteArray());
 }
