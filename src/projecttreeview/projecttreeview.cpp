@@ -39,7 +39,7 @@ void ProjectTreeView::setProjectModel(ProjectViewerModel *model)
 void ProjectTreeView::keyPressEvent(QKeyEvent *event)
 {
     QFileInfo info = (mProjectModel->fileInfo(selectedIndexes().at(0)));
-    if(event->key() == Qt::Key_Enter && selectedIndexes().size() != 0 && info.isFile())
+    if(((event->key() == Qt::Key_Enter) || (event->key() == Qt::Key_Return)) && selectedIndexes().size() != 0 && info.isFile())
     {
         qDebug()<<info.filePath();
         emit codeFileSelected(info.filePath());
