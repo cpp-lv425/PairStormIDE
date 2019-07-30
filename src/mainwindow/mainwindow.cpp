@@ -163,6 +163,9 @@ void MainWindow::setupMainMenu()
     // opening settings window
     toolsMenu->addAction("&Settings...", this, &MainWindow::onSettingsTriggered);
 
+    // for Valik for testing purposes
+    toolsMenu->addAction("&Test", this, &MainWindow::onTest, Qt::CTRL + Qt::SHIFT + Qt::Key_T);
+
     // help menu
     QMenu *helpMenu = new QMenu("&Help");
 
@@ -562,6 +565,19 @@ void MainWindow::onSettingsTriggered()
 {
     qDebug() << "settings";
 }
+
+//==================================================================================================
+//                                                                              FOR TESTING PURPOSES
+void MainWindow::onTest()
+{
+    qDebug() << "===========================================";
+    qDebug() << "==============               ==============";
+    qDebug() << "=============   VALIK TESTS   =============";
+    qDebug() << "==============               ==============";
+    qDebug() << "===========================================";
+    mplocalConnector->testConnectToLocalHost();
+}
+//==================================================================================================
 
 void MainWindow::onAboutTriggered()
 {
