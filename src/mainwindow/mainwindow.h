@@ -12,6 +12,7 @@ class ProjectViewerDock;
 class QFileSystemModel;
 class BottomPanelDock;
 class ChatWindowDock;
+class QMdiSubWindow;
 class QDockWidget;
 class CodeEditor;
 class MDIArea;
@@ -39,6 +40,9 @@ private:
     void saveDocument(CodeEditor* pDoc, QString fileName);
     void openDoc(QString fileName);
     bool checkIfOpened(const QString& fileName)const;
+    // returns true if any of docs has been modified
+    bool checkIfModified(QList<QMdiSubWindow*> &docsList);
+    void saveAllModifiedDocuments(QList<QMdiSubWindow*> &docsList);
 
 private slots:
     // file menu actions
