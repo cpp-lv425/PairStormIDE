@@ -8,7 +8,7 @@ class ConnectionServiceProvider : public QObject
 {
     Q_OBJECT
 
-    std::shared_ptr<ApiParser> m_apiParser;
+    std::shared_ptr<DefaultLocalConnector> m_apiParser;
 
     std::string m_userName;
 
