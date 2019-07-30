@@ -1,38 +1,54 @@
 #include "apiparser.h"
-
-BaseApiParser::BaseApiParser(QObject *qObject) : QObject(qObject)
+// ==========================================================================================
+// ==========================================================================================
+//                                 CONSTRUCTOR FOR THE BASIC INTERFACE OF THE LOCAL CONNECTOR
+LocalConnectorInterface::LocalConnectorInterface(QObject *qObject) : QObject(qObject) { }
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
+//                                                   CREATE CONNECTOR & CONFIGURE UDP SERVICE
+DefaultLocalConnector::DefaultLocalConnector() : LocalConnectorInterface()
 {
-    return;
-}
-
-ApiParser::ApiParser() : BaseApiParser()
-{
+    // Compose UDP service
     m_udpService = UdpService::getService();
 
-
+    // Begin continiously discovering users
     connect(
         m_udpService.get(), &UdpService::newDatagramSaved,
-        this,               &ApiParser::addServerFromUdpDatagramOnReceive,
+        this,               &DefaultLocalConnector::addServerFromUdpDatagramOnReceive,
         Qt::UniqueConnection);
 
     // TODO connect configureServerOnLogin to the login signal
 }
-
-std::shared_ptr<ApiParser> ApiParser::getParser()
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
+//                                                                     GET CONNECTOR INSTANCE
+std::shared_ptr<DefaultLocalConnector> DefaultLocalConnector::generateConnector()
 {
-    static std::shared_ptr<ApiParser> instance(new ApiParser);
+    static std::shared_ptr<DefaultLocalConnector>
+            instance(new DefaultLocalConnector);
+
     return instance;
 }
-
-QVector<QString> ApiParser::getOnlineUsers() const
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
+//                                                                       GET DISCOVERED USERS
+QVector<QString> DefaultLocalConnector::getOnlineUsers() const
 {
     QVector<QString> userNames;
+    // Get user names from discovered servers
     for (const auto & serverAttrib : m_discoveredTcpServersAttrib)
         userNames.push_back(serverAttrib.m_name);
+
     return userNames;
 }
-
-void ApiParser::shareWithUser(QString userName)
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
+//                                                                            REQUEST SHARING
+void DefaultLocalConnector::shareWithUser(QString userName)
 {
     auto usersServerData =
             std::find_if(m_discoveredTcpServersAttrib.begin(),
@@ -46,96 +62,97 @@ void ApiParser::shareWithUser(QString userName)
     // Else try to establish connection with server
     m_tcpService->connectToTcpServer(*usersServerData);
 }
-
-void ApiParser::boradcastServerAttributes()
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
+//                                                  BROADCAST DATAGRAM WITH SERVER ATTRIBUTES
+void DefaultLocalConnector::broadcastServerAttributesOnTimerTick()
 {
     // Push attributes to the Json bearer string & broadcast it
-    QString serverData(m_launchedTcpServerAttrib.toJsonQString());
+    ServerData launchedTcpServerAttrib = m_tcpService->getServerAttributes();
+    QString serverData(launchedTcpServerAttrib.toJsonQString());
     m_udpService->broadcastDatagram(serverData);
 }
-
-void ApiParser::configureServerOnLogin(const QString & userName)
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
+//                                                     LAUNCH SERVER AFTER USER HAS LOGGED IN
+void DefaultLocalConnector::configureServerOnLogin(const QString & userName)
 {
-    // Set user name
+    // Create TCP server with name of the user
+    m_tcpService = TcpService::getService(userName);
 
-
-    // Create TCP server
-    m_tcpService = TcpService::getService();
-
-    // Define server name with name of the user
-    // and save server informtation
-    m_tcpService->setServerName(userName);
-    m_launchedTcpServerAttrib = m_tcpService->getServerData();
-
-
-
+    // Generate processing when new user try to connect
     connect(
-        m_tcpService.get(), &TcpService::clientRequestConnection,
-        this,               &ApiParser::processConnectionOnRequest,
+        m_tcpService.get(), &TcpService::socketConnected,
+        this,               &DefaultLocalConnector::processConnectionOnRequest,
         Qt::UniqueConnection);
 
+    // Save TCP segments on receival
     connect(
         m_tcpService.get(), &TcpService::newSegmentSaved,
-        this,               &ApiParser::processTcpSegmentOnReceive,
+        this,               &DefaultLocalConnector::processTcpSegmentOnReceive,
         Qt::UniqueConnection
     );
+
+    // Broadcast server attributes each g_defaultBroadcastCycleMs milliseconds
+    m_internalBroadcastTimer = std::make_unique<QTimer>();
+    connect(
+        m_internalBroadcastTimer.get(), &QTimer::timeout,
+        this,                           &DefaultLocalConnector::broadcastServerAttributesOnTimerTick,
+        Qt::UniqueConnection);
+    m_internalBroadcastTimer->start(g_defaultBroadcastCycleMs);
 }
-
-void ApiParser::addServerFromUdpDatagramOnReceive()
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
+//                                                          ADD USER FROM DISCOVERED DATAGRAM
+void DefaultLocalConnector::addServerFromUdpDatagramOnReceive()
 {
-    // Read received datagram
-    Datagram data = m_udpService->getReceivedDatagram();
-    // Fill information about server from datagram
-    ServerData serverData;
-    serverData.fromJsonQString(data.m_data);
+    ServerData discoveredServerAttributes;
+
+    // Read received datagram and fill the information about discovered attributes
+    Datagram   datagramContent = m_udpService->getReceivedDatagram();
+    discoveredServerAttributes.fromJsonQString(datagramContent.m_data);
+    discoveredServerAttributes.m_sourceIp = datagramContent.m_ip;
 
 
-
-#ifdef CUSTOM_DEBUG
-    qDebug() << "____________________________________________________________";
-    qDebug() << "SERVER IS DISCOVERED THROUGH UDP DISCOVERY PROTOCOL:";
-    qDebug() << "name ->" << serverData.m_name;
-    qDebug() << "port ->" << serverData.m_port;
-    for(const auto & ip : serverData.m_ips)
-        qDebug() << "ip -> " << ip.toString();
-    qDebug() << "____________________________________________________________";
-#endif // CUSTOM_DEBUG
-
-
-
-    // If datagram was corrupted
-    if (serverData.empty())
+    if (discoveredServerAttributes.empty())
     {
+        // Datagram was corrupted
         return;
     }
 
-    // If name of discovered server matches name of current server
-    if (serverData.m_name == m_tcpService->getServerName())
+    if (discoveredServerAttributes.m_name ==
+        m_tcpService->getServerAttributes().m_name)
     {
+        // Discovered server name matches current server name
         return;
     }
 
-    // If server with a given name has already been discovered
-    auto attribPtr = std::find_if(m_discoveredTcpServersAttrib.cbegin(),
-                                  m_discoveredTcpServersAttrib.cend(),
-                                  [serverData] (const ServerData & inServerData)
-                                  {
-                                      return inServerData.m_name == serverData.m_name;
-                                  });
+    auto attribPtr =
+            std::find_if(m_discoveredTcpServersAttrib.cbegin(),
+                         m_discoveredTcpServersAttrib.cend(),
+                         [discoveredServerAttributes] (const ServerData & inServerData)
+                         {
+                             return inServerData.m_name ==
+                                    discoveredServerAttributes.m_name;
+                         });
     if (attribPtr != m_discoveredTcpServersAttrib.cend())
     {
+        // Server with a given name has already been discovered
         return;
     }
 
-    // Finally, save information about server
-    m_discoveredTcpServersAttrib.push_back(serverData);
+    // Finally, save information about server & emit "user discovered" signal
+    m_discoveredTcpServersAttrib.push_back(discoveredServerAttributes);
 
     emit newUserDiscovered();
 }
 
 
 
-void ApiParser::processTcpSegmentOnReceive()
+void DefaultLocalConnector::processTcpSegmentOnReceive()
 {
     Segment data = m_tcpService->getReceivedSegment();
 
@@ -154,8 +171,11 @@ void ApiParser::processTcpSegmentOnReceive()
     qDebug() << "____________________________________________________________";
 #endif // CUSTOM_DEBUG
 }
-
-void ApiParser::processConnectionOnRequest(std::shared_ptr<QTcpSocket> clientSocketPtr)
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
+//                                                         REMOVE USERNAME TO SOCKET RELATION
+void DefaultLocalConnector::processConnectionOnRequest(std::shared_ptr<QTcpSocket> clientSocketPtr)
 {
     // TODO process connection
 
@@ -168,13 +188,12 @@ void ApiParser::processConnectionOnRequest(std::shared_ptr<QTcpSocket> clientSoc
 
 
 #ifdef CUSTOM_DEBUG
-void ApiParser::testBroadcastServerInfoDatagram()
+void DefaultLocalConnector::testLoginUser(const QString & userName)
 {
-    configureServerOnLogin("Valik");
-    boradcastServerAttributes();
+    configureServerOnLogin(userName);
 }
 
-void ApiParser::testSendSegmentToLocalHost()
+void DefaultLocalConnector::testSendSegmentToLocalHost()
 {
     //m_tcpService->sendThroughSocket("Hello, Pair Storm is here", QHostAddress::LocalHost);
 }

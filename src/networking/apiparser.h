@@ -13,26 +13,27 @@
 //                                                                                  INTERFACE
 //                                                                             API interfacer
 // ==========================================================================================
-class BaseApiParser : public QObject
+class LocalConnectorInterface : public QObject
 {
     Q_OBJECT
 
 protected:
 
-    explicit BaseApiParser(QObject *qObject = nullptr); // Protected!
+    explicit LocalConnectorInterface(QObject *qObject = nullptr); // Protected!
 
     // UDP & TCP service providers
     std::shared_ptr<UdpService> m_udpService;
     std::shared_ptr<TcpService> m_tcpService;
 
+    std::unique_ptr<QTimer>     m_internalBroadcastTimer;
+
     // Attributes of the launched TCP server & discovered TCP servers
-    ServerData          m_launchedTcpServerAttrib;
     QVector<ServerData> m_discoveredTcpServersAttrib;
 
 public:
 
-    BaseApiParser(BaseApiParser const&)            = delete;
-    BaseApiParser& operator=(BaseApiParser const&) = delete;
+    LocalConnectorInterface(LocalConnectorInterface const&)            = delete;
+    LocalConnectorInterface& operator=(LocalConnectorInterface const&) = delete;
 
 
     virtual QVector<QString> getOnlineUsers() const = 0;
@@ -61,13 +62,15 @@ public slots:
     // When documents synchronization is needed between users
     //virtual void requireFullTextDocumentOnNeed();
 
+    virtual void broadcastServerAttributesOnTimerTick() = 0;
+
     //====================== On external signals ======================
 
     // When the uer has recently logged in to the application
     virtual void configureServerOnLogin(const QString & userName) = 0;
 
     // Each second when the counter emits signal
-    virtual void boradcastServerAttributes() = 0;
+
 
     // When editor emits change or chat emits message
     //virtual void informAttachedHostsAboutChanges() = 0;
@@ -76,7 +79,7 @@ public slots:
 
 #ifdef CUSTOM_DEBUG
 public:
-    virtual void testBroadcastServerInfoDatagram() = 0;
+    virtual void testLoginUser(const QString & userName) = 0;
     virtual void testSendSegmentToLocalHost()      = 0;
 #endif //CUSTOM_DEBUG
 };
@@ -89,21 +92,21 @@ public:
 //                                                                                   SNGLETON
 //                                                                             API interfacer
 // ==========================================================================================
-class ApiParser : public BaseApiParser
+class DefaultLocalConnector : public LocalConnectorInterface
 {
     Q_OBJECT
 
 private:
 
-    ApiParser(); // Private!
+    DefaultLocalConnector(); // Private!
 
 public:
 
-    ApiParser(ApiParser const&)            = delete;
-    ApiParser& operator=(ApiParser const&) = delete;
+    DefaultLocalConnector(DefaultLocalConnector const&)            = delete;
+    DefaultLocalConnector& operator=(DefaultLocalConnector const&) = delete;
 
     // The only way to get API parser
-    static std::shared_ptr<ApiParser> getParser();
+    static std::shared_ptr<DefaultLocalConnector> generateConnector();
 
 
     virtual QVector<QString> getOnlineUsers() const override;
@@ -118,6 +121,8 @@ public slots:
     virtual void addServerFromUdpDatagramOnReceive() override;
     virtual void processTcpSegmentOnReceive() override;
 
+    virtual void broadcastServerAttributesOnTimerTick() override;
+
     //virtual void requireFullTextDocumentOnNeed() override;
 
     virtual void processConnectionOnRequest(std::shared_ptr<QTcpSocket> clientSocketPtr) override;
@@ -125,7 +130,6 @@ public slots:
 
     virtual void configureServerOnLogin(const QString & userName) override;
 
-    virtual void boradcastServerAttributes() override;
 
     //virtual void informAttachedHostsAboutChanges() override;
     //virtual void sendMessageToAttachedHosts() override;
@@ -134,7 +138,7 @@ public slots:
 
 #ifdef CUSTOM_DEBUG
 public:
-    virtual void testBroadcastServerInfoDatagram() override;
+    virtual void testLoginUser(const QString & userName) override;
     virtual void testSendSegmentToLocalHost() override;
 #endif //CUSTOM_DEBUG
 };
