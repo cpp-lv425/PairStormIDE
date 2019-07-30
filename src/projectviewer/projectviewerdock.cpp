@@ -1,5 +1,6 @@
 #include "projectviewerdock.h"
 
+#include <QItemSelectionModel>
 #include <QDockWidget>
 #include <QException>
 #include <QSettings>
@@ -27,7 +28,8 @@ ProjectViewerDock::ProjectViewerDock(QWidget *pParent): QDockWidget(pParent)
         item.push_front('*');
 
     mpViewerModel = new ProjectViewerModel(this);
-    mpTreeViewer = new ProjectTreeView(mpViewerModel,this);    
+    mpTreeViewer = new ProjectTreeView(mpViewerModel,this);
+    mpTreeViewer->setCurrentIndex(mpViewerModel->index(0,0));
 
     setDir(QDir::current());
     setFilters(filters);
