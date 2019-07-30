@@ -14,6 +14,7 @@
 #include "projectviewerdock.h"
 #include "bottompaneldock.h"
 #include "chatwindowdock.h"
+#include "newfilewizard.h"
 #include "filemanager.h"
 #include "codeeditor.h"
 #include "mdiarea.h"
@@ -46,7 +47,7 @@ MainWindow::MainWindow(QWidget *parent) :
     addDockWidget(Qt::RightDockWidgetArea, mpChatWindowDock);
 
     // create instance of MDIArea
-    mpDocsArea = new MDIArea(this);   
+    mpDocsArea = new MDIArea(this);
 
     // create instance of Bottom Panel
     mpBottomPanelDock = new BottomPanelDock(this);
@@ -55,6 +56,22 @@ MainWindow::MainWindow(QWidget *parent) :
     setCentralWidget(mpDocsArea);
 
     restoreMainWindowState();
+}
+
+QStringList MainWindow::getFileExtensions() const
+{
+    return QStringList() << ".c" << ".cpp" << ".h" << ".hpp" << ".txt" << ".json";
+}
+
+void MainWindow::showStartPage()
+{
+    StartPage startPage(this);
+    connect(&startPage, &StartPage::onNewBtnPressed, this, &MainWindow::onNewFileTriggered);
+    connect(&startPage, &StartPage::onOpenBtnPressed, this, &MainWindow::onOpenFileTriggered);
+    connect(&startPage, &StartPage::onOpenDirPressed, this, &MainWindow::onOpenFolderTriggered);
+    connect(&startPage, &StartPage::onReferenceBtnPressed, this, &MainWindow::onReferenceTriggered);
+    connect(&startPage, &StartPage::onSettingsBtnPressed, this, &MainWindow::onSettingsTriggered);
+    startPage.showStartPage();
 }
 
 void MainWindow::setupMainMenu()
@@ -73,7 +90,7 @@ void MainWindow::setupMainMenu()
 
     // saving files
     fileMenu->addAction("&Save...", this, &MainWindow::onSaveFileTriggered, Qt::CTRL + Qt::Key_S);
-    fileMenu->addAction("Save &As...", this, &MainWindow::onSaveFileAsTriggered, Qt::CTRL + Qt::Key_S);
+    fileMenu->addAction("Save &As...", this, &MainWindow::onSaveFileAsTriggered);
     fileMenu->addAction("Save A&ll...", this, &MainWindow::onSaveAllFilesTriggered, Qt::CTRL + Qt::SHIFT + Qt::Key_S);
     fileMenu->addSeparator();
 
@@ -157,99 +174,170 @@ void MainWindow::setupMainMenu()
     menuBar()->addMenu(helpMenu);
 }
 
-void MainWindow::onNewFileTriggered()
+void MainWindow::saveDocument(CodeEditor *pDoc, QString fileName)
 {
-    QString fileName = QFileDialog::getSaveFileName
-            (this, tr("Enter new filename"), QDir::homePath());
+    qDebug() << "saving";
     try
     {
-        FileManager().createFile(fileName);
-        CodeEditor *newDoc = createNewDoc();
-        newDoc->setWindowTitle(fileName);
-        newDoc->show();
-    } catch (const QException& e)
+        // writing to file
+        FileManager().writeToFile(fileName, pDoc->toPlainText());
+    } catch (const QException&)
     {
-        QMessageBox::warning(this, tr("Error"),
-                             tr("Unable to create new file."));
+        QMessageBox::warning(this, "Error", "Unable to open file for saving");
     }
 }
 
-void MainWindow::onOpenFileTriggered()
+void MainWindow::openDoc(QString fileName)
 {
-    QString fileName = QFileDialog::getOpenFileName();
     QString readResult;
+
     try
     {
         readResult = FileManager().readFromFile(fileName);
-    } catch (const QException& e)
+    } catch (const QException&)
     {
         QMessageBox::warning(this, tr("Error"),
                              tr("Unable to open specified file."));
         return;
-    }    
+    }
 
+    // creating new doc & passing file content to it
     CodeEditor *newDoc = createNewDoc();
+    newDoc->setFileName(fileName);
+    int position = fileName.lastIndexOf(QChar{'/'});
+    newDoc->setWindowTitle(fileName.mid(position + 1));
     newDoc->setPlainText(readResult);
     newDoc->show();
 }
 
+void MainWindow::onNewFileTriggered()
+{
+    QStringList fileExtensions = getFileExtensions();
+    NewFileDialog newFileDialog(fileExtensions, this);
+
+    // new file dialog is called
+    // name of newly created file is received
+    QString newFileName = newFileDialog.start();
+
+    if(newFileName.isEmpty())
+        return;
+
+    // new doc is created & shown
+    CodeEditor *newDoc = createNewDoc();
+    int position = newFileName.lastIndexOf(QChar{'/'});
+    newDoc->setFileName(newFileName);
+    newDoc->setWindowTitle(newFileName.mid(position + 1));
+    newDoc->show();
+}
+
+void MainWindow::onOpenFileTriggered()
+{
+    QString fileName = QFileDialog::getOpenFileName
+            (
+                this,
+                "Open File",
+                QDir::currentPath(),
+                "C++/C files (*.h *.hpp *.cpp *.c) ;; Text Files (*.txt) ;; JSON Files (*.json)"
+                );
+    openDoc(fileName);
+}
+
 void MainWindow::onOpenFolderTriggered()
 {
-//    QString dirName = QFileDialog::getExistingDirectory
-//            (this, "Select directory", QDir::homePath());
-//    QDir selectedDir(dirName);
-
-//    QStringList filesList = selectedDir.entryList(QDir::Files);
-
-//    for (const QString& file : filesList)
-//    {
-//        QString readResult;
-//        try
-//        {
-//            readResult = FileManager().readFromFile(dirName + '/' + file);
-//        } catch (const QException& e)
-//        {
-//            QMessageBox::warning(this, tr("Error"),
-//                                 tr("Unable to open file from specified directory"));
-//            return;
-//        }
-
-//        QWidget *newDoc = createNewDoc();
-//        newDoc->setWindowTitle(file);
-
-//        QPlainTextEdit *pTextEdit = new QPlainTextEdit;
-//        pTextEdit->setPlainText(readResult);
-
-//        pLayout->addWidget(pTextEdit);
-//        newDoc->setLayout(pLayout);
-//        newDoc->show();
-//    }
+    QString dirName = QFileDialog::getExistingDirectory(this, "Open Directory", QDir::currentPath());
+    mpProjectViewerDock->setDir(dirName);
 }
 
 void MainWindow::onOpenStartPage()
 {
-    qDebug() << "open start page";
+    showStartPage();
 }
 
 void MainWindow::onSaveFileTriggered()
 {
-    QMdiSubWindow *pCurrentSubWdw =
-            mpDocsArea->currentSubWindow();
+    // if there are no opened docs
+    if(!mpDocsArea || !mpDocsArea->currentSubWindow())
+    {
+        QMessageBox::information(this, "Save", "There are no opened documents to save.");
+        return;
+    }
 
-    // get filename
-    QString filename;
-    // write to file
-    //writeToFile(filename, pCurrentDoc->toPlainText());
+    auto curDoc = qobject_cast<CodeEditor*>
+            (mpDocsArea->currentSubWindow()->widget());
+
+    // if ptr to current document is not valid
+    if(!curDoc)
+        return;
+
+    // if doc wasn't modified yet
+    if(!curDoc->document()->isModified())
+        return;
+
+    // saving doc
+    saveDocument(curDoc, curDoc->getFileName());
 }
 
 void MainWindow::onSaveFileAsTriggered()
 {
-    qDebug() << "save as";
+    // if there are no opened docs
+    if(!mpDocsArea || !mpDocsArea->currentSubWindow())
+    {
+        QMessageBox::information(this, "Save", "There are no opened documents to save.");
+        return;
+    }
+
+    auto curDoc = qobject_cast<CodeEditor*>
+            (mpDocsArea->currentSubWindow()->widget());
+
+    // if ptr to current document is not valid
+    if(!curDoc)
+        return;
+
+    QString extension;
+
+    QString fileName = QFileDialog::getSaveFileName
+            (
+                this,
+                "Save As",
+                QDir::currentPath() + "/Unnamed",
+                "*.h ;; *.hpp ;; *.cpp ;; *.c ;; *.txt ;; *.json",
+                &extension
+                );
+
+    int position = fileName.indexOf(QChar{'.'});
+    fileName += extension.mid(position + 1);
+
+    // saving doc
+    saveDocument(curDoc, fileName);
 }
 
 void MainWindow::onSaveAllFilesTriggered()
 {
-    qDebug() << "save all";
+    if(!mpDocsArea)
+        return;
+
+    // getting all docs
+    auto docsList = mpDocsArea->subWindowList();    
+
+    // if there are no docs
+    if(docsList.empty())
+    {
+        QMessageBox::information(this, "Save", "There are no opened documents to save.");
+        return;
+    }
+
+    // if doc is modified then it is saved
+    for (int i = 0; i < docsList.size(); ++i)
+    {
+        auto curDoc = qobject_cast<CodeEditor*>(docsList[i]->widget());
+        if(!curDoc)
+            qDebug() << "invalid ptr";
+        if(curDoc && curDoc->document()->isModified())
+        {
+            qDebug() << curDoc->getFileName();
+            saveDocument(curDoc, curDoc->getFileName());
+        }
+    }
 }
 
 void MainWindow::onCloseFileTriggered()
@@ -335,6 +423,11 @@ void MainWindow::onUserGuideTriggered()
 void MainWindow::onCheckUpdatesTriggered()
 {
     qDebug() << "check updates";
+}
+
+void MainWindow::onOpenFileFromProjectViewer(QString fileName)
+{
+    openDoc(fileName);
 }
 
 CodeEditor* MainWindow::createNewDoc()

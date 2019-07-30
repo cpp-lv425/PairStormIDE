@@ -1,10 +1,16 @@
 #ifndef CODEEDITOR_H
 #define CODEEDITOR_H
 
-#include<QAbstractScrollArea>
-#include <QPlainTextEdit>
-#include <QObject>
-#include "ideconfiguration.h"
+const int CHANGE_SAVE_TIME = 1000;
+const int TAB_SPACE = 4;
+
+#include<QPlainTextEdit>
+#include<QObject>
+#include"ideconfiguration.h"
+#include"changemanager.h"
+#include<utility>
+#include"lexercpp.h"
+#include"ideconfiguration.h"
 
 class QPaintEvent;
 class QResizeEvent;
@@ -23,7 +29,10 @@ public:
     void lineNumberAreaPaintEvent(QPaintEvent *event);
     int lineNumberAreaWidth();
     QString& getFileName();
-    void setFileName(const QString &flename);
+    void setFileName(const QString &fileame);
+    std::pair<const QString &, const QString &> getChangedFileInfo();
+    void undo();
+    void redo();
 
 protected:
     void resizeEvent(QResizeEvent *event)override;
@@ -32,9 +41,14 @@ private slots:
    void updateLineNumberAreaWidth();
    void highlightCurrentLine();
    void updateLineNumberArea(const QRect &rect, int dy);
+   void runLexer();
 
-public slots:
+public
+slots:
    void keyPressEvent(QKeyEvent *e) override;
+   void saveStateInTheHistory();
+signals:
+   void changesAppeared();
 
 private:
    QWidget *lineNumberArea;
@@ -42,8 +56,10 @@ private:
    int currentZoom = 100;
    QFont font;
    QString fileName;
+   ChangeManager *changeManager;
+   QTimer *timer;
+   LexerCPP lexer;
+   QVector<Token> tokens;
 };
-
-
 
 #endif // CODEEDITOR_H
