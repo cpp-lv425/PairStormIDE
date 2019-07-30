@@ -22,105 +22,83 @@ class TcpService : public QObject
     Q_OBJECT // for signals and slots
 
 
-    // Network session if needed
-    // Composition of the TCP server
-    // Set of the connected TCP
-    std::unique_ptr<QNetworkSession>     m_netSession;
+    // Name of the launched server and its port
+    const QString     m_serverName;
+    ServerData        m_serverAttributes;
+    const PortNumType m_portNumber;
+
+    // Composition of the Network session & TCP server
+    std::unique_ptr<QNetworkSession>     m_netSessionPtr;
     std::unique_ptr<QTcpServer>          m_tcpServerPtr;
-
-
+    // Vector of currently connected active sockets &
+    // variable for storing received segments
     QVector<std::shared_ptr<QTcpSocket>> m_connectedSockets;
+    Segment                              m_pendingSegment;
 
 
 
-    // Standard port number for TCP communication
-    // Received segments using the port m_portNumber
-    const PortNumType m_portNumber = g_defaultTcpPortNumber;
-    Segment m_pendingSegment;
-
-    QString m_serverName;
-
-    std::unordered_map<std::string, QString> m_ipToServerName;
-
+    // Experimental feature
     std::unordered_map<std::string, std::shared_ptr<QTcpSocket>> m_nameToSocket;
 
-    explicit TcpService(QObject *qObject = nullptr);
+
+
+    explicit TcpService(const QString & serverName, QObject *qObject = nullptr);
+
+    // Fill in internal attributes
+    ServerData resolveServerAttributes() const;
 
 public:
 
     TcpService(TcpService const&) = delete;
     TcpService& operator=(TcpService const&) = delete;
 
-    // Service getter
-    static std::shared_ptr<TcpService> getService();
+    // Service instance generator
+    static std::shared_ptr<TcpService> getService(const QString & serverName);
 
-    ServerData getServerData();
-    QString getServerName() const;
+    // Server attributes getter
+    ServerData getServerAttributes() const;
 
-    void sendThroughSocket(const QString & data, std::shared_ptr<QTcpSocket> receiver);
+    // Service destructor
+    ~TcpService();
+
+
+    // Connect to TCP server with specified attributes
+    // and create special socket or disconnect from given socket
+    void connectToTcpServer(const ServerData & serverData);
     void disconnectSocket(std::shared_ptr<QTcpSocket> socket);
 
-/*
-    void addIpServerNameRelation(QHostAddress ip, QString serverName);
-    QString getServerNameByIp(QHostAddress ip);
-*/
+
+    // Send thorough specified socket
+    void sendThroughSocket(const QString & data, std::shared_ptr<QTcpSocket> receiver);
+
+    // Saved segment getter
+    Segment getReceivedSegment() const;
+
+
     void setUserNameSocketRelation(const std::shared_ptr<QTcpSocket> & userSocket, const QString & userName);
     void removeUserNameSocketRelation(const QString & userName);
     bool resolveSocketByUserName(std::shared_ptr<QTcpSocket> & userSocket, const QString & userName);
     bool resolveUserNameBySocket(const std::shared_ptr<QTcpSocket> & userSocket, QString & userName);
 
-
-    void setServerName(const QString & name);
-
-    void connectToTcpServer(const ServerData & serverData);//QHostAddress ip, PortNumType port);
-    Segment getReceivedSegment() const;
-
-    ~TcpService();
-
 signals:
-    void clientRequestConnection(std::shared_ptr<QTcpSocket> clientSocketPtr);
+
+    void socketConnected(std::shared_ptr<QTcpSocket> clientSocketPtr);
+
     void socketDisconnected(QString serverName);
+
     void newSegmentSaved();
 
 public slots:
+
+    void removeSocketOnDisconnected();
+
+private slots:
+
     void configureServer();
     void configureSocketOnServerConnection();
     void configureSocketOnClientConnection();
-    void removeSocketOnDisconnected();
     void saveSegmentOnReceival();
 
 };
 
-/*
-#include <QDialog>
-#include <QString>
-#include <QVector>
-
-
-QT_BEGIN_NAMESPACE
-class QLabel;
-class QTcpServer;
-class QNetworkSession;
-QT_END_NAMESPACE
-
-class Server : public QDialog
-{
-    Q_OBJECT
-
-public:
-    explicit Server(QWidget *parent = nullptr);
-
-private slots:
-    void sessionOpened();
-    void sendFortune();
-
-private:
-    QLabel *statusLabel = nullptr;
-    QTcpServer *tcpServer = nullptr;
-    QVector<QString> fortunes;
-    QNetworkSession *networkSession = nullptr;
-};
-//! [0]
-//!
-*/
 #endif // TCPSERVICE_H

@@ -2,7 +2,8 @@
 // ==========================================================================================
 // ==========================================================================================
 //                                                                    UDP SERVICE CONSTRUCTOR
-UdpService::UdpService(QObject *qObject) : QObject(qObject)
+UdpService::UdpService(QObject *qObject) :
+    QObject(qObject), m_portNumber(g_defaultUdpPortNumber)
 {
     configureSocket();
 
@@ -49,6 +50,7 @@ std::shared_ptr<UdpService> UdpService::getService()
 {
     static std::shared_ptr<UdpService>
             serviceInstance(new UdpService);
+
     return serviceInstance;
 }
 // ==========================================================================================

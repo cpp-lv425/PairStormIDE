@@ -2,7 +2,8 @@
 // ==========================================================================================
 // ==========================================================================================
 //                                                                    TCP SERVICE CONSTRUCTOR
-TcpService::TcpService(QObject *qObject) : QObject(qObject)
+TcpService::TcpService(const QString & serverName, QObject *qObject) :
+    QObject(qObject), m_serverName(serverName), m_portNumber(g_defaultTcpPortNumber)
 {
     QNetworkConfigurationManager confManager;
     // Check if additional network configuration is needed
@@ -27,15 +28,15 @@ TcpService::TcpService(QObject *qObject) : QObject(qObject)
         }
 
         // Start opening new session with existent configurations
-        m_netSession = std::make_unique<QNetworkSession>(configData, this);
+        m_netSessionPtr = std::make_unique<QNetworkSession>(configData, this);
 
         // Configure server when session opening succeeds
         connect(
-            m_netSession.get(), &QNetworkSession::opened,
+            m_netSessionPtr.get(), &QNetworkSession::opened,
             this,               &TcpService::configureServer,
             Qt::UniqueConnection);
 
-        m_netSession->open();
+        m_netSessionPtr->open();
     }
     else
     {
@@ -43,26 +44,19 @@ TcpService::TcpService(QObject *qObject) : QObject(qObject)
         // network configuration is not needed
         configureServer();
     }
-
-    // Trigger processing of the connections, requested by clients
-    connect(
-        m_tcpServerPtr.get(), &QTcpServer::newConnection,
-        this,                 &TcpService::configureSocketOnClientConnection,
-        Qt::UniqueConnection);
 }
 // ==========================================================================================
 // ==========================================================================================
 // ==========================================================================================
 //                                                                       CONFIGURE TCP SERVER
-
 void TcpService::configureServer()
 {
     // Case, if additional configuration has been previously done
-    if (m_netSession)
+    if (m_netSessionPtr)
     {
-        QNetworkConfiguration configData = m_netSession->configuration();
+        QNetworkConfiguration configData = m_netSessionPtr->configuration();
         QString configId = (configData.type() == QNetworkConfiguration::UserChoice) ?
-            m_netSession->sessionProperty(QString("UserChoiceConfiguration")).toString() :
+            m_netSessionPtr->sessionProperty(QString("UserChoiceConfiguration")).toString() :
             configData.identifier();
 
         // Save network configurations to the registry
@@ -81,15 +75,24 @@ void TcpService::configureServer()
         return;
     }
     qDebug() << "Success: server has been started on port: " << m_tcpServerPtr->serverPort();
+
+    // Fill server attributes
+    m_serverAttributes = resolveServerAttributes();
+
+    // Trigger processing of the connections, requested by clients
+    connect(
+        m_tcpServerPtr.get(), &QTcpServer::newConnection,
+        this,                 &TcpService::configureSocketOnClientConnection,
+        Qt::UniqueConnection);
 }
 // ==========================================================================================
 // ==========================================================================================
 // ==========================================================================================
 //                                                   GET INSTANCE OF THE TCP SERVICE PROVIDER
-std::shared_ptr<TcpService> TcpService::getService()
+std::shared_ptr<TcpService> TcpService::getService(const QString & serverName)
 {
     static std::shared_ptr<TcpService>
-            serviceInstance(new TcpService);
+            serviceInstance(new TcpService(serverName));
     return serviceInstance;
 }
 // ==========================================================================================
@@ -111,24 +114,16 @@ TcpService::~TcpService()
 // ==========================================================================================
 // ==========================================================================================
 // ==========================================================================================
-//                                                     CONFIGURE NAME OF THE LOCAL TCP SERVER
-void TcpService::setServerName(const QString & name)
-{
-    m_serverName = name;
-}
-// ==========================================================================================
-// ==========================================================================================
-// ==========================================================================================
 //                                                            GET NAME OF THE LAUNCHED SERVER
-QString TcpService::getServerName() const
+ServerData TcpService::getServerAttributes() const
 {
-    return m_serverName;
+    return m_serverAttributes;
 }
 // ==========================================================================================
 // ==========================================================================================
 // ==========================================================================================
 //                                                 GET CONFIGURATIONS OF THE LOCAL TCP SERVER
-ServerData TcpService::getServerData()
+ServerData TcpService::resolveServerAttributes() const
 {
     ServerData serverData;
 
@@ -167,6 +162,8 @@ void TcpService::connectToTcpServer(const ServerData & serverData)
     std::shared_ptr<QTcpSocket>
             serverSocketPtr(new QTcpSocket(this));
 
+    serverSocketPtr->abort();
+
     // Force preliminary configuration in case of successful connection
     connect(
         serverSocketPtr.get(), &QTcpSocket::connected,
@@ -174,13 +171,10 @@ void TcpService::connectToTcpServer(const ServerData & serverData)
         Qt::AutoConnection);
 
     // Try to connect using present server' ip addresses
-    const PortNumType     port = serverData.m_port;
-    QVector<QHostAddress> ips =  serverData.m_ips;
+    const PortNumType  port = serverData.m_port;
+    const QHostAddress ip =   serverData.m_sourceIp;
 
-    for(const QHostAddress & ip : ips)
-    {
-        serverSocketPtr->connectToHost(ip, port);
-    }
+    serverSocketPtr->connectToHost(ip, port);
 }
 // ==========================================================================================
 // ==========================================================================================
@@ -217,6 +211,10 @@ void TcpService::configureSocketOnServerConnection()
 //                                                 CONFIGURE SOCKET WHEN CLIENT HAS CONNECTED
 void TcpService::configureSocketOnClientConnection()
 {
+        qDebug() << "Host request connection:";
+
+
+
     // Get brand new client' socket and save its ptr
     std::shared_ptr<QTcpSocket>
             clientSocketPtr(m_tcpServerPtr->nextPendingConnection());
@@ -235,8 +233,19 @@ void TcpService::configureSocketOnClientConnection()
         Qt::AutoConnection);
 
 
+    //===================================================================================
+    //                                                                ATTENTION: HARDCODE
 
-    emit clientRequestConnection(clientSocketPtr);
+
+    qDebug() << "ip: " << clientSocketPtr->peerAddress();
+    qDebug() << "port: " << clientSocketPtr->peerPort();
+
+    //===================================================================================
+
+
+
+    emit socketConnected(clientSocketPtr);
+
     // TODO establish normal connection
 }
 // ==========================================================================================

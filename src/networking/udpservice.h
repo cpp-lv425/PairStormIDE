@@ -19,9 +19,8 @@ class UdpService : public QObject
     Q_OBJECT // for signals and slots
 
 
-    // Standard port number for UDP communication
-    const PortNumType m_portNumber =
-            g_defaultUdpPortNumber;
+    // Port number for UDP service
+    const PortNumType m_portNumber;
 
     // QUdpSocket composition
     std::unique_ptr<QUdpSocket> m_udpSocketPtr;
@@ -55,7 +54,7 @@ signals:
 
     void newDatagramSaved();
 
-public slots:
+private slots:
 
     void saveDatagramOnReceival();
 };
