@@ -2,7 +2,7 @@
 #include<algorithm>
 #include<QString>
 ChangeManager::ChangeManager() = default;
-
+static int count = 10;
 void ChangeManager::limitCheck()
 {
     if(changesHistory.size() > CHANGES_HISTORY_MAX_SIZE)
@@ -11,7 +11,6 @@ void ChangeManager::limitCheck()
 
 void ChangeManager::removeHistory()//it's not necessary to hold history if we returned to the start and didn't press ctrl + Y
 {
-    qDebug()<<"History removed!";
     if(!changesHistory.size())
         return;
     auto it_victim = changesHistory.end() - 1;// move from the end of list
@@ -46,13 +45,15 @@ std::string ChangeManager::createStringFromMismatchIterators(std::string::iterat
 ChangeManager::ChangeManager(const std::string &fileState)
 {
     currentFileState = fileState;
+    writeChange("");
 }
 
 ChangeManager::~ChangeManager() = default;
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void ChangeManager::writeChange(std::string newFileState, QPlainTextEdit *codeEditor)
+void ChangeManager::writeChange(std::string newFileState)
 {
-    /*if(!fileChanged(newFileState))
+   /* QString test_start = QString::fromStdString(currentFileState);
+    //qDebug()<<"before = "<< test_start;
+    if(!fileChanged(newFileState))
         return;
 
     limitCheck();
@@ -70,11 +71,10 @@ void ChangeManager::writeChange(std::string newFileState, QPlainTextEdit *codeEd
             std::mismatch(currentFileState.rbegin(), currentFileState.rend(),
                 newFileState.rbegin(), newFileState.rend());
 
-        size_t occuranceIndex =
-            static_cast<size_t>(std::distance(currentFileState.begin(), mismatch_range_begin.first));
+    size_t occuranceIndex = static_cast<size_t>(std::distance(currentFileState.begin(), mismatch_range_begin.first));
 
-        /*std::copy(mismatch_range_begin.first, mismatch_range_end.first.base(), std::back_inserter(before));
-        std::copy(mismatch_range_begin.second, mismatch_range_end.second.base(), std::back_inserter(after));
+    std::copy(mismatch_range_begin.first, mismatch_range_end.first.base(), std::back_inserter(before));
+    std::copy(mismatch_range_begin.second, mismatch_range_end.second.base(), std::back_inserter(after));
 
         if ((mismatch_range_begin.first > mismatch_range_end.first.base()) || (mismatch_range_begin.second > mismatch_range_end.second.base()))
         {
@@ -88,130 +88,181 @@ void ChangeManager::writeChange(std::string newFileState, QPlainTextEdit *codeEd
         }
 
     change.before = before;
+    qDebug()<<"before = "<<QString::fromStdString(before);
     change.after = after;
+    qDebug()<<"before = "<<QString::fromStdString(after);
     change.begin_change_pos = occuranceIndex;
-    //change.cursor = codeEditor->cursor().pos();
-    //qDebug()<<"cursor pos x= "<<change.cursor.x();
-   // qDebug()<<"cursor pos y= "<<change.cursor.y();
-   // codeEditor->cur
-    //std::cout<<before;
-   // std::cout<<after;
-
 
     change.begin_change_pos = static_cast<size_t>(std::distance(currentFileState.begin(),
                                                             mismatch_range_begin.first));
 
     changesHistory.push_back(change);
     currentFileState = newFileState;
-    currentState_it = changesHistory.end() - 1;// if we add new record to the history, set the iterator to the end
-    //currentState_it;
-    qDebug()<<"added. size = "<<changesHistory.size();*/
+    currentState_it = changesHistory.end() - 1;
+
+
+   // qDebug()<<"*******************WRITE***********************************";
+    //qDebug()<<"before = "<<QString::fromStdString(currentState_it->before);
+   // qDebug()<<"after = "<<QString::fromStdString(currentState_it->after);
+   // qDebug()<<"position = "<< currentState_it->begin_change_pos;
+   // qDebug()<<"*********************************************************";
+    QString end_start = QString::fromStdString(currentFileState);
+   // qDebug()<<"after = "<< end_start;
+   */
     if (currentFileState == newFileState)
         {
             return;
         }
 
-        if (changesHistory.size() > 50)
-        {
-            std::cout << "LIMIT!";
-            changesHistory.pop_front();
-        }
+        limitCheck();
 
 
-        auto it_victim = changesHistory.end() - 1;
-
-        if (changesHistory.size())
-        {
-            while (it_victim != currentState_it)
-            {
-                it_victim--;
-                changesHistory.pop_back();
-            }
-        }
-
+        removeHistory();
         IntegralChange change;
         auto mismatch_range_begin = std::mismatch(currentFileState.begin(), currentFileState.end(),
             newFileState.begin(), newFileState.end());
+
+
+
+        /*auto mismatch_range_end_first = currentFileState.end();
+        auto mismatch_range_end_second = currentFileState.end();
+        while (true)
+        {
+            if (mismatch_range_end_first == currentFileState.end())
+            {
+                mismatch_range_end_first--;
+                mismatch_range_end_second--;
+                continue;
+            }
+            if (mismatch_range_end_first <= mismatch_range_begin.first ||
+                mismatch_range_end_second <= mismatch_range_begin.second)
+                break;
+            if (*mismatch_range_end_first != *mismatch_range_end_second)
+                break;
+        }*/
+
+
+
+        /*std::string rCurrentFileState = currentFileState;
+        std::string rNewFileState = newFileState;
+        std::reverse(rCurrentFileState.begin(), rCurrentFileState.end());
+        std::reverse(rNewFileState.begin(), rNewFileState.end());
+
+        auto mismatch_range_rbegin = std::mismatch(rCurrentFileState.begin(), rCurrentFileState.end(),
+            rNewFileState.begin(), rNewFileState.end());
+
+
+        //auto end_pos_before = std::distance(mismatch_range_rbegin.first, rCurrentFileState.end());
+        //auto end_pos_after = std::distance(mismatch_range_rbegin.second, rNewFileState.end());
+        auto end_pos_before = std::distance(rCurrentFileState.begin(), mismatch_range_rbegin.first);
+        auto end_pos_after = std::distance(rNewFileState.begin(), mismatch_range_rbegin.second);
+        //if (end_pos_before != end_pos_after)
+            //std::cout << "difff";
+
         std::string before;
-            std::string after;
+        std::string after;
+        if (mismatch_range_begin.first > currentFileState.end() - end_pos_before)
+        {
+            before = std::string(mismatch_range_begin.first, currentFileState.end());
+        }
+        else
+        {
+            before = std::string(mismatch_range_begin.first, currentFileState.end() - end_pos_before);
+        }
 
-            auto mismatch_range_end =
-                std::mismatch(currentFileState.rbegin(), currentFileState.rend(),
-                    newFileState.rbegin(), newFileState.rend());
+        if (mismatch_range_begin.second > newFileState.end() - end_pos_after)
+        {
+            after = std::string(mismatch_range_begin.second, newFileState.end());
+        }
+        else
+        {
+            after = std::string(mismatch_range_begin.second, newFileState.end() - end_pos_after);
+        }*/
 
-            size_t occuranceIndex =
-                static_cast<size_t>(std::distance(currentFileState.begin(), mismatch_range_begin.first));
+        std::string before;
+        std::string after;
 
-            /*std::copy(mismatch_range_begin.first, mismatch_range_end.first.base(), std::back_inserter(before));
+        auto it_before_end = currentFileState.end();
+        auto it_after_end = newFileState.end();
+
+        auto mismatch_range_end =
+            std::mismatch(currentFileState.rbegin(), currentFileState.rend(),
+                newFileState.rbegin(), newFileState.rend());
+
+        size_t occuranceIndex =
+            static_cast<size_t>(std::distance(currentFileState.begin(), mismatch_range_begin.first));
+
+        /*std::copy(mismatch_range_begin.first, mismatch_range_end.first.base(), std::back_inserter(before));
+        std::copy(mismatch_range_begin.second, mismatch_range_end.second.base(), std::back_inserter(after));
+        */
+        if ((mismatch_range_begin.first > mismatch_range_end.first.base()) || (mismatch_range_begin.second > mismatch_range_end.second.base()))
+        {
+            std::copy(mismatch_range_begin.first, currentFileState.end(), std::back_inserter(before));
+            std::copy(mismatch_range_begin.second, newFileState.end(), std::back_inserter(after));
+        }
+        else
+        {
+            std::copy(mismatch_range_begin.first, mismatch_range_end.first.base(), std::back_inserter(before));
             std::copy(mismatch_range_begin.second, mismatch_range_end.second.base(), std::back_inserter(after));
-            */
-            if ((mismatch_range_begin.first > mismatch_range_end.first.base()) || (mismatch_range_begin.second > mismatch_range_end.second.base()))
-            {
-                std::copy(mismatch_range_begin.first, currentFileState.end(), std::back_inserter(before));
-                std::copy(mismatch_range_begin.second, newFileState.end(), std::back_inserter(after));
-            }
-            else
-            {
-                std::copy(mismatch_range_begin.first, mismatch_range_end.first.base(), std::back_inserter(before));
-                std::copy(mismatch_range_begin.second, mismatch_range_end.second.base(), std::back_inserter(after));
-            }
+        }
 
-            change.before = before;
-            change.after = after;
-            change.begin_change_pos = occuranceIndex;
+        change.before = before;
+        std::cout<<"before = "<<before;
+        change.after = after;
+        std::cout<<"after = "<<after;
+        change.begin_change_pos = occuranceIndex;
 
-            //change.begin_change_pos = static_cast<size_t>(std::distance(currentFileState.begin(), mismatch_range_begin.first));
-            //change.begin_change_pos = static_cast<size_t>(std::distance(newFileState.begin(), mismatch_range_begin.second));
+        //change.begin_change_pos = static_cast<size_t>(std::distance(currentFileState.begin(), mismatch_range_begin.first));
+        //change.begin_change_pos = static_cast<size_t>(std::distance(newFileState.begin(), mismatch_range_begin.second));
 
-            changesHistory.push_back(change);
-            currentFileState = newFileState;
-            currentState_it = changesHistory.end() - 1;
-            std::cout << " added: " << currentFileState << std::endl;
-
+        changesHistory.push_back(change);
+        currentFileState = newFileState;
+        currentState_it = changesHistory.end() - 1;
+        std::cout << " ADDED\n: " << currentFileState << std::endl;
 }
 
 
 
 
-std::string ChangeManager::undo(QPlainTextEdit *codeEditor)
+std::string ChangeManager::undo()
 {
-    if(currentState_it == changesHistory.begin())
-    {
-        //qDebug()<<"NOTHING TO UNDO";
-
+    if (currentState_it == changesHistory.begin())
+        {
+            return currentFileState;
+        }
+        auto pos = currentState_it->begin_change_pos;
+        std::string from = currentState_it->after;
+        std::string to = currentState_it->before;
+        currentState_it--;
+        currentFileState.replace(pos, from.length(), to);
+        std::cout << "\nUNDO:\n" << currentFileState;
         return currentFileState;
-    }
-    //codeEditor->cursor().setPos(currentState_it->cursor);
-//in order to get previous position we should replace "before" with "after"
-    auto pos = currentState_it->begin_change_pos;
-    std::string from = currentState_it->after;
-    std::string to = currentState_it->before;
-    currentState_it--;
-    size_t distance = static_cast<size_t>(std::distance(changesHistory.begin(),
-                                                        currentState_it));
-    qDebug()<<"distance from the start = " << distance;
-    currentFileState.replace(pos, from.length(), to);
-
-    return currentFileState;
 }
 
-std::string ChangeManager::redo(QPlainTextEdit *codeEditor)
+std::string ChangeManager::redo()
 {
     if (currentState_it == (changesHistory.end() - 1))//if is no any record in the change history list
     {
-        //qDebug()<<"NOTHING TO REDO!";
+        qDebug()<<"NOTHING TO REDO!";
         return currentFileState;
     }
-    //codeEditor->cursor().setPos(currentState_it->cursor);
-// if oreder to get next position we should replace "after" from current record with "after" from next record
-    std::string from = currentState_it->after;
+
     currentState_it++;
-    auto pos_start = currentState_it->begin_change_pos;
-    std::string to = currentState_it->after;
-    auto pos_end = pos_start + currentState_it->before.length();
-    currentFileState.replace(currentFileState.begin() + static_cast<int>(pos_start),
-                             currentFileState.begin() + static_cast<int>(pos_end), to);
 
+    auto pos = currentState_it->begin_change_pos;
+    std::string inert = currentState_it->after;
+    /*qDebug()<<"***************************REDO**************************";
+    qDebug()<<"before = "<<QString::fromStdString(currentState_it->before);
+    qDebug()<<"after = "<<QString::fromStdString(currentState_it->after);
+    qDebug()<<"position = "<< currentState_it->begin_change_pos;
+    qDebug()<<"*********************************************************";
 
+    qDebug()<<"***********************REDO - 1********************************";
+    qDebug()<<"before = "<<QString::fromStdString((currentState_it - 1)->before);
+    qDebug()<<"after = "<<QString::fromStdString((currentState_it - 1)->after);
+    qDebug()<<"position = "<< (currentState_it - 1)->begin_change_pos;
+    qDebug()<<"*********************************************************";*/
+    currentFileState.replace(currentFileState.begin() + pos, currentFileState.begin() + pos + currentState_it->before.length(),inert);
+      //  qDebug()<<"distance from the start after = " << distance;
     return currentFileState;
 }

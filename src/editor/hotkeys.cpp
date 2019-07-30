@@ -10,16 +10,24 @@ void CodeEditor::keyPressEvent(QKeyEvent *e)
             e = new QKeyEvent(e->type(), e->key(), e->modifiers()&Qt::MetaModifier &Qt::KeypadModifier);
 
             std::string str = this->toPlainText().toUtf8().constData();
-            qDebug()<<"TEXT SET"<<QString::fromStdString(str);
-            qDebug()<<"size = "<<changeManager.changesHistory.size();
         }
 
-        if(e->key() == Qt::Key_Space || e->key() == Qt::Key_Enter || e->key() == Qt::Key_Return)
+        if(e->key() == Qt::Key_Space /*|| e->key() == Qt::Key_Enter || e->key() == Qt::Key_Return*/)
         {
-            std::string str = this->toPlainText().toUtf8().constData();
-            qDebug()<<"TEXT SET"<<QString::fromStdString(str);
-            qDebug()<<"size = "<<changeManager.changesHistory.size();
-            changeManager.writeChange(str, this);
+           //std::string str = this->toPlainText().toUtf8().constData();
+            //changeManager->writeChange(str);
+            /*changeManager->writeChange(std::string("11"));
+            changeManager->writeChange(std::string("11"));
+            changeManager->writeChange(std::string("22"));
+            changeManager->writeChange(std::string("33"));
+            changeManager->writeChange(std::string("44"));
+            changeManager->writeChange(std::string("55"));
+            changeManager->writeChange(std::string("66"));
+            changeManager->writeChange(std::string("77"));
+            changeManager->writeChange(std::string("88"));
+            changeManager->writeChange(std::string("99"));
+            changeManager->writeChange(std::string("11"));
+            changeManager->writeChange(std::string("22"));*/
         }
         if(e->key() == Qt::Key_BraceLeft)
         {
@@ -59,20 +67,20 @@ void CodeEditor::keyPressEvent(QKeyEvent *e)
 
         if(e->key() == Qt::Key_Z && e->modifiers() & Qt::ControlModifier)
         {
-            this->cursor().pos();
+            //this->cursor().pos();
 
-            QString text = QString::fromStdString(this->changeManager.undo(this));
+            QString text = QString::fromStdString(this->changeManager->undo());
             this->document()->setPlainText(text);
-            qDebug()<<"size = "<<changeManager.changesHistory.size();
+            qDebug()<<"size = "<<changeManager->changesHistory.size();
         }
 
         if(e->key() == Qt::Key_Y && e->modifiers() & Qt::ControlModifier)
         {
 
-            QString text = QString::fromStdString(this->changeManager.redo(this));
+            QString text = QString::fromStdString(this->changeManager->redo());
            // qDebug()<<"UNDO text = "<<text;
             this->document()->setPlainText(text);
-            qDebug()<<"size = "<<changeManager.changesHistory.size();
+            qDebug()<<"size = "<<changeManager->changesHistory.size();
         }
         QPlainTextEdit::keyPressEvent(e);
 }

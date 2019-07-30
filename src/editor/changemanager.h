@@ -15,7 +15,6 @@ struct IntegralChange
     size_t begin_change_pos;// position where changed started
     std::string   before;
     std::string   after;
-    QPoint cursor;
 };
 
 class ChangeManager
@@ -34,9 +33,9 @@ public:
     ChangeManager();
     ChangeManager(const std::string &fileState);
     ~ChangeManager();
-    void writeChange(std::string newFileState, QPlainTextEdit *codeEditor);
-    std::string undo(QPlainTextEdit *codeEditor);
-    std::string redo(QPlainTextEdit *codeEditor);
+    void writeChange(std::string newFileState);
+    std::string undo();
+    std::string redo();
 };
 
 #endif // CHANGESMANAGER_H

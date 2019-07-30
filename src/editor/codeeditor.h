@@ -1,7 +1,7 @@
 #ifndef CODEEDITOR_H
 #define CODEEDITOR_H
 
-#define CHANGE_SAVE_TIME 500
+#define CHANGE_SAVE_TIME 1000
 #define TAB_SPACE 4
 
 #include<QPlainTextEdit>
@@ -55,7 +55,7 @@ private:
    int currentZoom = 100;
    QFont font;
    QString fileName;
-   ChangeManager changeManager;
+   ChangeManager *changeManager;
    QTimer *timer;
    LexerCPP lexer;
    QVector<Token> tokens;
