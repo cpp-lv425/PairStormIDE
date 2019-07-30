@@ -79,6 +79,9 @@ void DefaultLocalConnector::broadcastServerAttributesOnTimerTick()
 //                                                     LAUNCH SERVER AFTER USER HAS LOGGED IN
 void DefaultLocalConnector::configureServerOnLogin(const QString & userName)
 {
+    // If server has previously been configured
+    if (m_tcpService) return;
+
     // Create TCP server with name of the user
     m_tcpService = TcpService::getService(userName);
 
@@ -109,6 +112,11 @@ void DefaultLocalConnector::configureServerOnLogin(const QString & userName)
 //                                                          ADD USER FROM DISCOVERED DATAGRAM
 void DefaultLocalConnector::addServerFromUdpDatagramOnReceive()
 {
+    if (!m_tcpService)
+    {
+        return;
+    }
+
     ServerData discoveredServerAttributes;
 
     // Read received datagram and fill the information about discovered attributes
