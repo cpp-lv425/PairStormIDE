@@ -17,13 +17,16 @@
 #include "filemanager.h"
 #include "codeeditor.h"
 #include "mdiarea.h"
+#include "storeconf.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-
+    {
+        StoreConf conf(this);
+    }
     // when first started main window is maximized
     setWindowState(Qt::WindowMaximized);
 
@@ -352,7 +355,7 @@ MainWindow::~MainWindow()
 // save to configuration file current state and geometry of mainwindow's toolbars and dockwidgets
 void MainWindow::saveMainWindowState()
 {
-    QSettings settings("425", "PairStorm");
+    QSettings settings(QApplication::organizationName(), QApplication::applicationName());
     settings.setValue("mainWindowGeometry", saveGeometry());
     settings.setValue("mainWindowState", saveState());
 }
@@ -360,7 +363,7 @@ void MainWindow::saveMainWindowState()
 // restore state and geometry of mainwindow's toolbars and dockwidgets from last session
 void MainWindow::restoreMainWindowState()
 {
-    QSettings settings("425", "PairStorm");
+    QSettings settings(QApplication::organizationName(), QApplication::applicationName());
     restoreGeometry(settings.value("mainWindowGeometry").toByteArray());
     restoreState(settings.value("mainWindowState").toByteArray());
 }
