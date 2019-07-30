@@ -80,6 +80,8 @@ public slots:
 private:
     // creates new doc in MDIArea
     CodeEditor* createNewDoc();
+protected:
+    void closeEvent(QCloseEvent *event);
 };
 
 #endif // MAINWINDOW_H

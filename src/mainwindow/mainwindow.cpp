@@ -472,6 +472,32 @@ CodeEditor* MainWindow::createNewDoc()
     return newDoc;
 }
 
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    if(!mpDocsArea)
+        return;
+
+    // getting all docs
+    auto docsList = mpDocsArea->subWindowList();
+
+    // if there are no docs
+    if(docsList.empty())
+    {
+        event->accept();
+    }
+
+    // if doc is modified then we should ask user if changes have to be saved
+    for (int i = 0; i < docsList.size(); ++i)
+    {
+        auto curDoc = qobject_cast<CodeEditor*>(docsList[i]->widget());
+
+        if(curDoc && curDoc->document()->isModified())
+        {
+            saveDocument(curDoc, curDoc->getFileName());
+        }
+    }
+}
+
 MainWindow::~MainWindow()
 {
     QSettings settings("425", "PairStorm");
