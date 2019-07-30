@@ -1,13 +1,12 @@
 #ifndef CHANGESMANAGER_H
 #define CHANGESMANAGER_H
 
-#define CHANGES_HISTORY_MAX_SIZE 200
+const int CHANGES_HISTORY_MAX_SIZE = 200;
 
 #include<string>
 #include<deque>
 #include<iostream>
 #include<algorithm>
-#include<QString>
 
 struct IntegralChange
 {

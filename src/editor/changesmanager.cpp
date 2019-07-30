@@ -19,12 +19,8 @@ void ChangeManager::removeHistory()//it's not necessary to hold history if we re
 {
     if(!changesHistory.size())
         return;
-    auto it_victim = changesHistory.end() - 1;// move from the end of list
-    while(it_victim != currentState_it)//delete all till pass iterator position(iterator isn't point to the end only if we pressed ctrl + Z)
-    {
-        it_victim--;
-        changesHistory.pop_back();
-    }
+   //delete all till pass iterator position(iterator isn't point to the end only if we pressed ctrl + Z)
+    changesHistory.erase(std::next(currentState_it, 1), changesHistory.end());
 }
 
 bool ChangeManager::fileChanged(const std::string &newFileState)
@@ -48,7 +44,7 @@ void ChangeManager::writeChange(std::string newFileState)
     std::string after;
 
     auto mismatch_range_end = std::mismatch(currentFileState.rbegin(), currentFileState.rend(),
-                                             newFileState.rbegin(), newFileState.rend());
+                                            newFileState.rbegin(), newFileState.rend());
 
     size_t occuranceIndex =
     static_cast<size_t>(std::distance(currentFileState.begin(), mismatch_range_begin.first));
@@ -96,7 +92,8 @@ std::string ChangeManager::undo()
 
 std::string ChangeManager::redo()
 {
-    if (currentState_it == (changesHistory.end() - 1))//if is no any record in the change history list
+    if (currentState_it == (changesHistory.end() - 1) ||
+        currentState_it == (changesHistory.end()))//if is no any record in the change history list
         return currentFileState;
 
     currentState_it++;

@@ -1,8 +1,8 @@
 #ifndef CODEEDITOR_H
 #define CODEEDITOR_H
 
-#define CHANGE_SAVE_TIME 1000
-#define TAB_SPACE 4
+const int CHANGE_SAVE_TIME = 1000;
+const int TAB_SPACE = 4;
 
 #include<QPlainTextEdit>
 #include<QObject>
@@ -31,6 +31,8 @@ public:
     QString& getFileName();
     void setFileName(const QString &fileame);
     std::pair<const QString &, const QString &> getChangedFileInfo();
+    void undo();
+    void redo();
 
 protected:
     void resizeEvent(QResizeEvent *event)override;

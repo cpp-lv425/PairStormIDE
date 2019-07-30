@@ -6,19 +6,23 @@ void CodeEditor::keyPressEvent(QKeyEvent *e)
             ((e->modifiers() & Qt::ShiftModifier) == Qt::ShiftModifier))
     {
         e = new QKeyEvent(e->type(), e->key(), e->modifiers()&Qt::MetaModifier &Qt::KeypadModifier);
-
-        std::string str = this->toPlainText().toUtf8().constData();
+        QPlainTextEdit::keyPressEvent(e);
+        return;
     }
 
     if(e->key() == Qt::Key_Space || e->key() == Qt::Key_Enter || e->key() == Qt::Key_Return)
     {
        saveStateInTheHistory();
+       QPlainTextEdit::keyPressEvent(e);
+       return;
     }
 
 
     if((e->key() == Qt::Key_V && e->modifiers() & Qt::ControlModifier))
     {
         saveStateInTheHistory();
+        QPlainTextEdit::keyPressEvent(e);
+        return;
     }
 
     if(e->key() == Qt::Key_BraceLeft)
@@ -61,6 +65,7 @@ void CodeEditor::keyPressEvent(QKeyEvent *e)
     {
         QString text = QString::fromStdString(this->changeManager->undo());
         this->document()->setPlainText(text);
+        return;
     }
 
     if(e->key() == Qt::Key_Y && e->modifiers() & Qt::ControlModifier)
@@ -68,6 +73,7 @@ void CodeEditor::keyPressEvent(QKeyEvent *e)
 
         QString text = QString::fromStdString(this->changeManager->redo());
         this->document()->setPlainText(text);
+        return;
     }
     QPlainTextEdit::keyPressEvent(e);
 }

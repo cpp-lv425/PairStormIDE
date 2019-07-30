@@ -24,7 +24,6 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     connect(this,  SIGNAL(textChanged()),            this, SLOT(runLexer()));
     connect(this,  SIGNAL(cursorPositionChanged()),  this, SLOT(highlightCurrentLine()));
     connect(timer, SIGNAL(timeout()),                this, SLOT(saveStateInTheHistory()));
-    //connect(this, SIGNAL(textChanged()), this, SLOT(changesAppeared()));
 
     timer->start(CHANGE_SAVE_TIME);//save text by this time
 
@@ -75,6 +74,16 @@ void CodeEditor::setFileName(const QString &fileName)
 std::pair<const QString &, const QString &> CodeEditor::getChangedFileInfo()
 {
     return std::make_pair(this->toPlainText(), fileName);
+}
+
+void CodeEditor::undo()
+{
+    changeManager->undo();
+}
+
+void CodeEditor::redo()
+{
+    changeManager->redo();
 }
 
 void CodeEditor::updateLineNumberAreaWidth()
