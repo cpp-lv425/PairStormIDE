@@ -56,6 +56,9 @@ void ApiParser::boradcastServerAttributes()
 
 void ApiParser::configureServerOnLogin(const QString & userName)
 {
+    // Set user name
+
+
     // Create TCP server
     m_tcpService = TcpService::getService();
 
@@ -101,22 +104,33 @@ void ApiParser::addServerFromUdpDatagramOnReceive()
 
 
     // If datagram was corrupted
-    if (serverData.empty()) return;
+    if (serverData.empty())
+    {
+        return;
+    }
 
-    // If discovered server has the name of the current user
-    if (serverData.m_name == m_userName) return;
+    // If name of discovered server matches name of current server
+    if (serverData.m_name == m_tcpService->getServerName())
+    {
+        return;
+    }
 
-    // If datagram has already been saved
+    // If server with a given name has already been discovered
     auto attribPtr = std::find_if(m_discoveredTcpServersAttrib.cbegin(),
                                   m_discoveredTcpServersAttrib.cend(),
                                   [serverData] (const ServerData & inServerData)
+                                  {
+                                      return inServerData.m_name == serverData.m_name;
+                                  });
+    if (attribPtr != m_discoveredTcpServersAttrib.cend())
     {
-        return inServerData.m_name != serverData.m_name;
-    });
-    if (attribPtr != m_discoveredTcpServersAttrib.cend()) return;
+        return;
+    }
 
     // Finally, save information about server
     m_discoveredTcpServersAttrib.push_back(serverData);
+
+    emit newUserDiscovered();
 }
 
 

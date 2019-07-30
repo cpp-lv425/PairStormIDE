@@ -21,9 +21,6 @@ protected:
 
     explicit BaseApiParser(QObject *qObject = nullptr); // Protected!
 
-    // Name of the user that has logged in
-    QString m_userName;
-
     // UDP & TCP service providers
     std::shared_ptr<UdpService> m_udpService;
     std::shared_ptr<TcpService> m_tcpService;
