@@ -6,20 +6,8 @@ LocalConnectorInterface::LocalConnectorInterface(QObject *qObject) : QObject(qOb
 // ==========================================================================================
 // ==========================================================================================
 // ==========================================================================================
-//                                                   CREATE CONNECTOR & CONFIGURE UDP SERVICE
-DefaultLocalConnector::DefaultLocalConnector() : LocalConnectorInterface()
-{
-    // Compose UDP service
-    m_udpService = UdpService::getService();
-
-    // Begin continiously discovering users
-    connect(
-        m_udpService.get(), &UdpService::newDatagramSaved,
-        this,               &DefaultLocalConnector::addServerFromUdpDatagramOnReceive,
-        Qt::UniqueConnection);
-
-    // TODO connect configureServerOnLogin to the login signal
-}
+//                                                                           CREATE CONNECTOR
+DefaultLocalConnector::DefaultLocalConnector() : LocalConnectorInterface() { }
 // ==========================================================================================
 // ==========================================================================================
 // ==========================================================================================
@@ -30,6 +18,91 @@ std::shared_ptr<DefaultLocalConnector> DefaultLocalConnector::generateConnector(
             instance(new DefaultLocalConnector);
 
     return instance;
+}
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
+//                                                   LAUNCH SERVICES AFTER USER HAS LOGGED IN
+void DefaultLocalConnector::configureServiceOnLogin(const QString & userName)
+{
+    // Return if services has previously been configured
+    if (m_udpService || m_tcpService) return;
+
+    // Configure the UDP service & TCP service
+    m_udpService = UdpService::getService();
+    m_tcpService = TcpService::getService(userName);
+
+
+    // Begin discovering neighbor servers using UDP service
+    connect(
+        m_udpService.get(), &UdpService::newDatagramSaved,
+        this,               &DefaultLocalConnector::addServerFromUdpDatagramOnReceive,
+        Qt::UniqueConnection);
+
+    // Begin capturing incomming user connections using TCP service
+    connect(
+        m_tcpService.get(), &TcpService::socketConnected,
+        this,               &DefaultLocalConnector::processConnectionOnRequest,
+        Qt::UniqueConnection);
+
+    // Begin saving incoming messages using TCP service
+    connect(
+        m_tcpService.get(), &TcpService::newSegmentSaved,
+        this,               &DefaultLocalConnector::processTcpSegmentOnReceive,
+        Qt::UniqueConnection
+    );
+
+
+    // Broadcast server attributes each g_defaultBroadcastCycleMs
+    // milliseconds using UDP service
+    m_internalBroadcastTimer = std::make_unique<QTimer>();
+    connect(
+        m_internalBroadcastTimer.get(), &QTimer::timeout,
+        this,                           &DefaultLocalConnector::broadcastServerAttributesOnTimerTick,
+        Qt::UniqueConnection);
+    m_internalBroadcastTimer->start(g_defaultBroadcastCycleMs);
+}
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
+//                                                          ADD USER FROM DISCOVERED DATAGRAM
+void DefaultLocalConnector::addServerFromUdpDatagramOnReceive()
+{
+    ServerData discoveredServerAttributes;
+    // Read received datagram and fill it with attributes of the discovered server
+    Datagram   datagramContent = m_udpService->getReceivedDatagram();
+    discoveredServerAttributes.fromJsonQString(datagramContent.m_data);
+    discoveredServerAttributes.m_sourceIp = datagramContent.m_ip;
+
+
+    if (discoveredServerAttributes.empty())
+    {
+        // Datagram was corrupted
+        return;
+    }
+    if (discoveredServerAttributes.m_name ==
+        m_tcpService->getServerAttributes().m_name)
+    {
+        // Discovered server name matches current server name
+        return;
+    }
+    auto attribPtr =
+            std::find_if(m_discoveredTcpServersAttrib.cbegin(),
+                         m_discoveredTcpServersAttrib.cend(),
+                         [discoveredServerAttributes] (const ServerData & inServerData)
+                         {
+                             return inServerData.m_name ==
+                                    discoveredServerAttributes.m_name;
+                         });
+    if (attribPtr != m_discoveredTcpServersAttrib.cend())
+    {
+        // Server with a given name has already been discovered
+        return;
+    }
+    // Finally, save information about server & emit "user discovered" signal
+    m_discoveredTcpServersAttrib.push_back(discoveredServerAttributes);
+
+    emit newUserDiscovered();
 }
 // ==========================================================================================
 // ==========================================================================================
@@ -50,17 +123,18 @@ QVector<QString> DefaultLocalConnector::getOnlineUsers() const
 //                                                                            REQUEST SHARING
 void DefaultLocalConnector::shareWithUser(QString userName)
 {
-    auto usersServerData =
+    auto serverAttributes =
             std::find_if(m_discoveredTcpServersAttrib.begin(),
                          m_discoveredTcpServersAttrib.end(),
                          [userName] (const ServerData & serverData)
                          {
                              return serverData.m_name == userName;
                          });
-    // Return if not found any server with a given userName
-    if (usersServerData == m_discoveredTcpServersAttrib.end()) return;
-    // Else try to establish connection with server
-    m_tcpService->connectToTcpServer(*usersServerData);
+    // If found user with a given userName
+    if (serverAttributes != m_discoveredTcpServersAttrib.end())
+    {
+        m_tcpService->connectToTcpServer(*serverAttributes);
+    }
 }
 // ==========================================================================================
 // ==========================================================================================
@@ -76,90 +150,7 @@ void DefaultLocalConnector::broadcastServerAttributesOnTimerTick()
 // ==========================================================================================
 // ==========================================================================================
 // ==========================================================================================
-//                                                     LAUNCH SERVER AFTER USER HAS LOGGED IN
-void DefaultLocalConnector::configureServerOnLogin(const QString & userName)
-{
-    // If server has previously been configured
-    if (m_tcpService) return;
-
-    // Create TCP server with name of the user
-    m_tcpService = TcpService::getService(userName);
-
-    // Generate processing when new user try to connect
-    connect(
-        m_tcpService.get(), &TcpService::socketConnected,
-        this,               &DefaultLocalConnector::processConnectionOnRequest,
-        Qt::UniqueConnection);
-
-    // Save TCP segments on receival
-    connect(
-        m_tcpService.get(), &TcpService::newSegmentSaved,
-        this,               &DefaultLocalConnector::processTcpSegmentOnReceive,
-        Qt::UniqueConnection
-    );
-
-    // Broadcast server attributes each g_defaultBroadcastCycleMs milliseconds
-    m_internalBroadcastTimer = std::make_unique<QTimer>();
-    connect(
-        m_internalBroadcastTimer.get(), &QTimer::timeout,
-        this,                           &DefaultLocalConnector::broadcastServerAttributesOnTimerTick,
-        Qt::UniqueConnection);
-    m_internalBroadcastTimer->start(g_defaultBroadcastCycleMs);
-}
-// ==========================================================================================
-// ==========================================================================================
-// ==========================================================================================
-//                                                          ADD USER FROM DISCOVERED DATAGRAM
-void DefaultLocalConnector::addServerFromUdpDatagramOnReceive()
-{
-    if (!m_tcpService)
-    {
-        return;
-    }
-
-    ServerData discoveredServerAttributes;
-
-    // Read received datagram and fill the information about discovered attributes
-    Datagram   datagramContent = m_udpService->getReceivedDatagram();
-    discoveredServerAttributes.fromJsonQString(datagramContent.m_data);
-    discoveredServerAttributes.m_sourceIp = datagramContent.m_ip;
-
-
-    if (discoveredServerAttributes.empty())
-    {
-        // Datagram was corrupted
-        return;
-    }
-
-    if (discoveredServerAttributes.m_name ==
-        m_tcpService->getServerAttributes().m_name)
-    {
-        // Discovered server name matches current server name
-        return;
-    }
-
-    auto attribPtr =
-            std::find_if(m_discoveredTcpServersAttrib.cbegin(),
-                         m_discoveredTcpServersAttrib.cend(),
-                         [discoveredServerAttributes] (const ServerData & inServerData)
-                         {
-                             return inServerData.m_name ==
-                                    discoveredServerAttributes.m_name;
-                         });
-    if (attribPtr != m_discoveredTcpServersAttrib.cend())
-    {
-        // Server with a given name has already been discovered
-        return;
-    }
-
-    // Finally, save information about server & emit "user discovered" signal
-    m_discoveredTcpServersAttrib.push_back(discoveredServerAttributes);
-
-    emit newUserDiscovered();
-}
-
-
-
+//                                                             TRANSLATE RECEIVED TCP SEGMENT
 void DefaultLocalConnector::processTcpSegmentOnReceive()
 {
     Segment data = m_tcpService->getReceivedSegment();
@@ -199,10 +190,14 @@ void DefaultLocalConnector::processConnectionOnRequest(std::shared_ptr<QTcpSocke
 
 void DefaultLocalConnector::testConnectToValik()
 {
-    qDebug() << "trying to connect to the local host";
+    qDebug() << "trying to connect to other server";
     ServerData serverData;
-    serverData.m_sourceIp = QHostAddress::LocalHost;
-    serverData.m_port = g_defaultTcpPortNumber;
-    m_tcpService->connectToTcpServer(serverData);
+    serverData.m_sourceIp = QHostAddress("192.168.43.226");
+    serverData.m_port = g_defaultTcpPortNumber + 10;
+    if(m_tcpService->connectToTcpServer(serverData))
+        qDebug() << "successful connection";
+    else {
+        qDebug() << "connection failed";
+    }
 }
 #endif //CUSTOM_DEBUG

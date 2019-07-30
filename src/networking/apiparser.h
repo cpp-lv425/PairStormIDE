@@ -50,7 +50,7 @@ signals:
     void changeReceived();
 
 
-public slots:
+private slots:
     //====================== On internal signals ======================
 
     // When either UDP datagram or TCP segment has been received
@@ -66,8 +66,9 @@ public slots:
 
     //====================== On external signals ======================
 
+public slots:
     // When the uer has recently logged in to the application
-    virtual void configureServerOnLogin(const QString & userName) = 0;
+    virtual void configureServiceOnLogin(const QString & userName) = 0;
 
     // Each second when the counter emits signal
 
@@ -127,7 +128,7 @@ public slots:
     virtual void processConnectionOnRequest(std::shared_ptr<QTcpSocket> clientSocketPtr) override;
 
 
-    virtual void configureServerOnLogin(const QString & userName) override;
+    virtual void configureServiceOnLogin(const QString & userName) override;
 
 
     //virtual void informAttachedHostsAboutChanges() override;
