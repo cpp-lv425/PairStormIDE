@@ -33,7 +33,7 @@ TcpService::TcpService(const QString & serverName, QObject *qObject) :
         // Configure server when session opening succeeds
         connect(
             m_netSessionPtr.get(), &QNetworkSession::opened,
-            this,               &TcpService::configureServer,
+            this,                  &TcpService::configureServer,
             Qt::UniqueConnection);
 
         m_netSessionPtr->open();
@@ -211,9 +211,6 @@ void TcpService::configureSocketOnServerConnection()
 //                                                 CONFIGURE SOCKET WHEN CLIENT HAS CONNECTED
 void TcpService::configureSocketOnClientConnection()
 {
-        qDebug() << "Host request connection:";
-
-
 
     // Get brand new client' socket and save its ptr
     std::shared_ptr<QTcpSocket>
@@ -236,8 +233,8 @@ void TcpService::configureSocketOnClientConnection()
     //===================================================================================
     //                                                                ATTENTION: HARDCODE
 
-
-    qDebug() << "ip: " << clientSocketPtr->peerAddress();
+    qDebug() << "Host request connection:";
+    qDebug() << "ip: " << clientSocketPtr->peerAddress().toString();
     qDebug() << "port: " << clientSocketPtr->peerPort();
 
     //===================================================================================

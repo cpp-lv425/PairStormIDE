@@ -178,23 +178,23 @@ void DefaultLocalConnector::processTcpSegmentOnReceive()
 void DefaultLocalConnector::processConnectionOnRequest(std::shared_ptr<QTcpSocket> clientSocketPtr)
 {
     // TODO process connection
+    qDebug() << "sharing requested in connections manager";
 
-    QString userName;
 
-    emit sharingRequested(userName);
+    //emit sharingRequested(userName);
 }
 
 
 
 
 #ifdef CUSTOM_DEBUG
-void DefaultLocalConnector::testLoginUser(const QString & userName)
-{
-    configureServerOnLogin(userName);
-}
 
-void DefaultLocalConnector::testSendSegmentToLocalHost()
+void DefaultLocalConnector::testConnectToLocalHost()
 {
-    //m_tcpService->sendThroughSocket("Hello, Pair Storm is here", QHostAddress::LocalHost);
+    qDebug() << "trying to connect to the local host";
+    ServerData serverData;
+    serverData.m_sourceIp = QHostAddress::LocalHost;
+    serverData.m_port = g_defaultTcpPortNumber;
+    m_tcpService->connectToTcpServer(serverData);
 }
 #endif //CUSTOM_DEBUG

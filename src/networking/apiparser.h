@@ -37,7 +37,7 @@ public:
 
 
     virtual QVector<QString> getOnlineUsers() const = 0;
-    virtual void shareWithUser(QString userName) = 0;
+    virtual void shareWithUser(QString userName)    = 0;
 
 signals:
 
@@ -79,8 +79,7 @@ public slots:
 
 #ifdef CUSTOM_DEBUG
 public:
-    virtual void testLoginUser(const QString & userName) = 0;
-    virtual void testSendSegmentToLocalHost()      = 0;
+    virtual void testConnectToValik()      = 0;
 #endif //CUSTOM_DEBUG
 };
 
@@ -138,8 +137,7 @@ public slots:
 
 #ifdef CUSTOM_DEBUG
 public:
-    virtual void testLoginUser(const QString & userName) override;
-    virtual void testSendSegmentToLocalHost() override;
+    virtual void testConnectToValik() override;
 #endif //CUSTOM_DEBUG
 };
 
