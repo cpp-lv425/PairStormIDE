@@ -128,10 +128,8 @@ void MainWindow::setupMainMenu()
     QMenu *scaleSubMenu = new QMenu("&Scale");
     viewMenu->addMenu(scaleSubMenu);
     viewMenu->addSeparator();
-    auto showProjectViewerAction = viewMenu->addAction("&Show Project Viewer", this, &MainWindow::onShowProjectViewerTriggered);
-    //showProjectViewerAction->setCheckable(true);
-    //showProjectViewerAction->setChecked(true);
-
+    viewMenu->addAction("Show &Project Viewer", this, &MainWindow::onShowProjectViewerTriggered);
+    viewMenu->addAction("Show &Chat Window", this, &MainWindow::onShowChatWindowDockTriggered);
 
     // tools menu
     QMenu *toolsMenu = new QMenu("&Tools");
@@ -543,6 +541,11 @@ void MainWindow::onShowProjectViewerTriggered()
     mpProjectViewerDock->show();
 }
 
+void MainWindow::onShowChatWindowDockTriggered()
+{
+    mpChatWindowDock->show();
+}
+
 void MainWindow::onRefactorTriggered()
 {
     qDebug() << "refactor";
@@ -551,7 +554,7 @@ void MainWindow::onRefactorTriggered()
 void MainWindow::onConnectTriggered()
 {
     LoginDialog loginDialog(this);
-    currentUserName = loginDialog.start();
+    mCurrentUserName = loginDialog.start();
 }
 
 void MainWindow::onSettingsTriggered()
