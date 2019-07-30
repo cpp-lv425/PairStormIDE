@@ -46,10 +46,7 @@ MainWindow::MainWindow(QWidget *parent) :
     setupMainMenu();
 
     // create instance of Project Viewer
-    mpProjectViewerDock = new ProjectViewerDock(this);
-    addDockWidget(Qt::LeftDockWidgetArea, mpProjectViewerDock);
-    mpProjectViewerDock->setObjectName("mpProjectViewerDock");
-    mpProjectViewerDock->restoreGeometry(settings.value("mpProjectViewerDockGeometry").toByteArray());
+    createProjectViewer();
 
     // create instance of Chat Window
     mpChatWindowDock = new ChatWindowDock(this);
@@ -129,6 +126,11 @@ void MainWindow::setupMainMenu()
     viewMenu->addAction("&Full screen", this, &MainWindow::onFullScreenTriggered, Qt::CTRL + Qt::SHIFT + Qt::Key_F11);
     QMenu *scaleSubMenu = new QMenu("&Scale");
     viewMenu->addMenu(scaleSubMenu);
+    viewMenu->addSeparator();
+    auto showProjectViewerAction = viewMenu->addAction("&Show Project Viewer", this, &MainWindow::onShowProjectViewerTriggered);
+    //showProjectViewerAction->setCheckable(true);
+    //showProjectViewerAction->setChecked(true);
+
 
     // tools menu
     QMenu *toolsMenu = new QMenu("&Tools");
@@ -260,6 +262,12 @@ void MainWindow::saveAllModifiedDocuments(QList<QMdiSubWindow*> &docsList)
         auto curDoc = qobject_cast<CodeEditor*>(docsList[i]->widget());
         saveDocument(curDoc, curDoc->getFileName());
     }
+}
+
+void MainWindow::createProjectViewer()
+{
+    mpProjectViewerDock = new ProjectViewerDock(this);
+    addDockWidget(Qt::LeftDockWidgetArea, mpProjectViewerDock);
 }
 
 void MainWindow::onNewFileTriggered()
@@ -527,6 +535,11 @@ void MainWindow::onFindTriggered()
 void MainWindow::onFullScreenTriggered()
 {
     qDebug() << "full screen";
+}
+
+void MainWindow::onShowProjectViewerTriggered()
+{
+    mpProjectViewerDock->show();
 }
 
 void MainWindow::onRefactorTriggered()

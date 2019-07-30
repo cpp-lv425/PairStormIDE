@@ -43,6 +43,7 @@ private:
     // returns true if any of docs has been modified
     bool checkIfModified(QList<QMdiSubWindow*> &docsList);
     void saveAllModifiedDocuments(QList<QMdiSubWindow*> &docsList);
+    void createProjectViewer();
 
 private slots:
     // file menu actions
@@ -67,6 +68,7 @@ private slots:
 
     // view menu
     void onFullScreenTriggered();
+    void onShowProjectViewerTriggered();
 
     // tools menu
     void onRefactorTriggered();

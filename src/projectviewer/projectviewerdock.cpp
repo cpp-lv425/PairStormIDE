@@ -54,4 +54,5 @@ ProjectViewerDock::~ProjectViewerDock()
 {
     QSettings settings("425", "PairStorm");
     settings.setValue("ProjectViewerDockGeometry", saveGeometry());
+    qDebug() << "~ProjectViewerDock()";
 }
