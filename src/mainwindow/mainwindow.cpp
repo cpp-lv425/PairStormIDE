@@ -97,7 +97,7 @@ void MainWindow::setupMainMenu()
     fileMenu->addSeparator();
 
     // closing docs & exiting the program
-    fileMenu->addAction("&Close document", this, &MainWindow::onCloseFileTriggered, Qt::CTRL + Qt::Key_W);
+    fileMenu->addAction("&Close document", this, &MainWindow::onCloseFileTriggered, Qt::CTRL + Qt::SHIFT + Qt::Key_W);
     fileMenu->addAction("&Exit", this, &MainWindow::onExitTriggered, Qt::ALT + Qt::Key_F4);
 
     // edit menu
@@ -212,6 +212,26 @@ void MainWindow::openDoc(QString fileName)
     newDoc->show();
 }
 
+bool MainWindow::checkIfOpened(const QString &fileName) const
+{
+    // getting all docs
+    auto docsList = mpDocsArea->subWindowList();
+
+    // if there are no docs
+    if(!docsList.empty())
+    {
+        for (const auto& doc : docsList)
+        {
+            auto curDoc = qobject_cast<CodeEditor*>(doc->widget());
+            if(curDoc && curDoc->getFileName() == fileName)
+            {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 void MainWindow::onNewFileTriggered()
 {
     QStringList fileExtensions = getFileExtensions();
@@ -241,6 +261,14 @@ void MainWindow::onOpenFileTriggered()
                 QDir::currentPath(),
                 "C++/C files (*.h *.hpp *.cpp *.c) ;; Text Files (*.txt) ;; JSON Files (*.json)"
                 );
+
+    // if document already opened then return
+    if(checkIfOpened(fileName))
+    {
+        QMessageBox::warning(this, "Document already opened", "Selected document already opened.");
+        return;
+    }
+
     openDoc(fileName);
 }
 
@@ -460,6 +488,13 @@ void MainWindow::onCheckUpdatesTriggered()
 
 void MainWindow::onOpenFileFromProjectViewer(QString fileName)
 {
+    // if document already opened then return
+    if(checkIfOpened(fileName))
+    {
+        QMessageBox::warning(this, "Document already opened", "Selected document already opened.");
+        return;
+    }
+
     openDoc(fileName);
 }
 
@@ -509,6 +544,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
         }
     }
 
+    // if appreved then save changes
     for (int i = 0; i < docsList.size(); ++i)
     {
         auto curDoc = qobject_cast<CodeEditor*>(docsList[i]->widget());

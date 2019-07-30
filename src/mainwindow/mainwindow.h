@@ -38,6 +38,7 @@ private:
     void setupMainMenu();
     void saveDocument(CodeEditor* pDoc, QString fileName);
     void openDoc(QString fileName);
+    bool checkIfOpened(const QString& fileName)const;
 
 private slots:
     // file menu actions
@@ -80,6 +81,7 @@ public slots:
 private:
     // creates new doc in MDIArea
     CodeEditor* createNewDoc();
+
 protected:
     void closeEvent(QCloseEvent *event);
 };
