@@ -3,11 +3,14 @@
 
 #include <QMainWindow>
 
+#include "startpage.h"
+
 namespace Ui {
 class MainWindow;
 }
 
 QT_BEGIN_NAMESPACE
+class ProjectViewerDock;
 class QFileSystemModel;
 class BottomPanelDock;
 class ChatWindowDock;
@@ -22,16 +25,20 @@ class MainWindow : public QMainWindow
 
 public:
     explicit MainWindow(QWidget *parent = nullptr);
+    QStringList getFileExtensions()const;
+    void showStartPage();
     ~MainWindow();
 
 private:
     Ui::MainWindow *ui;
-    QDockWidget *mpProjectViewerDock;
+    ProjectViewerDock *mpProjectViewerDock;
     QDockWidget *mpChatWindowDock;
     BottomPanelDock *mpBottomPanelDock;
-    MDIArea *mpDocsArea;
+    MDIArea *mpDocsArea;    
 
     void setupMainMenu();
+    void saveDocument(CodeEditor* pDoc, QString fileName);
+    void openDoc(QString fileName);
 
 private slots:
     // file menu actions
@@ -68,6 +75,10 @@ private slots:
     void onUserGuideTriggered();
     void onCheckUpdatesTriggered();
 
+public slots:
+    void onOpenFileFromProjectViewer(QString fileName);
+
+private:
     // creates new doc in MDIArea
     CodeEditor* createNewDoc();
 };

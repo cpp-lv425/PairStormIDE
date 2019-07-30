@@ -24,6 +24,8 @@ public:
     CodeEditor(QWidget *parent = nullptr);
     void lineNumberAreaPaintEvent(QPaintEvent *event);
     int lineNumberAreaWidth();
+    QString& getFileName();
+    void setFileName(const QString &flename);
 
 protected:
     void resizeEvent(QResizeEvent *event)override;
@@ -36,6 +38,7 @@ private slots:
 
 public slots:
    void keyPressEvent(QKeyEvent *e) override;
+
 private:
    QWidget *lineNumberArea;
    ConfigParams configParam;
