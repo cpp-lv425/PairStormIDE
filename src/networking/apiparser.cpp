@@ -189,7 +189,7 @@ void DefaultLocalConnector::processConnectionOnRequest(std::shared_ptr<QTcpSocke
 
 #ifdef CUSTOM_DEBUG
 
-void DefaultLocalConnector::testConnectToLocalHost()
+void DefaultLocalConnector::testConnectToValik()
 {
     qDebug() << "trying to connect to the local host";
     ServerData serverData;
