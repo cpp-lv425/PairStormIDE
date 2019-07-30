@@ -1,20 +1,24 @@
 #include "chatwidget.h"
 
 #include <QPlainTextEdit>
+#include <QListWidget>
 #include <QBoxLayout>
 #include <QLineEdit>
 #include <QLabel>
 
 ChatWidget::ChatWidget(QWidget *pParent): QWidget (pParent)
 {
-    pFeed = new QPlainTextEdit;
+    mpUsersList = new QListWidget;
+    mpUsersList->addItem("Volodya");
+
+    mpFeed = new QPlainTextEdit;
     QLabel *pLbl = new QLabel(">> ");
-    pEnterLine = new QLineEdit;
+    mpEnterLine = new QLineEdit;
     QHBoxLayout *pLineLayout = new QHBoxLayout;
     pLineLayout->addWidget(pLbl);
-    pLineLayout->addWidget(pEnterLine);
+    pLineLayout->addWidget(mpEnterLine);
     QVBoxLayout *pWindowLayout = new QVBoxLayout;
-    pWindowLayout->addWidget(pFeed);
+    pWindowLayout->addWidget(mpFeed);
     pWindowLayout->addLayout(pLineLayout);
     setLayout(pWindowLayout);
 }
