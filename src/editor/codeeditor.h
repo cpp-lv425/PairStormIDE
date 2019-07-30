@@ -9,8 +9,8 @@
 #include"ideconfiguration.h"
 #include"changemanager.h"
 #include<utility>
-#include "lexercpp.h"
-#include "ideconfiguration.h"
+#include"lexercpp.h"
+#include"ideconfiguration.h"
 
 class QPaintEvent;
 class QResizeEvent;
@@ -31,7 +31,6 @@ public:
     QString& getFileName();
     void setFileName(const QString &fileame);
     std::pair<const QString &, const QString &> getChangedFileInfo();
-
 
 protected:
     void resizeEvent(QResizeEvent *event)override;

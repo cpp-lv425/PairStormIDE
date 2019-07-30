@@ -3,8 +3,6 @@
 #include "codeeditor.h"
 #include <QWidget>
 
-
-
 class LineNumberArea : public QWidget
 {
 public:
