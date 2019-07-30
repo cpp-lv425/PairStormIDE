@@ -33,3 +33,12 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 include($$PWD/mainwindow/mainwindow.pri)
 include($$PWD/networking/networking.pri)
+include($$PWD/chatwindow/chatwindow.pri)
+include($$PWD/mdiarea/mdiarea.pri)
+include($$PWD/filemanager/filemanager.pri)
+include($$PWD/editor/editor.pri)
+include($$PWD/bottompanel/bottompanel.pri)
+include($$PWD/settings/settings.pri)
+include($$PWD/startpage/startpage.pri)
+include($$PWD/projectviewer/projectviewer.pri)
+include($$PWD/newfilewizard/newfilewizard.pri)
