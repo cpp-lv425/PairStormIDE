@@ -14,4 +14,4 @@ HEADERS += \
     $$PWD/tcpservice.h \
     $$PWD/udpservice.h
 
-include($$PWD/changesManager/changesmanager.pri)
+#include($$PWD/changesManager/changesmanager.pri)
