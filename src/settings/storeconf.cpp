@@ -1,7 +1,5 @@
 #include "storeconf.h"
 
-#include <experimental/filesystem>
-
 #include <QString>
 #include <QFileDialog>
 #include <QDebug>
@@ -30,8 +28,12 @@ StoreConf::~StoreConf() { }
 
 QString StoreConf::getPathToConFile()
 {
-    if (std::experimental::filesystem::exists("conf.json"))
+    QString currentPath = QDir::currentPath();
+    currentPath += "/conf.json";
+    QFile file(currentPath);
+    if(file.exists())
         return "conf.json";
+
     QFileDialog fd(this);
     fd.setObjectName("fileDialog");
     QString str = fd.getOpenFileName(this, "Choose configuration file *.json", "", "*.json");

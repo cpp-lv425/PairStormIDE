@@ -7,6 +7,4 @@ SOURCES += \
 HEADERS += \
     $$PWD/storeconf.h
 
-LIBS += \
-    -lstdc++fs
 
