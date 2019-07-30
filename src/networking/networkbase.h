@@ -13,14 +13,17 @@
 
 typedef quint16 PortNumType;
 typedef quint64 SizeType;
-const PortNumType g_defaultTcpPortNumber = 36108;
-const PortNumType g_defaultUdpPortNumber = 32807;
+const PortNumType g_defaultTcpPortNumber    = 36108;
+const PortNumType g_defaultUdpPortNumber    = 32807;
+const SizeType    g_defaultBroadcastCycleMs = 3000;
+
 const QString     g_orgLabel             = "cpp-lv425";
 const QString     g_appLabel             = "PairStorm 0.0.1";
 
 struct ServerData {
     QString               m_name;
     QVector<QHostAddress> m_ips;
+    QHostAddress          m_sourceIp;
     PortNumType           m_port;
 
     QString toJsonQString() const
