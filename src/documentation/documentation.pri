@@ -2,7 +2,11 @@ DEPENDPATH += $$PWD
 INCLUDEPATH += $$PWD
 
 HEADERS += \
-    $$PWD/documentationsearch.h
+    $$PWD/documentationsearch.h \
+    $$PWD/documentationviewer.h
 
 SOURCES += \
-    $$PWD/documentationsearch.cpp
+    $$PWD/documentationsearch.cpp \
+    $$PWD/documentationviewer.cpp
+
+FORMS +=
