@@ -129,6 +129,7 @@ void DefaultLocalConnector::startSharing(const QString & userName)
         message.m_type       = MessageType::MessageTypeRequestSharingMessage;
         if(m_tcpService->sendDataToTcpServer(message.toJsonQString(), *serverAttributesPtr))
         {
+            qDebug() << "sharing was started";
             m_connectedTcpServersAttrib.push_back(*serverAttributesPtr);
             emit newUserConnected(this);
         }
@@ -217,7 +218,7 @@ void DefaultLocalConnector::processConnectionOnRequest(QTcpSocket * clientSocket
 void DefaultLocalConnector::testSendHelloToLastServer()
 {
     ServerData serverData;
-    if(m_discoveredTcpServersAttrib.empty())
+    if(!m_discoveredTcpServersAttrib.empty())
     {
         serverData = m_discoveredTcpServersAttrib.back();
     }
@@ -229,6 +230,11 @@ void DefaultLocalConnector::testSendHelloToLastServer()
     data.append(" to ");
     data.append(serverData.m_name);
 
+    Message message;
+    message.m_data = data;
+    message.m_type = MessageType::MessageTypeChatMessage;
+    message.m_sourceName = m_tcpService->getServerAttributes().m_name;
+
     if(m_tcpService->sendDataToTcpServer(data, serverData))
     {
         qDebug() << "message is sent";
@@ -237,6 +243,6 @@ void DefaultLocalConnector::testSendHelloToLastServer()
     {
         qDebug() << "message is not sent";
     }
-    startSharing(serverData.m_name);
+    //startSharing(serverData.m_name);
 }
 #endif //CUSTOM_DEBUG

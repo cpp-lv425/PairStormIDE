@@ -1,4 +1,5 @@
 #include "tcpservice.h"
+#include <QApplication>
 // ==========================================================================================
 // ==========================================================================================
 //                                                                    TCP SERVICE CONSTRUCTOR
@@ -182,7 +183,7 @@ bool TcpService::sendDataToTcpServer(const QString & data, const ServerData & se
 
     serverSocketPtr->setSocketOption(QAbstractSocket::KeepAliveOption, 1);
     serverSocketPtr->connectToHost(ip, port);
-    if (serverSocketPtr->waitForConnected(100))
+    if (serverSocketPtr->waitForConnected(1000))
     {
         sendThroughSocket(data, serverSocketPtr);
         return true;
@@ -265,6 +266,8 @@ void TcpService::saveSegmentOnReceival()
     m_pendingSegment.m_data = data;
     m_pendingSegment.m_ip   = ip;
     m_pendingSegment.m_port = port;
+
+    senderSocketPtr->disconnectFromHost();
 
     // Inform about segment receival
     emit newSegmentSaved();
