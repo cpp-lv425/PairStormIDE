@@ -7,9 +7,10 @@
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QException> // temporarily included
+#include <QSettings>
+#include <QStyle>
 #include <QDebug> // temporarily included
 #include <QFile>
-#include <QSettings>
 
 #include "projectviewerdock.h"
 #include "bottompaneldock.h"
@@ -18,9 +19,9 @@
 #include "logindialog.h"
 #include "filemanager.h"
 #include "codeeditor.h"
+#include "storeconf.h"
 #include "startpage.h"
 #include "mdiarea.h"
-#include "storeconf.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -88,10 +89,19 @@ void MainWindow::setupMainMenu()
 {
     // file menu
     QMenu *fileMenu = new QMenu("&File");
+    QToolBar *pToolbar = new QToolBar("Main Tool Bar");
+
     // working with files
-    fileMenu->addAction("&New file", this, &MainWindow::onNewFileTriggered, Qt::CTRL + Qt::Key_N);
-    fileMenu->addAction("&Open file...", this, &MainWindow::onOpenFileTriggered, Qt::CTRL + Qt::Key_O);
-    fileMenu->addAction("Open &folder...", this, &MainWindow::onOpenFolderTriggered);
+    QAction *pNewFileAction = fileMenu->addAction("&New file", this, &MainWindow::onNewFileTriggered, Qt::CTRL + Qt::Key_N);
+    pNewFileAction->setIcon(style()->standardIcon(QStyle::SP_FileIcon));
+    pToolbar->addAction(pNewFileAction);
+
+    QAction *pOpenFileAction = fileMenu->addAction("&Open file...", this, &MainWindow::onOpenFileTriggered, Qt::CTRL + Qt::Key_O);
+    pOpenFileAction->setIcon(style()->standardIcon(QStyle::SP_DialogOpenButton));
+    pToolbar->addAction(pOpenFileAction);
+    QAction *pOpenFolderAction = fileMenu->addAction("Open &folder...", this, &MainWindow::onOpenFolderTriggered);
+    pOpenFolderAction->setIcon(style()->standardIcon(QStyle::SP_DirHomeIcon));
+    pToolbar->addAction(pOpenFolderAction);
     fileMenu->addSeparator();
 
     // opening start page
@@ -99,7 +109,9 @@ void MainWindow::setupMainMenu()
     fileMenu->addSeparator();
 
     // saving files
-    fileMenu->addAction("&Save...", this, &MainWindow::onSaveFileTriggered, Qt::CTRL + Qt::Key_S);
+    QAction *pSaveAction = fileMenu->addAction("&Save...", this, &MainWindow::onSaveFileTriggered, Qt::CTRL + Qt::Key_S);
+    pSaveAction->setIcon(style()->standardIcon(QStyle::SP_DialogSaveButton));
+    pToolbar->addAction(pSaveAction);
     fileMenu->addAction("Save &As...", this, &MainWindow::onSaveFileAsTriggered);
     fileMenu->addAction("Save A&ll...", this, &MainWindow::onSaveAllFilesTriggered, Qt::CTRL + Qt::SHIFT + Qt::Key_S);
     fileMenu->addSeparator();
@@ -143,7 +155,9 @@ void MainWindow::setupMainMenu()
     toolsMenu->addSeparator();
 
     // opening chat window
-    toolsMenu->addAction("&Connect...", this, &MainWindow::onConnectTriggered);
+    QAction *pConnectAction = toolsMenu->addAction("&Connect...", this, &MainWindow::onConnectTriggered);
+    pConnectAction->setIcon(style()->standardIcon(QStyle::SP_DialogYesButton));
+    pToolbar->addAction(pConnectAction);
     toolsMenu->addSeparator();
 
     // buidling solution
@@ -185,6 +199,9 @@ void MainWindow::setupMainMenu()
     menuBar()->addMenu(viewMenu);
     menuBar()->addMenu(toolsMenu);
     menuBar()->addMenu(helpMenu);
+
+    addToolBar(pToolbar);
+
 }
 
 void MainWindow::saveDocument(CodeEditor *pDoc, QString fileName)
@@ -435,14 +452,19 @@ void MainWindow::onCloseFileTriggered()
                 this,
                 "Save changes",
                 "Do you want to save changes to current document?",
-                QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No
+                QMessageBox::StandardButton::Yes |
+                QMessageBox::StandardButton::No |
+                QMessageBox::StandardButton::Cancel
                 );
 
     // checking user's answer
-    if(reply == QMessageBox::StandardButton::Yes)
+    if(reply == QMessageBox::Yes)
     {
         saveDocument(curDoc, curDoc->getFileName());
     }
+    if(reply == QMessageBox::Cancel)
+        return;
+
     // closing doc
     mpDocsArea->closeActiveSubWindow();
 }
@@ -611,10 +633,10 @@ void MainWindow::onCloseWindow(CodeEditor *curDoc)
                     this,
                     "Saving Changes",
                     "Do you want to save changes to opened documents?",
-                    QMessageBox::Yes | QMessageBox::No
+                    QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel
                     );
 
-        if(reply == QMessageBox::No)
+        if(reply == QMessageBox::No | reply == QMessageBox::Cancel)
             return;
 
         saveDocument(curDoc, curDoc->getFileName());
@@ -660,7 +682,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
                 this,
                 "Saving Changes",
                 "Do you want to save changes to opened documents?",
-                QMessageBox::Yes | QMessageBox::No
+                QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel
                 );
 
     if(reply == QMessageBox::No)
@@ -668,11 +690,14 @@ void MainWindow::closeEvent(QCloseEvent *event)
         event->accept();
         return;
     }
+    if(reply == QMessageBox::Yes)
+    {
+        // if appreved then save changes
+        saveAllModifiedDocuments(docsList);
+        event->accept();
+    }
 
-    // if appreved then save changes
-    saveAllModifiedDocuments(docsList);
-
-    event->accept();
+    event->ignore();
 }
 
 MainWindow::~MainWindow()
