@@ -168,7 +168,16 @@ bool TcpService::connectToTcpServer(const ServerData & serverData)
 
     // Try to connect using present server' ip addresses
     const PortNumType  port = serverData.m_port;
-    const QHostAddress ip =   serverData.m_sourceIp;
+    const QVector<QHostAddress> ips = serverData.m_ips;
+    QHostAddress ip;
+    const auto ipPtr = std::find(ips.cbegin(),
+                                 ips.cend(),
+                                 serverData.m_sourceIp);
+    if (ipPtr != ips.cend())
+    {
+        qDebug() << "one ip is the same as other ip";
+        ip = *ipPtr;
+    }
 
     serverSocketPtr->connectToHost(ip, port);
     if (serverSocketPtr->waitForConnected(1000))

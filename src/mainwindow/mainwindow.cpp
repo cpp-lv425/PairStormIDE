@@ -11,6 +11,7 @@
 #include <QFile>
 #include <QSettings>
 
+#include "localconnectorgenerator.h"
 #include "projectviewerdock.h"
 #include "bottompaneldock.h"
 #include "chatwindowdock.h"
@@ -19,7 +20,6 @@
 #include "filemanager.h"
 #include "codeeditor.h"
 #include "startpage.h"
-#include "apiparser.h"
 #include "mdiarea.h"
 #include "storeconf.h"
 
@@ -27,7 +27,9 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-    mplocalConnector = DefaultLocalConnector::generateConnector().get();
+    // Generate default local network connector
+    mplocalConnector =
+            LocalConnectorGenerator::getDefaultConnector();
 
     ui->setupUi(this);
     {

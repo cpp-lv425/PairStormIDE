@@ -1,25 +1,4 @@
-#include "apiparser.h"
-// ==========================================================================================
-// ==========================================================================================
-//                                 CONSTRUCTOR FOR THE BASIC INTERFACE OF THE LOCAL CONNECTOR
-LocalConnectorInterface::LocalConnectorInterface(QObject *qObject) : QObject(qObject) { }
-// ==========================================================================================
-// ==========================================================================================
-// ==========================================================================================
-//                                                                           CREATE CONNECTOR
-DefaultLocalConnector::DefaultLocalConnector() : LocalConnectorInterface() { }
-// ==========================================================================================
-// ==========================================================================================
-// ==========================================================================================
-//                                                                     GET CONNECTOR INSTANCE
-std::shared_ptr<DefaultLocalConnector> DefaultLocalConnector::generateConnector()
-{
-    static std::shared_ptr<DefaultLocalConnector>
-            instance(new DefaultLocalConnector);
-
-    return instance;
-}
-// ==========================================================================================
+#include "localconnector.h"
 // ==========================================================================================
 // ==========================================================================================
 //                                                   LAUNCH SERVICES AFTER USER HAS LOGGED IN
@@ -58,15 +37,33 @@ void DefaultLocalConnector::configureServiceOnLogin(const QString & userName)
         Qt::UniqueConnection
     );
 
+    startBroadcastingAttributes();
+}
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
+//                                                                       GET DISCOVERED USERS
+QStringList DefaultLocalConnector::getOnlineUsers() const
+{
+    QStringList userNames;
+    // Get user names from discovered servers
+    for (const auto & serverAttrib : m_discoveredTcpServersAttrib)
+        userNames.push_back(serverAttrib.m_name);
 
-    // Broadcast server attributes each g_defaultBroadcastCycleMs
-    // milliseconds using UDP service
-    m_internalBroadcastTimer = std::make_unique<QTimer>();
-    connect(
-        m_internalBroadcastTimer.get(), &QTimer::timeout,
-        this,                           &DefaultLocalConnector::broadcastServerAttributesOnTimerTick,
-        Qt::UniqueConnection);
-    m_internalBroadcastTimer->start(g_defaultBroadcastCycleMs);
+    return userNames;
+}
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
+//                                                        GET USERS, ALLOWED FOR SHARING WITH
+QStringList DefaultLocalConnector::getConnectedUsers() const
+{
+    QStringList userNames;
+    // Get user names from connected servers
+    for (const auto & serverAttrib : m_connectedTcpServersAttrib)
+        userNames.push_back(serverAttrib.m_name);
+
+    return userNames;
 }
 // ==========================================================================================
 // ==========================================================================================
@@ -113,34 +110,8 @@ void DefaultLocalConnector::addServerFromUdpDatagramOnReceive()
 // ==========================================================================================
 // ==========================================================================================
 // ==========================================================================================
-//                                                                       GET DISCOVERED USERS
-QVector<QString> DefaultLocalConnector::getOnlineUsers() const
-{
-    QVector<QString> userNames;
-    // Get user names from discovered servers
-    for (const auto & serverAttrib : m_discoveredTcpServersAttrib)
-        userNames.push_back(serverAttrib.m_name);
-
-    return userNames;
-}
-// ==========================================================================================
-// ==========================================================================================
-// ==========================================================================================
-//                                                        GET USERS, ALLOWED FOR SHARING WITH
-QVector<QString> DefaultLocalConnector::getConnectedUsers() const
-{
-    QVector<QString> userNames;
-    // Get user names from connected servers
-    for (const auto & serverAttrib : m_connectedTcpServersAttrib)
-        userNames.push_back(serverAttrib.m_name);
-
-    return userNames;
-}
-// ==========================================================================================
-// ==========================================================================================
-// ==========================================================================================
 //                                                                            REQUEST SHARING
-void DefaultLocalConnector::requestSharingWithUser(QString userName)
+void DefaultLocalConnector::startSharing(const QString & userName)
 {
     auto serverAttributesPtr =
             std::find_if(m_discoveredTcpServersAttrib.begin(),
@@ -155,6 +126,21 @@ void DefaultLocalConnector::requestSharingWithUser(QString userName)
         m_connectedTcpServersAttrib.push_back(*serverAttributesPtr);
         //m_tcpService->connectToTcpServer(*serverAttributes);
     }
+}
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
+//                                                       START BROADCASTING SERVER ATTRIBUTES
+void DefaultLocalConnector::startBroadcastingAttributes()
+{
+    // Broadcast server attributes each g_defaultBroadcastCycleMs
+    // milliseconds using UDP service
+    m_internalBroadcastTimer = std::make_unique<QTimer>();
+    connect(
+        m_internalBroadcastTimer.get(), &QTimer::timeout,
+        this,                           &DefaultLocalConnector::broadcastServerAttributesOnTimerTick,
+        Qt::UniqueConnection);
+    m_internalBroadcastTimer->start(g_defaultBroadcastCycleMs);
 }
 // ==========================================================================================
 // ==========================================================================================
@@ -211,12 +197,19 @@ void DefaultLocalConnector::processConnectionOnRequest(QTcpSocket * clientSocket
 void DefaultLocalConnector::testConnectToValik()
 {
     qDebug() << "trying to connect to other server";
-    ServerData serverData;
-    serverData.m_sourceIp = QHostAddress("192.168.103.19");
-    serverData.m_port = 37108;
+    if(m_discoveredTcpServersAttrib.empty())
+    {
+        return;
+    }
+    ServerData serverData =
+            m_discoveredTcpServersAttrib.back();
+    serverData.m_sourceIp = QHostAddress("192.168.43.243");
     if(m_tcpService->connectToTcpServer(serverData))
+    {
         qDebug() << "successful connection";
-    else {
+    }
+    else
+    {
         qDebug() << "connection failed";
     }
 }

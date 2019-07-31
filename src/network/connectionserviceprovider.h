@@ -2,7 +2,7 @@
 #define CONNECTIONSERVICEPROVIDER_H
 
 #include <QObject>
-#include "apiparser.h"
+#include "localconnector.h"
 
 class ConnectionServiceProvider : public QObject
 {

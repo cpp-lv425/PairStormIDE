@@ -1,8 +1,8 @@
 #ifndef SERVERDATA_H
 #define SERVERDATA_H
 
-#include <QString>
 #include <QObject>
+#include <QString>
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QJsonDocument>
