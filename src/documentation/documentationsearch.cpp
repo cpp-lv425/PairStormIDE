@@ -31,3 +31,8 @@ QVector<QFileInfo> DocumentationSearch::search(const QDir &directory, const QStr
     }
     return rResult;
 }
+
+QUrl DocumentationSearch::getUrl(const QFileInfo &info)
+{
+    return QUrl::fromLocalFile(info.filePath());
+}
