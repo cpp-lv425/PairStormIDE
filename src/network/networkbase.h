@@ -50,6 +50,7 @@ struct ServerData {
 
     void fromJsonQString(QString str)
     {
+        *this = ServerData();
         // Decompose the Json bearer string
         QJsonDocument doc = QJsonDocument::fromJson(str.toUtf8());
         QJsonObject json = doc.object();
@@ -61,7 +62,6 @@ struct ServerData {
            !json.keys().contains("name")  ||
            !json.keys().contains("port"))
         {
-            *this = ServerData();
             return;
         }
 
@@ -83,6 +83,67 @@ struct ServerData {
     bool empty() const
     {
         return m_name == QString();
+    }
+};
+
+enum MessageType : int
+{
+    MessageTypeRequestSharingMessage,
+    MessageTypeChatMessage,
+    MessageTypeChangesMessage
+};
+
+struct Message {
+    QString     m_sourceName;
+    QString     m_data;
+    MessageType m_type;
+
+    QString toJsonQString() const
+    {
+        // Create Json object and set its API
+        QJsonObject json;
+        json["app"] = g_appLabel;
+
+        // Fill object with needed values
+        json["sourceName"] = m_sourceName;
+        json["data"]       = m_data;
+        json["type"]       = static_cast<int>(m_type);
+
+        // Compose the Json bearer string
+        QJsonDocument doc(json);
+        QByteArray docData = doc.toJson(QJsonDocument::Compact);
+        return QString(docData);
+    }
+
+    void fromJsonQString(QString str)
+    {
+        *this = Message();
+        // Decompose the Json bearer string
+        QJsonDocument doc = QJsonDocument::fromJson(str.toUtf8());
+        QJsonObject json = doc.object();
+
+        // Verify if the Json object is not corrupted
+        if(json.isEmpty()                      ||
+           !json.keys().contains("app")        ||
+           !json.keys().contains("sourceName") ||
+           !json.keys().contains("data")       ||
+           !json.keys().contains("type"))
+        {
+            return;
+        }
+
+        // Check if the API version match
+        if(json.value("app").toString() != g_appLabel) return;
+
+        // Get needed values from Json object
+        m_sourceName = json.value("sourceName").toString();
+        m_data = json.value("data").toString();
+        m_type = MessageType(json.value("type").toInt());
+    }
+
+    bool empty() const
+    {
+        return m_sourceName == QString();
     }
 };
 

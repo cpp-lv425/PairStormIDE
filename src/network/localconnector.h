@@ -35,9 +35,10 @@ public slots:
 signals:
 
     //======================= Signals to GUI =================================
-    void serviceFailed();
+    void serviceFailed    ();
     void newUserDiscovered(const LocalConnectorInterface * connector);
-    void sharingRequested(QString userName);
+    void newUserConnected (const LocalConnectorInterface * connector);
+    void sharingRequested (QString userName);
 
     //======================= Signals to Editor & Chat =======================
     void changeReceived();
@@ -47,7 +48,7 @@ signals:
 //Experimental features ======================================================
 #ifdef CUSTOM_DEBUG
 public:
-    virtual void testConnectToValik() = 0;
+    virtual void testSendHelloToLastServer() = 0;
 #endif //CUSTOM_DEBUG
 //============================================================================
 };
@@ -107,7 +108,7 @@ public slots:
 //Experimental features ======================================================
 #ifdef CUSTOM_DEBUG
 public:
-    virtual void testConnectToValik() override;
+    virtual void testSendHelloToLastServer() override;
 #endif //CUSTOM_DEBUG
 //============================================================================
 };

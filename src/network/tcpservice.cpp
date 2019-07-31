@@ -137,13 +137,6 @@ ServerData TcpService::getServerAttributes() const
 //                                                                     TCP SERVICE DESTRUCTOR
 TcpService::~TcpService()
 {
-    // Disconnect active sockets
-    std::for_each(m_connectedSockets.begin(), m_connectedSockets.end(),
-                  [this](QTcpSocket * socket)
-                  {
-                      disconnectSocket(socket);
-                  });
-
     // Close server if it has been successfully launched
     if (m_tcpServerPtr->isListening())
     {
@@ -154,13 +147,16 @@ TcpService::~TcpService()
 // ==========================================================================================
 // ==========================================================================================
 //                                           CONNECT TO TCP SERVER BY GIVEN SERVER ATTRIBUTES
-bool TcpService::connectToTcpServer(const ServerData & serverData)
+bool TcpService::sendDataToTcpServer(const QString & data, const ServerData & serverData)
 {
+    if (serverData.empty())
+    {
+        return false;
+    }
     // Create new empty server socket & save its ptr
-    QTcpSocket *
-            serverSocketPtr(new QTcpSocket(this));
+    QTcpSocket * serverSocketPtr(new QTcpSocket(this));
 
-    // Force preliminary configuration in case of successful connection
+    // Force configuration in case of successful connection
     connect(
         serverSocketPtr, &QTcpSocket::connected,
         this,            &TcpService::configureSocketOnServerConnection,
@@ -169,19 +165,26 @@ bool TcpService::connectToTcpServer(const ServerData & serverData)
     // Try to connect using present server' ip addresses
     const PortNumType  port = serverData.m_port;
     const QVector<QHostAddress> ips = serverData.m_ips;
-    QHostAddress ip;
-    const auto ipPtr = std::find(ips.cbegin(),
-                                 ips.cend(),
-                                 serverData.m_sourceIp);
+
+    // Try to resolve active ip address
+    QHostAddress ip = serverData.m_sourceIp;
+    const auto ipPtr = std::find_if(ips.cbegin(),
+                                    ips.cend(),
+                                    [serverData] (const QHostAddress & ip)
+                                    {
+                                        return ip.isEqual(serverData.m_sourceIp,
+                                                          QHostAddress::ConvertV4MappedToIPv4);
+                                    });
     if (ipPtr != ips.cend())
     {
-        qDebug() << "one ip is the same as other ip";
         ip = *ipPtr;
     }
 
+    serverSocketPtr->setSocketOption(QAbstractSocket::KeepAliveOption, 1);
     serverSocketPtr->connectToHost(ip, port);
-    if (serverSocketPtr->waitForConnected(1000))
+    if (serverSocketPtr->waitForConnected(100))
     {
+        sendThroughSocket(data, serverSocketPtr);
         return true;
     }
     return false;
@@ -193,33 +196,19 @@ bool TcpService::connectToTcpServer(const ServerData & serverData)
 void TcpService::configureSocketOnServerConnection()
 {
     // Get connected host' socket ptr
-    QTcpSocket *
-            serverSocketPtr(qobject_cast<QTcpSocket*>(sender()));
-    m_connectedSockets.push_back(serverSocketPtr);
+    QTcpSocket * serverSocketPtr(qobject_cast<QTcpSocket*>(sender()));
 
     // Trigger saving received segments on readyRead
     connect(
         serverSocketPtr, &QTcpSocket::readyRead,
-        this,                  &TcpService::saveSegmentOnReceival,
+        this,            &TcpService::saveSegmentOnReceival,
         Qt::AutoConnection);
 
     // Trigger informing about disconnected hosts
     connect(
         serverSocketPtr, &QTcpSocket::disconnected,
-        this,                  &TcpService::removeSocketOnDisconnected,
+        this,            &TcpService::removeSocketOnDisconnected,
         Qt::AutoConnection);
-
-
-    //===================================================================================
-    //                                                                ATTENTION: HARDCODE
-
-    // TODO establish normal connection
-    // TODO write userName -> socket relation
-
-    QString data("Client: hello, I'm now connected");
-    sendThroughSocket(data, serverSocketPtr);
-
-    //===================================================================================
 }
 // ==========================================================================================
 // ==========================================================================================
@@ -228,9 +217,7 @@ void TcpService::configureSocketOnServerConnection()
 void TcpService::configureSocketOnClientConnection()
 {
     // Get brand new client' socket and save its ptr
-    QTcpSocket *
-            clientSocketPtr(m_tcpServerPtr->nextPendingConnection());
-    m_connectedSockets.push_back(clientSocketPtr);
+    QTcpSocket * clientSocketPtr(m_tcpServerPtr->nextPendingConnection());
 
     // Trigger saving received segments on readyRead
     connect(
@@ -241,22 +228,8 @@ void TcpService::configureSocketOnClientConnection()
     // Trigger informing about disconnected hosts
     connect(
         clientSocketPtr, &QTcpSocket::disconnected,
-        this,                  &TcpService::removeSocketOnDisconnected,
+        this,            &TcpService::removeSocketOnDisconnected,
         Qt::AutoConnection);
-
-
-    //===================================================================================
-    //                                                                ATTENTION: HARDCODE
-
-    //emit socketConnected(clientSocketPtr);
-
-    // TODO establish normal connection
-    // TODO write userName -> socket relation
-
-    QString data("Server: hello, I'm now connected");
-    sendThroughSocket(data, clientSocketPtr);
-
-    //===================================================================================
 }
 // ==========================================================================================
 // ==========================================================================================
@@ -315,68 +288,12 @@ bool TcpService::isActive() const
 // ==========================================================================================
 // ==========================================================================================
 // ==========================================================================================
-//                                                                    DISCONNECT GIVEN SOCKET
-void TcpService::disconnectSocket(QTcpSocket * socket)
-{
-    socket->abort();
-    socket->disconnectFromHost();
-}
-// ==========================================================================================
-// ==========================================================================================
-// ==========================================================================================
 //                                             REMOVE DISCONNECTED SOCKET FROM ACTIVE SOCKETS
 void TcpService::removeSocketOnDisconnected()
 {
-    qDebug() << "try to deleting socket";
-    // Get disconnected socket
-    QTcpSocket *
-            disconnectedSocketPtr(qobject_cast<QTcpSocket*>(sender()));
-
-    // Suppose that disconnected socket name is unknown
-    QString disconnectedSocketName("Unknown");
-    // Try to get real name of the server, described by the given socket
-    //bool isNameResolved =
-    //        resolveUserNameBySocket(disconnectedSocketPtr, disconnectedSocketName);
-    //if (isNameResolved)
-    //{
-    //    removeUserNameSocketRelation(disconnectedSocketName);
-    //}
-
+    // Get and close disconnected socket
+    QTcpSocket * disconnectedSocketPtr(qobject_cast<QTcpSocket*>(sender()));
     disconnectedSocketPtr->close();
-    disconnectSocket(disconnectedSocketPtr);
-    //m_connectedSockets.erase(std::find(m_connectedSockets.begin(), m_connectedSockets.end(), disconnectedSocketPtr));
-    /*
-    // Move socket away from active sockets
-    auto newConnectedSocketsEnd =
-            std::remove(m_connectedSockets.begin(),
-                        m_connectedSockets.end(),
-                        disconnectedSocketPtr);
-
-    // Close the socket
-    std::for_each(newConnectedSocketsEnd,
-                  m_connectedSockets.end(),
-                  [] (QTcpSocket * socket)
-                  {
-                      socket->close();
-                  });
-
-    // Erase socket from active sockets
-    m_connectedSockets.erase(newConnectedSocketsEnd);
-    */
-
-
-#ifdef CUSTOM_DEBUG
-    qDebug() << "____________________________________________________________";
-    qDebug() << "Host has been disconnected:";
-    qDebug() << "    ip   -> " << disconnectedSocketPtr->peerAddress().toString();
-    qDebug() << "    port -> " << disconnectedSocketPtr->peerPort();
-    qDebug() << "____________________________________________________________";
-#endif // CUSTOM_DEBUG
-
-
-
-    // Inform about socket disconnection
-    emit socketDisconnected(disconnectedSocketName);
 }
 /*
 // ==========================================================================================

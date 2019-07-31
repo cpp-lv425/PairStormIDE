@@ -32,7 +32,7 @@ class TcpService : public QObject
     std::unique_ptr<QTcpServer>          m_tcpServerPtr;
     // Vector of currently connected active sockets &
     // variable for storing received segments
-    QVector<QTcpSocket*>                 m_connectedSockets;
+    //QVector<QTcpSocket*>                 m_connectedSockets;
     Segment                              m_pendingSegment;
 
 
@@ -46,6 +46,9 @@ class TcpService : public QObject
 
     // Fill in internal attributes
     void saveServerAttributes();
+
+    // Send thorough specified socket
+    void sendThroughSocket(const QString & data, QTcpSocket * receiver);
 
 public:
 
@@ -64,12 +67,8 @@ public:
 
     // Connect to TCP server with specified attributes
     // and create special socket or disconnect from given socket
-    bool connectToTcpServer(const ServerData & serverData);
-    void disconnectSocket(QTcpSocket * socket);
+    bool sendDataToTcpServer(const QString & data, const ServerData & serverData);
 
-
-    // Send thorough specified socket
-    void sendThroughSocket(const QString & data, QTcpSocket * receiver);
 
     // Saved segment getter
     Segment getReceivedSegment() const;

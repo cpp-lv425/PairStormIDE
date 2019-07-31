@@ -123,8 +123,15 @@ void DefaultLocalConnector::startSharing(const QString & userName)
     // If found user with a given userName
     if (serverAttributesPtr != m_discoveredTcpServersAttrib.end())
     {
-        m_connectedTcpServersAttrib.push_back(*serverAttributesPtr);
-        //m_tcpService->connectToTcpServer(*serverAttributes);
+        Message message;
+        message.m_sourceName = m_tcpService->getServerAttributes().m_name;
+        message.m_data       = QString();
+        message.m_type       = MessageType::MessageTypeRequestSharingMessage;
+        if(m_tcpService->sendDataToTcpServer(message.toJsonQString(), *serverAttributesPtr))
+        {
+            m_connectedTcpServersAttrib.push_back(*serverAttributesPtr);
+            emit newUserConnected(this);
+        }
     }
 }
 // ==========================================================================================
@@ -159,20 +166,33 @@ void DefaultLocalConnector::broadcastServerAttributesOnTimerTick()
 //                                                             TRANSLATE RECEIVED TCP SEGMENT
 void DefaultLocalConnector::processTcpSegmentOnReceive()
 {
-    Segment data = m_tcpService->getReceivedSegment();
+    Segment segment = m_tcpService->getReceivedSegment();
+    Message message;
+    message.fromJsonQString(segment.m_data);
 
+    if (message.empty())
+    {
+        return;
+    }
 
-    // TODO processing
-
-
-
+    switch(message.m_type)
+    {
+    case MessageType::MessageTypeRequestSharingMessage:
+        qDebug() << message.m_sourceName << " request sharing changes";
+        emit sharingRequested(message.m_sourceName);
+        break;
+    case MessageType::MessageTypeChatMessage:
+        break;
+    case MessageType::MessageTypeChangesMessage:
+        break;
+    }
 
 #ifdef CUSTOM_DEBUG
     qDebug() << "____________________________________________________________";
     qDebug() << "TCP SEGMENT HAS BEEN RECEIVED: ";
-    qDebug() << "data ->" << data.m_data;
-    qDebug() << "ip -> " << data.m_ip.toString();
-    qDebug() << "port ->" << data.m_port;
+    qDebug() << "data ->" << segment.m_data;
+    qDebug() << "ip -> "  << segment.m_ip.toString();
+    qDebug() << "port ->" << segment.m_port;
     qDebug() << "____________________________________________________________";
 #endif // CUSTOM_DEBUG
 }
@@ -194,23 +214,29 @@ void DefaultLocalConnector::processConnectionOnRequest(QTcpSocket * clientSocket
 
 #ifdef CUSTOM_DEBUG
 
-void DefaultLocalConnector::testConnectToValik()
+void DefaultLocalConnector::testSendHelloToLastServer()
 {
-    qDebug() << "trying to connect to other server";
+    ServerData serverData;
     if(m_discoveredTcpServersAttrib.empty())
     {
-        return;
+        serverData = m_discoveredTcpServersAttrib.back();
     }
-    ServerData serverData =
-            m_discoveredTcpServersAttrib.back();
-    serverData.m_sourceIp = QHostAddress("192.168.43.243");
-    if(m_tcpService->connectToTcpServer(serverData))
+
+    qDebug() << "try to send hello to server " << serverData.m_name;
+
+    QString data("hello from ");
+    data.append(m_tcpService->getServerAttributes().m_name);
+    data.append(" to ");
+    data.append(serverData.m_name);
+
+    if(m_tcpService->sendDataToTcpServer(data, serverData))
     {
-        qDebug() << "successful connection";
+        qDebug() << "message is sent";
     }
     else
     {
-        qDebug() << "connection failed";
+        qDebug() << "message is not sent";
     }
+    startSharing(serverData.m_name);
 }
 #endif //CUSTOM_DEBUG

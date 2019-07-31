@@ -590,7 +590,7 @@ void MainWindow::onTest()
     qDebug() << "=============   VALIK TESTS   =============";
     qDebug() << "==============               ==============";
     qDebug() << "===========================================";
-    mplocalConnector->testConnectToValik();
+    mplocalConnector->testSendHelloToLastServer();
 }
 //==================================================================================================
 
