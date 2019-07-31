@@ -8,6 +8,7 @@
 #include <QMessageBox>
 #include <QException>
 #include <QLineEdit>
+#include <QDebug>
 #include <QLabel>
 #include <QDir>
 
@@ -117,6 +118,14 @@ void NewFileDialog::onCreateFile()
         return;
     }
 
+    // if file name is empty string
+    if(mpLine->text().isEmpty())
+    {
+        QMessageBox::warning(this, "Incorrect name",
+                             "Please enter file name.");
+        return;
+    }
+
     // preventing overwriting existing files
     QDir dir(dirName);
     if(dir.exists(fileName))
@@ -126,6 +135,7 @@ void NewFileDialog::onCreateFile()
                              "Please select other file name.");
         return;
     }
+
     // creating new file
     try
     {
@@ -136,6 +146,11 @@ void NewFileDialog::onCreateFile()
         return;
     }
     QMessageBox::information(this, "File Created", "Specified file has been successfully created.");
-    mFileName = dirName + '/' + fileName;
+
+    // check if filename is an empty string
+    if(fileName.isEmpty())
+        mFileName = QString();
+    else
+        mFileName = dirName + '/' + fileName;
     accept();
 }

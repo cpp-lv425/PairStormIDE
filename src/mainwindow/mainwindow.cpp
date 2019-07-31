@@ -1,7 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-#include <QPlainTextEdit> // temporarily included
 #include <QMdiSubWindow>
 #include <QStyleFactory>
 #include <QMessageBox>
@@ -213,12 +212,12 @@ void MainWindow::setupMainMenu()
 }
 
 void MainWindow::saveDocument(CodeEditor *pDoc, QString fileName)
-{
-    qDebug() << "saving";
+{    
     try
     {
         // writing to file
         FileManager().writeToFile(fileName, pDoc->toPlainText());
+        statusBar()->showMessage(tr("Changes to document have been saved"), 5000);
     } catch (const QException&)
     {
         QMessageBox::warning(this, "Error", "Unable to open file for saving");
@@ -318,14 +317,12 @@ void MainWindow::createButtomPanel()
 void MainWindow::onNewFileTriggered()
 {
     QStringList fileExtensions = getFileExtensions();
+
     NewFileDialog newFileDialog(fileExtensions, this);
 
     // new file dialog is called
     // name of newly created file is received
-    QString newFileName = newFileDialog.start();
-
-    if(newFileName.isEmpty())
-        return;
+    QString newFileName = newFileDialog.start();    
 
     // new doc is created & shown
     CodeEditor *newDoc = createNewDoc();
@@ -717,6 +714,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
         // if appreved then save changes
         saveAllModifiedDocuments(docsList);
         event->accept();
+        return;
     }
 
     event->ignore();
