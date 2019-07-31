@@ -40,6 +40,8 @@ private:
     void saveDocument(CodeEditor* pDoc, QString fileName);
     void openDoc(QString fileName);
 
+    void saveMainWindowState();
+    void restoreMainWindowState();
 private slots:
     // file menu actions
     void onNewFileTriggered();
