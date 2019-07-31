@@ -105,7 +105,7 @@ void DefaultLocalConnector::addServerFromUdpDatagramOnReceive()
     // Finally, save information about server & emit "user discovered" signal
     m_discoveredTcpServersAttrib.push_back(discoveredServerAttributes);
 
-    emit newUserDiscovered();
+    emit newUserDiscovered(this);
 }
 // ==========================================================================================
 // ==========================================================================================

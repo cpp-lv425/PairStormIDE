@@ -36,7 +36,7 @@ signals:
 
     //======================= Signals to GUI =================================
     void serviceFailed();
-    void newUserDiscovered();
+    void newUserDiscovered(const LocalConnectorInterface * connector);
     void sharingRequested(QString userName);
 
     //======================= Signals to Editor & Chat =======================

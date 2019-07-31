@@ -60,6 +60,11 @@ MainWindow::MainWindow(QWidget *parent) :
     mpChatWindowDock->setObjectName("mpChatWindowDock");
     addDockWidget(Qt::RightDockWidgetArea, mpChatWindowDock);
 
+    // Add updating user list on discovering new users
+    connect(mplocalConnector, &LocalConnectorInterface::newUserDiscovered,
+            mpChatWindowDock, &ChatWindowDock::updateUsersListOnDiscovery,
+            Qt::AutoConnection);
+
     // create instance of MDIArea
     mpDocsArea = new MDIArea(this);
 

@@ -11,3 +11,11 @@ ChatWindowDock::ChatWindowDock(QWidget *pParent): QDockWidget (pParent)
     pChatWidget = new ChatWidget;
     setWidget(pChatWidget);
 }
+
+
+
+void ChatWindowDock::updateUsersListOnDiscovery(const LocalConnectorInterface * connector)
+{
+    QStringList updatedUsersList(connector->getOnlineUsers());
+    pChatWidget->setUsersList(updatedUsersList);
+}
