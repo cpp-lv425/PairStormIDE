@@ -612,7 +612,12 @@ void MainWindow::onSettingsTriggered()
 
 void MainWindow::onAboutTriggered()
 {
-    qDebug() << "about";
+    QString info = "This application has been "
+            "developed by students of group LV-425.C++ of SoftServe IT Academy. "
+             "\n\nIt is designed to provide tools for "
+            "pair programming as well as facilities "
+            "of high-end development environment.";
+    QMessageBox::about(this, "About PairStorm", info);
 }
 
 void MainWindow::onReferenceTriggered()
