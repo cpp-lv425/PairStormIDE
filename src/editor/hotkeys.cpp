@@ -4,35 +4,42 @@
 
 QString CodeEditor::tabs="";
 
-bool CodeEditor::insidebracket(){
+bool CodeEditor::isinsidebracket()
+{
     QTextCursor cursor = this->textCursor();
-    if(cursor.position()!=this->document()->toPlainText().size()){
+    if(cursor.position()!=this->document()->toPlainText().size())
+    {
         cursor.movePosition(QTextCursor::PreviousCharacter);
         int currentpos = cursor.position();
         QString prev =this->document()->toPlainText().at(currentpos);
         cursor.movePosition(QTextCursor::NextCharacter);
         currentpos = cursor.position();
         QString next = this->document()->toPlainText().at(currentpos);
-        if(prev=="{" && next=="}")return true;
+        if(prev == "{" && next == "}")
+            return true;
     }
     return false;
 }
 
 
 
-void CodeEditor::autotab(){
+void CodeEditor::autotab()
+{
     QString text(this->document()->toRawText());
-    int lbrackets=0 ;
-    int rbrackets=0 ;
-    QTextCursor crs=this->textCursor();
-    for (int c=0; c<crs.position();c++){
-        if(text.at(c)=="{") lbrackets++;
-        if(text.at(c)=="}") rbrackets++;
+    int lbrackets = 0;
+    int rbrackets = 0;
+    QTextCursor crs = this->textCursor();
+    for (int c = 0; c < crs.position(); c++)
+    {
+        if(text.at(c) == "{")
+            lbrackets++;
+        if(text.at(c) == "}")
+            rbrackets++;
     }
-    tabs="";
-    int difference=lbrackets-rbrackets;
+    tabs = "";
+    int difference = lbrackets - rbrackets;
 
-    for(int i=0; i<difference;i++)
+    for(int i = 0; i < difference; i++)
     {
       tabs.append("\t");
     }
@@ -48,16 +55,18 @@ void CodeEditor::keyPressEvent(QKeyEvent *e)
             e = new QKeyEvent(e->type(), e->key(), e->modifiers()&Qt::MetaModifier &Qt::KeypadModifier);
         }
 
-        if(e->key() == Qt::Key_Enter || e->key() == Qt::Key_Return){
-            if(insidebracket()){
-               this->insertPlainText("\n\n");
-               emit autotab();
-               tabs.resize(tabs.size()-1);
-               this->insertPlainText(tabs);
-               this->moveCursor(QTextCursor::Up);
-               emit autotab();
-               this->insertPlainText(tabs);
-               return;
+        if(e->key() == Qt::Key_Enter || e->key() == Qt::Key_Return)
+        {
+            if(isinsidebracket())
+            {
+                this->insertPlainText("\n\n");
+                emit autotab();
+                tabs.resize(tabs.size()-1);
+                this->insertPlainText(tabs);
+                this->moveCursor(QTextCursor::Up);
+                emit autotab();
+                this->insertPlainText(tabs);
+                return;
             }
             QPlainTextEdit::keyPressEvent(e);
             emit autotab();
@@ -82,7 +91,6 @@ void CodeEditor::keyPressEvent(QKeyEvent *e)
            return;
         }
         if(e->key() == Qt::Key_Slash){
-           //QPlainTextEdit::keyPressEvent(e);
             pressSlesh=true;
         }
         if(e->key() == Qt::Key_Asterisk && pressSlesh){
@@ -138,14 +146,12 @@ void CodeEditor::keyPressEvent(QKeyEvent *e)
 
         if(e->key() == Qt::Key_Z && e->modifiers() & Qt::ControlModifier)
         {
-
             QString text = QString::fromStdString(this->changeManager.undo());
             this->document()->setPlainText(text);
         }
 
         if(e->key() == Qt::Key_Y && e->modifiers() & Qt::ControlModifier)
         {
-
             QString text = QString::fromStdString(this->changeManager.redo());
             this->document()->setPlainText(text);
         }

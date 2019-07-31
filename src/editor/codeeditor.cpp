@@ -29,7 +29,7 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     //If the text is scrolled, rect will cover the entire viewport area.
     //If the text is scrolled vertically, dy carries the amount of pixels the viewport was scrolled.
     connect(this, SIGNAL(updateRequest(QRect,int)), this, SLOT(updateLineNumberArea(QRect,int)));
-    connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(runLexer()));
+    connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(runLexerAndHighlight()));
     connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(highlightCurrentLine()));
     connect(timer, SIGNAL(timeout()), this, SLOT(saveStateInTheHistory()));
     connect(this, SIGNAL(textChanged()), this, SLOT(changesAppeared()));
@@ -57,10 +57,9 @@ void CodeEditor::runLexerAndHighlight()
     //run highlight
     hcpp->setData(tokens);
     hcpp->setText(this->document()->toPlainText());
-    for(int i=0;i<hcpp->lines.size();i++)
+    for(int i = 0; i < hcpp->mLines.size(); i++)
     {
-        hcpp->highlightBlock(hcpp->lines[i]);
-
+        hcpp->highlightBlock(hcpp->mLines[i]);
     }
 }
 

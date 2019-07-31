@@ -35,16 +35,11 @@ public:
     CodeEditor(QWidget *parent = nullptr);
     void lineNumberAreaPaintEvent(QPaintEvent *event);
     int lineNumberAreaWidth();
-    bool insidebracket();
+    bool isinsidebracket();
     static QString tabs;
-
     QString& getFileName();
-
     void setFileName(const QString &flename);
-
     std::pair<const QString &, const QString &> getChangedFileInfo();
-
-
 
 protected:
     void resizeEvent(QResizeEvent *event)override;
@@ -59,6 +54,7 @@ public slots:
     void keyPressEvent(QKeyEvent *e) override;
     void autotab();
     void saveStateInTheHistory();
+
 signals:
     void changesAppeared();
 
@@ -68,7 +64,6 @@ private:
     ConfigParams configParam;
     int currentZoom = 100;
     QFont font;
-
     QString fileName;
     ChangeManager changeManager;
     QTimer *timer;

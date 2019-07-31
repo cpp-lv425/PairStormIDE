@@ -4,57 +4,59 @@
 
 Highlightercpp::Highlightercpp(QTextDocument* parent):QSyntaxHighlighter (parent) 
 {
+    mCurrentLine = 0;
     //font color settings
-    formatkeyword.setForeground(QColor(0, 102, 255));
-    formatliteral.setForeground(QColor(153, 0, 255));
-    formatcomment.setForeground(QColor(0, 255, 204));
+    mFormatKeyword.setForeground(QColor(0, 102, 255));
+    mFormatLiteral.setForeground(QColor(153, 0, 255));
+    mFormatComment.setForeground(QColor(0, 255, 204));
 }
 
-
-void Highlightercpp::setData(QVector<Token> _data)
+void Highlightercpp::setData(QVector<Token> _mData)
 {
-    data = _data;
+    mData = _mData;
 }
 
 void Highlightercpp::findLine(QString text)
 {
-    if(text.size()==0) currentLine = -1;
-    for(unsigned int i = 0; i < lines.size(); i++)
+    if(text.size() == 0)
+        mCurrentLine = -1;
+
+    for(unsigned int i = 0; i < mLines.size(); i++)
     {
-        int y = QString::compare(lines[i], text);
+        int y = QString::compare(mLines[i], text);
         if(y == 0)
         {
-            currentLine = i;
+            mCurrentLine = i;
             return;
         }
     }
 }
 
-void Highlightercpp::setText (QString _textEditor)
+void Highlightercpp::setText(QString TextEditor)
 {
-    textEditor = _textEditor;
-    lines = textEditor.split("\n");
+    mTextEditor = TextEditor;
+    mLines = mTextEditor.split("\n");
 }
 
 void Highlightercpp::highlightBlock(const QString &text)
 {
     findLine(text);
 
-    for(auto p: data)
+    for(auto p: mData)
     {
-        if(currentLine == p.linesCount)
+        if(mCurrentLine == p.linesCount)
         {
             if(p.type == KW)
             {
-                setFormat(p.begin, p.end - p.begin , formatkeyword);
+                setFormat(p.begin, p.end - p.begin, mFormatKeyword);
             }
             else if(p.type == LIT)
             {
-                setFormat(p.begin, p.end - p.begin , formatliteral);
+                setFormat(p.begin, p.end - p.begin, mFormatLiteral);
             }
             else if(p.type == COM)
             {
-                setFormat(p.begin, p.end - p.begin, formatcomment);
+                setFormat(p.begin, p.end - p.begin, mFormatComment);
             }
         }
     }

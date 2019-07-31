@@ -8,16 +8,15 @@
 class Highlightercpp: QSyntaxHighlighter
 {
 private:
-    int currentLine=0;
-    QVector<Token> data;
-    QString textEditor;
-
-    QTextCharFormat formatkeyword;
-    QTextCharFormat formatliteral;
-    QTextCharFormat formatcomment;
+    int mCurrentLine;
+    QVector<Token> mData;
+    QString mTextEditor;
+    QTextCharFormat mFormatKeyword;
+    QTextCharFormat mFormatLiteral;
+    QTextCharFormat mFormatComment;
 
 public:
-    QStringList lines;
+    QStringList mLines;
     Highlightercpp(QTextDocument* parent);
     void setData(QVector<Token>);
     void findLine(QString text);
