@@ -11,9 +11,11 @@ const int TAB_SPACE = 4;
 #include"changemanager.h"
 #include<utility>
 #include<QAbstractScrollArea>
-#include "highlightercpp.h"
-#include "lexercpp.h"
-#include "ideconfiguration.h"
+#include"highlightercpp.h"
+#include"lexercpp.h"
+#include"ideconfiguration.h"
+#include<QSettings>
+#include<QApplication>
 
 class QPaintEvent;
 class QResizeEvent;

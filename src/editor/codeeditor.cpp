@@ -4,6 +4,7 @@
 #include<QDebug>
 #include<QTextCursor>
 #include<QPainter>
+#include <QFontDatabase>
 
 #define TAB_SPACE 4
 
@@ -14,8 +15,21 @@
 CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
 {
     // just for test. in the future it'll read config parametrs from JSON file
-    configParam.setConfigParams("Consolas", "12", "WHITE");
+    //configParam.setConfigParams("Consolas", "20", "WHITE");
     setLineWrapMode(QPlainTextEdit::NoWrap);// don't move cursor to the next line where it's out of visible scope
+
+    QSettings settings(QApplication::organizationName(), QApplication::applicationName());
+
+    QString analizerFontSize = settings.value("analizerFontSize").toString();
+    qDebug()<<"analizerFontSize = "<<analizerFontSize;
+
+    QString analizerFontName = settings.value("analizerFontName").toString();
+    qDebug()<<"fontName ="<<analizerFontName;
+
+    QString analizerStyle = settings.value("analizerStyle").toString();
+    qDebug()<<"type = "<<analizerStyle;
+
+    configParam.setConfigParams(analizerFontName,analizerFontSize,analizerStyle);
 
     lineNumberArea = new LineNumberArea(this);
     timer = new QTimer;
@@ -28,20 +42,13 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     //This signal is emitted when the text document needs an update of the specified rect.
     //If the text is scrolled, rect will cover the entire viewport area.
     //If the text is scrolled vertically, dy carries the amount of pixels the viewport was scrolled.
-    connect(this, SIGNAL(updateRequest(QRect,int)), this, SLOT(updateLineNumberArea(QRect,int)));
-    connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(runLexerAndHighlight()));
-    connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(highlightCurrentLine()));
-    connect(timer, SIGNAL(timeout()), this, SLOT(saveStateInTheHistory()));
-    connect(this, SIGNAL(textChanged()), this, SLOT(changesAppeared()));
-    timer->start(CHANGE_SAVE_TIME);//save text by this time
-    connect(this, SIGNAL(textChanged()), this, SLOT(runLexer()));
-    connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(highlightCurrentLine()));
     connect(this,  SIGNAL(updateRequest(QRect,int)), this, SLOT(updateLineNumberArea(QRect,int)));
-    connect(this,  SIGNAL(textChanged()),            this, SLOT(runLexer()));
-    connect(this,  SIGNAL(cursorPositionChanged()),  this, SLOT(highlightCurrentLine()));
-    connect(timer, SIGNAL(timeout()),                this, SLOT(saveStateInTheHistory()));
-
+    connect(this,  SIGNAL(cursorPositionChanged()), this, SLOT(runLexerAndHighlight()));
+    connect(this,  SIGNAL(cursorPositionChanged()), this, SLOT(highlightCurrentLine()));
+    connect(timer, SIGNAL(timeout()), this, SLOT(saveStateInTheHistory()));
+    connect(this,  SIGNAL(textChanged()), this, SLOT(changesAppeared()));
     timer->start(CHANGE_SAVE_TIME);//save text by this time
+
 
     this->setTabStopDistance(TAB_SPACE * fontMetrics().width(QLatin1Char('0')));//set tab distance
 
@@ -50,14 +57,23 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     //that's why we need to set this position
     updateLineNumberAreaWidth();
     highlightCurrentLine();
-    this->setTabStopDistance(TAB_SPACE * fontMetrics().width(QLatin1Char('0')));//set tab distance
+    //this->setTabStopDistance(TAB_SPACE * fontMetrics().width(QLatin1Char('0')));//set tab distance
     //fonts and colors configurations
     font.setPointSize(configParam.mFontSize);
+    //font.setFamily("Sitka Text");
     font.setFamily(configParam.mTextStyle);
     font.setBold(false);
     font.setItalic(false);
     this->setFont(font);
 
+
+    QFontDatabase db;
+    foreach(const auto &a, db.families())
+    {
+        qDebug()<<a;
+    }
+
+    //configParam.setConfigParams(analizerFontName,analizerFontSize,analizerStyle);
 }
 
 void CodeEditor::runLexerAndHighlight()
@@ -75,7 +91,7 @@ void CodeEditor::runLexerAndHighlight()
     }
 
     for(auto it = tokens.begin(); it < tokens.end(); ++it)
-        qDebug() << it->name << " "  << it->begin << " " << it->end << " " << it->linesCount << '\n';
+       // qDebug() << it->name << " "  << it->begin << " " << it->end << " " << it->linesCount << '\n';
     lexer.lexicalAnalysis(toPlainText());
     tokens = lexer.getTokens();
 }
@@ -90,7 +106,7 @@ int CodeEditor::lineNumberAreaWidth()
         ++digits;
     }
 
-    return fontMetrics().maxWidth() * digits;// wight of one symbol(in our case number) * count of digits
+    return fontMetrics().averageCharWidth() * digits;// wight of one symbol(in our case number) * count of digits
 }
 
 QString &CodeEditor::getFileName()
@@ -140,6 +156,7 @@ void CodeEditor::updateLineNumberArea(const QRect &rect, int dy)// rectangle of 
 
 void CodeEditor::resizeEvent(QResizeEvent *e)
 {
+
     QPlainTextEdit::resizeEvent(e);
     QRect cr = contentsRect();//whole area inside widget's margins
     lineNumberArea->setGeometry(QRect(0, 0, lineNumberAreaWidth(), cr.height()));//set the same height as codeEditor for lineCouter
@@ -160,9 +177,15 @@ void CodeEditor::highlightCurrentLine()
 
 void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event)
 {
+
+    static int i{0};
+    ++i;
+    if(i > 5)
+    {
+        qDebug()<<"   paint    " <<i;
+    }
     QPainter painter(lineNumberArea);
     painter.fillRect(event->rect(), configParam.mLineCounterAreaColor);
-
 
     QTextBlock block = firstVisibleBlock();//area of first numeration block from linecounter
     int blockNumber = block.blockNumber();//get line number (start from 0)
