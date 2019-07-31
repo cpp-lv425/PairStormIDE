@@ -472,41 +472,6 @@ void MainWindow::onCloseFileTriggered()
 
 void MainWindow::onExitTriggered()
 {
-    if(!mpDocsArea)
-        return;
-
-    // getting all docs
-    auto docsList = mpDocsArea->subWindowList();
-
-    // if there are no docs
-    if(docsList.empty())
-    {
-        QApplication::closeAllWindows();
-        return;
-    }
-
-    // if doc is modified then we should ask user if changes have to be saved
-    if(!checkIfModified(docsList))
-    {
-        QApplication::closeAllWindows();
-        return;
-    }
-
-    QMessageBox::StandardButton reply = QMessageBox::question
-            (
-                this,
-                "Saving Changes",
-                "Do you want to save changes to opened documents?",
-                QMessageBox::Yes | QMessageBox::No
-                );
-
-    if(reply == QMessageBox::No)
-    {
-        QApplication::closeAllWindows();
-        return;
-    }
-
-    saveAllModifiedDocuments(docsList);
     QApplication::closeAllWindows();
 }
 

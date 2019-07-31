@@ -34,12 +34,7 @@ ChatWidget::ChatWidget(QWidget *pParent): QWidget (pParent)
 
     pWindowLayout->addWidget(mpFeed);
     pWindowLayout->addLayout(pLineLayout);
-    setLayout(pWindowLayout);
-
-    // temp solution
-    QStringList usersList;
-    usersList << "Valik" << "Ihog" << "Alex" << "Nastia";
-    setUsersList(usersList);
+    setLayout(pWindowLayout);    
 }
 
 void ChatWidget::setUsersList(const QStringList &usersList)
