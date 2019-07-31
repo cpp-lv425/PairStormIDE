@@ -16,6 +16,7 @@ class ChatWidget: public QWidget
     QLineEdit *mpEnterLine;
 public:
     ChatWidget(QWidget *pParent = nullptr);
+    void setUsersList(const QStringList& usersList);
 };
 
 #endif // CHATWIDGET_H

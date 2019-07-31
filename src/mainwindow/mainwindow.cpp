@@ -61,7 +61,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     setCentralWidget(mpDocsArea);
 
-    restoreMainWindowState();
+    restoreMainWindowState();    
+
 }
 
 QStringList MainWindow::getFileExtensions() const
@@ -232,6 +233,7 @@ bool MainWindow::checkIfOpened(const QString &fileName) const
             auto curDoc = qobject_cast<CodeEditor*>(doc->widget());
             if(curDoc && curDoc->getFileName() == fileName)
             {
+
                 return true;
             }
         }
