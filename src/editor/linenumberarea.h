@@ -3,8 +3,6 @@
 #include "codeeditor.h"
 #include <QWidget>
 
-
-
 class LineNumberArea : public QWidget
 {
 public:
@@ -12,6 +10,7 @@ public:
 
 protected:
     void paintEvent(QPaintEvent *event);
+
 private:
     CodeEditor *codeEditor;
 };

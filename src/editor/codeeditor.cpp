@@ -5,6 +5,11 @@
 #include<QTextCursor>
 #include<QPainter>
 
+#define TAB_SPACE 4
+
+#include<QMessageBox>
+#include<iostream>
+
 
 CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
 {
@@ -13,25 +18,66 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     setLineWrapMode(QPlainTextEdit::NoWrap);// don't move cursor to the next line where it's out of visible scope
 
     lineNumberArea = new LineNumberArea(this);
+    timer = new QTimer;
+    this->cursorPositionChanged();
+    hcpp = new Highlightercpp(document());
+    lcpp = new LexerCPP();
+    timer = new QTimer;
+    changeManager = new ChangeManager(this->toPlainText().toUtf8().constData());
 
     //This signal is emitted when the text document needs an update of the specified rect.
     //If the text is scrolled, rect will cover the entire viewport area.
     //If the text is scrolled vertically, dy carries the amount of pixels the viewport was scrolled.
     connect(this, SIGNAL(updateRequest(QRect,int)), this, SLOT(updateLineNumberArea(QRect,int)));
-
+    connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(runLexerAndHighlight()));
     connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(highlightCurrentLine()));
+    connect(timer, SIGNAL(timeout()), this, SLOT(saveStateInTheHistory()));
+    connect(this, SIGNAL(textChanged()), this, SLOT(changesAppeared()));
+    timer->start(CHANGE_SAVE_TIME);//save text by this time
+    connect(this, SIGNAL(textChanged()), this, SLOT(runLexer()));
+    connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(highlightCurrentLine()));
+    connect(this,  SIGNAL(updateRequest(QRect,int)), this, SLOT(updateLineNumberArea(QRect,int)));
+    connect(this,  SIGNAL(textChanged()),            this, SLOT(runLexer()));
+    connect(this,  SIGNAL(cursorPositionChanged()),  this, SLOT(highlightCurrentLine()));
+    connect(timer, SIGNAL(timeout()),                this, SLOT(saveStateInTheHistory()));
+
+    timer->start(CHANGE_SAVE_TIME);//save text by this time
+
+    this->setTabStopDistance(TAB_SPACE * fontMetrics().width(QLatin1Char('0')));//set tab distance
+
 
     // start typing from correct position (in the first line it doesn't consider weight of lineCounter)
     //that's why we need to set this position
     updateLineNumberAreaWidth();
     highlightCurrentLine();
-
+    this->setTabStopDistance(TAB_SPACE * fontMetrics().width(QLatin1Char('0')));//set tab distance
     //fonts and colors configurations
     font.setPointSize(configParam.mFontSize);
     font.setFamily(configParam.mTextStyle);
     font.setBold(false);
     font.setItalic(false);
     this->setFont(font);
+
+}
+
+void CodeEditor::runLexerAndHighlight()
+{
+    //run lexer
+    lcpp->clear();
+    lcpp->lexicalAnalysis(document()->toPlainText());
+    tokens = lcpp->getTokens();
+    //run highlight
+    hcpp->setData(tokens);
+    hcpp->setText(this->document()->toPlainText());
+    for(int i = 0; i < hcpp->mLines.size(); i++)
+    {
+        hcpp->highlightBlock(hcpp->mLines[i]);
+    }
+
+    for(auto it = tokens.begin(); it < tokens.end(); ++it)
+        qDebug() << it->name << " "  << it->begin << " " << it->end << " " << it->linesCount << '\n';
+    lexer.lexicalAnalysis(toPlainText());
+    tokens = lexer.getTokens();
 }
 
 int CodeEditor::lineNumberAreaWidth()
@@ -55,6 +101,21 @@ QString &CodeEditor::getFileName()
 void CodeEditor::setFileName(const QString &fileName)
 {
     this->fileName = fileName;
+}
+
+std::pair<const QString &, const QString &> CodeEditor::getChangedFileInfo()
+{
+    return std::make_pair(this->toPlainText(), fileName);
+}
+
+void CodeEditor::undo()
+{
+    changeManager->undo();
+}
+
+void CodeEditor::redo()
+{
+    changeManager->redo();
 }
 
 void CodeEditor::updateLineNumberAreaWidth()
@@ -112,7 +173,7 @@ void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event)
     {
         QString number = QString::number(blockNumber + 1);
         painter.setPen(configParam.mCodeTextColor);
-        painter.drawText(0, top, lineNumberArea->width(), fontMetrics().height(),//drat line count
+        painter.drawText(0, top, lineNumberArea->width(), fontMetrics().height(),//draw line count
                          Qt::AlignCenter, number);
         block = block.next();
         int temp = top;//save current top position
@@ -120,4 +181,10 @@ void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event)
         bottom += bottom - temp;// bottom - temp = dy which is block height
         ++blockNumber;
     }
+}
+
+void CodeEditor::saveStateInTheHistory()
+{
+    std::string newFileState = this->toPlainText().toUtf8().constData();
+    changeManager->writeChange(newFileState);
 }
