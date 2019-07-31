@@ -36,7 +36,7 @@ private:
     ChatWindowDock *mpChatWindowDock;
     BottomPanelDock *mpBottomPanelDock;
     MDIArea *mpDocsArea;
-    QString currentUserName;
+    QString mCurrentUserName;
 
     void setupMainMenu();
     void saveDocument(CodeEditor* pDoc, QString fileName);
@@ -73,6 +73,7 @@ private slots:
     // view menu
     void onFullScreenTriggered();
     void onShowProjectViewerTriggered();
+    void onShowChatWindowDockTriggered();
 
     // tools menu
     void onRefactorTriggered();

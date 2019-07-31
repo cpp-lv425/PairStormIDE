@@ -38,6 +38,9 @@ MainWindow::MainWindow(QWidget *parent) :
     // when first started main window is maximized
     setWindowState(Qt::WindowMaximized);
 
+    // set icon
+    setWindowIcon(QIcon(":/img/app_logo.jpg"));
+
     QString styleName;
 
     // set Fusion style globally - TEMP SOLUTION
@@ -66,7 +69,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     setCentralWidget(mpDocsArea);
 
-    restoreMainWindowState();
+    restoreMainWindowState();    
+
 }
 
 QStringList MainWindow::getFileExtensions() const
@@ -133,10 +137,8 @@ void MainWindow::setupMainMenu()
     QMenu *scaleSubMenu = new QMenu("&Scale");
     viewMenu->addMenu(scaleSubMenu);
     viewMenu->addSeparator();
-    auto showProjectViewerAction = viewMenu->addAction("&Show Project Viewer", this, &MainWindow::onShowProjectViewerTriggered);
-    //showProjectViewerAction->setCheckable(true);
-    //showProjectViewerAction->setChecked(true);
-
+    viewMenu->addAction("Show &Project Viewer", this, &MainWindow::onShowProjectViewerTriggered);
+    viewMenu->addAction("Show &Chat Window", this, &MainWindow::onShowChatWindowDockTriggered);
 
     // tools menu
     QMenu *toolsMenu = new QMenu("&Tools");
@@ -242,6 +244,7 @@ bool MainWindow::checkIfOpened(const QString &fileName) const
             auto curDoc = qobject_cast<CodeEditor*>(doc->widget());
             if(curDoc && curDoc->getFileName() == fileName)
             {
+
                 return true;
             }
         }
@@ -551,6 +554,11 @@ void MainWindow::onShowProjectViewerTriggered()
     mpProjectViewerDock->show();
 }
 
+void MainWindow::onShowChatWindowDockTriggered()
+{
+    mpChatWindowDock->show();
+}
+
 void MainWindow::onRefactorTriggered()
 {
     qDebug() << "refactor";
@@ -559,8 +567,8 @@ void MainWindow::onRefactorTriggered()
 void MainWindow::onConnectTriggered()
 {
     LoginDialog loginDialog(this);
-    currentUserName = loginDialog.start();
-    mplocalConnector->configureServiceOnLogin(currentUserName);
+    mCurrentUserName = loginDialog.start();
+    mplocalConnector->configureServiceOnLogin(mCurrentUserName);
 }
 
 void MainWindow::onSettingsTriggered()
