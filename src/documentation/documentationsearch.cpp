@@ -2,6 +2,8 @@
 
 #include <QDebug>
 #include <QDirIterator>
+#include <QStandardPaths>
+
 QVector<QFileInfo> DocumentationSearch::search(const QDir &directory, const QString &keyword)
 {
     QVector<QFileInfo> rResult;
@@ -35,4 +37,20 @@ QVector<QFileInfo> DocumentationSearch::search(const QDir &directory, const QStr
 QUrl DocumentationSearch::getUrl(const QFileInfo &info)
 {
     return QUrl::fromLocalFile(info.filePath());
+}
+
+QDir DocumentationSearch::documentationDirectory(bool &result)
+{
+
+    QString documents(QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation));
+    QDir documentation(documents);
+    result = documentation.cd("PairStorm");
+    if(result)
+    {
+        return documentation;
+    }
+    else
+    {
+        return QDir::home();
+    }
 }

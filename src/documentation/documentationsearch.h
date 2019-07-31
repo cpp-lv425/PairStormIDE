@@ -11,6 +11,7 @@ public:
     static QVector<QFileInfo> search(const QDir &directory,const QString &keyword);
     static QVector<QFileInfo> search(const QDir &directory,const QString &include, const QString &function);
     static QUrl getUrl(const QFileInfo &info);
+    static QDir documentationDirectory(bool &result);
 };
 
 #endif // DOCUMENTATIONSEARCH_H

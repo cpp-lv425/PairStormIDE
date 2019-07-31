@@ -10,7 +10,6 @@ class ConnectionManager : public QObject
 public:
     ConnectionManager(QObject *parent = nullptr);
     bool hasConnection();
-private:
 };
 
 #endif // CONNECTIONMANAGER_H
