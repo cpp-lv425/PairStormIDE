@@ -62,6 +62,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // create instance of Bottom Panel
     mpBottomPanelDock = new BottomPanelDock(this);
     mpBottomPanelDock->setObjectName("mpBottomPanelDock");
+    addDockWidget(Qt::BottomDockWidgetArea, mpChatWindowDock);
 
     setCentralWidget(mpDocsArea);
 
@@ -146,6 +147,7 @@ void MainWindow::setupMainMenu()
     viewMenu->addSeparator();
     viewMenu->addAction("Show &Project Viewer", this, &MainWindow::onShowProjectViewerTriggered);
     viewMenu->addAction("Show &Chat Window", this, &MainWindow::onShowChatWindowDockTriggered);
+    viewMenu->addAction("Show &Bottom Panel", this, &MainWindow::onShowBottomPanel);
 
     // tools menu
     QMenu *toolsMenu = new QMenu("&Tools");
@@ -201,7 +203,6 @@ void MainWindow::setupMainMenu()
     menuBar()->addMenu(helpMenu);
 
     addToolBar(pToolbar);
-
 }
 
 void MainWindow::saveDocument(CodeEditor *pDoc, QString fileName)
@@ -571,6 +572,11 @@ void MainWindow::onShowProjectViewerTriggered()
 void MainWindow::onShowChatWindowDockTriggered()
 {
     mpChatWindowDock->show();
+}
+
+void MainWindow::onShowBottomPanel()
+{
+    mpBottomPanelDock->show();
 }
 
 void MainWindow::onRefactorTriggered()

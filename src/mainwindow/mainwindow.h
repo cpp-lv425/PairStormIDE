@@ -72,6 +72,7 @@ private slots:
     void onFullScreenTriggered();
     void onShowProjectViewerTriggered();
     void onShowChatWindowDockTriggered();
+    void onShowBottomPanel();
 
     // tools menu
     void onRefactorTriggered();

@@ -23,6 +23,7 @@ ChatWidget::ChatWidget(QWidget *pParent): QWidget (pParent)
 
     // creating send button
     QPushButton *pSendButton = new QPushButton("Send");
+    pSendButton->setMaximumWidth(30);
     QHBoxLayout *pLineLayout = new QHBoxLayout;
     pLineLayout->addWidget(mpEnterLine);
     pLineLayout->addWidget(pSendButton);
