@@ -602,7 +602,12 @@ void MainWindow::onRefactorTriggered()
 void MainWindow::onConnectTriggered()
 {
     LoginDialog loginDialog(this);
-    mCurrentUserName = loginDialog.start();
+    QString userInput = loginDialog.start();
+    if (userInput.isEmpty())
+    {
+        return;
+    }
+    mCurrentUserName = userInput;
 }
 
 void MainWindow::onSettingsTriggered()
