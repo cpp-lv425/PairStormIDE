@@ -21,6 +21,7 @@ public:
 
 private slots:
     void onUserToConnectSelected(QListWidgetItem* item);
+    void onSendCommand();
 
 signals:
     void userToConnectSelected(QString);

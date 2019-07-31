@@ -27,6 +27,9 @@ ChatWidget::ChatWidget(QWidget *pParent): QWidget (pParent)
     // creating send button
     QPushButton *pSendButton = new QPushButton("Send");
     pSendButton->setMaximumWidth(30);
+    connect(pSendButton, &QPushButton::clicked,
+            this, &ChatWidget::onSendCommand);
+
     QHBoxLayout *pLineLayout = new QHBoxLayout;
     pLineLayout->addWidget(mpEnterLine);
     pLineLayout->addWidget(pSendButton);
@@ -63,4 +66,14 @@ void ChatWidget::onUserToConnectSelected(QListWidgetItem *item)
     QString userName = item->text();
     int position = userName.lastIndexOf(QChar{':'});
     emit userToConnectSelected(userName.mid(position + 2));
+}
+
+void ChatWidget::onSendCommand()
+{
+    QString feed = mpFeed->toPlainText();
+    feed += '\n';
+    feed += "> ";
+    feed += mpEnterLine->text();
+    mpFeed->setPlainText(feed);
+    mpEnterLine->clear();
 }
