@@ -83,7 +83,9 @@ void MainWindow::setupMainMenu()
 {
     // file menu
     QMenu *fileMenu = new QMenu("&File");
+    // main tool bar
     QToolBar *pToolbar = new QToolBar("Main Tool Bar");
+    pToolbar->setObjectName("pToolbar");
 
     // working with files
     QAction *pNewFileAction = fileMenu->addAction("&New file", this, &MainWindow::onNewFileTriggered, Qt::CTRL + Qt::Key_N);
@@ -310,7 +312,8 @@ void MainWindow::createChatWindow()
 void MainWindow::createButtomPanel()
 {
     // create instance of Bottom Panel
-    mpBottomPanelDock = new BottomPanelDock(this);    
+    mpBottomPanelDock = new BottomPanelDock(this);
+    mpBottomPanelDock->setObjectName("mpBottomPanelDock");
 }
 
 void MainWindow::onNewFileTriggered()
