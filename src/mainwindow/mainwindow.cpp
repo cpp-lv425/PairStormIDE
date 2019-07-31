@@ -33,6 +33,9 @@ MainWindow::MainWindow(QWidget *parent) :
     // when first started main window is maximized
     setWindowState(Qt::WindowMaximized);
 
+    // set icon
+    setWindowIcon(QIcon(":/img/app_logo.jpg"));
+
     QString styleName;
 
     // set Fusion style globally - TEMP SOLUTION
