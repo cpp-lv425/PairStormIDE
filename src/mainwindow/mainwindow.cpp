@@ -52,22 +52,17 @@ MainWindow::MainWindow(QWidget *parent) :
     createProjectViewer();    
 
     // create instance of Chat Window
-    mpChatWindowDock = new ChatWindowDock(this);
-    mpChatWindowDock->setObjectName("mpChatWindowDock");
-    addDockWidget(Qt::RightDockWidgetArea, mpChatWindowDock);
+    createChatWindow();
 
     // create instance of MDIArea
     mpDocsArea = new MDIArea(this);
 
     // create instance of Bottom Panel
-    mpBottomPanelDock = new BottomPanelDock(this);
-    mpBottomPanelDock->setObjectName("mpBottomPanelDock");
-    addDockWidget(Qt::BottomDockWidgetArea, mpChatWindowDock);
+    createButtomPanel();
 
     setCentralWidget(mpDocsArea);
 
-    restoreMainWindowState();    
-
+    restoreMainWindowState();
 }
 
 QStringList MainWindow::getFileExtensions() const
@@ -292,6 +287,22 @@ void MainWindow::createProjectViewer()
     addDockWidget(Qt::LeftDockWidgetArea, mpProjectViewerDock);
 }
 
+void MainWindow::createChatWindow()
+{
+    // create instance of Chat Window
+    mpChatWindowDock = new ChatWindowDock(this);
+    mpChatWindowDock->setObjectName("mpChatWindowDock");
+    addDockWidget(Qt::RightDockWidgetArea, mpChatWindowDock);
+}
+
+void MainWindow::createButtomPanel()
+{
+    // create instance of Bottom Panel
+    mpBottomPanelDock = new BottomPanelDock(this);
+    mpBottomPanelDock->setObjectName("mpBottomPanelDock");
+    addDockWidget(Qt::BottomDockWidgetArea, mpChatWindowDock);
+}
+
 void MainWindow::onNewFileTriggered()
 {
     QStringList fileExtensions = getFileExtensions();
@@ -501,17 +512,38 @@ void MainWindow::onRedoTriggered()
 
 void MainWindow::onCutTriggered()
 {
-    qDebug() << "cut";
+    auto curDoc = qobject_cast<CodeEditor*>
+            (mpDocsArea->currentSubWindow()->widget());
+
+    // if ptr to current document is not valid
+    if(!curDoc)
+        return;
+
+    curDoc->cut();
 }
 
 void MainWindow::onCopyTriggered()
 {
-    qDebug() << "copy";
+    auto curDoc = qobject_cast<CodeEditor*>
+            (mpDocsArea->currentSubWindow()->widget());
+
+    // if ptr to current document is not valid
+    if(!curDoc)
+        return;
+
+    curDoc->copy();
 }
 
 void MainWindow::onPasteTriggered()
 {
-    qDebug() << "paste";
+    auto curDoc = qobject_cast<CodeEditor*>
+            (mpDocsArea->currentSubWindow()->widget());
+
+    // if ptr to current document is not valid
+    if(!curDoc)
+        return;
+
+    curDoc->paste();
 }
 
 void MainWindow::onSelectAllTriggered()

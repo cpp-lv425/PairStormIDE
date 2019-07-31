@@ -44,9 +44,12 @@ private:
     bool checkIfModified(QList<QMdiSubWindow*> &docsList);
     void saveAllModifiedDocuments(QList<QMdiSubWindow*> &docsList);
     void createProjectViewer();
+    void createChatWindow();
+    void createButtomPanel();
 
     void saveMainWindowState();
     void restoreMainWindowState();
+
 private slots:
     // file menu actions
     void onNewFileTriggered();
