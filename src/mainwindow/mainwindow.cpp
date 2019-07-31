@@ -132,13 +132,18 @@ void MainWindow::setupMainMenu()
     editMenu->addSeparator();
 
     // find patterns in docs
-    editMenu->addAction("&Find/Replace...", this, &MainWindow::onFindTriggered, Qt::CTRL + Qt::Key_F);
+    QAction *pFindAction = editMenu->addAction("&Find/Replace...", this, &MainWindow::onFindTriggered, Qt::CTRL + Qt::Key_F);
+    pFindAction->setDisabled(true);
 
     // view menu
     QMenu *viewMenu = new QMenu("&View");
-    viewMenu->addAction("&Full screen", this, &MainWindow::onFullScreenTriggered, Qt::CTRL + Qt::SHIFT + Qt::Key_F11);
+    QAction *pFullScreenActoin = viewMenu->addAction("&Full screen", this, &MainWindow::onFullScreenTriggered, Qt::CTRL + Qt::SHIFT + Qt::Key_F11);
+    pFullScreenActoin->setDisabled(true);
+
     QMenu *scaleSubMenu = new QMenu("&Scale");
-    viewMenu->addMenu(scaleSubMenu);
+    QAction *pScaleSubMenu = viewMenu->addMenu(scaleSubMenu);
+    pScaleSubMenu->setDisabled(true);
+
     viewMenu->addSeparator();
     viewMenu->addAction("Show &Project Viewer", this, &MainWindow::onShowProjectViewerTriggered);
     viewMenu->addAction("Show &Chat Window", this, &MainWindow::onShowChatWindowDockTriggered);
@@ -148,7 +153,8 @@ void MainWindow::setupMainMenu()
     QMenu *toolsMenu = new QMenu("&Tools");
 
     // opening refactoring toolbar
-    toolsMenu->addAction("&Refactor...", this, &MainWindow::onRefactorTriggered);
+    QAction *pRefactorAction = toolsMenu->addAction("&Refactor...", this, &MainWindow::onRefactorTriggered);
+    pRefactorAction->setDisabled(true);
     toolsMenu->addSeparator();
 
     // opening chat window
@@ -159,19 +165,23 @@ void MainWindow::setupMainMenu()
 
     // buidling solution
     QMenu *buildSubMenu = new QMenu("&Build");
-    toolsMenu->addMenu(buildSubMenu);
+    QAction *pBuildActoin = toolsMenu->addMenu(buildSubMenu);
+    pBuildActoin->setDisabled(true);
 
     // debugging program
     QMenu *debugSubMenu = new QMenu("&Debug");
-    toolsMenu->addMenu(debugSubMenu);
+    QAction *pDebugAction = toolsMenu->addMenu(debugSubMenu);
+    pDebugAction->setDisabled(true);
 
     // git
     QMenu *gitSubMenu = new QMenu("&Git");
-    toolsMenu->addMenu(gitSubMenu);
+    QAction *pGitActoin = toolsMenu->addMenu(gitSubMenu);
+    pGitActoin->setDisabled(true);
     toolsMenu->addSeparator();
 
     // opening settings window
-    toolsMenu->addAction("&Settings...", this, &MainWindow::onSettingsTriggered);
+    QAction *pSettingsAction = toolsMenu->addAction("&Settings...", this, &MainWindow::onSettingsTriggered);
+    pSettingsAction->setDisabled(true);
 
     // help menu
     QMenu *helpMenu = new QMenu("&Help");
@@ -184,11 +194,13 @@ void MainWindow::setupMainMenu()
     helpMenu->addAction("&Reference Assistant...", this, &MainWindow::onReferenceTriggered, Qt::CTRL + Qt::Key_F1);
 
     // user guide
-    helpMenu->addAction("User &Guide...", this, &MainWindow::onUserGuideTriggered, Qt::Key_F1);
+    QAction *pUserGuideActoin = helpMenu->addAction("User &Guide...", this, &MainWindow::onUserGuideTriggered, Qt::Key_F1);
+    pUserGuideActoin->setDisabled(true);
     helpMenu->addSeparator();
 
     // checking updates
-    helpMenu->addAction("Check for &Updates...", this, &MainWindow::onCheckUpdatesTriggered);
+    QAction *pUpdatesAction = helpMenu->addAction("Check for &Updates...", this, &MainWindow::onCheckUpdatesTriggered);
+    pUpdatesAction->setDisabled(true);
 
     // adding all menus to MainMenuBar
     menuBar()->addMenu(fileMenu);
@@ -548,7 +560,14 @@ void MainWindow::onPasteTriggered()
 
 void MainWindow::onSelectAllTriggered()
 {
-    qDebug() << "select all";
+    auto curDoc = qobject_cast<CodeEditor*>
+            (mpDocsArea->currentSubWindow()->widget());
+
+    // if ptr to current document is not valid
+    if(!curDoc)
+        return;
+
+    curDoc->selectAll();
 }
 
 void MainWindow::onFindTriggered()
