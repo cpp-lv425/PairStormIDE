@@ -13,6 +13,9 @@ public:
     explicit DocumentationWebEngine(QObject *parent = nullptr);
     void searchByKeyword(const QString &keyword);
     void searchByLibraryAndFunction(const QString &include, const QString &function);
+
+    QVector<QUrl> documentationLinks() const;
+
 signals:
 
 public slots:

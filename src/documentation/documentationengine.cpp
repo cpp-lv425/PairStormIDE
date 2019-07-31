@@ -46,3 +46,8 @@ void DocumentationWebEngine::searchByLibraryAndFunction(const QString &include, 
         mDocumentationLinks.push_back(QUrl("https://en.cppreference.com/w/"));
     }
 }
+
+QVector<QUrl> DocumentationWebEngine::documentationLinks() const
+{
+    return mDocumentationLinks;
+}
