@@ -3,15 +3,17 @@
 #include <fmstates.h>
 #include <token.h>
 #include <QVector>
-#include <QTextStream>
 
 class iLexer
 {
 protected:
     QVector<Token> tokens;
     States state;
-    QTextStream stream;
+    int it;
     QString current_lexem;
+    unsigned int current_line;
+    unsigned int symbolCount;
+
 public:
     iLexer();
     virtual ~iLexer() = 0;
