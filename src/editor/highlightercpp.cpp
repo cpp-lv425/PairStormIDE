@@ -1,33 +1,65 @@
 #include "highlightercpp.h"
 #include <QDebug>
 
-Highlightercpp::Highlightercpp(QTextDocument* parent):QSyntaxHighlighter (parent)
-{
 
+Highlightercpp::Highlightercpp(QTextDocument* parent):QSyntaxHighlighter (parent) 
+{
+    mCurrentLine = 0;
+    //font color settings
+    mFormatKeyword.setForeground(QColor(0, 102, 255));
+    mFormatLiteral.setForeground(QColor(153, 0, 255));
+    mFormatComment.setForeground(QColor(0, 255, 204));
 }
 
-void Highlightercpp::setData(QVector<Token> _data)
+void Highlightercpp::setData(QVector<Token> _mData)
 {
-    data = _data;
+    mData = _mData;
 }
 
-void Highlightercpp::setCurrentLine(unsigned int _line)
+void Highlightercpp::findLine(QString text)
 {
-    currentLine = _line;
+    if(text.size() == 0)
+        mCurrentLine = -1;
+
+    for(unsigned int i = 0; i < mLines.size(); i++)
+    {
+        int y = QString::compare(mLines[i], text);
+        if(y == 0)
+        {
+            mCurrentLine = i;
+            return;
+        }
+    }
+}
+
+void Highlightercpp::setText(QString TextEditor)
+{
+    mTextEditor = TextEditor;
+    mLines = mTextEditor.split("\n");
 }
 
 void Highlightercpp::highlightBlock(const QString &text)
 {
-    QTextCharFormat kw;
-    kw.setForeground(Qt::red);
-    for(auto it = data.begin(); it < data.end(); ++it)
+    findLine(text);
+
+    for(auto p: mData)
     {
-        qDebug() << it->name << " " << it->type << " " << it->begin << " " << it->end << " " << it->linesCount <<'\n';
-        setFormat(0, text.size(), QTextCharFormat());
-        if(it->type == KW && it->linesCount == currentLine)
+        if(mCurrentLine == p.linesCount)
         {
-            setFormat(it->begin, it->end, kw);
+            if(p.type == KW)
+            {
+                setFormat(p.begin, p.end - p.begin, mFormatKeyword);
+            }
+            else if(p.type == LIT)
+            {
+                setFormat(p.begin, p.end - p.begin, mFormatLiteral);
+            }
+            else if(p.type == COM)
+            {
+                setFormat(p.begin, p.end - p.begin, mFormatComment);
+            }
         }
     }
-    qDebug() << "*******************************";
+
+
 }
