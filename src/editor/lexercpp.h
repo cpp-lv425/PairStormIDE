@@ -28,6 +28,9 @@ public:
     bool isDigit(QChar);
     bool isSpace(QChar);
     void clear();
+    bool isAlpha(char);
+    bool isDigit(char);
+    bool isSpace(char);
 };
 
 #endif // LEXERCPP_H

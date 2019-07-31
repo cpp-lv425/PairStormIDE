@@ -63,12 +63,14 @@ bool LexerCPP::isBlockComments(QString lexem)
     return rx.exactMatch(lexem);
 }
 
+
 bool LexerCPP::isSpace(QChar sym)
 {
     return SPACES.contains(sym);
 }
 
 bool LexerCPP::isAlpha(QChar sym)
+
 {
     QRegExp rx("[A-Za-z]");
     return rx.exactMatch(QString(sym));
@@ -87,6 +89,7 @@ void LexerCPP::addLexem()
     current_lexem.clear();
     state = ST;
 }
+
 
 void LexerCPP::changeState(States st, QChar sym)
 {
@@ -122,6 +125,7 @@ void LexerCPP::lexicalAnalysis(QString code)
                     }
                     break;
                 }
+
                 if(isAlpha(sym))
                     changeState(ID, sym);
                 else if(isDigit(sym))
