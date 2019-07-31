@@ -1,6 +1,7 @@
 #ifndef CODEEDITOR_H
 #define CODEEDITOR_H
 
+
 const int CHANGE_SAVE_TIME = 1000;
 const int TAB_SPACE = 4;
 
@@ -55,6 +56,9 @@ private:
    ConfigParams configParam;
    int currentZoom = 100;
    QFont font;
+   QVector<Token> tokens;
+   Highlightercpp *hcpp;
+   LexerCPP *lcpp;
    QString fileName;
    ChangeManager *changeManager;
    QTimer *timer;

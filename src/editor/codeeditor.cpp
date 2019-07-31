@@ -14,12 +14,17 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     setLineWrapMode(QPlainTextEdit::NoWrap);// don't move cursor to the next line where it's out of visible scope
 
     lineNumberArea = new LineNumberArea(this);
+    hcpp = new Highlightercpp(document());
+    lcpp = new LexerCPP();
     timer = new QTimer;
     changeManager = new ChangeManager(this->toPlainText().toUtf8().constData());
 
     //This signal is emitted when the text document needs an update of the specified rect.
     //If the text is scrolled, rect will cover the entire viewport area.
     //If the text is scrolled vertically, dy carries the amount of pixels the viewport was scrolled.
+    connect(this, SIGNAL(updateRequest(QRect,int)), this, SLOT(updateLineNumberArea(QRect,int)));
+    connect(this, SIGNAL(textChanged()), this, SLOT(runLexer()));
+    connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(highlightCurrentLine()));
     connect(this,  SIGNAL(updateRequest(QRect,int)), this, SLOT(updateLineNumberArea(QRect,int)));
     connect(this,  SIGNAL(textChanged()),            this, SLOT(runLexer()));
     connect(this,  SIGNAL(cursorPositionChanged()),  this, SLOT(highlightCurrentLine()));
@@ -44,6 +49,11 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
 
 void CodeEditor::runLexer()
 {
+    lcpp->clear();
+    lcpp->lexicalAnalysis(document()->toPlainText());
+    tokens = lcpp->getTokens();
+    for(auto it = tokens.begin(); it < tokens.end(); ++it)
+        qDebug() << it->name << " "  << it->begin << " " << it->end << " " << it->linesCount << '\n';
     lexer.lexicalAnalysis(toPlainText());
     tokens = lexer.getTokens();
 }
