@@ -50,36 +50,32 @@ protected:
     void resizeEvent(QResizeEvent *event)override;
 
 private slots:
-   void updateLineNumberAreaWidth();
-   void highlightCurrentLine();
-   void updateLineNumberArea(const QRect &rect, int dy);
-   void runLexer();
+    void updateLineNumberAreaWidth();
+    void highlightCurrentLine();
+    void updateLineNumberArea(const QRect &rect, int dy);
+    void runLexerAndHighlight();
 
-public
-slots:
-   void keyPressEvent(QKeyEvent *e) override;
-
-   void autotab();
-
-
-   void saveStateInTheHistory();
+public slots:
+    void keyPressEvent(QKeyEvent *e) override;
+    void autotab();
+    void saveStateInTheHistory();
 signals:
-   void changesAppeared();
+    void changesAppeared();
 
 
 private:
-   QWidget *lineNumberArea;
-   ConfigParams configParam;
-   int currentZoom = 100;
-   QFont font;
+    QWidget *lineNumberArea;
+    ConfigParams configParam;
+    int currentZoom = 100;
+    QFont font;
 
-   QString fileName;
-   ChangeManager changeManager;
-   QTimer *timer;
-   LexerCPP lexer;
-   QVector<Token> tokens;
-   Highlightercpp *hcpp;
-   LexerCPP *lcpp;
+    QString fileName;
+    ChangeManager changeManager;
+    QTimer *timer;
+    LexerCPP lexer;
+    QVector<Token> tokens;
+    Highlightercpp *hcpp;
+    LexerCPP *lcpp;
 };
 
 

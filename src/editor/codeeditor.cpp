@@ -19,23 +19,21 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
 
     lineNumberArea = new LineNumberArea(this);
     timer = new QTimer;
+    this->cursorPositionChanged();
 
     hcpp = new Highlightercpp(document());
+
     lcpp = new LexerCPP();
 
     //This signal is emitted when the text document needs an update of the specified rect.
     //If the text is scrolled, rect will cover the entire viewport area.
     //If the text is scrolled vertically, dy carries the amount of pixels the viewport was scrolled.
     connect(this, SIGNAL(updateRequest(QRect,int)), this, SLOT(updateLineNumberArea(QRect,int)));
-    connect(this, SIGNAL(textChanged()), this, SLOT(runLexer()));
+    connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(runLexer()));
     connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(highlightCurrentLine()));
-   // connect(this,SIGNAL(textChanged()),this,SLOT(highlightBlock));
     connect(timer, SIGNAL(timeout()), this, SLOT(saveStateInTheHistory()));
     connect(this, SIGNAL(textChanged()), this, SLOT(changesAppeared()));
-
     timer->start(CHANGE_SAVE_TIME);//save text by this time
-
-
     // start typing from correct position (in the first line it doesn't consider weight of lineCounter)
     //that's why we need to set this position
     updateLineNumberAreaWidth();
@@ -47,18 +45,23 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     font.setBold(false);
     font.setItalic(false);
     this->setFont(font);
+
 }
 
-void CodeEditor::runLexer()
+void CodeEditor::runLexerAndHighlight()
 {
+    //run lexer
     lcpp->clear();
     lcpp->lexicalAnalysis(document()->toPlainText());
-    hcpp->setCurrentLine(textCursor().blockNumber());
-    qDebug()<<textCursor().blockNumber();
     tokens = lcpp->getTokens();
+    //run highlight
     hcpp->setData(tokens);
-   /* for(auto it = tokens.begin(); it < tokens.end(); ++it)
-        qDebug() << it->name << " "  << it->begin << " " << it->end << " " << it->linesCount << '\n';*/
+    hcpp->setText(this->document()->toPlainText());
+    for(int i=0;i<hcpp->lines.size();i++)
+    {
+        hcpp->highlightBlock(hcpp->lines[i]);
+
+    }
 }
 
 int CodeEditor::lineNumberAreaWidth()
