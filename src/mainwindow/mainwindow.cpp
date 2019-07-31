@@ -295,13 +295,14 @@ void MainWindow::createProjectViewer()
 {
     mpProjectViewerDock = new ProjectViewerDock(this);
     addDockWidget(Qt::LeftDockWidgetArea, mpProjectViewerDock);
+    mpProjectViewerDock->setObjectName("mpProjectViewerDock");
 }
 
 void MainWindow::createChatWindow()
 {
     // create instance of Chat Window
     mpChatWindowDock = new ChatWindowDock(this);
-    //mpChatWindowDock->setObjectName("mpChatWindowDock");
+    mpChatWindowDock->setObjectName("mpChatWindowDock");
     addDockWidget(Qt::RightDockWidgetArea, mpChatWindowDock, Qt::Vertical);
     mpChatWindowDock->setAllowedAreas(Qt::RightDockWidgetArea);
 }
