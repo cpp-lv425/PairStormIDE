@@ -8,7 +8,6 @@
 #include <QMessageBox>
 #include <QException>
 #include <QLineEdit>
-#include <QDebug>
 #include <QLabel>
 #include <QDir>
 
