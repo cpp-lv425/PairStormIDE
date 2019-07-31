@@ -235,7 +235,7 @@ void DefaultLocalConnector::testSendHelloToLastServer()
     message.m_type = MessageType::MessageTypeChatMessage;
     message.m_sourceName = m_tcpService->getServerAttributes().m_name;
 
-    if(m_tcpService->sendDataToTcpServer(data, serverData))
+    if(m_tcpService->sendDataToTcpServer(message.toJsonQString(), serverData))
     {
         qDebug() << "message is sent";
     }
