@@ -7,6 +7,7 @@ QT_BEGIN_NAMESPACE
 class QDir;
 class QListView;
 class QWebEngineView;
+class ConnectionManager;
 QT_END_NAMESPACE
 
 class DocumentationViewer : public QDialog
@@ -19,6 +20,7 @@ public:
 private:
     QWebEngineView *mWebView;
     QListView *mDocumentsView;
+    ConnectionManager *mManager;
 };
 
 #endif // DOCUMENTATIONVIEWER_H
