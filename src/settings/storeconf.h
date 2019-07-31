@@ -22,9 +22,9 @@ private:
     QString applicationName         = "Pair Storm";
     QString analizerStyle           = "white";
     QString analizerFontSize        = "12";
-    QString analizerFontName        = "Times New Roman";
+    QString analizerFontName        = "Courier";
     QString cppExtentions           = "c;cpp;h;hpp;json;txt";
-    QStringList cppExtentionsL;
+    QStringList cppExtentionsList {"c", "cpp", "h", "hpp", "json", "txt"};
 
     void writeJson();
     void readJson();                //  read [confile] to [loadDoc]. status write to [readStatus]

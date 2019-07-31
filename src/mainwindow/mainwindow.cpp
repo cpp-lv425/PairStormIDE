@@ -28,6 +28,7 @@ MainWindow::MainWindow(QWidget *parent) :
     {
         StoreConf conf(this);
     }
+
     // when first started main window is maximized
     setWindowState(Qt::WindowMaximized);
 
