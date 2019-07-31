@@ -12,6 +12,13 @@ class ChatWindowDock: public QDockWidget
     ChatWidget *pChatWidget;
 public:
     ChatWindowDock(QWidget *pParent = nullptr);
+
+signals:
+    void userToConnectSelected(QString);
+
+public slots:
+    void onUserToConnectSelected(QString userName);
+
 };
 
 #endif // CHATWINDOWDOCK_H

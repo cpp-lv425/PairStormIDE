@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include <QListWidgetItem>
 #include <QMdiSubWindow>
 #include <QStyleFactory>
 #include <QMessageBox>
@@ -304,6 +305,8 @@ void MainWindow::createChatWindow()
 {
     // create instance of Chat Window
     mpChatWindowDock = new ChatWindowDock(this);
+    connect(mpChatWindowDock, &ChatWindowDock::userToConnectSelected,
+            this, &MainWindow::onUserToConnectSelected);
     mpChatWindowDock->setObjectName("mpChatWindowDock");
     addDockWidget(Qt::RightDockWidgetArea, mpChatWindowDock, Qt::Vertical);
     mpChatWindowDock->setAllowedAreas(Qt::RightDockWidgetArea);
@@ -672,6 +675,11 @@ void MainWindow::onCloseWindow(CodeEditor *curDoc)
 
         saveDocument(curDoc, curDoc->getFileName());
     }
+}
+
+void MainWindow::onUserToConnectSelected(QString userName)
+{
+    qDebug() << userName;
 }
 
 CodeEditor* MainWindow::createNewDoc()
