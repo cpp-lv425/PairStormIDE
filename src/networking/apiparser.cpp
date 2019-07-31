@@ -26,12 +26,18 @@ std::shared_ptr<DefaultLocalConnector> DefaultLocalConnector::generateConnector(
 void DefaultLocalConnector::configureServiceOnLogin(const QString & userName)
 {
     // Return if services has previously been configured
-    if (m_udpService || m_tcpService) return;
-
+    if (m_udpService && m_tcpService)
+    {
+        return;
+    }
     // Configure the UDP service & TCP service
     m_udpService = UdpService::getService();
     m_tcpService = TcpService::getService(userName);
-
+    if (!m_tcpService->isActive())
+    {
+        emit serviceFailed();
+        return;
+    }
 
     // Begin discovering neighbor servers using UDP service
     connect(
@@ -120,10 +126,23 @@ QVector<QString> DefaultLocalConnector::getOnlineUsers() const
 // ==========================================================================================
 // ==========================================================================================
 // ==========================================================================================
-//                                                                            REQUEST SHARING
-void DefaultLocalConnector::shareWithUser(QString userName)
+//                                                        GET USERS, ALLOWED FOR SHARING WITH
+QVector<QString> DefaultLocalConnector::getConnectedUsers() const
 {
-    auto serverAttributes =
+    QVector<QString> userNames;
+    // Get user names from connected servers
+    for (const auto & serverAttrib : m_connectedTcpServersAttrib)
+        userNames.push_back(serverAttrib.m_name);
+
+    return userNames;
+}
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
+//                                                                            REQUEST SHARING
+void DefaultLocalConnector::requestSharingWithUser(QString userName)
+{
+    auto serverAttributesPtr =
             std::find_if(m_discoveredTcpServersAttrib.begin(),
                          m_discoveredTcpServersAttrib.end(),
                          [userName] (const ServerData & serverData)
@@ -131,9 +150,10 @@ void DefaultLocalConnector::shareWithUser(QString userName)
                              return serverData.m_name == userName;
                          });
     // If found user with a given userName
-    if (serverAttributes != m_discoveredTcpServersAttrib.end())
+    if (serverAttributesPtr != m_discoveredTcpServersAttrib.end())
     {
-        m_tcpService->connectToTcpServer(*serverAttributes);
+        m_connectedTcpServersAttrib.push_back(*serverAttributesPtr);
+        //m_tcpService->connectToTcpServer(*serverAttributes);
     }
 }
 // ==========================================================================================
@@ -174,7 +194,7 @@ void DefaultLocalConnector::processTcpSegmentOnReceive()
 // ==========================================================================================
 // ==========================================================================================
 //                                                         REMOVE USERNAME TO SOCKET RELATION
-void DefaultLocalConnector::processConnectionOnRequest(std::shared_ptr<QTcpSocket> clientSocketPtr)
+void DefaultLocalConnector::processConnectionOnRequest(QTcpSocket * clientSocketPtr)
 {
     // TODO process connection
     qDebug() << "sharing requested in connections manager";
@@ -192,8 +212,8 @@ void DefaultLocalConnector::testConnectToValik()
 {
     qDebug() << "trying to connect to other server";
     ServerData serverData;
-    serverData.m_sourceIp = QHostAddress("192.168.43.226");
-    serverData.m_port = g_defaultTcpPortNumber + 10;
+    serverData.m_sourceIp = QHostAddress("192.168.103.19");
+    serverData.m_port = 37108;
     if(m_tcpService->connectToTcpServer(serverData))
         qDebug() << "successful connection";
     else {

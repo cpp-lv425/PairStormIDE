@@ -13,7 +13,7 @@
 
 typedef quint16 PortNumType;
 typedef quint64 SizeType;
-const PortNumType g_defaultTcpPortNumber    = 37108;//36108
+const PortNumType g_defaultTcpPortNumber    = 36108;//36108
 const PortNumType g_defaultUdpPortNumber    = 32807;
 const SizeType    g_defaultBroadcastCycleMs = 500;
 

@@ -32,20 +32,20 @@ class TcpService : public QObject
     std::unique_ptr<QTcpServer>          m_tcpServerPtr;
     // Vector of currently connected active sockets &
     // variable for storing received segments
-    QVector<std::shared_ptr<QTcpSocket>> m_connectedSockets;
+    QVector<QTcpSocket*>                 m_connectedSockets;
     Segment                              m_pendingSegment;
 
 
 
     // Experimental feature
-    std::unordered_map<std::string, std::shared_ptr<QTcpSocket>> m_nameToSocket;
+    //std::unordered_map<std::string, std::shared_ptr<QTcpSocket>> m_nameToSocket;
 
 
 
     explicit TcpService(const QString & serverName, QObject *qObject = nullptr);
 
     // Fill in internal attributes
-    ServerData resolveServerAttributes() const;
+    void saveServerAttributes();
 
 public:
 
@@ -65,24 +65,25 @@ public:
     // Connect to TCP server with specified attributes
     // and create special socket or disconnect from given socket
     bool connectToTcpServer(const ServerData & serverData);
-    void disconnectSocket(std::shared_ptr<QTcpSocket> socket);
+    void disconnectSocket(QTcpSocket * socket);
 
 
     // Send thorough specified socket
-    void sendThroughSocket(const QString & data, std::shared_ptr<QTcpSocket> receiver);
+    void sendThroughSocket(const QString & data, QTcpSocket * receiver);
 
     // Saved segment getter
     Segment getReceivedSegment() const;
+    bool isActive() const;
 
-
+/*
     void setUserNameSocketRelation(const std::shared_ptr<QTcpSocket> & userSocket, const QString & userName);
     void removeUserNameSocketRelation(const QString & userName);
     bool resolveSocketByUserName(std::shared_ptr<QTcpSocket> & userSocket, const QString & userName);
     bool resolveUserNameBySocket(const std::shared_ptr<QTcpSocket> & userSocket, QString & userName);
-
+*/
 signals:
 
-    void socketConnected(std::shared_ptr<QTcpSocket> clientSocketPtr);
+    void socketConnected(QTcpSocket * clientSocketPtr);
 
     void socketDisconnected(QString serverName);
 

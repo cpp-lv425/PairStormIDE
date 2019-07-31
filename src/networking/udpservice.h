@@ -42,6 +42,7 @@ public:
     // Service instance generator
     static std::shared_ptr<UdpService> getService();
 
+    ~UdpService();
 
 
     // Datagram broadcaster

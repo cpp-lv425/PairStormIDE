@@ -27,8 +27,11 @@ protected:
 
     std::unique_ptr<QTimer>     m_internalBroadcastTimer;
 
-    // Attributes of the launched TCP server & discovered TCP servers
+    // Attributes of discovered TCP servers
     QVector<ServerData> m_discoveredTcpServersAttrib;
+
+    // Attributes of connected TCP servers
+    QVector<ServerData> m_connectedTcpServersAttrib;
 
 public:
 
@@ -37,11 +40,13 @@ public:
 
 
     virtual QVector<QString> getOnlineUsers() const = 0;
-    virtual void shareWithUser(QString userName)    = 0;
+    virtual QVector<QString> getConnectedUsers() const = 0;
+    virtual void requestSharingWithUser(QString userName)    = 0;
 
 signals:
 
     //========================== To the  GUI ==========================
+    void serviceFailed();
     void sharingRequested(QString userName);
     void newUserDiscovered();
 
@@ -57,7 +62,7 @@ private slots:
     virtual void addServerFromUdpDatagramOnReceive() = 0;
     virtual void processTcpSegmentOnReceive()        = 0;
 
-    virtual void processConnectionOnRequest(std::shared_ptr<QTcpSocket> clientSocketPtr)        = 0;
+    virtual void processConnectionOnRequest(QTcpSocket * clientSocketPtr)        = 0;
 
     // When documents synchronization is needed between users
     //virtual void requireFullTextDocumentOnNeed();
@@ -110,7 +115,8 @@ public:
 
 
     virtual QVector<QString> getOnlineUsers() const override;
-    virtual void shareWithUser(QString userName) override;
+    virtual QVector<QString> getConnectedUsers() const override;
+    virtual void requestSharingWithUser(QString userName) override;
 
 
 signals:
@@ -125,7 +131,7 @@ public slots:
 
     //virtual void requireFullTextDocumentOnNeed() override;
 
-    virtual void processConnectionOnRequest(std::shared_ptr<QTcpSocket> clientSocketPtr) override;
+    virtual void processConnectionOnRequest(QTcpSocket * clientSocketPtr) override;
 
 
     virtual void configureServiceOnLogin(const QString & userName) override;
