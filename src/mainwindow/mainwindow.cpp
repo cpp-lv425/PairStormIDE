@@ -47,19 +47,18 @@ MainWindow::MainWindow(QWidget *parent) :
 
     setupMainMenu();
 
+    // create instance of MDIArea
+    mpDocsArea = new MDIArea(this);
+    setCentralWidget(mpDocsArea);
+
     // create instance of Project Viewer
     createProjectViewer();    
 
     // create instance of Chat Window
     createChatWindow();
 
-    // create instance of MDIArea
-    mpDocsArea = new MDIArea(this);
-
     // create instance of Bottom Panel
     createButtomPanel();
-
-    setCentralWidget(mpDocsArea);
 
     restoreMainWindowState();
 }
@@ -208,7 +207,7 @@ void MainWindow::setupMainMenu()
     menuBar()->addMenu(toolsMenu);
     menuBar()->addMenu(helpMenu);
 
-    addToolBar(pToolbar);
+    addToolBar(Qt::TopToolBarArea, pToolbar);
 }
 
 void MainWindow::saveDocument(CodeEditor *pDoc, QString fileName)
@@ -302,16 +301,15 @@ void MainWindow::createChatWindow()
 {
     // create instance of Chat Window
     mpChatWindowDock = new ChatWindowDock(this);
-    mpChatWindowDock->setObjectName("mpChatWindowDock");
-    addDockWidget(Qt::RightDockWidgetArea, mpChatWindowDock);
+    //mpChatWindowDock->setObjectName("mpChatWindowDock");
+    addDockWidget(Qt::RightDockWidgetArea, mpChatWindowDock, Qt::Vertical);
+    mpChatWindowDock->setAllowedAreas(Qt::RightDockWidgetArea);
 }
 
 void MainWindow::createButtomPanel()
 {
     // create instance of Bottom Panel
-    mpBottomPanelDock = new BottomPanelDock(this);
-    mpBottomPanelDock->setObjectName("mpBottomPanelDock");
-    addDockWidget(Qt::BottomDockWidgetArea, mpChatWindowDock);
+    mpBottomPanelDock = new BottomPanelDock(this);    
 }
 
 void MainWindow::onNewFileTriggered()
