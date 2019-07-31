@@ -1,15 +1,13 @@
 #include "storeconf.h"
-#include <iostream>
+
 #include <regex>
 
-#include <QString>
-#include <QFileDialog>
 #include <QDebug>
-#include <QJsonArray>
-#include <QApplication>
+#include <QString>
 #include <QSettings>
-
-using std::string;
+#include <QJsonArray>
+#include <QFileDialog>
+#include <QApplication>
 
 StoreConf::StoreConf(QWidget * parent)
     : QWidget (parent)
@@ -26,8 +24,6 @@ StoreConf::StoreConf(QWidget * parent)
     }
 }
 
-StoreConf::~StoreConf() { }
-
 QString StoreConf::getPathToConFile()
 {
     QString currentPath = QDir::currentPath();
@@ -35,16 +31,8 @@ QString StoreConf::getPathToConFile()
     QFile file(currentPath);
     if(file.exists())
         return "conf.json";
-
-    QFileDialog fd(this);
-    fd.setObjectName("fileDialog");
-    QString str = fd.getOpenFileName(this, "Choose configuration file *.json", "", "*.json");
-    //QString str = QFileDialog::getOpenFileName(this, "Choose configuration file *.json", "", "*.json");
-    std::string utf8_text = str.toUtf8().constData();
-    if (utf8_text.size() == 0) {    // user chose Cancel button.
+    else
         return "";
-    }
-    return str;
 }
 
 void StoreConf::writeJson()
@@ -77,7 +65,7 @@ void StoreConf::readJson()
 {
     QFile loadFile(conFile);        // close in destructor
     if (loadFile.open(QIODevice::ReadOnly))
-            readStatus = true;
+        readStatus = true;
     else {
         readStatus = false;
         return;

@@ -40,11 +40,11 @@ MainWindow::MainWindow(QWidget *parent) :
     // create instance of Project Viewer
     mpProjectViewerDock = new ProjectViewerDock(this);
     addDockWidget(Qt::LeftDockWidgetArea, mpProjectViewerDock);
-    mpProjectViewerDock->setObjectName("mpProjectViewerDock");
+    mpProjectViewerDock->setObjectName("mpProjectViewerDock");  // added to avoid Warning in Unix system
 
     // create instance of Chat Window
     mpChatWindowDock = new ChatWindowDock(this);
-    mpChatWindowDock->setObjectName("mpChatWindowDock");
+    mpChatWindowDock->setObjectName("mpChatWindowDock");        // added to avoid Warning in Unix system
     addDockWidget(Qt::RightDockWidgetArea, mpChatWindowDock);
 
     // create instance of MDIArea
@@ -52,7 +52,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // create instance of Bottom Panel
     mpBottomPanelDock = new BottomPanelDock(this);
-    mpBottomPanelDock->setObjectName("mpBottomPanelDock");
+    mpBottomPanelDock->setObjectName("mpBottomPanelDock");      // added to avoid Warning in Unix system
 
     setCentralWidget(mpDocsArea);
 
