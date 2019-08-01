@@ -1,7 +1,7 @@
 #ifndef LOCALCONNECTORGENERATOR_H
 #define LOCALCONNECTORGENERATOR_H
 
-#include "localconnector.h"
+#include "defaultlocalconnector.h"
 
 class LocalConnectorGenerator
 {
