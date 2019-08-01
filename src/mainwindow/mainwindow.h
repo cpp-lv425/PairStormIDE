@@ -98,6 +98,7 @@ public slots:
                       const QString &message);
     void onSendMessage(const QString &userName,
                        const QString &message);
+    void onConnectionFailed();
 
 private:
     // creates new doc in MDIArea

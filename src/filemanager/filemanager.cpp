@@ -15,6 +15,7 @@ QString FileManager::readFromFile(const QString &fileName)
         file.close();
         return rReadResult;
     }
+
     throw QException();
 }
 

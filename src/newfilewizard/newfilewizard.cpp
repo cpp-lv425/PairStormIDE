@@ -95,7 +95,11 @@ NewFileDialog::NewFileDialog(QStringList &fileExtensions,
 
 QString NewFileDialog::start()
 {
-    exec();
+    if (!exec())
+    {
+        throw QException();
+    }
+
     // full filename is returned to the caller
     return mFileName;
 }

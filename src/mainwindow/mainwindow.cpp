@@ -320,12 +320,18 @@ void MainWindow::createButtomPanel()
 void MainWindow::onNewFileTriggered()
 {    
     QStringList fileExtensions = getFileExtensions();
-
     NewFileDialog newFileDialog(fileExtensions, this);
+    QString newFileName;
+    try
+    {
+        // new file dialog is called
+        // name of newly created file is received
+        newFileName = newFileDialog.start();
 
-    // new file dialog is called
-    // name of newly created file is received
-    QString newFileName = newFileDialog.start();
+    } catch (const QException&)
+    {
+        return;
+    }
 
     // new doc is created & shown
     CodeEditor *newDoc = createNewDoc();
@@ -698,6 +704,11 @@ void MainWindow::onNewMessage(const QString &userName, const QString &message)
 void MainWindow::onSendMessage(const QString &userName, const QString &message)
 {
     qDebug() << "onSendMessage" << userName << '\n' << message;
+}
+
+void MainWindow::onConnectionFailed()
+{
+    QMessageBox::warning(this, "Connection error", "Connection failed");
 }
 
 CodeEditor* MainWindow::createNewDoc()
