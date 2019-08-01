@@ -21,6 +21,7 @@
 #include "storeconf.h"
 #include "startpage.h"
 #include "mdiarea.h"
+#include "menuoptions.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -199,7 +200,7 @@ void MainWindow::setupMainMenu()
 
     // opening settings window
     QAction *pSettingsAction = toolsMenu->addAction("&Settings...", this, &MainWindow::onSettingsTriggered);
-    pSettingsAction->setDisabled(true);
+    //pSettingsAction->setDisabled(true);
 
     // help menu
     QMenu *helpMenu = new QMenu("&Help");
@@ -625,6 +626,7 @@ void MainWindow::onConnectTriggered()
 void MainWindow::onSettingsTriggered()
 {
     qDebug() << "settings";
+    MenuOptions *pMenuOptions = new MenuOptions(this);
 }
 
 void MainWindow::onAboutTriggered()
