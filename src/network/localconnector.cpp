@@ -32,6 +32,7 @@ void DefaultLocalConnector::configureServiceOnLogin(const QString & userName)
     );
 
     startBroadcastingAttributes();
+    startClearingOutdatedAttributes();
 }
 // ==========================================================================================
 // ==========================================================================================
@@ -51,6 +52,21 @@ void DefaultLocalConnector::startBroadcastingAttributes()
 // ==========================================================================================
 // ==========================================================================================
 // ==========================================================================================
+//                                                       START BROADCASTING SERVER ATTRIBUTES
+void DefaultLocalConnector::startClearingOutdatedAttributes()
+{
+    // Broadcast server attributes each g_defaultBroadcastCycleMs
+    // milliseconds using UDP service
+    m_internalClearOutdatedTimer = std::make_unique<QTimer>();
+    connect(
+        m_internalClearOutdatedTimer.get(), &QTimer::timeout,
+        this,                               &DefaultLocalConnector::clearOutdatedAttributesOnTimerTick,
+        Qt::UniqueConnection);
+    m_internalClearOutdatedTimer->start(g_defaultBroadcastCycleMs);
+}
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
 //                                                  BROADCAST DATAGRAM WITH SERVER ATTRIBUTES
 void DefaultLocalConnector::shareAttributesOnTimerTick()
 {
@@ -58,6 +74,32 @@ void DefaultLocalConnector::shareAttributesOnTimerTick()
     ServerData launchedTcpServerAttrib = m_tcpService->getServerAttributes();
     QString serverData(launchedTcpServerAttrib.toJsonQString());
     m_udpService->broadcastDatagram(serverData);
+}
+
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
+//                                                           CLEAR OUTDATED SERVER ATTRIBUTES
+void DefaultLocalConnector::clearOutdatedAttributesOnTimerTick()
+{
+    SizeType nowMomentMs = QDateTime::currentMSecsSinceEpoch();
+    if(m_discoveredTcpServersAttrib.empty())
+    {
+        return;
+    }
+    SizeType oldSize = m_discoveredTcpServersAttrib.size();
+    m_discoveredTcpServersAttrib.erase(
+                std::remove_if(m_discoveredTcpServersAttrib.begin(),
+                               m_discoveredTcpServersAttrib.end(),
+                               [nowMomentMs] (ServerData serverData)
+                               {
+                                   return (nowMomentMs - serverData.m_creationMomentMs) >
+                                          g_defaultOutdatingCycleMs;
+                               }));
+    if (oldSize != m_discoveredTcpServersAttrib.size())
+    {
+        emit onlineUsersUpdated(this);
+    }
 }
 // ==========================================================================================
 // ==========================================================================================
@@ -70,6 +112,9 @@ void DefaultLocalConnector::addServerFromUdpDatagramOnReceive()
     Datagram   datagramContent = m_udpService->getReceivedDatagram();
     discoveredServerAttributes.fromJsonQString(datagramContent.m_data);
     discoveredServerAttributes.m_sourceIp = datagramContent.m_ip;
+    // Set timepoint of discovery
+    discoveredServerAttributes.m_creationMomentMs =
+            QDateTime::currentMSecsSinceEpoch();
 
 
     if (discoveredServerAttributes.empty())
@@ -192,7 +237,7 @@ void DefaultLocalConnector::stopSharing(const QString & userName,
                                               *serverAttributesPtr);
         }
 
-        m_connectedTcpServersAttrib.erase(serverAttributesPtr);
+        m_connectedTcpServersAttrib.erase(serverAttributesPtr, std::next(serverAttributesPtr));
 
         qDebug() << "sharing was stopped";
         emit connectedUsersUpdated(this);

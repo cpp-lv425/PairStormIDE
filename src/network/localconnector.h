@@ -76,6 +76,8 @@ private:
 
     // Timer for regular broadcasting
     std::unique_ptr<QTimer> m_internalBroadcastTimer;
+    // Timer for regular clearing outdated attributes
+    std::unique_ptr<QTimer> m_internalClearOutdatedTimer;
 
 public:
 
@@ -91,10 +93,12 @@ public:
 private:
 
     void startBroadcastingAttributes();
+    void startClearingOutdatedAttributes();
 
 private slots:
 
     void shareAttributesOnTimerTick();
+    void clearOutdatedAttributesOnTimerTick();
     void addServerFromUdpDatagramOnReceive();
 
     void processTcpSegmentOnReceive();
