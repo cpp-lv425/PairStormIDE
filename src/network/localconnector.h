@@ -24,7 +24,7 @@ public:
 public slots:
 
     //======================= Slots for GUI events ===========================
-    virtual void configureServiceOnLogin(const QString & userName) = 0;
+    virtual void configureOnLogin(const QString & userName) = 0;
 
     virtual void startSharingOnCommand(const QString userName) = 0;
     virtual void stopSharingOnCommand (const QString userName) = 0;
@@ -35,7 +35,7 @@ public slots:
 signals:
 
     //======================= Signals to GUI =================================
-    void serviceFailed ();
+    void serviceStatus (bool status);
 
     void onlineUsersUpdated    (const QStringList users);
     void connectedUsersUpdated (const QStringList users);
@@ -89,7 +89,7 @@ public:
 
 private:
 
-    void startBroadcastingAttributes();
+    void startSharingAttributes();
     void startClearingOutdatedAttributes();
     void startSharing(const QString userName,
                       const bool isSelfInitiated = true);
@@ -103,12 +103,12 @@ private slots:
 
     void shareAttributesOnTimerTick();
     void clearOutdatedAttributesOnTimerTick();
-    void addServerFromUdpDatagramOnReceive();
+    void addServerAttributesOnReceive();
 
     void processTcpSegmentOnReceive();
 
 public slots:
-    virtual void configureServiceOnLogin(const QString & userName) override;
+    virtual void configureOnLogin(const QString & userName) override;
 
 
     virtual void shareMessage(const QString messageContent) override;

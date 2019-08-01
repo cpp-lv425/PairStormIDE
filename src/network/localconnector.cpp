@@ -1,8 +1,8 @@
 #include "localconnector.h"
 // ==========================================================================================
 // ==========================================================================================
-//                                                   LAUNCH SERVICES AFTER USER HAS LOGGED IN
-void DefaultLocalConnector::configureServiceOnLogin(const QString & userName)
+//                                                             LAUNCH SERVICES ON USER LOG IN
+void DefaultLocalConnector::configureOnLogin(const QString & userName)
 {
     // Return if services has previously been configured
     if (mpUdpService && mpTcpService)
@@ -12,18 +12,18 @@ void DefaultLocalConnector::configureServiceOnLogin(const QString & userName)
     // Configure the UDP service & TCP service
     mpUdpService = std::unique_ptr<UdpService>(new UdpService());
     mpTcpService = std::unique_ptr<TcpService>(new TcpService(userName));
+
+    emit serviceStatus(mpTcpService->isServerActive()? true : false);
     if (!mpTcpService->isServerActive())
     {
-        emit serviceFailed();
         return;
     }
 
     // Begin discovering neighbor servers using UDP service
     connect(
         mpUdpService.get(), &UdpService::newDatagramSaved,
-        this,               &DefaultLocalConnector::addServerFromUdpDatagramOnReceive,
+        this,               &DefaultLocalConnector::addServerAttributesOnReceive,
         Qt::UniqueConnection);
-
     // Begin saving incoming messages using TCP service
     connect(
         mpTcpService.get(), &TcpService::newSegmentSaved,
@@ -31,38 +31,22 @@ void DefaultLocalConnector::configureServiceOnLogin(const QString & userName)
         Qt::UniqueConnection
     );
 
-    startBroadcastingAttributes();
+    startSharingAttributes();
     startClearingOutdatedAttributes();
 }
 // ==========================================================================================
 // ==========================================================================================
 // ==========================================================================================
 //                                                       START BROADCASTING SERVER ATTRIBUTES
-void DefaultLocalConnector::startBroadcastingAttributes()
+void DefaultLocalConnector::startSharingAttributes()
 {
-    // Broadcast server attributes each g_defaultBroadcastCycleMs
-    // milliseconds using UDP service
+    // Broadcast server attributes each gDefaultBroadcastCycleMs milliseconds
     mpBroadcastingTimer = std::make_unique<QTimer>();
     connect(
         mpBroadcastingTimer.get(), &QTimer::timeout,
-        this,                           &DefaultLocalConnector::shareAttributesOnTimerTick,
+        this,                      &DefaultLocalConnector::shareAttributesOnTimerTick,
         Qt::UniqueConnection);
     mpBroadcastingTimer->start(gDefaultBroadcastCycleMs);
-}
-// ==========================================================================================
-// ==========================================================================================
-// ==========================================================================================
-//                                                       START BROADCASTING SERVER ATTRIBUTES
-void DefaultLocalConnector::startClearingOutdatedAttributes()
-{
-    // Broadcast server attributes each g_defaultBroadcastCycleMs
-    // milliseconds using UDP service
-    mAttributesObsoletionTimer = std::make_unique<QTimer>();
-    connect(
-        mAttributesObsoletionTimer.get(), &QTimer::timeout,
-        this,                               &DefaultLocalConnector::clearOutdatedAttributesOnTimerTick,
-        Qt::UniqueConnection);
-    mAttributesObsoletionTimer->start(gDefaultBroadcastCycleMs);
 }
 // ==========================================================================================
 // ==========================================================================================
@@ -75,6 +59,20 @@ void DefaultLocalConnector::shareAttributesOnTimerTick()
     QString serverData(launchedTcpServerAttrib.toJsonQString());
     mpUdpService->broadcastDatagram(serverData);
 }
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
+//                                                         START CLEARING OUTDATED ATTRIBUTES
+void DefaultLocalConnector::startClearingOutdatedAttributes()
+{
+    // Clean outdated attributes each gDefaultOutdatingCycleMs milliseconds
+    mAttributesObsoletionTimer = std::make_unique<QTimer>();
+    connect(
+        mAttributesObsoletionTimer.get(), &QTimer::timeout,
+        this,                             &DefaultLocalConnector::clearOutdatedAttributesOnTimerTick,
+        Qt::UniqueConnection);
+    mAttributesObsoletionTimer->start(gDefaultOutdatingCycleMs);
+}
 
 // ==========================================================================================
 // ==========================================================================================
@@ -82,70 +80,71 @@ void DefaultLocalConnector::shareAttributesOnTimerTick()
 //                                                           CLEAR OUTDATED SERVER ATTRIBUTES
 void DefaultLocalConnector::clearOutdatedAttributesOnTimerTick()
 {
-    /*
-    SizeType nowMomentMs = QDateTime::currentMSecsSinceEpoch();
-    if(m_discoveredTcpServersAttrib.empty())
+    if(mDiscoveredServersAttrib.empty())
     {
         return;
     }
-    SizeType oldSize = m_discoveredTcpServersAttrib.size();
-    m_discoveredTcpServersAttrib.erase(
-                std::remove_if(m_discoveredTcpServersAttrib.begin(),
-                               m_discoveredTcpServersAttrib.end(),
-                               [nowMomentMs] (ServerData serverData)
+
+    SizeType discoveredServersNumBefore = mDiscoveredServersAttrib.size();
+    SizeType currentMs = QDateTime::currentMSecsSinceEpoch();
+    mDiscoveredServersAttrib.erase(
+                std::remove_if(mDiscoveredServersAttrib.begin(),
+                               mDiscoveredServersAttrib.end(),
+                               [currentMs] (const ServerData & serverAttributes)
                                {
-                                   return (nowMomentMs - serverData.m_creationMomentMs) >
-                                          g_defaultOutdatingCycleMs;
-                               }));
-    if (oldSize != m_discoveredTcpServersAttrib.size())
+                                   return (currentMs - serverAttributes.mDiscoveryMoment) >
+                                           gDefaultOutdatingCycleMs;
+                               }),
+                mDiscoveredServersAttrib.end());
+    SizeType discoveredServersNumAfter = mDiscoveredServersAttrib.size();
+
+    if (discoveredServersNumAfter < discoveredServersNumBefore)
     {
         emit onlineUsersUpdated(getOnlineUsers());
     }
-    */
 }
 // ==========================================================================================
 // ==========================================================================================
 // ==========================================================================================
 //                                             ADD SERVER ATTRIBUTES FROM DISCOVERED DATAGRAM
-void DefaultLocalConnector::addServerFromUdpDatagramOnReceive()
+void DefaultLocalConnector::addServerAttributesOnReceive()
 {
-    ServerData discoveredServerAttributes;
-    // Read received datagram and fill it with attributes of the discovered server
-    Datagram   datagramContent = mpUdpService->getReceivedDatagram();
-    discoveredServerAttributes.fromJsonQString(datagramContent.mContent);
-    discoveredServerAttributes.mActiveIp = datagramContent.mIp;
-    // Set timepoint of discovery
-    discoveredServerAttributes.mDiscoveryMoment =
-            QDateTime::currentMSecsSinceEpoch();
+    Datagram datagramContent = mpUdpService->getReceivedDatagram();
+
+    ServerData curretnAttributes;
+    curretnAttributes.fromJsonQString(datagramContent.mContent);
+    // Explicitly set timepoint of discovery and active ip
+    curretnAttributes.mDiscoveryMoment = QDateTime::currentMSecsSinceEpoch();
+    curretnAttributes.mActiveIp        = datagramContent.mIp;
 
 
-    if (discoveredServerAttributes.empty())
+    if (curretnAttributes.empty())
     {
         // Datagram was corrupted
         return;
     }
-    if (discoveredServerAttributes.mName ==
-        mpTcpService->getServerAttributes().mName)
+    if (curretnAttributes.mName == mpTcpService->getServerAttributes().mName)
     {
         // Discovered server name matches current server name
         return;
     }
-    auto attribPtr =
-            std::find_if(mDiscoveredServersAttrib.cbegin(),
-                         mDiscoveredServersAttrib.cend(),
-                         [discoveredServerAttributes] (const ServerData & inServerData)
+    auto pExistentAttributes =
+            std::find_if(mDiscoveredServersAttrib.begin(),
+                         mDiscoveredServersAttrib.end(),
+                         [curretnAttributes] (const ServerData & inServerData)
                          {
                              return inServerData.mName ==
-                                    discoveredServerAttributes.mName;
+                                    curretnAttributes.mName;
                          });
-    if (attribPtr != mDiscoveredServersAttrib.cend())
+    if (pExistentAttributes != mDiscoveredServersAttrib.cend())
     {
-        // Server with a given name has already been discovered
+        // Server with a given name has already been discovered so update discovery moment
+        pExistentAttributes->mDiscoveryMoment = curretnAttributes.mDiscoveryMoment;
         return;
     }
-    // Finally, save information about server & emit "user discovered" signal
-    mDiscoveredServersAttrib.push_back(discoveredServerAttributes);
 
+    // Finally, save information about server & emit user list updated signal
+    mDiscoveredServersAttrib.push_back(curretnAttributes);
     emit onlineUsersUpdated(getOnlineUsers());
 }
 // ==========================================================================================
