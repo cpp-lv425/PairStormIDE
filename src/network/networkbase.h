@@ -88,7 +88,7 @@ struct ServerData {
 
 enum MessageType : int
 {
-    MessageTypeRequestSharingMessage,
+    MessageTypeSharingControlMessage,
     MessageTypeChatMessage,
     MessageTypeChangesMessage
 };

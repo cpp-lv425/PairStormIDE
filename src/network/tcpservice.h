@@ -82,18 +82,11 @@ public:
 */
 signals:
 
-    void socketConnected(QTcpSocket * clientSocketPtr);
-
-    void socketDisconnected(QString serverName);
-
     void newSegmentSaved();
-
-public slots:
-
-    void removeSocketOnDisconnected();
 
 private slots:
 
+    void removeSocketOnDisconnected();
     void configureServer();
     void configureSocketOnServerConnection();
     void configureSocketOnClientConnection();

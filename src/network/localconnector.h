@@ -21,28 +21,32 @@ public:
     virtual QStringList getOnlineUsers()    const = 0;
     virtual QStringList getConnectedUsers() const = 0;
 
-    virtual void startSharing(const QString & userName) = 0;
-
 public slots:
 
     //======================= Slots for GUI events ===========================
     virtual void configureServiceOnLogin(const QString & userName) = 0;
 
+    virtual void startSharing(const QString & userName,
+                              const bool isSelfInitiated = true) = 0;
+    virtual void stopSharing (const QString & userName,
+                              const bool isSelfInitiated = true) = 0;
+
     //======================= Slots for Editor & Chat events =================
-    //virtual void informAttachedHostsAboutChanges() = 0;
-    //virtual void sendMessageToAttachedHosts()      = 0;
+    virtual void shareMessage(const QString & messageContent) = 0;
 
 signals:
 
     //======================= Signals to GUI =================================
-    void serviceFailed    ();
-    void newUserDiscovered(const LocalConnectorInterface * connector);
-    void newUserConnected (const LocalConnectorInterface * connector);
-    void sharingRequested (QString userName);
+    void serviceFailed ();
+
+    void onlineUsersUpdated    (const LocalConnectorInterface * connector);
+    void connectedUsersUpdated (const LocalConnectorInterface * connector);
+
+    void startSharingRequested (const QString userName);
+    void stopSharingRequested  (const QString userName);
 
     //======================= Signals to Editor & Chat =======================
-    void changeReceived();
-    void messageReceived();
+    void messageReceived(const QString userName, const QString message);
 
 
 //Experimental features ======================================================
@@ -83,7 +87,6 @@ public:
     virtual QStringList getOnlineUsers()    const override;
     virtual QStringList getConnectedUsers() const override;
 
-    virtual void startSharing(const QString & userName) override;
 
 private:
 
@@ -91,18 +94,20 @@ private:
 
 private slots:
 
+    void shareAttributesOnTimerTick();
     void addServerFromUdpDatagramOnReceive();
+
     void processTcpSegmentOnReceive();
 
-    void broadcastServerAttributesOnTimerTick();
-
-    //virtual void requireFullTextDocumentOnNeed() override;
-
-    void processConnectionOnRequest(QTcpSocket * clientSocketPtr);
-
 public slots:
-
     virtual void configureServiceOnLogin(const QString & userName) override;
+
+    virtual void startSharing(const QString & userName,
+                              const bool isSelfInitiated = true) override;
+    virtual void stopSharing(const QString & userName,
+                             const bool isSelfInitiated = true)  override;
+
+    virtual void shareMessage(const QString & messageContent) override;
 
 
 //Experimental features ======================================================

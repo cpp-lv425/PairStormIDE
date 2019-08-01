@@ -61,7 +61,7 @@ MainWindow::MainWindow(QWidget *parent) :
     addDockWidget(Qt::RightDockWidgetArea, mpChatWindowDock);
 
     // Add updating user list on discovering new users
-    connect(mplocalConnector, &LocalConnectorInterface::newUserDiscovered,
+    connect(mplocalConnector, &LocalConnectorInterface::onlineUsersUpdated,
             mpChatWindowDock, &ChatWindowDock::updateUsersListOnDiscovery,
             Qt::AutoConnection);
 
