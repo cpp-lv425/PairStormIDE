@@ -116,7 +116,7 @@ std::string ChangeManager::redo()
         return mCurrentFileState;
 
     mCurrentFileStateIter++;
-//TEST
+
     auto pos = mCurrentFileStateIter->beginChangePos;
     std::string to   = mCurrentFileStateIter->after;
     std::string from = mCurrentFileStateIter->before;

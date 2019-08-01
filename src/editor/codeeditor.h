@@ -39,10 +39,10 @@ public:
 protected:
     void resizeEvent(QResizeEvent *event)override;
     virtual void mouseMoveEvent(QMouseEvent *event) override;
+    virtual void closeEvent(QCloseEvent *event) override;
 
 private slots:
     void updateLineNumberAreaWidth();
-    void highlightCurrentLine();
     void updateLineNumberArea(const QRect &rect, int dy);
     void runLexerAndHighlight();
 

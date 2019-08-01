@@ -8,6 +8,7 @@
 #include<QScrollBar>
 #include<QMessageBox>
 #include<iostream>
+#include<thread>
 
 #define TAB_SPACE 4
 
@@ -43,7 +44,6 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     //If the text is scrolled vertically, dy carries the amount of pixels the viewport was scrolled.
     connect(this,  SIGNAL(updateRequest(QRect,int)), this, SLOT(updateLineNumberArea(QRect,int)));
     connect(this,  SIGNAL(cursorPositionChanged()), this, SLOT(runLexerAndHighlight()));
-    connect(this,  SIGNAL(cursorPositionChanged()), this, SLOT(highlightCurrentLine()));
     connect(mTimer, SIGNAL(timeout()), this, SLOT(saveStateInTheHistory()));
     connect(this,  SIGNAL(textChanged()), this, SLOT(changesAppeared()));
 
@@ -52,7 +52,6 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     // start typing from correct position (in the first line it doesn't consider weight of lineCounter)
     //that's why we need to set this position
     updateLineNumberAreaWidth();
-    highlightCurrentLine();
 
     //fonts and colors configurations
     mFont.setPointSize(mConfigParam.mFontSize);
@@ -75,11 +74,6 @@ void CodeEditor::runLexerAndHighlight()
     {
         mHcpp->highlightBlock(mHcpp->mLines[i]);
     }
-
-    for(auto it = mTokens.begin(); it < mTokens.end(); ++it)
-       // qDebug() << it->name << " "  << it->begin << " " << it->end << " " << it->linesCount << '\n';
-    mLexer.lexicalAnalysis(toPlainText());
-    mTokens = mLexer.getTokens();
 }
 
 int CodeEditor::getLineNumberAreaWidth()
@@ -158,18 +152,7 @@ void CodeEditor::resizeEvent(QResizeEvent *e)
     lineNumberArea->setGeometry(QRect(0, 0, getLineNumberAreaWidth(), cr.height()));//set the same height as codeEditor for lineCouter
 }
 
-void CodeEditor::highlightCurrentLine()
-{
-    QList<QTextEdit::ExtraSelection> extraSelections;
-    QTextEdit::ExtraSelection selection;
 
-    QColor lineColor = mConfigParam.mCurrentLineColor;
-    selection.format.setBackground(lineColor);
-    selection.format.setProperty(QTextFormat::FullWidthSelection, true);
-    selection.cursor = textCursor();
-    extraSelections.append(selection);
-    setExtraSelections(extraSelections);
-}
 
 void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event)
 {
@@ -251,4 +234,9 @@ void CodeEditor::mouseMoveEvent(QMouseEvent *event)
        }
     }
     QPlainTextEdit::mouseMoveEvent(event);
+}
+
+void CodeEditor::closeEvent(QCloseEvent *event)
+{
+    //to do
 }
