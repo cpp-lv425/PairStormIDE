@@ -26,7 +26,7 @@ void ChatWindowDock::setUserName(const QString &userName)
     mpChatWidget->setCurrentUserName(userName);
 }
 
-void ChatWindowDock::displayMessage(const QString &userName, const QString &message)
+void ChatWindowDock::displayMessage(const QString userName, const QString message)
 {
     mpChatWidget->displayMessage(userName, message);
 }
@@ -37,10 +37,10 @@ void ChatWindowDock::onUserToConnectSelected(QString userName)
     emit userToConnectSelected(userName);
 }
 
-void ChatWindowDock::onSendMessage(const QString &userName, const QString &message)
+void ChatWindowDock::onSendMessage(const QString &message)
 {
     qDebug() << "dock slot send message";
-    emit sendMessage(userName, message);
+    emit sendMessage(message);
 }
 
 void ChatWindowDock::keyPressEvent(QKeyEvent *event)

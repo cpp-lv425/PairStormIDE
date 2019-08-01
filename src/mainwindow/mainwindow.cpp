@@ -67,10 +67,6 @@ MainWindow::MainWindow(QWidget *parent) :
     createButtomPanel();
 
     restoreMainWindowState();
-
-    // for testing
-    onNewMessage("Valik", "Hello world");
-    onNewMessage("Igor", "How are you?");
 }
 
 QStringList MainWindow::getFileExtensions() const
@@ -319,13 +315,25 @@ void MainWindow::createChatWindow()
     mpChatWindowDock = new ChatWindowDock(this);
     connect(mpChatWindowDock, &ChatWindowDock::userToConnectSelected,
             this, &MainWindow::onUserToConnectSelected);
-    connect(mpChatWindowDock, &ChatWindowDock::sendMessage,
-            this, &MainWindow::onSendMessage);
 
     // Add updating user list on discovering new users
     connect(mplocalConnector, &LocalConnectorInterface::onlineUsersUpdated,
             mpChatWindowDock, &ChatWindowDock::updateOnlineUsersOnChange,
-            Qt::AutoConnection);
+            Qt::UniqueConnection);
+
+    connect(mpChatWindowDock, &ChatWindowDock::userToConnectSelected,
+            mplocalConnector, &LocalConnectorInterface::startSharingOnCommand,
+            Qt::UniqueConnection);
+
+    connect(mpChatWindowDock, &ChatWindowDock::sendMessage,
+            mplocalConnector, &LocalConnectorInterface::shareMessage,
+            Qt::UniqueConnection);
+
+    connect(mplocalConnector, &LocalConnectorInterface::messageReceived,
+            mpChatWindowDock, &ChatWindowDock::displayMessage,
+            Qt::UniqueConnection);
+
+
 
     mpChatWindowDock->setObjectName("mpChatWindowDock");
     addDockWidget(Qt::RightDockWidgetArea, mpChatWindowDock, Qt::Vertical);
@@ -714,17 +722,8 @@ void MainWindow::onCloseWindow(CodeEditor *curDoc)
 
 void MainWindow::onUserToConnectSelected(QString userName)
 {
+    mplocalConnector->startSharingOnCommand(userName);
     qDebug() << userName;
-}
-
-void MainWindow::onNewMessage(const QString &userName, const QString &message)
-{
-    mpChatWindowDock->displayMessage(userName, message);
-}
-
-void MainWindow::onSendMessage(const QString &userName, const QString &message)
-{
-    qDebug() << "onSendMessage" << userName << '\n' << message;
 }
 
 CodeEditor* MainWindow::createNewDoc()

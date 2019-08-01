@@ -26,13 +26,11 @@ public slots:
     //======================= Slots for GUI events ===========================
     virtual void configureServiceOnLogin(const QString & userName) = 0;
 
-    virtual void startSharing(const QString & userName,
-                              const bool isSelfInitiated = true) = 0;
-    virtual void stopSharing (const QString & userName,
-                              const bool isSelfInitiated = true) = 0;
+    virtual void startSharingOnCommand(const QString userName) = 0;
+    virtual void stopSharingOnCommand (const QString userName) = 0;
 
     //======================= Slots for Editor & Chat events =================
-    virtual void shareMessage(const QString & messageContent) = 0;
+    virtual void shareMessage(const QString messageContent) = 0;
 
 signals:
 
@@ -94,8 +92,15 @@ private:
 
     void startBroadcastingAttributes();
     void startClearingOutdatedAttributes();
+    void startSharing(const QString userName,
+                      const bool isSelfInitiated = true);
+    void stopSharing(const QString userName,
+                     const bool isSelfInitiated = true);
 
 private slots:
+
+    virtual void startSharingOnCommand(const QString userName) override;
+    virtual void stopSharingOnCommand (const QString userName) override;
 
     void shareAttributesOnTimerTick();
     void clearOutdatedAttributesOnTimerTick();
@@ -106,12 +111,8 @@ private slots:
 public slots:
     virtual void configureServiceOnLogin(const QString & userName) override;
 
-    virtual void startSharing(const QString & userName,
-                              const bool isSelfInitiated = true) override;
-    virtual void stopSharing(const QString & userName,
-                             const bool isSelfInitiated = true)  override;
 
-    virtual void shareMessage(const QString & messageContent) override;
+    virtual void shareMessage(const QString messageContent) override;
 
 
 //Experimental features ======================================================

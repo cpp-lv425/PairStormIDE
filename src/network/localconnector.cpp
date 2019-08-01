@@ -175,8 +175,24 @@ QStringList DefaultLocalConnector::getConnectedUsers() const
 // ==========================================================================================
 // ==========================================================================================
 // ==========================================================================================
+//                                                                   START SHARING ON REQUEST
+void DefaultLocalConnector::startSharingOnCommand(const QString userName)
+{
+    startSharing(userName, true);
+}
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
+//                                                                    STOP SHARING ON REQUEST
+void DefaultLocalConnector::stopSharingOnCommand(const QString userName)
+{
+    stopSharing(userName, true);
+}
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
 //                                                                              START SHARING
-void DefaultLocalConnector::startSharing(const QString & userName,
+void DefaultLocalConnector::startSharing(const QString userName,
                                          const bool isSelfInitiated)
 {
     auto serverAttributesPtr =
@@ -213,7 +229,7 @@ void DefaultLocalConnector::startSharing(const QString & userName,
 // ==========================================================================================
 // ==========================================================================================
 //                                                                               STOP SHARING
-void DefaultLocalConnector::stopSharing(const QString & userName,
+void DefaultLocalConnector::stopSharing(const QString userName,
                                         const bool isSelfInitiated)
 {
     auto serverAttributesPtr =
@@ -247,7 +263,7 @@ void DefaultLocalConnector::stopSharing(const QString & userName,
 // ==========================================================================================
 // ==========================================================================================
 //                                                      SHARE MESSAGE BETWEEN CONNECTED USERS
-void DefaultLocalConnector::shareMessage(const QString & messageContent)
+void DefaultLocalConnector::shareMessage(const QString messageContent)
 {
     Message message;
     message.m_type       = MessageType::MessageTypeChatMessage;
