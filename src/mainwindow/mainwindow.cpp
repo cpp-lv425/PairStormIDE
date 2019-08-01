@@ -319,6 +319,21 @@ void MainWindow::createButtomPanel()
     mpBottomPanelDock->setObjectName("mpBottomPanelDock");
 }
 
+CodeEditor *MainWindow::getCurrentDoc()
+{
+    // get current subWindow
+    // if there are no subWindows nullptr is returned
+    auto subWindow = mpDocsArea->currentSubWindow();
+
+    if (!subWindow)
+    {
+        return nullptr;
+    }
+    auto curDoc = qobject_cast<CodeEditor*>(subWindow->widget());
+
+    return curDoc ? curDoc : nullptr;
+}
+
 void MainWindow::onNewFileTriggered()
 {    
     QStringList fileExtensions = getFileExtensions();
@@ -509,80 +524,62 @@ void MainWindow::onExitTriggered()
 
 void MainWindow::onUndoTriggered()
 {
-    auto curDoc = qobject_cast<CodeEditor*>
-            (mpDocsArea->currentSubWindow()->widget());
+    auto curDoc = getCurrentDoc();
 
-    // if ptr to current document is not valid
-    if (!curDoc)
+    if (curDoc)
     {
-        return;
+        curDoc->undo();
     }
-    curDoc->undo();
 }
 
 void MainWindow::onRedoTriggered()
 {
-    auto curDoc = qobject_cast<CodeEditor*>
-            (mpDocsArea->currentSubWindow()->widget());
+    auto curDoc = getCurrentDoc();
 
-    // if ptr to current document is not valid
-    if (!curDoc)
+    if (curDoc)
     {
-        return;
+        curDoc->redo();
     }
-    curDoc->redo();
 }
 
 void MainWindow::onCutTriggered()
 {
-    auto curDoc = qobject_cast<CodeEditor*>
-            (mpDocsArea->currentSubWindow()->widget());
+    auto curDoc = getCurrentDoc();
 
-    // if ptr to current document is not valid
-    if (!curDoc)
+    if (curDoc)
     {
-        return;
+        curDoc->cut();
     }
-    curDoc->cut();
 }
 
 void MainWindow::onCopyTriggered()
 {
-    auto curDoc = qobject_cast<CodeEditor*>
-            (mpDocsArea->currentSubWindow()->widget());
+    auto curDoc = getCurrentDoc();
 
-    // if ptr to current document is not valid
-    if (!curDoc)
+    if (curDoc)
     {
-        return;
+        curDoc->copy();
     }
-    curDoc->copy();
 }
 
 void MainWindow::onPasteTriggered()
 {
-    auto curDoc = qobject_cast<CodeEditor*>
-            (mpDocsArea->currentSubWindow()->widget());
+    auto curDoc = getCurrentDoc();
 
-    // if ptr to current document is not valid
-    if (!curDoc)
+    if (curDoc)
     {
-        return;
+        curDoc->paste();
     }
-    curDoc->paste();
 }
 
 void MainWindow::onSelectAllTriggered()
-{
-    auto curDoc = qobject_cast<CodeEditor*>
-            (mpDocsArea->currentSubWindow()->widget());
+{    
+    auto curDoc = getCurrentDoc();
 
-    // if ptr to current document is not valid
-    if (!curDoc)
+    if (curDoc)
     {
-        return;
+        curDoc->selectAll();
     }
-    curDoc->selectAll();
 }
 
 void MainWindow::onFindTriggered()

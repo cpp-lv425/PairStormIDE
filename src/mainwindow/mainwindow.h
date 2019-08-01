@@ -36,7 +36,6 @@ private:
     BottomPanelDock *mpBottomPanelDock;
     MDIArea *mpDocsArea;
     QString mCurrentUserName;
-
     void setupMainMenu();
     void saveDocument(CodeEditor *pDoc, const QString &fileName);
     void openDoc(QString fileName);
@@ -47,6 +46,7 @@ private:
     void createProjectViewer();
     void createChatWindow();
     void createButtomPanel();
+    CodeEditor* getCurrentDoc();
 
     void saveMainWindowState();
     void restoreMainWindowState();
