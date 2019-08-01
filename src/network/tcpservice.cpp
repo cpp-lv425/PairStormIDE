@@ -12,7 +12,7 @@ TcpService::TcpService(const QString & serverName, QObject *qObject) :
     if (isNetConfigurationNeeded)
     {
         // Get previously saved network configuration from the registry
-        QSettings netSettings(QSettings::UserScope, gDefaultOrgLabel, gDefaultAppLabel);
+        QSettings netSettings;
         netSettings.beginGroup(QString("PSnet"));
         const QString configId =
                 netSettings.value(QString("DefaultNetworkConfiguration")).toString();
@@ -33,7 +33,7 @@ TcpService::TcpService(const QString & serverName, QObject *qObject) :
         // Configure server when session opening succeeds
         connect(
             mpNetSession.get(), &QNetworkSession::opened,
-            this,                  &TcpService::configureServer,
+            this,               &TcpService::configureServer,
             Qt::UniqueConnection);
 
         mpNetSession->open();
@@ -60,7 +60,7 @@ void TcpService::configureServer()
             configData.identifier();
 
         // Save network configurations to the registry
-        QSettings netSettings(QSettings::UserScope, gDefaultOrgLabel, gDefaultAppLabel);
+        QSettings netSettings;
         netSettings.beginGroup(QString("PSnet"));
         netSettings.setValue(QString("DefaultNetworkConfiguration"), configId);
         netSettings.endGroup();

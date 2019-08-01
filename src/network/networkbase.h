@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QString>
+#include <QSettings>
 #include <QDateTime>
 #include <QJsonArray>
 #include <QJsonObject>
@@ -17,8 +18,6 @@ typedef quint16 PortNumType;
 typedef qint64  SizeType;
 
 // Default values for common parameters
-const QString     gDefaultAppLabel         = "PairStorm";
-const QString     gDefaultOrgLabel         = "cpp-lv425";
 
 const PortNumType gDefaultTcpPortNumber    = 36108;
 const PortNumType gDefaultUdpPortNumber    = 32807;
@@ -38,7 +37,9 @@ struct ServerData {
     {
         // Create Json object and set its API
         QJsonObject jsonAttrib;
-        jsonAttrib["app"] = gDefaultAppLabel;
+        QSettings applicationSettings;
+        QString appLabel = applicationSettings.value("applicationName").toString();
+        jsonAttrib["app"] = appLabel;
 
         // Fill object with needed values
         jsonAttrib["name"] = mName;
@@ -74,7 +75,9 @@ struct ServerData {
             return;
         }
         // Check if the API version match
-        if(jsonAttrib.value("app").toString() != gDefaultAppLabel)
+        QSettings applicationSettings;
+        QString appLabel = applicationSettings.value("applicationName").toString();
+        if(jsonAttrib.value("app").toString() != appLabel)
         {
             return;
         }
@@ -109,7 +112,9 @@ struct Message {
     {
         // Create Json object and set its API
         QJsonObject jsonAttrib;
-        jsonAttrib["app"] = gDefaultAppLabel;
+        QSettings applicationSettings;
+        QString appLabel = applicationSettings.value("applicationName").toString();
+        jsonAttrib["app"] = appLabel;
 
         // Fill object with needed values
         jsonAttrib["sourceName"] = mSourceName;
@@ -139,7 +144,9 @@ struct Message {
             return;
         }
         // Check if the API version match
-        if(json.value("app").toString() != gDefaultAppLabel)
+        QSettings applicationSettings;
+        QString appLabel = applicationSettings.value("applicationName").toString();
+        if(json.value("app").toString() != appLabel)
         {
             return;
         }
