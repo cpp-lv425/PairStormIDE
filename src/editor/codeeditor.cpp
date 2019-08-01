@@ -29,16 +29,16 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     //If the text is scrolled, rect will cover the entire viewport area.
     //If the text is scrolled vertically, dy carries the amount of pixels the viewport was scrolled.
     connect(this, SIGNAL(updateRequest(QRect,int)), this, SLOT(updateLineNumberArea(QRect,int)));
-    connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(runLexerAndHighlight()));
-    connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(highlightCurrentLine()));
+    //connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(runLexerAndHighlight()));
+    //connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(highlightCurrentLine()));
     connect(timer, SIGNAL(timeout()), this, SLOT(saveStateInTheHistory()));
     connect(this, SIGNAL(textChanged()), this, SLOT(changesAppeared()));
     timer->start(CHANGE_SAVE_TIME);//save text by this time
-    connect(this, SIGNAL(textChanged()), this, SLOT(runLexer()));
+   // connect(this, SIGNAL(textChanged()), this, SLOT(runLexer()));
     connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(highlightCurrentLine()));
     connect(this,  SIGNAL(updateRequest(QRect,int)), this, SLOT(updateLineNumberArea(QRect,int)));
-    connect(this,  SIGNAL(textChanged()),            this, SLOT(runLexer()));
-    connect(this,  SIGNAL(cursorPositionChanged()),  this, SLOT(highlightCurrentLine()));
+    connect(this,  SIGNAL(textChanged()),            this, SLOT(runLexerAndHighlight()));
+    //connect(this,  SIGNAL(cursorPositionChanged()),  this, SLOT(highlightCurrentLine()));
     connect(timer, SIGNAL(timeout()),                this, SLOT(saveStateInTheHistory()));
 
     timer->start(CHANGE_SAVE_TIME);//save text by this time
