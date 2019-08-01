@@ -82,6 +82,7 @@ void DefaultLocalConnector::shareAttributesOnTimerTick()
 //                                                           CLEAR OUTDATED SERVER ATTRIBUTES
 void DefaultLocalConnector::clearOutdatedAttributesOnTimerTick()
 {
+    /*
     SizeType nowMomentMs = QDateTime::currentMSecsSinceEpoch();
     if(m_discoveredTcpServersAttrib.empty())
     {
@@ -100,6 +101,7 @@ void DefaultLocalConnector::clearOutdatedAttributesOnTimerTick()
     {
         emit onlineUsersUpdated(getOnlineUsers());
     }
+    */
 }
 // ==========================================================================================
 // ==========================================================================================
@@ -195,6 +197,19 @@ void DefaultLocalConnector::stopSharingOnCommand(const QString userName)
 void DefaultLocalConnector::startSharing(const QString userName,
                                          const bool isSelfInitiated)
 {
+    // Check if user is already connected
+    auto connectedServerAttributesPtr =
+            std::find_if(m_connectedTcpServersAttrib.begin(),
+                         m_connectedTcpServersAttrib.end(),
+                         [userName] (const ServerData & serverData)
+                         {
+                             return serverData.m_name == userName;
+                         });
+    if (connectedServerAttributesPtr != m_connectedTcpServersAttrib.end())
+    {
+        return;
+    }
+
     auto serverAttributesPtr =
             std::find_if(m_discoveredTcpServersAttrib.begin(),
                          m_discoveredTcpServersAttrib.end(),
