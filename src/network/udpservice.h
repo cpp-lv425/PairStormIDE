@@ -11,8 +11,7 @@
 #include <QNetworkInterface>
 
 // ==========================================================================================
-//                                                                                   SNGLETON
-//                                                                       UDP service provider
+//                                                                       UDP SERVICE PROVIDER
 // ==========================================================================================
 class UdpService : public QObject
 {
@@ -28,7 +27,6 @@ class UdpService : public QObject
     Datagram                    m_pendingDatagram;
     QVector<QHostAddress>       m_broadcastIps;
 
-    explicit UdpService(QObject *qObject = nullptr); // Private!
 
     // Socket configuration routine, have to be executed
     // before using class - is called inside constructor
@@ -36,11 +34,9 @@ class UdpService : public QObject
 
 public:
 
+    explicit UdpService(QObject *qObject = nullptr);
     UdpService(UdpService const&) = delete;
     UdpService& operator=(UdpService const&) = delete;
-
-    // Service instance generator
-    static std::shared_ptr<UdpService> getService();
 
     ~UdpService();
 

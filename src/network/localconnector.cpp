@@ -10,8 +10,8 @@ void DefaultLocalConnector::configureServiceOnLogin(const QString & userName)
         return;
     }
     // Configure the UDP service & TCP service
-    m_udpService = UdpService::getService();
-    m_tcpService = TcpService::getService(userName);
+    m_udpService = std::unique_ptr<UdpService>(new UdpService());
+    m_tcpService = std::unique_ptr<TcpService>(new TcpService(userName));
     if (!m_tcpService->isActive())
     {
         emit serviceFailed();

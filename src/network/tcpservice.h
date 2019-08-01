@@ -14,8 +14,7 @@
 #include <QNetworkSession>
 
 // ==========================================================================================
-//                                                                                   SNGLETON
-//                                                                       TCP service provider
+//                                                                       TCP SERVICE PROVIDER
 // ==========================================================================================
 class TcpService : public QObject
 {
@@ -30,19 +29,8 @@ class TcpService : public QObject
     // Composition of the Network session & TCP server
     std::unique_ptr<QNetworkSession>     m_netSessionPtr;
     std::unique_ptr<QTcpServer>          m_tcpServerPtr;
-    // Vector of currently connected active sockets &
-    // variable for storing received segments
-    //QVector<QTcpSocket*>                 m_connectedSockets;
+
     Segment                              m_pendingSegment;
-
-
-
-    // Experimental feature
-    //std::unordered_map<std::string, std::shared_ptr<QTcpSocket>> m_nameToSocket;
-
-
-
-    explicit TcpService(const QString & serverName, QObject *qObject = nullptr);
 
     // Fill in internal attributes
     void saveServerAttributes();
@@ -52,27 +40,24 @@ class TcpService : public QObject
 
 public:
 
+    explicit TcpService(const QString & serverName, QObject *qObject = nullptr);
     TcpService(TcpService const&) = delete;
     TcpService& operator=(TcpService const&) = delete;
 
-    // Service instance generator
-    static std::shared_ptr<TcpService> getService(const QString & serverName);
-
-    // Server attributes getter
-    ServerData getServerAttributes() const;
+    bool isActive() const;
 
     // Service destructor
     ~TcpService();
 
+    // Server attributes getter
+    ServerData getServerAttributes() const;
 
     // Connect to TCP server with specified attributes
     // and create special socket or disconnect from given socket
     bool sendDataToTcpServer(const QString & data, const ServerData & serverData);
 
-
     // Saved segment getter
     Segment getReceivedSegment() const;
-    bool isActive() const;
 
 /*
     void setUserNameSocketRelation(const std::shared_ptr<QTcpSocket> & userSocket, const QString & userName);

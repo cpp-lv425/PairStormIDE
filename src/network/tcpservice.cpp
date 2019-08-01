@@ -117,16 +117,6 @@ void TcpService::saveServerAttributes()
 // ==========================================================================================
 // ==========================================================================================
 // ==========================================================================================
-//                                                   GET INSTANCE OF THE TCP SERVICE PROVIDER
-std::shared_ptr<TcpService> TcpService::getService(const QString & serverName)
-{
-    static std::shared_ptr<TcpService>
-            serviceInstance(new TcpService(serverName));
-    return serviceInstance;
-}
-// ==========================================================================================
-// ==========================================================================================
-// ==========================================================================================
 //                                                            GET LOCAL TCP SERVER ATTRIBUTES
 ServerData TcpService::getServerAttributes() const
 {
