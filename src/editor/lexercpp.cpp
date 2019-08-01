@@ -102,7 +102,6 @@ void LexerCPP::clear()
     tokens.clear();
     current_lexem.clear();
     state = ST;
-    symbolCount = 0;
     current_line = 0;
 }
 
@@ -117,15 +116,7 @@ void LexerCPP::lexicalAnalysis(QString code)
         switch(state)
         {
             case ST:
-                if(isSpace(sym)) {
-                    if(sym == '\n')
-                    {
-                        symbolCount = it;
-                        ++current_line;
-                    }
-                    break;
-                }
-
+                if(isSpace(sym)) break;
                 if(isAlpha(sym))
                     changeState(ID, sym);
                 else if(isDigit(sym))

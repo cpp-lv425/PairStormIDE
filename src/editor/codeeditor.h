@@ -56,6 +56,7 @@ public slots:
 
 signals:
     void changesAppeared();
+    void sendLexem(QString);
 
 
 private:

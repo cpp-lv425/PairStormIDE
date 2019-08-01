@@ -40,26 +40,5 @@ void Highlightercpp::setText(QString TextEditor)
 
 void Highlightercpp::highlightBlock(const QString &text)
 {
-    findLine(text);
-
-    for(auto p: mData)
-    {
-        if(mCurrentLine == p.linesCount)
-        {
-            if(p.type == KW)
-            {
-                setFormat(p.begin, p.end - p.begin, mFormatKeyword);
-            }
-            else if(p.type == LIT)
-            {
-                setFormat(p.begin, p.end - p.begin, mFormatLiteral);
-            }
-            else if(p.type == COM)
-            {
-                setFormat(p.begin, p.end - p.begin, mFormatComment);
-            }
-        }
-    }
-
-
+    qDebug() << ":3\n";
 }

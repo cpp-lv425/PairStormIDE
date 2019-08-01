@@ -34,14 +34,6 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     connect(timer, SIGNAL(timeout()), this, SLOT(saveStateInTheHistory()));
     connect(this, SIGNAL(textChanged()), this, SLOT(changesAppeared()));
     timer->start(CHANGE_SAVE_TIME);//save text by this time
-    connect(this, SIGNAL(textChanged()), this, SLOT(runLexer()));
-    connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(highlightCurrentLine()));
-    connect(this,  SIGNAL(updateRequest(QRect,int)), this, SLOT(updateLineNumberArea(QRect,int)));
-    connect(this,  SIGNAL(textChanged()),            this, SLOT(runLexer()));
-    connect(this,  SIGNAL(cursorPositionChanged()),  this, SLOT(highlightCurrentLine()));
-    connect(timer, SIGNAL(timeout()),                this, SLOT(saveStateInTheHistory()));
-
-    timer->start(CHANGE_SAVE_TIME);//save text by this time
 
     this->setTabStopDistance(TAB_SPACE * fontMetrics().width(QLatin1Char('0')));//set tab distance
 
@@ -62,22 +54,13 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
 
 void CodeEditor::runLexerAndHighlight()
 {
-    //run lexer
     lcpp->clear();
     lcpp->lexicalAnalysis(document()->toPlainText());
     tokens = lcpp->getTokens();
-    //run highlight
-    hcpp->setData(tokens);
-    hcpp->setText(this->document()->toPlainText());
-    for(int i = 0; i < hcpp->mLines.size(); i++)
+    for(auto it: tokens)
     {
-        hcpp->highlightBlock(hcpp->mLines[i]);
+        qDebug() << it.name << ' ' << it.begin << ' ' << it.end << ' ' << it.type << '\n';
     }
-
-    for(auto it = tokens.begin(); it < tokens.end(); ++it)
-        qDebug() << it->name << " "  << it->begin << " " << it->end << " " << it->linesCount << '\n';
-    lexer.lexicalAnalysis(toPlainText());
-    tokens = lexer.getTokens();
 }
 
 int CodeEditor::lineNumberAreaWidth()
