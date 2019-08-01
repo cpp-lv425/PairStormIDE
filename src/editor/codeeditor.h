@@ -53,6 +53,7 @@ public slots:
 
 signals:
     void changesAppeared();
+    void closeDocEventOccured(CodeEditor*);
 
 private:
    QWidget *lineNumberArea;

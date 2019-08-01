@@ -671,24 +671,7 @@ void MainWindow::onOpenFileFromProjectViewer(QString fileName)
 
 void MainWindow::onCloseWindow(CodeEditor *curDoc)
 {
-    if (!curDoc)
-    {
-        return;
-    }
-    if (curDoc->document()->isModified())
-    {
-        QMessageBox::StandardButton reply = QMessageBox::question
-                (this,
-                 "Saving Changes",
-                 "Do you want to save changes to opened documents?",
-                 QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
-
-        if (reply == QMessageBox::No | reply == QMessageBox::Cancel)
-        {
-            return;
-        }
-        saveDocument(curDoc, curDoc->getFileName());
-    }
+    saveDocument(curDoc, curDoc->getFileName());
 }
 
 void MainWindow::onUserToConnectSelected(QString userName)
@@ -718,6 +701,7 @@ CodeEditor* MainWindow::createNewDoc()
     // !!! will be used when CodeEditor will emit closeSignal on closeEvent
     //connect(curDoc, &CodeEditor::closeSignal, this, &MainWindow::onCloseWindow);
     mpDocsArea->addSubWindow(newDoc);
+    connect(newDoc, &CodeEditor::closeDocEventOccured, this, &MainWindow::onCloseWindow);
     newDoc->setAttribute(Qt::WA_DeleteOnClose);
 
     return newDoc;
