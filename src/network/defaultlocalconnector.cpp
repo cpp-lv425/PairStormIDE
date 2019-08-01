@@ -267,7 +267,7 @@ void DefaultLocalConnector::stopSharing(const QString userName,
                                               *serverAttributesPtr);
         }
 
-        mConnectedServersAttrib.erase(serverAttributesPtr, std::next(serverAttributesPtr));
+        mConnectedServersAttrib.erase(serverAttributesPtr);
 
         qDebug() << "sharing was stopped";
         emit connectedUsersUpdated(getConnectedUsers());
