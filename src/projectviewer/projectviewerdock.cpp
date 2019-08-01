@@ -6,7 +6,6 @@
 #include <QSettings>
 #include <QTreeView>
 #include <QWidget>
-#include <QDebug>
 #include <QDir>
 
 #include "projectviewermodel.h"
@@ -19,13 +18,17 @@ ProjectViewerDock::ProjectViewerDock(QWidget *pParent): QDockWidget(pParent)
 
     auto pMainWindow = qobject_cast<MainWindow*>(pParent);
 
-    if(!pMainWindow)
+    if (!pMainWindow)
+    {
         return;
+    }
 
     // constructing filters
     QStringList filters = pMainWindow->getFileExtensions();
-    for(auto& item: filters)
+    for (auto& item: filters)
+    {
         item.push_front('*');
+    }
 
     mpViewerModel = new ProjectViewerModel(this);
     mpTreeViewer = new ProjectTreeView(mpViewerModel,this);
@@ -56,4 +59,3 @@ ProjectViewerDock::~ProjectViewerDock()
     QSettings settings("425", "PairStorm");
     settings.setValue("ProjectViewerDockGeometry", saveGeometry());
 }
-

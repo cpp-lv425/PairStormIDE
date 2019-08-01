@@ -20,11 +20,11 @@ public:
 
 private:
     Ui::StartPage *ui;
-    QPushButton *pNewBtn;
-    QPushButton *pOpenBtn;
-    QPushButton *pOpenDirBtn;
-    QPushButton *pReferenceBtn;
-    QPushButton *pSettingsBtn;
+    QPushButton *mpNewBtn;
+    QPushButton *mpOpenBtn;
+    QPushButton *mpOpenDirBtn;
+    QPushButton *mpReferenceBtn;
+    QPushButton *mpSettingsBtn;
 
 private slots:
     void newBtnPressed();

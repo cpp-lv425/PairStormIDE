@@ -18,7 +18,6 @@ class ProjectViewerDock: public QDockWidget
     ProjectViewerModel *mpViewerModel;
 public:
     ProjectViewerDock(QWidget *pParent = nullptr);
-
     void setFilters(QStringList filters);
     void setDir(QDir curDir);
     ~ProjectViewerDock();

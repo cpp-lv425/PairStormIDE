@@ -7,8 +7,8 @@ class QLineEdit;
 
 class LoginDialog: public QDialog
 {
-    QLineEdit *pUserNameLineEdit;
-    QString userName;
+    QLineEdit *mpUserNameLineEdit;
+    QString mUserName;
 public:    
     LoginDialog(QWidget *pParent = nullptr);
     QString start();

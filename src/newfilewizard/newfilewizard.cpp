@@ -41,7 +41,9 @@ NewFileDialog::NewFileDialog(QStringList &fileExtensions,
     // file extensions list
     mpExtensionsList = new QListWidget;
     for(const auto& item: fileExtensions)
+    {
         mpExtensionsList->addItem(item);
+    }
     mpExtensionsList->setCurrentRow(0);
 
     // laying out wgts
@@ -110,7 +112,7 @@ void NewFileDialog::onCreateFile()
     QString dirName = mpDirLbl->text();
 
     // check if directory is not empty
-    if(dirName.isEmpty())
+    if (dirName.isEmpty())
     {
         QMessageBox::warning(this, "Wrong directory",
                              "Please specify correct file directory.");
@@ -127,7 +129,7 @@ void NewFileDialog::onCreateFile()
 
     // preventing overwriting existing files
     QDir dir(dirName);
-    if(dir.exists(fileName))
+    if (dir.exists(fileName))
     {
         QMessageBox::warning(this, "File exists",
                              "File with specified name already exists. "
@@ -147,9 +149,13 @@ void NewFileDialog::onCreateFile()
     QMessageBox::information(this, "File Created", "Specified file has been successfully created.");
 
     // check if filename is an empty string
-    if(fileName.isEmpty())
+    if (fileName.isEmpty())
+    {
         mFileName = QString();
+    }
     else
+    {
         mFileName = dirName + '/' + fileName;
+    }
     accept();
 }

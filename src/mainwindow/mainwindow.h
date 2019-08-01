@@ -38,7 +38,7 @@ private:
     QString mCurrentUserName;
 
     void setupMainMenu();
-    void saveDocument(CodeEditor* pDoc, QString fileName);
+    void saveDocument(CodeEditor *pDoc, const QString &fileName);
     void openDoc(QString fileName);
     bool checkIfOpened(const QString& fileName)const;
     // returns true if any of docs has been modified
@@ -50,6 +50,7 @@ private:
 
     void saveMainWindowState();
     void restoreMainWindowState();
+    void setAppStyle();
 
 private slots:
     // file menu actions
@@ -91,7 +92,7 @@ private slots:
 
 public slots:
     void onOpenFileFromProjectViewer(QString fileName);    
-    void onCloseWindow(CodeEditor* curDoc);
+    void onCloseWindow(CodeEditor *curDoc);
     void onUserToConnectSelected(QString userName);
     void onNewMessage(const QString &userName,
                       const QString &message);

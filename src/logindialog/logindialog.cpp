@@ -25,11 +25,11 @@ LoginDialog::LoginDialog(QWidget *pParent): QDialog (pParent)
     // create user name label
     QLabel *pUserNameLbl = new QLabel("User Name");
     // create user name line edit
-    pUserNameLineEdit = new QLineEdit;
-    pUserNameLineEdit->setText("Unnamed");
+    mpUserNameLineEdit = new QLineEdit;
+    mpUserNameLineEdit->setText("Unnamed");
     QHBoxLayout *pEditLayout = new QHBoxLayout;
     pEditLayout->addWidget(pUserNameLbl);
-    pEditLayout->addWidget(pUserNameLineEdit);
+    pEditLayout->addWidget(mpUserNameLineEdit);
 
     // create group box to hold user name label & line edit
     QGroupBox *pLoginBox = new QGroupBox("Login");
@@ -68,17 +68,17 @@ QString LoginDialog::start()
 {
     exec();
     // return user name
-    return userName;
+    return mUserName;
 }
 
 void LoginDialog::onOkButtonClicked()
 {
     // check if user left empty edit line
-    if(pUserNameLineEdit->text().isEmpty())
+    if (mpUserNameLineEdit->text().isEmpty())
     {
         QMessageBox::warning(this, "User Name Input", "Please enter user name to proceed");
         return;
     }
-    userName = pUserNameLineEdit->text();
+    mUserName = mpUserNameLineEdit->text();
     accept();
 }

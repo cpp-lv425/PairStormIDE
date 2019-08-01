@@ -5,8 +5,6 @@
 #include <QListWidget>
 #include <QBoxLayout>
 #include <QLineEdit>
-#include <QListView>
-#include <QDebug> // temp
 #include <QLabel>
 
 ChatWidget::ChatWidget(QWidget *pParent):
@@ -29,8 +27,7 @@ ChatWidget::ChatWidget(QWidget *pParent):
     // creating send button
     QPushButton *pSendButton = new QPushButton("Send");
     pSendButton->setMaximumWidth(30);
-    connect(pSendButton, &QPushButton::clicked,
-            this, &ChatWidget::onSendCommand);
+    connect(pSendButton, &QPushButton::clicked, this, &ChatWidget::onSendCommand);
 
     QHBoxLayout *pLineLayout = new QHBoxLayout;
     pLineLayout->addWidget(mpEnterLine);
@@ -42,12 +39,7 @@ ChatWidget::ChatWidget(QWidget *pParent):
 
     pWindowLayout->addWidget(mpFeed);
     pWindowLayout->addLayout(pLineLayout);
-    setLayout(pWindowLayout);
-
-    // temp
-    QStringList users;
-    users << "London" << "Berlin" << "Paris";
-    setUsersList(users);
+    setLayout(pWindowLayout);    
 }
 
 void ChatWidget::setUsersList(const QStringList &usersList)
@@ -80,7 +72,6 @@ void ChatWidget::displayMessage(const QString &userName,
 
 void ChatWidget::onUserToConnectSelected(QListWidgetItem *item)
 {
-    qDebug() << "chat slot";
     QString userName = item->text();
     int position = userName.lastIndexOf(QChar{':'});
     emit userToConnectSelected(userName.mid(position + 2));
@@ -90,7 +81,6 @@ void ChatWidget::onSendCommand()
 {
     emit sendMessage(mUserName, mpEnterLine->text());
     updateFeedOnSend();
-
 }
 
 void ChatWidget::updateFeedOnSend()

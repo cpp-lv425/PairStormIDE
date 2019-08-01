@@ -10,6 +10,7 @@ class QLabel;
 class NewFileDialog: public QDialog
 {
     Q_OBJECT
+
 public:
     NewFileDialog(QStringList &fileExtensions,
                  QWidget *pParent = nullptr);
