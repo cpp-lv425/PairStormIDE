@@ -11,10 +11,8 @@ const int TAB_SPACE = 4;
 #include"changemanager.h"
 #include<utility>
 #include<QAbstractScrollArea>
-#include "highlightercpp.h"
 #include "lexercpp.h"
 #include "ideconfiguration.h"
-
 class QPaintEvent;
 class QResizeEvent;
 class QSize;
@@ -57,20 +55,39 @@ public slots:
 signals:
     void changesAppeared();
 
-
 private:
    QWidget *lineNumberArea;
    ConfigParams configParam;
    int currentZoom = 100;
    QFont font;
    QVector<Token> tokens;
-   Highlightercpp *hcpp;
    LexerCPP *lcpp;
    QString fileName;
    ChangeManager *changeManager;
    QTimer *timer;
    LexerCPP lexer;
+   QMap<QPair<int, QFlags<Qt::KeyboardModifier>>, void(CodeEditor::*)(QKeyEvent *)> mKeysEventMap;
 
+public:
+  static bool ispressSlesh;
+  //void setkeyeventmap();
+   //keyboard event's handlers
+   void eventBracketLeft(QKeyEvent *e);
+   void eventBraceLeft(QKeyEvent *e);
+   void eventSlash(QKeyEvent *e);
+   void eventAsterisk(QKeyEvent *e);
+   /*void event(QKeyEvent *e);
+   void event(QKeyEvent *e);
+   void event(QKeyEvent *e);
+   void event(QKeyEvent *e);
+   void event(QKeyEvent *e);
+   void event(QKeyEvent *e);
+   void event(QKeyEvent *e);
+   void event(QKeyEvent *e);
+   void event(QKeyEvent *e);
+   void event(QKeyEvent *e);
+   void event(QKeyEvent *e);
+   void event(QKeyEvent *e);*/
 };
 
 #endif // CODEEDITOR_H

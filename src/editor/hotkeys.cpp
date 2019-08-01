@@ -1,10 +1,10 @@
 #include "codeeditor.h"
 
-
+#include <QDebug>
 #include <QRegularExpression>
 
 QString CodeEditor::tabs="";
-
+bool CodeEditor::ispressSlesh=false;
 bool CodeEditor::isinsidebracket()
 {
     QTextCursor cursor = this->textCursor();
@@ -21,8 +21,6 @@ bool CodeEditor::isinsidebracket()
     }
     return false;
 }
-
-
 
 void CodeEditor::autotab()
 {
@@ -45,6 +43,7 @@ void CodeEditor::autotab()
       tabs.append("\t");
     }
 }
+
 const QString SINGLE_LINE_COMMENT = "//";
 const QString COMMENT_BLOCK_START = "/*";
 const QString COMMENT_BLOCK_END = "*/";
@@ -75,142 +74,143 @@ void removeMultilineComment(CodeEditor *editor, QTextCursor &cursor, int start, 
     cursor.removeSelectedText();
 }
 
-void CodeEditor::keyPressEvent(QKeyEvent *e)
+/*void keyPressEventtw(QKeyEvent *e)
 {
-   static bool pressSlesh=false;
-        if((e->key() == Qt::Key_Enter || e->key() == Qt::Key_Return) &&// shift + enter
-                ((e->modifiers() & Qt::ShiftModifier) == Qt::ShiftModifier))
-        {
-            e = new QKeyEvent(e->type(), e->key(), e->modifiers()&Qt::MetaModifier &Qt::KeypadModifier);
-        }
+    static bool pressSlesh=false;
+    if((e->key() == Qt::Key_Enter || e->key() == Qt::Key_Return) &&// shift + enter
+            ((e->modifiers() & Qt::ShiftModifier) == Qt::ShiftModifier))
+    {
+        e = new QKeyEvent(e->type(), e->key(), e->modifiers()&Qt::MetaModifier &Qt::KeypadModifier);
+    }
 
-        if(e->key() == Qt::Key_Enter || e->key() == Qt::Key_Return)
+    if(e->key() == Qt::Key_Enter || e->key() == Qt::Key_Return)
+    {
+        if(isinsidebracket())
         {
-            if(isinsidebracket())
-            {
-                this->insertPlainText("\n\n");
-                emit autotab();
-                tabs.resize(tabs.size()-1);
-                this->insertPlainText(tabs);
-                this->moveCursor(QTextCursor::Up);
-                emit autotab();
-                this->insertPlainText(tabs);
-                return;
-            }
-            QPlainTextEdit::keyPressEvent(e);
+            this->insertPlainText("\n\n");
+            emit autotab();
+            tabs.resize(tabs.size()-1);
+            this->insertPlainText(tabs);
+            this->moveCursor(QTextCursor::Up);
             emit autotab();
             this->insertPlainText(tabs);
             return;
+        }
+        QPlainTextEdit::keyPressEvent(e);
+        emit autotab();
+        this->insertPlainText(tabs);
+        return;
 
-        }
-        if(e->key() == Qt::Key_BraceLeft)
-        {
-            QPlainTextEdit::keyPressEvent(e);
-            this->insertPlainText("}");
-            this->moveCursor(QTextCursor::Left);
-            this->verticalScrollBar();
-            return;
-        }
-        if(e->key() == Qt::Key_BracketLeft)
-        {
-           QPlainTextEdit::keyPressEvent(e);
-           this->insertPlainText("]");
-           this->moveCursor(QTextCursor::Left);
-           this->verticalScrollBar();
-           return;
-        }
-        if(e->key() == Qt::Key_Slash){
-            pressSlesh=true;
-        }
-        if(e->key() == Qt::Key_Asterisk && pressSlesh){
-            QPlainTextEdit::keyPressEvent(e);
-            this->insertPlainText("*/");
-            this->moveCursor(QTextCursor::Left);
-            this->moveCursor(QTextCursor::Left);
-            this->verticalScrollBar();
-            return;
+    }
+    if(e->key() == Qt::Key_BraceLeft)
+    {
+        QPlainTextEdit::keyPressEvent(e);
+        this->insertPlainText("}");
+        this->moveCursor(QTextCursor::Left);
+        this->verticalScrollBar();
+        return;
+    }
+    if(e->key() == Qt::Key_BracketLeft)
+    {
+        QPlainTextEdit::keyPressEvent(e);
+        this->insertPlainText("]");
+        this->moveCursor(QTextCursor::Left);
+        this->verticalScrollBar();
+        return;
+    }
+    if(e->key() == Qt::Key_Slash){
+        pressSlesh=true;
+    }
+    if(e->key() == Qt::Key_Asterisk && pressSlesh){
+        QPlainTextEdit::keyPressEvent(e);
+        this->insertPlainText("");
+        this->moveCursor(QTextCursor::Left);
+        this->moveCursor(QTextCursor::Left);
+        this->verticalScrollBar();
+        return;
 
-        }
-        if(e->key() == Qt::Key_ParenLeft)
-        {
-            QPlainTextEdit::keyPressEvent(e);
-            this->insertPlainText(")");
-            this->moveCursor(QTextCursor::Left);
-            this->verticalScrollBar();
-            return;
-        }
-        if(e->key() == Qt::Key_Apostrophe)
-        {
-            QPlainTextEdit::keyPressEvent(e);
-            this->insertPlainText("\'");
-            this->moveCursor(QTextCursor::Left);
-            this->verticalScrollBar();
-            return;
-        }
-        if(e->key() == Qt::Key_QuoteDbl)
-        {
-            QPlainTextEdit::keyPressEvent(e);
-            this->insertPlainText("\"");
-            this->moveCursor(QTextCursor::Left);
-            this->verticalScrollBar();
-            return;
-        }
-        if((e->key() == Qt::Key_Plus && e->modifiers() & Qt::ControlModifier)//ctrl & +
-                && currentZoom <= 150)// forbid to zoom so much
-        {
-            this->zoomIn(1);//increase zoom
-            currentZoom += 1;
-            setViewportMargins(lineNumberAreaWidth(), 0, 0, 0);// reset text margin in accordance to linecouter change
-            return;
-        }
+    }
+    if(e->key() == Qt::Key_ParenLeft)
+    {
+        QPlainTextEdit::keyPressEvent(e);
+        this->insertPlainText(")");
+        this->moveCursor(QTextCursor::Left);
+        this->verticalScrollBar();
+        return;
+    }
+    if(e->key() == Qt::Key_Apostrophe)
+    {
+        QPlainTextEdit::keyPressEvent(e);
+        this->insertPlainText("\'");
+        this->moveCursor(QTextCursor::Left);
+        this->verticalScrollBar();
+        return;
+    }
+    if(e->key() == Qt::Key_QuoteDbl)
+    {
+        QPlainTextEdit::keyPressEvent(e);
+        this->insertPlainText("\"");
+        this->moveCursor(QTextCursor::Left);
+        this->verticalScrollBar();
+        return;
+    }
+    if((e->key() == Qt::Key_Plus && e->modifiers() & Qt::ControlModifier)//ctrl & +
+            && currentZoom <= 150)// forbid to zoom so much
+    {
+        this->zoomIn(1);//increase zoom
+        currentZoom += 1;
+        setViewportMargins(lineNumberAreaWidth(), 0, 0, 0);// reset text margin in accordance to linecouter change
+        return;
+    }
 
-        if((e->key() == Qt::Key_Minus && e->modifiers() & Qt::ControlModifier)//ctrl & -
-                && currentZoom >= 50)//forbid to zoom so much
+    if((e->key() == Qt::Key_Minus && e->modifiers() & Qt::ControlModifier)//ctrl & -
+            && currentZoom >= 50)//forbid to zoom so much
+    {
+        this->zoomOut(1);//decrease zoom
+        currentZoom -= 1;
+        setViewportMargins(lineNumberAreaWidth(), 0, 0, 0);// reset text margin in accordance to linecouter change
+        return;
+    }
+
+    if(e->key() == Qt::Key_Slash && e->modifiers() & Qt::ControlModifier)
+    {
+
+
+        QTextCursor cursor = textCursor();
+        if(cursor.hasSelection())
         {
-            this->zoomOut(1);//decrease zoom
-            currentZoom -= 1;
-            setViewportMargins(lineNumberAreaWidth(), 0, 0, 0);// reset text margin in accordance to linecouter change
-            return;
-        }
+            int start = cursor.selectionStart();
+            int finish = cursor.selectionEnd();
 
-        if(e->key() == Qt::Key_Slash && e->modifiers() & Qt::ControlModifier)
-        {
+            selectText(cursor, start, start + COMMENT_BLOCK_START.size());
+            QString begin = cursor.selectedText();
 
+            selectText(cursor, finish - COMMENT_BLOCK_START.size(), finish);
+            QString end = cursor.selectedText();
 
-            QTextCursor cursor = textCursor();
-            if(cursor.hasSelection())
+            if(begin == COMMENT_BLOCK_START && end == COMMENT_BLOCK_END)
             {
-                int start = cursor.selectionStart();
-                int finish = cursor.selectionEnd();
-
-                selectText(cursor, start, start + COMMENT_BLOCK_START.size());
-                QString begin = cursor.selectedText();
-
-                selectText(cursor, finish - COMMENT_BLOCK_START.size(), finish);
-                QString end = cursor.selectedText();
-
-                if(begin == COMMENT_BLOCK_START && end == COMMENT_BLOCK_END)
-                {
-                    removeMultilineComment(this, cursor, start, finish);
-                }
-                else
-                {
-                    insertMultilineComment(this, cursor, start, finish);
-                }
+                removeMultilineComment(this, cursor, start, finish);
             }
             else
             {
-                moveCursor(QTextCursor::StartOfLine);
-                cursor = textCursor();
-                selectText(cursor, cursor.position(), cursor.position() + COMMENT_BLOCK_START.size());
-                QString lineBegin = cursor.selectedText();
-                if(lineBegin == SINGLE_LINE_COMMENT)
-                    cursor.removeSelectedText();
-                else
-                    insertPlainText(SINGLE_LINE_COMMENT);
+                insertMultilineComment(this, cursor, start, finish);
             }
+        }
+        else
+        {
+            moveCursor(QTextCursor::StartOfLine);
+            cursor = textCursor();
+            selectText(cursor, cursor.position(), cursor.position() + COMMENT_BLOCK_START.size());
+            QString lineBegin = cursor.selectedText();
+            if(lineBegin == SINGLE_LINE_COMMENT)
+                cursor.removeSelectedText();
+            else
+                insertPlainText(SINGLE_LINE_COMMENT);
+        }
 
-}
+    }
+
     if((e->key() == Qt::Key_Enter || e->key() == Qt::Key_Return) &&// shift + enter
             ((e->modifiers() & Qt::ShiftModifier) == Qt::ShiftModifier))
     {
@@ -221,9 +221,9 @@ void CodeEditor::keyPressEvent(QKeyEvent *e)
 
     if(e->key() == Qt::Key_Space || e->key() == Qt::Key_Enter || e->key() == Qt::Key_Return)
     {
-       saveStateInTheHistory();
-       QPlainTextEdit::keyPressEvent(e);
-       return;
+        saveStateInTheHistory();
+        QPlainTextEdit::keyPressEvent(e);
+        return;
     }
 
 
@@ -245,11 +245,11 @@ void CodeEditor::keyPressEvent(QKeyEvent *e)
 
     if(e->key() == Qt::Key_BracketLeft)
     {
-       QPlainTextEdit::keyPressEvent(e);
-       this->insertPlainText("]");
-       this->moveCursor(QTextCursor::Left);
-       this->verticalScrollBar();
-       return;
+        QPlainTextEdit::keyPressEvent(e);
+        this->insertPlainText("]");
+        this->moveCursor(QTextCursor::Left);
+        this->verticalScrollBar();
+        return;
     }
 
     if((e->key() == Qt::Key_Plus && e->modifiers() & Qt::ControlModifier)//ctrl & +
@@ -284,6 +284,63 @@ void CodeEditor::keyPressEvent(QKeyEvent *e)
         this->document()->setPlainText(text);
         return;
     }
+
+    QPlainTextEdit::keyPressEvent(e);
+}*/
+
+
+void CodeEditor::eventBracketLeft(QKeyEvent *e)
+{
+    QPlainTextEdit::keyPressEvent(e);
+    this->insertPlainText("]");
+    this->moveCursor(QTextCursor::Left);
+    this->verticalScrollBar();
+    return;
+}
+void CodeEditor::eventBraceLeft(QKeyEvent *e)
+{
+    QPlainTextEdit::keyPressEvent(e);
+    this->insertPlainText("}");
+    this->moveCursor(QTextCursor::Left);
+    this->verticalScrollBar();
+    return;
+}
+
+void CodeEditor::eventSlash(QKeyEvent *e)
+{
+    QPlainTextEdit::keyPressEvent(e);
+    ispressSlesh=true;
+    qDebug()<<"sleeshhhh"<<ispressSlesh<<"\n";
+    return;
+}
+void CodeEditor::eventAsterisk(QKeyEvent *e)
+{
+    QPlainTextEdit::keyPressEvent(e);
+    if(ispressSlesh)
+    {
+        this->insertPlainText("*/");
+        this->moveCursor(QTextCursor::Left);
+        this->moveCursor(QTextCursor::Left);
+        this->verticalScrollBar();
+        //ispressSlesh=false;
+        return;
+    }
+}
+
+void CodeEditor::keyPressEvent(QKeyEvent *e)
+{
+   if(mKeysEventMap[qMakePair(e->key(),e->modifiers())])
+   {
+           (this->*mKeysEventMap.value(qMakePair(e->key(),e->modifiers())))(e);
+   }
+   else
     QPlainTextEdit::keyPressEvent(e);
 }
+
+
+
+
+
+
+
 
