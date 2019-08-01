@@ -28,6 +28,10 @@ public:
 
     bool fileChanged(const std::string &newFileState);
 
+    int getCursorPosPrev();
+
+    int getCursorPosNext();
+
 public:
     ChangeManager();
 

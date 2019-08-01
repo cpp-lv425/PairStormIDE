@@ -177,13 +177,6 @@ void CodeEditor::highlightCurrentLine()
 
 void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event)
 {
-
-    static int i{0};
-    ++i;
-    if(i > 5)
-    {
-        qDebug()<<"   paint    " <<i;
-    }
     QPainter painter(lineNumberArea);
     painter.fillRect(event->rect(), configParam.mLineCounterAreaColor);
 

@@ -1,5 +1,5 @@
 #include "changemanager.h"
-
+#include<QDebug>
 ChangeManager::ChangeManager() = default;
 
 ChangeManager::ChangeManager(const std::string &fileState)
@@ -26,6 +26,31 @@ void ChangeManager::removeHistory()//it's not necessary to hold history if we re
 bool ChangeManager::fileChanged(const std::string &newFileState)
 {
     return currentFileState != newFileState;
+}
+
+int ChangeManager::getCursorPosNext()
+{
+    auto temp = currentState_it;
+    if(temp == changesHistory.end() - 1)
+    {
+        return static_cast<int>(temp->begin_change_pos);
+        //return static_cast<int>((temp - 1)->begin_change_pos);
+    }
+        temp++;
+    return static_cast<int>(temp->begin_change_pos);
+//    if(temp == changesHistory.begin())
+    //temp++;
+      //  return static_cast<int>(temp->begin_change_pos);
+
+}
+
+int ChangeManager::getCursorPosPrev()
+{
+    auto temp = currentState_it;
+    temp++;
+    if(temp == changesHistory.end())
+        temp--;
+    return static_cast<int>(temp->begin_change_pos);
 }
 
 void ChangeManager::writeChange(std::string newFileState)

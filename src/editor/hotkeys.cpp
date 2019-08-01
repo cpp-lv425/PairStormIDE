@@ -2,6 +2,8 @@
 
 
 #include <QRegularExpression>
+#include<QTextCursor>
+#include<QDebug>
 
 QString CodeEditor::tabs="";
 
@@ -82,6 +84,11 @@ void CodeEditor::keyPressEvent(QKeyEvent *e)
                 ((e->modifiers() & Qt::ShiftModifier) == Qt::ShiftModifier))
         {
             e = new QKeyEvent(e->type(), e->key(), e->modifiers()&Qt::MetaModifier &Qt::KeypadModifier);
+        }
+
+        if(e->key() == Qt::Key_Enter || e->key() == Qt::Key_Return || e->key() == Qt::Key_Space)
+        {
+            saveStateInTheHistory();
         }
 
         if(e->key() == Qt::Key_Enter || e->key() == Qt::Key_Return)
@@ -274,6 +281,12 @@ void CodeEditor::keyPressEvent(QKeyEvent *e)
     {
         QString text = QString::fromStdString(this->changeManager->undo());
         this->document()->setPlainText(text);
+
+        QTextCursor cursor(this->document());
+        cursor.setPosition(changeManager->getCursorPosPrev());
+
+        this->setTextCursor(cursor);
+
         return;
     }
 
@@ -282,6 +295,12 @@ void CodeEditor::keyPressEvent(QKeyEvent *e)
 
         QString text = QString::fromStdString(this->changeManager->redo());
         this->document()->setPlainText(text);
+
+        QTextCursor cursor(this->document());
+        cursor.setPosition(changeManager->getCursorPosNext());
+
+        this->setTextCursor(cursor);
+
         return;
     }
     QPlainTextEdit::keyPressEvent(e);
