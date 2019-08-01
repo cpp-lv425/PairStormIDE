@@ -27,7 +27,7 @@ StartPage::StartPage(QWidget *parent) :
 
     // creating & configuring open folder button
     pOpenDirBtn = new QPushButton(tr("   Open Folder"));
-    setupButton(pOpenDirBtn, style()->standardIcon(QStyle::SP_DirHomeIcon), maxButtonsWidth);
+    setupButton(pOpenDirBtn, style()->standardIcon(QStyle::SP_DriveHDIcon), maxButtonsWidth);
     connect(pOpenDirBtn, &QPushButton::pressed, this, &StartPage::openDirPressed);
 
     // creating & configuring reference call button

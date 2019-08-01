@@ -3,8 +3,6 @@
 
 #include <QMainWindow>
 
-#include "startpage.h"
-
 namespace Ui {
 class MainWindow;
 }
@@ -14,6 +12,7 @@ class ProjectViewerDock;
 class QFileSystemModel;
 class BottomPanelDock;
 class ChatWindowDock;
+class QMdiSubWindow;
 class QDockWidget;
 class CodeEditor;
 class MDIArea;
@@ -32,16 +31,25 @@ public:
 private:
     Ui::MainWindow *ui;
     ProjectViewerDock *mpProjectViewerDock;
-    QDockWidget *mpChatWindowDock;
+    ChatWindowDock *mpChatWindowDock;
     BottomPanelDock *mpBottomPanelDock;
-    MDIArea *mpDocsArea;    
+    MDIArea *mpDocsArea;
+    QString mCurrentUserName;
 
     void setupMainMenu();
     void saveDocument(CodeEditor* pDoc, QString fileName);
     void openDoc(QString fileName);
+    bool checkIfOpened(const QString& fileName)const;
+    // returns true if any of docs has been modified
+    bool checkIfModified(QList<QMdiSubWindow*> &docsList);
+    void saveAllModifiedDocuments(QList<QMdiSubWindow*> &docsList);
+    void createProjectViewer();
+    void createChatWindow();
+    void createButtomPanel();
 
     void saveMainWindowState();
     void restoreMainWindowState();
+
 private slots:
     // file menu actions
     void onNewFileTriggered();
@@ -65,6 +73,9 @@ private slots:
 
     // view menu
     void onFullScreenTriggered();
+    void onShowProjectViewerTriggered();
+    void onShowChatWindowDockTriggered();
+    void onShowBottomPanel();
 
     // tools menu
     void onRefactorTriggered();
@@ -78,11 +89,15 @@ private slots:
     void onCheckUpdatesTriggered();
 
 public slots:
-    void onOpenFileFromProjectViewer(QString fileName);
+    void onOpenFileFromProjectViewer(QString fileName);    
+    void onCloseWindow(CodeEditor* curDoc);
 
 private:
     // creates new doc in MDIArea
     CodeEditor* createNewDoc();
+
+protected:
+    void closeEvent(QCloseEvent *event);
 };
 
 #endif // MAINWINDOW_H
