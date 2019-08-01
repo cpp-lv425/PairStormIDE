@@ -1,33 +1,23 @@
 #ifndef CODEEDITOR_H
 #define CODEEDITOR_H
 
-
 const int CHANGE_SAVE_TIME = 1000;
 const int TAB_SPACE = 4;
 const int TOP_UNUSED_PIXELS_HEIGHT = 4;
 
-
 #include"ideconfiguration.h"
 #include"changemanager.h"
 #include"addcommentbutton.h"
-#include<utility>
-#include<QAbstractScrollArea>
+#include"ideconfiguration.h"
 #include"highlightercpp.h"
 #include"lexercpp.h"
-#include"ideconfiguration.h"
+#include<utility>
+#include<QAbstractScrollArea>
 #include<QSettings>
 #include<QApplication>
 #include<QPlainTextEdit>
 #include<QObject>
 #include<QMouseEvent>
-
-class QPaintEvent;
-class QResizeEvent;
-class QSize;
-class QWidget;
-
-class LineNumberArea;
-
 
 class CodeEditor : public QPlainTextEdit
 {
@@ -48,7 +38,7 @@ public:
 
 protected:
     void resizeEvent(QResizeEvent *event)override;
-    virtual void mouseMoveEvent(QMouseEvent *event);
+    virtual void mouseMoveEvent(QMouseEvent *event) override;
 
 private slots:
     void updateLineNumberAreaWidth();
@@ -64,19 +54,18 @@ public slots:
 signals:
     void changesAppeared();
 
-
 private:
    QWidget *lineNumberArea;
-   ConfigParams configParam;
-   int currentZoom = 100;
-   QFont font;
-   QVector<Token> tokens;
-   Highlightercpp *hcpp;
-   LexerCPP *lcpp;
-   QString fileName;
-   ChangeManager *changeManager;
-   QTimer *timer;
-   LexerCPP lexer;
+   ConfigParams mConfigParam;
+   int mCurrentZoom;
+   QFont mFont;
+   QVector<Token> mTokens;
+   Highlightercpp *mHcpp;
+   LexerCPP *mLcpp;
+   QString mFileName;
+   ChangeManager *mChangeManager;
+   QTimer *mTimer;
+   LexerCPP mLexer;
    AddCommentButton *mAddCommentButton;
    int mLinesCount;
 };

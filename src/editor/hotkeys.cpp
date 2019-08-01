@@ -163,19 +163,19 @@ void CodeEditor::keyPressEvent(QKeyEvent *e)
             return;
         }
         if((e->key() == Qt::Key_Plus && e->modifiers() & Qt::ControlModifier)//ctrl & +
-                && currentZoom <= 150)// forbid to zoom so much
+                && mCurrentZoom <= 150)// forbid to zoom so much
         {
             this->zoomIn(1);//increase zoom
-            currentZoom += 1;
+            mCurrentZoom += 1;
             setViewportMargins(getLineNumberAreaWidth(), 0, 0, 0);// reset text margin in accordance to linecouter change
             return;
         }
 
         if((e->key() == Qt::Key_Minus && e->modifiers() & Qt::ControlModifier)//ctrl & -
-                && currentZoom >= 50)//forbid to zoom so much
+                && mCurrentZoom >= 50)//forbid to zoom so much
         {
             this->zoomOut(1);//decrease zoom
-            currentZoom -= 1;
+            mCurrentZoom -= 1;
             setViewportMargins(getLineNumberAreaWidth(), 0, 0, 0);// reset text margin in accordance to linecouter change
             return;
         }
@@ -260,46 +260,33 @@ void CodeEditor::keyPressEvent(QKeyEvent *e)
     }
 
     if((e->key() == Qt::Key_Plus && e->modifiers() & Qt::ControlModifier)//ctrl & +
-            && currentZoom <= 150)// forbid to zoom so much
+            && mCurrentZoom <= 150)// forbid to zoom so much
     {
         this->zoomIn(1);//increase zoom
-        currentZoom += 1;
+        mCurrentZoom += 1;
         setViewportMargins(getLineNumberAreaWidth(), 0, 0, 0);// reset text margin in accordance to linecouter change
         return;
     }
 
     if((e->key() == Qt::Key_Minus && e->modifiers() & Qt::ControlModifier)//ctrl & -
-            && currentZoom >= 50)//forbid to zoom so much
+            && mCurrentZoom >= 50)//forbid to zoom so much
     {
         this->zoomOut(1);//decrease zoom
-        currentZoom -= 1;
+        mCurrentZoom -= 1;
         setViewportMargins(getLineNumberAreaWidth(), 0, 0, 0);// reset text margin in accordance to linecouter change
         return;
     }
 
     if(e->key() == Qt::Key_Z && e->modifiers() & Qt::ControlModifier)
     {
-        QString text = QString::fromStdString(this->changeManager->undo());
-        this->document()->setPlainText(text);
-
-        QTextCursor cursor(this->document());
-        cursor.setPosition(changeManager->getCursorPosPrev());
-
-        this->setTextCursor(cursor);
+        undo();
 
         return;
     }
 
     if(e->key() == Qt::Key_Y && e->modifiers() & Qt::ControlModifier)
     {
-
-        QString text = QString::fromStdString(this->changeManager->redo());
-        this->document()->setPlainText(text);
-
-        QTextCursor cursor(this->document());
-        cursor.setPosition(changeManager->getCursorPosNext());
-
-        this->setTextCursor(cursor);
+        redo();
 
         return;
     }
