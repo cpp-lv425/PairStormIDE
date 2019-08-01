@@ -10,7 +10,7 @@ const int CHANGES_HISTORY_MAX_SIZE = 200;
 
 struct IntegralChange
 {
-    size_t begin_change_pos;// position where changed started
+    size_t beginChangePos;// position where changed started
     std::string before;// string with prev delta
     std::string after;//string with current delta
 };
@@ -18,15 +18,19 @@ struct IntegralChange
 class ChangeManager
 {
 public:
-    std::deque<IntegralChange> changesHistory;
-    std::string currentFileState;
-    std::deque<IntegralChange>::iterator currentState_it;
+    std::deque<IntegralChange> mChangesHistory;
+    std::string mCurrentFileState;
+    std::deque<IntegralChange>::iterator mCurrentFileStateIter;
 
     void limitCheck();
 
     void removeHistory();
 
-    bool fileChanged(const std::string &newFileState);
+    bool isFileChanged(const std::string &newFileState);
+
+    int getCursorPosPrev();
+
+    int getCursorPosNext();
 
 public:
     ChangeManager();

@@ -41,9 +41,11 @@ include($$PWD/settings/settings.pri)
 include($$PWD/startpage/startpage.pri)
 include($$PWD/projectviewer/projectviewer.pri)
 include($$PWD/newfilewizard/newfilewizard.pri)
+
 include($$PWD/logindialog/logindialog.pri)
 include($$PWD/splashscreen/splashscreen.pri)
 include($$PWD/utils/utils.pri)
 
 RESOURCES += \
     globalresources.qrc
+
