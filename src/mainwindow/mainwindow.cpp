@@ -6,7 +6,6 @@
 #include <QStyleFactory>
 #include <QMessageBox>
 #include <QFileDialog>
-#include <QException> // temporarily included
 #include <QSettings>
 #include <QStyle>
 #include <QDebug> // temporarily included
@@ -22,6 +21,7 @@
 #include "storeconf.h"
 #include "startpage.h"
 #include "mdiarea.h"
+#include "utils.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -229,7 +229,12 @@ void MainWindow::openDoc(QString fileName)
     try
     {
         readResult = FileManager().readFromFile(fileName);
-    } catch (const QException&)
+    }
+    catch (const IncorrectUserInput&)
+    {
+        return;
+    }
+    catch (const QException&)
     {
         QMessageBox::warning(this, tr("Error"),
                              tr("Unable to open specified file."));

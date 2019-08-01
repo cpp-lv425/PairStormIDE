@@ -1,11 +1,16 @@
 #include "filemanager.h"
 
 #include <QTextStream>
-#include <QException>
 #include <QFile>
+
+#include "utils.h"
 
 QString FileManager::readFromFile(const QString &fileName)
 {
+    if (fileName.isEmpty())
+    {
+        throw IncorrectUserInput();
+    }
     QFile file(fileName);
 
     if (file.open(QIODevice::ReadOnly))
@@ -15,7 +20,6 @@ QString FileManager::readFromFile(const QString &fileName)
         file.close();
         return rReadResult;
     }
-
     throw QException();
 }
 
