@@ -125,6 +125,13 @@ void CodeEditor::redo()
     this->setTextCursor(cursor);
 }
 
+void CodeEditor::zoom(int val)
+{
+    val > 0 ?this->zoomIn(val):this->zoomOut(-val);
+    mCurrentZoom+=val;
+    setViewportMargins(getLineNumberAreaWidth(), 0, 0, 0);// reset text margin in accordance to linecouter change
+}
+
 void CodeEditor::updateLineNumberAreaWidth()
 {
     // reset start position for typing (according new linecounter position)
@@ -185,6 +192,7 @@ void CodeEditor::saveStateInTheHistory()
     mChangeManager->writeChange(newFileState);
 }
 
+
 void CodeEditor::mouseMoveEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::NoButton)
@@ -215,16 +223,9 @@ void CodeEditor::mouseMoveEvent(QMouseEvent *event)
             {
                 int commentBottonXpos = commentAreaLeftMargin + getLineNumberAreaWidth();
 
-                if(currSliderPos)// if we scrolled
-                {
-                    mAddCommentButton->setGeometry(commentBottonXpos, commentBottonYpos, side, side);
-                }
-                else
-                {
-                    //if text wasn't scrolled, we have to add these pixels in order to right drawing level
-                    mAddCommentButton->setGeometry(commentBottonXpos,
-                                                   commentBottonYpos + TOP_UNUSED_PIXELS_HEIGHT, side, side);
-                }
+                mAddCommentButton->setGeometry(commentBottonXpos, currSliderPos ? commentBottonYpos :
+                                          commentBottonYpos + TOP_UNUSED_PIXELS_HEIGHT , side, side);
+
                 mAddCommentButton->setVisible(true);
             }
        }

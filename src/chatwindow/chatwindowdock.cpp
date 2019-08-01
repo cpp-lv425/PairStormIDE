@@ -10,4 +10,5 @@ ChatWindowDock::ChatWindowDock(QWidget *pParent): QDockWidget (pParent)
     setWindowTitle("Chat");
     pChatWidget = new ChatWidget;
     setWidget(pChatWidget);
+    setMinimumWidth(200);
 }

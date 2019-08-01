@@ -32,9 +32,9 @@ public:
     QString& getFileName();
     void setFileName(const QString &flename);
     std::pair<const QString &, const QString &> getChangedFileInfo();
-
     void undo();
     void redo();
+    void zoom(int val);
 
 protected:
     void resizeEvent(QResizeEvent *event)override;

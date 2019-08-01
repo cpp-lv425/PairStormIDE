@@ -42,4 +42,8 @@ include($$PWD/startpage/startpage.pri)
 include($$PWD/projectviewer/projectviewer.pri)
 include($$PWD/newfilewizard/newfilewizard.pri)
 
-HEADERS +=
+include($$PWD/logindialog/logindialog.pri)
+
+RESOURCES += \
+    globalresources.qrc
+
