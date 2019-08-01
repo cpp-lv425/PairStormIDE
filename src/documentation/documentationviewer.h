@@ -20,12 +20,16 @@ private:
     QWebEngineView *mWebView;
     QProgressBar *mProgressBar;
     QStackedWidget *stacked_widget;
-    QAction *mPrevPageAction;
-    QAction *mNextPageAction;
-    QAction *mStopLoadAction;
     QStatusBar *mStatusBar;
     QToolBar *mBottomToolBar;
     QLineEdit *phrase;
+
+    QAction *mPrevPageAction;
+    QAction *mNextPageAction;
+    QAction *mStopLoadAction;
+    QAction *mRefreshPageAction;
+
+
     void setupUI();
 
 protected:
