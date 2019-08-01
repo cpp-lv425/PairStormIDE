@@ -51,6 +51,7 @@ ChatWidget::ChatWidget(QWidget *pParent):
 void ChatWidget::setUsersList(const QStringList &usersList)
 {
     QListWidgetItem *pItem;
+    mpUsersList->clear();
     for (const QString& userName: usersList)
     {
         pItem = new QListWidgetItem;

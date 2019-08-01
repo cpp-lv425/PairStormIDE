@@ -5,14 +5,14 @@
 void DefaultLocalConnector::configureServiceOnLogin(const QString & userName)
 {
     // Return if services has previously been configured
-    if (m_udpService && m_tcpService)
+    if (mpUdpService && mpTcpService)
     {
         return;
     }
     // Configure the UDP service & TCP service
-    m_udpService = std::unique_ptr<UdpService>(new UdpService());
-    m_tcpService = std::unique_ptr<TcpService>(new TcpService(userName));
-    if (!m_tcpService->isActive())
+    mpUdpService = std::unique_ptr<UdpService>(new UdpService());
+    mpTcpService = std::unique_ptr<TcpService>(new TcpService(userName));
+    if (!mpTcpService->isServerActive())
     {
         emit serviceFailed();
         return;
@@ -20,13 +20,13 @@ void DefaultLocalConnector::configureServiceOnLogin(const QString & userName)
 
     // Begin discovering neighbor servers using UDP service
     connect(
-        m_udpService.get(), &UdpService::newDatagramSaved,
+        mpUdpService.get(), &UdpService::newDatagramSaved,
         this,               &DefaultLocalConnector::addServerFromUdpDatagramOnReceive,
         Qt::UniqueConnection);
 
     // Begin saving incoming messages using TCP service
     connect(
-        m_tcpService.get(), &TcpService::newSegmentSaved,
+        mpTcpService.get(), &TcpService::newSegmentSaved,
         this,               &DefaultLocalConnector::processTcpSegmentOnReceive,
         Qt::UniqueConnection
     );
@@ -42,12 +42,12 @@ void DefaultLocalConnector::startBroadcastingAttributes()
 {
     // Broadcast server attributes each g_defaultBroadcastCycleMs
     // milliseconds using UDP service
-    m_internalBroadcastTimer = std::make_unique<QTimer>();
+    mpBroadcastingTimer = std::make_unique<QTimer>();
     connect(
-        m_internalBroadcastTimer.get(), &QTimer::timeout,
+        mpBroadcastingTimer.get(), &QTimer::timeout,
         this,                           &DefaultLocalConnector::shareAttributesOnTimerTick,
         Qt::UniqueConnection);
-    m_internalBroadcastTimer->start(g_defaultBroadcastCycleMs);
+    mpBroadcastingTimer->start(gDefaultBroadcastCycleMs);
 }
 // ==========================================================================================
 // ==========================================================================================
@@ -57,12 +57,12 @@ void DefaultLocalConnector::startClearingOutdatedAttributes()
 {
     // Broadcast server attributes each g_defaultBroadcastCycleMs
     // milliseconds using UDP service
-    m_internalClearOutdatedTimer = std::make_unique<QTimer>();
+    mAttributesObsoletionTimer = std::make_unique<QTimer>();
     connect(
-        m_internalClearOutdatedTimer.get(), &QTimer::timeout,
+        mAttributesObsoletionTimer.get(), &QTimer::timeout,
         this,                               &DefaultLocalConnector::clearOutdatedAttributesOnTimerTick,
         Qt::UniqueConnection);
-    m_internalClearOutdatedTimer->start(g_defaultBroadcastCycleMs);
+    mAttributesObsoletionTimer->start(gDefaultBroadcastCycleMs);
 }
 // ==========================================================================================
 // ==========================================================================================
@@ -71,9 +71,9 @@ void DefaultLocalConnector::startClearingOutdatedAttributes()
 void DefaultLocalConnector::shareAttributesOnTimerTick()
 {
     // Push attributes to the Json bearer string & broadcast it
-    ServerData launchedTcpServerAttrib = m_tcpService->getServerAttributes();
+    ServerData launchedTcpServerAttrib = mpTcpService->getServerAttributes();
     QString serverData(launchedTcpServerAttrib.toJsonQString());
-    m_udpService->broadcastDatagram(serverData);
+    mpUdpService->broadcastDatagram(serverData);
 }
 
 // ==========================================================================================
@@ -111,11 +111,11 @@ void DefaultLocalConnector::addServerFromUdpDatagramOnReceive()
 {
     ServerData discoveredServerAttributes;
     // Read received datagram and fill it with attributes of the discovered server
-    Datagram   datagramContent = m_udpService->getReceivedDatagram();
-    discoveredServerAttributes.fromJsonQString(datagramContent.m_data);
-    discoveredServerAttributes.m_sourceIp = datagramContent.m_ip;
+    Datagram   datagramContent = mpUdpService->getReceivedDatagram();
+    discoveredServerAttributes.fromJsonQString(datagramContent.mContent);
+    discoveredServerAttributes.mActiveIp = datagramContent.mIp;
     // Set timepoint of discovery
-    discoveredServerAttributes.m_creationMomentMs =
+    discoveredServerAttributes.mDiscoveryMoment =
             QDateTime::currentMSecsSinceEpoch();
 
 
@@ -124,27 +124,27 @@ void DefaultLocalConnector::addServerFromUdpDatagramOnReceive()
         // Datagram was corrupted
         return;
     }
-    if (discoveredServerAttributes.m_name ==
-        m_tcpService->getServerAttributes().m_name)
+    if (discoveredServerAttributes.mName ==
+        mpTcpService->getServerAttributes().mName)
     {
         // Discovered server name matches current server name
         return;
     }
     auto attribPtr =
-            std::find_if(m_discoveredTcpServersAttrib.cbegin(),
-                         m_discoveredTcpServersAttrib.cend(),
+            std::find_if(mDiscoveredServersAttrib.cbegin(),
+                         mDiscoveredServersAttrib.cend(),
                          [discoveredServerAttributes] (const ServerData & inServerData)
                          {
-                             return inServerData.m_name ==
-                                    discoveredServerAttributes.m_name;
+                             return inServerData.mName ==
+                                    discoveredServerAttributes.mName;
                          });
-    if (attribPtr != m_discoveredTcpServersAttrib.cend())
+    if (attribPtr != mDiscoveredServersAttrib.cend())
     {
         // Server with a given name has already been discovered
         return;
     }
     // Finally, save information about server & emit "user discovered" signal
-    m_discoveredTcpServersAttrib.push_back(discoveredServerAttributes);
+    mDiscoveredServersAttrib.push_back(discoveredServerAttributes);
 
     emit onlineUsersUpdated(getOnlineUsers());
 }
@@ -156,8 +156,8 @@ QStringList DefaultLocalConnector::getOnlineUsers() const
 {
     QStringList userNames;
     // Get user names from discovered servers
-    for (const auto & serverAttrib : m_discoveredTcpServersAttrib)
-        userNames.push_back(serverAttrib.m_name);
+    for (const auto & serverAttrib : mDiscoveredServersAttrib)
+        userNames.push_back(serverAttrib.mName);
 
     return userNames;
 }
@@ -169,8 +169,8 @@ QStringList DefaultLocalConnector::getConnectedUsers() const
 {
     QStringList userNames;
     // Get user names from connected servers
-    for (const auto & serverAttrib : m_connectedTcpServersAttrib)
-        userNames.push_back(serverAttrib.m_name);
+    for (const auto & serverAttrib : mConnectedServersAttrib)
+        userNames.push_back(serverAttrib.mName);
 
     return userNames;
 }
@@ -199,41 +199,41 @@ void DefaultLocalConnector::startSharing(const QString userName,
 {
     // Check if user is already connected
     auto connectedServerAttributesPtr =
-            std::find_if(m_connectedTcpServersAttrib.begin(),
-                         m_connectedTcpServersAttrib.end(),
+            std::find_if(mConnectedServersAttrib.begin(),
+                         mConnectedServersAttrib.end(),
                          [userName] (const ServerData & serverData)
                          {
-                             return serverData.m_name == userName;
+                             return serverData.mName == userName;
                          });
-    if (connectedServerAttributesPtr != m_connectedTcpServersAttrib.end())
+    if (connectedServerAttributesPtr != mConnectedServersAttrib.end())
     {
         return;
     }
 
     auto serverAttributesPtr =
-            std::find_if(m_discoveredTcpServersAttrib.begin(),
-                         m_discoveredTcpServersAttrib.end(),
+            std::find_if(mDiscoveredServersAttrib.begin(),
+                         mDiscoveredServersAttrib.end(),
                          [userName] (const ServerData & serverData)
                          {
-                             return serverData.m_name == userName;
+                             return serverData.mName == userName;
                          });
     // Request sharing from user with a given userName
-    if (serverAttributesPtr != m_discoveredTcpServersAttrib.end())
+    if (serverAttributesPtr != mDiscoveredServersAttrib.end())
     {
         bool isAllowedToStartSharing = true;
         if (isSelfInitiated)
         {
             Message message;
-            message.m_type       = MessageType::MessageTypeSharingControlMessage;
-            message.m_sourceName = m_tcpService->getServerAttributes().m_name;
-            message.m_data       = QString("start");
+            message.mType       = Message::Type::SharingControlMessage;
+            message.mSourceName = mpTcpService->getServerAttributes().mName;
+            message.mContent       = QString("start");
             isAllowedToStartSharing =
-                    m_tcpService->sendDataToTcpServer(message.toJsonQString(),
+                    mpTcpService->sendDataToTcpServer(message.toJsonQString(),
                                                       *serverAttributesPtr);
         }
         if (isAllowedToStartSharing)
         {
-            m_connectedTcpServersAttrib.push_back(*serverAttributesPtr);
+            mConnectedServersAttrib.push_back(*serverAttributesPtr);
 
             qDebug() << "sharing was started";
             emit connectedUsersUpdated(getConnectedUsers());
@@ -248,27 +248,27 @@ void DefaultLocalConnector::stopSharing(const QString userName,
                                         const bool isSelfInitiated)
 {
     auto serverAttributesPtr =
-            std::find_if(m_connectedTcpServersAttrib.begin(),
-                         m_connectedTcpServersAttrib.end(),
+            std::find_if(mConnectedServersAttrib.begin(),
+                         mConnectedServersAttrib.end(),
                          [userName] (const ServerData & serverData)
                          {
-                             return serverData.m_name == userName;
+                             return serverData.mName == userName;
                          });
 
     // Request sharing from user with a given userName
-    if (serverAttributesPtr != m_connectedTcpServersAttrib.end())
+    if (serverAttributesPtr != mConnectedServersAttrib.end())
     {
         if (isSelfInitiated)
         {
             Message message;
-            message.m_type       = MessageType::MessageTypeSharingControlMessage;
-            message.m_sourceName = m_tcpService->getServerAttributes().m_name;
-            message.m_data       = QString("stop");
-            m_tcpService->sendDataToTcpServer(message.toJsonQString(),
+            message.mType       = Message::Type::SharingControlMessage;
+            message.mSourceName = mpTcpService->getServerAttributes().mName;
+            message.mContent       = QString("stop");
+            mpTcpService->sendDataToTcpServer(message.toJsonQString(),
                                               *serverAttributesPtr);
         }
 
-        m_connectedTcpServersAttrib.erase(serverAttributesPtr, std::next(serverAttributesPtr));
+        mConnectedServersAttrib.erase(serverAttributesPtr, std::next(serverAttributesPtr));
 
         qDebug() << "sharing was stopped";
         emit connectedUsersUpdated(getConnectedUsers());
@@ -281,12 +281,12 @@ void DefaultLocalConnector::stopSharing(const QString userName,
 void DefaultLocalConnector::shareMessage(const QString messageContent)
 {
     Message message;
-    message.m_type       = MessageType::MessageTypeChatMessage;
-    message.m_sourceName = m_tcpService->getServerAttributes().m_name;
-    message.m_data       = messageContent;
-    for(const auto & serverAttrib : m_connectedTcpServersAttrib)
+    message.mType       = Message::Type::ChatMessage;
+    message.mSourceName = mpTcpService->getServerAttributes().mName;
+    message.mContent       = messageContent;
+    for(const auto & serverAttrib : mConnectedServersAttrib)
     {
-        m_tcpService->sendDataToTcpServer(message.toJsonQString(),
+        mpTcpService->sendDataToTcpServer(message.toJsonQString(),
                                           serverAttrib);
     }
 }
@@ -296,39 +296,39 @@ void DefaultLocalConnector::shareMessage(const QString messageContent)
 //                                                             TRANSLATE RECEIVED TCP SEGMENT
 void DefaultLocalConnector::processTcpSegmentOnReceive()
 {
-    Segment segment = m_tcpService->getReceivedSegment();
+    Segment segment = mpTcpService->getReceivedSegment();
     Message message;
-    message.fromJsonQString(segment.m_data);
+    message.fromJsonQString(segment.mContent);
 
     if (message.empty())
     {
         return;
     }
 
-    switch(message.m_type)
+    switch(message.mType)
     {
-    case MessageType::MessageTypeSharingControlMessage:
-        if (message.m_data == "start")
+    case Message::Type::SharingControlMessage:
+        if (message.mContent == "start")
         {
-            startSharing(message.m_sourceName, false);
+            startSharing(message.mSourceName, false);
 
-            qDebug() << message.m_sourceName << " wants to start share his workflow";
-            emit startSharingRequested(message.m_sourceName);
+            qDebug() << message.mSourceName << " wants to start share his workflow";
+            emit startSharingRequested(message.mSourceName);
         }
-        if (message.m_data == "stop")
+        if (message.mContent == "stop")
         {
-            stopSharing(message.m_sourceName, false);
+            stopSharing(message.mSourceName, false);
 
-            qDebug() << message.m_sourceName << " wants to stop share his workflow";
-            emit stopSharingRequested(message.m_sourceName);
+            qDebug() << message.mSourceName << " wants to stop share his workflow";
+            emit stopSharingRequested(message.mSourceName);
         }
         break;
-    case MessageType::MessageTypeChatMessage:
-        qDebug() << message.m_sourceName << " shared his message";
-        emit messageReceived(message.m_sourceName, message.m_data);
+    case Message::Type::ChatMessage:
+        qDebug() << message.mSourceName << " shared his message";
+        emit messageReceived(message.mSourceName, message.mContent);
         break;
-    case MessageType::MessageTypeChangesMessage:
-        qDebug() << message.m_sourceName << " shared his change";
+    case Message::Type::ChangesMessage:
+        qDebug() << message.mSourceName << " shared his change";
         // TODO on second sprint
         break;
     }
@@ -336,9 +336,9 @@ void DefaultLocalConnector::processTcpSegmentOnReceive()
 #ifdef CUSTOM_DEBUG
     qDebug() << "____________________________________________________________";
     qDebug() << "TCP SEGMENT HAS BEEN RECEIVED: ";
-    qDebug() << "data ->" << segment.m_data;
-    qDebug() << "ip -> "  << segment.m_ip.toString();
-    qDebug() << "port ->" << segment.m_port;
+    qDebug() << "data ->" << segment.mContent;
+    qDebug() << "ip -> "  << segment.mIp.toString();
+    qDebug() << "port ->" << segment.mPort;
     qDebug() << "____________________________________________________________";
 #endif // CUSTOM_DEBUG
 }
@@ -350,24 +350,24 @@ void DefaultLocalConnector::processTcpSegmentOnReceive()
 void DefaultLocalConnector::testSendHelloToLastServer()
 {
     ServerData serverData;
-    if(!m_discoveredTcpServersAttrib.empty())
+    if(!mDiscoveredServersAttrib.empty())
     {
-        serverData = m_discoveredTcpServersAttrib.back();
+        serverData = mDiscoveredServersAttrib.back();
     }
 
-    qDebug() << "try to send hello to server " << serverData.m_name;
+    qDebug() << "try to send hello to server " << serverData.mName;
 
     QString data("hello from ");
-    data.append(m_tcpService->getServerAttributes().m_name);
+    data.append(mpTcpService->getServerAttributes().mName);
     data.append(" to ");
-    data.append(serverData.m_name);
+    data.append(serverData.mName);
 
     Message message;
-    message.m_data = data;
-    message.m_type = MessageType::MessageTypeChatMessage;
-    message.m_sourceName = m_tcpService->getServerAttributes().m_name;
+    message.mContent = data;
+    message.mType = Message::Type::ChatMessage;
+    message.mSourceName = mpTcpService->getServerAttributes().mName;
 
-    if(m_tcpService->sendDataToTcpServer(message.toJsonQString(), serverData))
+    if(mpTcpService->sendDataToTcpServer(message.toJsonQString(), serverData))
     {
         qDebug() << "message is sent";
     }

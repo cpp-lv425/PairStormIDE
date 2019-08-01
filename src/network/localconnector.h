@@ -65,17 +65,16 @@ class DefaultLocalConnector : public LocalConnectorInterface
 private:
 
     // UDP & TCP service providers
-    std::shared_ptr<UdpService> m_udpService;
-    std::shared_ptr<TcpService> m_tcpService;
+    std::shared_ptr<UdpService> mpUdpService;
+    std::shared_ptr<TcpService> mpTcpService;
 
     // Attributes of discovered & connected TCP servers
-    QVector<ServerData> m_discoveredTcpServersAttrib;
-    QVector<ServerData> m_connectedTcpServersAttrib;
+    QVector<ServerData> mDiscoveredServersAttrib;
+    QVector<ServerData> mConnectedServersAttrib;
 
-    // Timer for regular broadcasting
-    std::unique_ptr<QTimer> m_internalBroadcastTimer;
-    // Timer for regular clearing outdated attributes
-    std::unique_ptr<QTimer> m_internalClearOutdatedTimer;
+    // Timer for regular broadcasting & clearing outdated attributes
+    std::unique_ptr<QTimer> mpBroadcastingTimer;
+    std::unique_ptr<QTimer> mAttributesObsoletionTimer;
 
 public:
 

@@ -18,18 +18,13 @@ class UdpService : public QObject
     Q_OBJECT // for signals and slots
 
 
-    // Port number for UDP service
-    const PortNumType m_portNumber;
+    const PortNumType     mcSocketPortNumber;
+    QVector<QHostAddress> mBroadcastAddresses;
+    Datagram              mPendingDatagram;
 
     // QUdpSocket composition
-    std::unique_ptr<QUdpSocket> m_udpSocketPtr;
-    // Received datagrams and broadcast IPv4 addresses
-    Datagram                    m_pendingDatagram;
-    QVector<QHostAddress>       m_broadcastIps;
+    std::unique_ptr<QUdpSocket> mpUdpSocket;
 
-
-    // Socket configuration routine, have to be executed
-    // before using class - is called inside constructor
     void configureSocket();
 
 public:
@@ -38,14 +33,11 @@ public:
     UdpService(UdpService const&) = delete;
     UdpService& operator=(UdpService const&) = delete;
 
-    ~UdpService();
-
-
-    // Datagram broadcaster
     void broadcastDatagram(const QString & datagram);
 
-    // Saved datagram getter
     Datagram getReceivedDatagram() const;
+
+    ~UdpService();
 
 signals:
 

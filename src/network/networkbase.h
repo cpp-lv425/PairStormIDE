@@ -12,110 +12,116 @@
 
 #define CUSTOM_DEBUG
 
+// Custom types
 typedef quint16 PortNumType;
-typedef qint64 SizeType;
-const PortNumType g_defaultTcpPortNumber    = 36108;//36108
-const PortNumType g_defaultUdpPortNumber    = 32807;
-const SizeType    g_defaultBroadcastCycleMs = 500;
-const SizeType    g_defaultOutdatingCycleMs = 800;
+typedef qint64  SizeType;
 
-const QString     g_orgLabel             = "cpp-lv425";
-const QString     g_appLabel             = "PairStorm 0.0.1";
+// Default values for common parameters
+const QString     gDefaultAppLabel         = "PairStorm";
+const QString     gDefaultOrgLabel         = "cpp-lv425";
+
+const PortNumType gDefaultTcpPortNumber    = 36108;
+const PortNumType gDefaultUdpPortNumber    = 32807;
+
+const SizeType    gDefaultBroadcastCycleMs = 500;
+const SizeType    gDefaultOutdatingCycleMs = 800;
+
 
 struct ServerData {
-    QString               m_name;
-    QVector<QHostAddress> m_ips;
-    QHostAddress          m_sourceIp;
-    PortNumType           m_port;
-    SizeType              m_creationMomentMs;
+    SizeType              mDiscoveryMoment;
+    QHostAddress          mActiveIp;
+    QString               mName;
+    PortNumType           mPort;
+    QVector<QHostAddress> mIps;
 
     QString toJsonQString() const
     {
         // Create Json object and set its API
-        QJsonObject json;
-        json["app"] = g_appLabel;
+        QJsonObject jsonAttrib;
+        jsonAttrib["app"] = gDefaultAppLabel;
 
         // Fill object with needed values
-        json["name"] = m_name;
+        jsonAttrib["name"] = mName;
         QJsonArray jsonIpArr;
-        for (const auto & ip : m_ips)
+        for (const auto & ip : mIps)
         {
             jsonIpArr.push_back(ip.toString());
         }
-        json["ips"]   = jsonIpArr;
-        json["port"] = m_port;
+        jsonAttrib["ips"]  = jsonIpArr;
+        jsonAttrib["port"] = mPort;
 
         // Compose the Json bearer string
-        QJsonDocument doc(json);
-        QByteArray docData = doc.toJson(QJsonDocument::Compact);
-        return QString(docData);
+        QJsonDocument attribDocument(jsonAttrib);
+        QByteArray attribData =
+                attribDocument.toJson(QJsonDocument::Compact);
+        return QString(attribData);
     }
 
-    void fromJsonQString(QString str)
+    void fromJsonQString(const QString & attribData)
     {
         *this = ServerData();
         // Decompose the Json bearer string
-        QJsonDocument doc = QJsonDocument::fromJson(str.toUtf8());
-        QJsonObject json = doc.object();
+        QJsonDocument doc =
+                QJsonDocument::fromJson(attribData.toUtf8());
+        QJsonObject jsonAttrib = doc.object();
 
         // Verify if the Json object is not corrupted
-        if(json.isEmpty()                 ||
-           !json.keys().contains("app")   ||
-           !json.keys().contains("ips")   ||
-           !json.keys().contains("name")  ||
-           !json.keys().contains("port"))
+        if(jsonAttrib.isEmpty()                 ||
+           !jsonAttrib.keys().contains("app")   ||
+           !jsonAttrib.keys().contains("ips")   ||
+           !jsonAttrib.keys().contains("name")  ||
+           !jsonAttrib.keys().contains("port"))
+        {
+            return;
+        }
+        // Check if the API version match
+        if(jsonAttrib.value("app").toString() != gDefaultAppLabel)
         {
             return;
         }
 
-        // Check if the API version match
-        if(json.value("app").toString() != g_appLabel) return;
-
         // Get needed values from Json object
-        m_name = json.value("name").toString();
-        m_port = static_cast<quint16>(json.value("port").toInt());
-        QJsonArray jsonIpArr = json.value("ips").toArray();
-        m_ips.clear();
+        mName = jsonAttrib.value("name").toString();
+        mPort = static_cast<quint16>(jsonAttrib.value("port").toInt());
+        QJsonArray jsonIpArr =
+                jsonAttrib.value("ips").toArray();
         for (const auto ip : jsonIpArr)
         {
-            QString str = ip.toString();
-            m_ips.push_back(QHostAddress(str));
+            mIps.push_back(QHostAddress(ip.toString()));
         }
     }
 
     bool empty() const
     {
-        return m_name == QString();
+        return mName == QString();
     }
 };
 
-enum MessageType : int
-{
-    MessageTypeSharingControlMessage,
-    MessageTypeChatMessage,
-    MessageTypeChangesMessage
-};
-
 struct Message {
-    QString     m_sourceName;
-    QString     m_data;
-    MessageType m_type;
+    QString mSourceName;
+    QString mContent;
+    enum Type : int
+    {
+        SharingControlMessage,
+        ChangesMessage,
+        ChatMessage
+    } mType;
 
     QString toJsonQString() const
     {
         // Create Json object and set its API
-        QJsonObject json;
-        json["app"] = g_appLabel;
+        QJsonObject jsonAttrib;
+        jsonAttrib["app"] = gDefaultAppLabel;
 
         // Fill object with needed values
-        json["sourceName"] = m_sourceName;
-        json["data"]       = m_data;
-        json["type"]       = static_cast<int>(m_type);
+        jsonAttrib["sourceName"] = mSourceName;
+        jsonAttrib["data"]       = mContent;
+        jsonAttrib["type"]       = static_cast<int>(mType);
 
         // Compose the Json bearer string
-        QJsonDocument doc(json);
-        QByteArray docData = doc.toJson(QJsonDocument::Compact);
-        return QString(docData);
+        QJsonDocument attribDocument(jsonAttrib);
+        QByteArray attribData = attribDocument.toJson(QJsonDocument::Compact);
+        return QString(attribData);
     }
 
     void fromJsonQString(QString str)
@@ -134,33 +140,34 @@ struct Message {
         {
             return;
         }
-
         // Check if the API version match
-        if(json.value("app").toString() != g_appLabel) return;
+        if(json.value("app").toString() != gDefaultAppLabel)
+        {
+            return;
+        }
 
         // Get needed values from Json object
-        m_sourceName = json.value("sourceName").toString();
-        m_data = json.value("data").toString();
-        m_type = MessageType(json.value("type").toInt());
+        mSourceName = json.value("sourceName").toString();
+        mContent    = json.value("data").toString();
+        mType       = Type(json.value("type").toInt());
     }
 
     bool empty() const
     {
-        return m_sourceName == QString();
+        return mSourceName == QString();
     }
 };
 
 struct Segment {
-    //QString      m_serverName;
-    QString      m_data;
-    QHostAddress m_ip;
-    PortNumType  m_port;
+    QString      mContent;
+    PortNumType  mPort;
+    QHostAddress mIp;
 };
 
 struct Datagram {
-    QString      m_data;
-    QHostAddress m_ip;
-    PortNumType  m_port;
+    QString      mContent;
+    PortNumType  mPort;
+    QHostAddress mIp;
 };
 
 #endif // SERVERDATA_H

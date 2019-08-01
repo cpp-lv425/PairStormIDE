@@ -1,10 +1,9 @@
 #include "tcpservice.h"
-#include <QApplication>
 // ==========================================================================================
 // ==========================================================================================
 //                                                                    TCP SERVICE CONSTRUCTOR
 TcpService::TcpService(const QString & serverName, QObject *qObject) :
-    QObject(qObject), m_serverName(serverName), m_portNumber(g_defaultTcpPortNumber)
+    QObject(qObject), mcServerPortNumber(gDefaultTcpPortNumber), mcServerName(serverName)
 {
     QNetworkConfigurationManager confManager;
     // Check if additional network configuration is needed
@@ -13,7 +12,7 @@ TcpService::TcpService(const QString & serverName, QObject *qObject) :
     if (isNetConfigurationNeeded)
     {
         // Get previously saved network configuration from the registry
-        QSettings netSettings(QSettings::UserScope, g_orgLabel, g_appLabel);
+        QSettings netSettings(QSettings::UserScope, gDefaultOrgLabel, gDefaultAppLabel);
         netSettings.beginGroup(QString("PSnet"));
         const QString configId =
                 netSettings.value(QString("DefaultNetworkConfiguration")).toString();
@@ -29,15 +28,15 @@ TcpService::TcpService(const QString & serverName, QObject *qObject) :
         }
 
         // Start opening new session with existent configurations
-        m_netSessionPtr = std::make_unique<QNetworkSession>(configData, this);
+        mpNetSession = std::make_unique<QNetworkSession>(configData, this);
 
         // Configure server when session opening succeeds
         connect(
-            m_netSessionPtr.get(), &QNetworkSession::opened,
+            mpNetSession.get(), &QNetworkSession::opened,
             this,                  &TcpService::configureServer,
             Qt::UniqueConnection);
 
-        m_netSessionPtr->open();
+        mpNetSession->open();
     }
     else
     {
@@ -53,85 +52,61 @@ TcpService::TcpService(const QString & serverName, QObject *qObject) :
 void TcpService::configureServer()
 {
     // Case, if additional configuration has been previously done
-    if (m_netSessionPtr)
+    if (mpNetSession)
     {
-        QNetworkConfiguration configData = m_netSessionPtr->configuration();
+        QNetworkConfiguration configData = mpNetSession->configuration();
         QString configId = (configData.type() == QNetworkConfiguration::UserChoice) ?
-            m_netSessionPtr->sessionProperty(QString("UserChoiceConfiguration")).toString() :
+            mpNetSession->sessionProperty(QString("UserChoiceConfiguration")).toString() :
             configData.identifier();
 
         // Save network configurations to the registry
-        QSettings settings(QSettings::UserScope, g_orgLabel, g_appLabel);
-        settings.beginGroup(QString("PSnet"));
-        settings.setValue(QString("DefaultNetworkConfiguration"), configId);
-        settings.endGroup();
+        QSettings netSettings(QSettings::UserScope, gDefaultOrgLabel, gDefaultAppLabel);
+        netSettings.beginGroup(QString("PSnet"));
+        netSettings.setValue(QString("DefaultNetworkConfiguration"), configId);
+        netSettings.endGroup();
     }
 
-    // Launch QTcpServer on the m_portNumber
-    m_tcpServerPtr = std::make_unique<QTcpServer>(new QTcpServer(this));
-    if (!m_tcpServerPtr->listen(QHostAddress::Any, m_portNumber))
+    mpTcpServer = std::make_unique<QTcpServer>(new QTcpServer(this));
+    if (!mpTcpServer->listen(QHostAddress::Any, mcServerPortNumber))
     {
-        qDebug() << "Failure: server hasn't been started";
-        m_tcpServerPtr->close();
+        mpTcpServer->close();
         return;
     }
-    qDebug() << "Success: server has been started on port: " << m_tcpServerPtr->serverPort();
     saveServerAttributes();
 
-
-    // Trigger processing of the connections, requested by clients
+    // Trigger processing of the requested connections
     connect(
-        m_tcpServerPtr.get(), &QTcpServer::newConnection,
-        this,                 &TcpService::configureSocketOnClientConnection,
+        mpTcpServer.get(), &QTcpServer::newConnection,
+        this,                 &TcpService::attachSocketOnClientConnected,
         Qt::UniqueConnection);
 }
 // ==========================================================================================
 // ==========================================================================================
 // ==========================================================================================
-//                                           GET FINAL CONFIGURATIONS OF THE LOCAL TCP SERVER
+//                                                       SAVE SERVER ATTRIBUTES INSIDE SERVER
 void TcpService::saveServerAttributes()
 {
     // Insert server name and server port
-    m_serverAttributes.m_name = m_serverName;
-    m_serverAttributes.m_port = m_tcpServerPtr->serverPort();
+    mServerAttributes.mName = mcServerName;
+    mServerAttributes.mPort = mpTcpServer->serverPort();
 
     // Append server addresses for each interface
-    for (const auto & availableInt : QNetworkInterface::allInterfaces())
+    for (const auto & availInterface : QNetworkInterface::allInterfaces())
     {
-        QNetworkInterface::InterfaceFlags intFlags = availableInt.flags();
-        bool isInterfaceRunning(intFlags & QNetworkInterface::IsRunning);
+        QNetworkInterface::InterfaceFlags intFlags = availInterface.flags();
+        bool isInterfaceRunning (intFlags & QNetworkInterface::IsRunning);
         bool isInterfaceLoopBack(intFlags & QNetworkInterface::IsLoopBack);
         // Omit interfaces that are LoopBack or are not active
         if(!isInterfaceRunning || isInterfaceLoopBack) continue;
 
         // Add all active IPv4 addresses inside this interface
-        for (const auto & ipEntry : availableInt.addressEntries())
+        for (const auto & ipEntry : availInterface.addressEntries())
         {
             if(ipEntry.ip().protocol() == QAbstractSocket::IPv4Protocol)
             {
-                m_serverAttributes.m_ips.push_back(ipEntry.ip());
+                mServerAttributes.mIps.push_back(ipEntry.ip());
             }
         }
-    }
-}
-// ==========================================================================================
-// ==========================================================================================
-// ==========================================================================================
-//                                                            GET LOCAL TCP SERVER ATTRIBUTES
-ServerData TcpService::getServerAttributes() const
-{
-    return m_serverAttributes;
-}
-// ==========================================================================================
-// ==========================================================================================
-// ==========================================================================================
-//                                                                     TCP SERVICE DESTRUCTOR
-TcpService::~TcpService()
-{
-    // Close server if it has been successfully launched
-    if (m_tcpServerPtr->isListening())
-    {
-        m_tcpServerPtr->close();
     }
 }
 // ==========================================================================================
@@ -144,38 +119,32 @@ bool TcpService::sendDataToTcpServer(const QString & data, const ServerData & se
     {
         return false;
     }
-    // Create new empty server socket & save its ptr
-    QTcpSocket * serverSocketPtr(new QTcpSocket(this));
 
-    // Force configuration in case of successful connection
+    // Create new empty server socket & attach it after successful connection
+    QTcpSocket * pServerSocket(new QTcpSocket(this));
     connect(
-        serverSocketPtr, &QTcpSocket::connected,
-        this,            &TcpService::configureSocketOnServerConnection,
+        pServerSocket, &QTcpSocket::connected,
+        this,          &TcpService::attachSocketOnServerConnected,
         Qt::AutoConnection);
 
-    // Try to connect using present server' ip addresses
-    const PortNumType  port = serverData.m_port;
-    const QVector<QHostAddress> ips = serverData.m_ips;
-
-    // Try to resolve active ip address
-    QHostAddress ip = serverData.m_sourceIp;
-    const auto ipPtr = std::find_if(ips.cbegin(),
-                                    ips.cend(),
-                                    [serverData] (const QHostAddress & ip)
-                                    {
-                                        return ip.isEqual(serverData.m_sourceIp,
-                                                          QHostAddress::ConvertV4MappedToIPv4);
-                                    });
-    if (ipPtr != ips.cend())
+    // Set server port and its working IP address from interface IPs
+    const PortNumType port = serverData.mPort;
+    QHostAddress serverIp  = serverData.mActiveIp;
+    for (const auto & interfaceIp : serverData.mIps)
     {
-        ip = *ipPtr;
+        if (interfaceIp.isEqual(serverIp, QHostAddress::ConvertV4MappedToIPv4))
+        {
+            serverIp = interfaceIp;
+            break;
+        }
     }
 
-    serverSocketPtr->setSocketOption(QAbstractSocket::KeepAliveOption, 1);
-    serverSocketPtr->connectToHost(ip, port);
-    if (serverSocketPtr->waitForConnected(1000))
+    // Try to connect to socket and then send data
+    pServerSocket->connectToHost(serverIp, port);
+    if (pServerSocket->waitForConnected(700))
     {
-        sendThroughSocket(data, serverSocketPtr);
+        pServerSocket->write(data.toUtf8());
+        pServerSocket->flush();
         return true;
     }
     return false;
@@ -183,84 +152,18 @@ bool TcpService::sendDataToTcpServer(const QString & data, const ServerData & se
 // ==========================================================================================
 // ==========================================================================================
 // ==========================================================================================
-//                                                 CONFIGURE SOCKET WHEN SERVER HAS CONNECTED
-void TcpService::configureSocketOnServerConnection()
+//                                                              RETURN SERVER ACTIVITY STATUS
+bool TcpService::isServerActive() const
 {
-    // Get connected host' socket ptr
-    QTcpSocket * serverSocketPtr(qobject_cast<QTcpSocket*>(sender()));
-
-    // Trigger saving received segments on readyRead
-    connect(
-        serverSocketPtr, &QTcpSocket::readyRead,
-        this,            &TcpService::saveSegmentOnReceival,
-        Qt::AutoConnection);
-
-    // Trigger informing about disconnected hosts
-    connect(
-        serverSocketPtr, &QTcpSocket::disconnected,
-        this,            &TcpService::removeSocketOnDisconnected,
-        Qt::AutoConnection);
+    return mpTcpServer->isListening();
 }
 // ==========================================================================================
 // ==========================================================================================
 // ==========================================================================================
-//                                                 CONFIGURE SOCKET WHEN CLIENT HAS CONNECTED
-void TcpService::configureSocketOnClientConnection()
+//                                                                      GET SERVER ATTRIBUTES
+ServerData TcpService::getServerAttributes() const
 {
-    // Get brand new client' socket and save its ptr
-    QTcpSocket * clientSocketPtr(m_tcpServerPtr->nextPendingConnection());
-
-    // Trigger saving received segments on readyRead
-    connect(
-        clientSocketPtr, &QTcpSocket::readyRead,
-        this,                  &TcpService::saveSegmentOnReceival,
-        Qt::AutoConnection);
-
-    // Trigger informing about disconnected hosts
-    connect(
-        clientSocketPtr, &QTcpSocket::disconnected,
-        this,            &TcpService::removeSocketOnDisconnected,
-        Qt::AutoConnection);
-}
-// ==========================================================================================
-// ==========================================================================================
-// ==========================================================================================
-//                                                             SEND DATA THROUGH GIVEN SOCKET
-void TcpService::sendThroughSocket(const QString & data,
-                                   QTcpSocket * receiver)
-{
-    // Create & fill TCP segment with data
-    QByteArray segment;
-    segment.append(data);
-
-    // Send TCP segment through socket
-    receiver->write(segment);
-    receiver->flush();
-}
-// ==========================================================================================
-// ==========================================================================================
-// ==========================================================================================
-//                                                                 SAVE EACH RECEIVED SEGMENT
-void TcpService::saveSegmentOnReceival()
-{
-    // Get source' socket ptr
-    std::shared_ptr<QTcpSocket>
-            senderSocketPtr(qobject_cast<QTcpSocket*>(sender()));
-
-    // Get received data & socket attributes, i.e. IP and port
-    QByteArray   data (senderSocketPtr->readAll());
-    QHostAddress ip   (senderSocketPtr->peerAddress());
-    PortNumType  port (senderSocketPtr->peerPort());
-
-    // Save attributes of the segment
-    m_pendingSegment.m_data = data;
-    m_pendingSegment.m_ip   = ip;
-    m_pendingSegment.m_port = port;
-
-    senderSocketPtr->disconnectFromHost();
-
-    // Inform about segment receival
-    emit newSegmentSaved();
+    return mServerAttributes;
 }
 // ==========================================================================================
 // ==========================================================================================
@@ -268,87 +171,92 @@ void TcpService::saveSegmentOnReceival()
 //                                                                  GET LAST RECEIVED SEGMENT
 Segment TcpService::getReceivedSegment() const
 {
-    return m_pendingSegment;
+    return mPendingSegment;
 }
 // ==========================================================================================
 // ==========================================================================================
 // ==========================================================================================
-//                                                           RETURNS TRUE IF SERVER IS ACTIVE
-bool TcpService::isActive() const
+//                                                                   SAVE SEGMENT ON RECEIVAL
+void TcpService::saveSegmentOnReceival()
 {
-    return m_tcpServerPtr->isListening();
+    // Get source' socket ptr
+    QTcpSocket * pSenderSocket(qobject_cast<QTcpSocket*>(sender()));
+
+    // Get received data & socket attributes, i.e. IP and port
+    QByteArray   data (pSenderSocket->readAll());
+    QHostAddress ip   (pSenderSocket->peerAddress());
+    PortNumType  port (pSenderSocket->peerPort());
+
+    // Save attributes of the segment
+    mPendingSegment.mContent = data;
+    mPendingSegment.mIp   = ip;
+    mPendingSegment.mPort = port;
+
+    pSenderSocket->disconnectFromHost();
+
+    // Inform about segment receival
+    emit newSegmentSaved();
 }
 // ==========================================================================================
 // ==========================================================================================
 // ==========================================================================================
-//                                             REMOVE DISCONNECTED SOCKET FROM ACTIVE SOCKETS
-void TcpService::removeSocketOnDisconnected()
+//                                                          ATTACH SERVER SOCKET ON CONNECTED
+void TcpService::attachSocketOnServerConnected()
+{
+    // Get connected host' socket ptr
+    QTcpSocket * pServerSocket(qobject_cast<QTcpSocket*>(sender()));
+
+    // Trigger saving received segments on readyRead
+    connect(
+        pServerSocket, &QTcpSocket::readyRead,
+        this,          &TcpService::saveSegmentOnReceival,
+        Qt::AutoConnection);
+
+    // Trigger informing about disconnected hosts
+    connect(
+        pServerSocket, &QTcpSocket::disconnected,
+        this,          &TcpService::closeSocketOnDisconnected,
+        Qt::AutoConnection);
+}
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
+//                                                          ATTACH CLIENT SOCKET ON CONNECTED
+void TcpService::attachSocketOnClientConnected()
+{
+    // Get brand new client' socket and save its ptr
+    QTcpSocket * pClientSocket(mpTcpServer->nextPendingConnection());
+
+    // Trigger saving received segments on readyRead
+    connect(
+        pClientSocket, &QTcpSocket::readyRead,
+        this,          &TcpService::saveSegmentOnReceival,
+        Qt::AutoConnection);
+
+    // Trigger informing about disconnected hosts
+    connect(
+        pClientSocket, &QTcpSocket::disconnected,
+        this,          &TcpService::closeSocketOnDisconnected,
+        Qt::AutoConnection);
+}
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
+//                                                               CLOSE SOCKET ON DISCONNECTED
+void TcpService::closeSocketOnDisconnected()
 {
     // Get and close disconnected socket
-    QTcpSocket * disconnectedSocketPtr(qobject_cast<QTcpSocket*>(sender()));
-    disconnectedSocketPtr->close();
-}
-/*
+    QTcpSocket * pDisconnectedSocket(qobject_cast<QTcpSocket*>(sender()));
+    pDisconnectedSocket->close();
+}// ==========================================================================================
 // ==========================================================================================
 // ==========================================================================================
-// ==========================================================================================
-//                                                        INSERT USERNAME TO SOCKET RELATION
-void TcpService::setUserNameSocketRelation(const std::shared_ptr<QTcpSocket> & userSocket,
-                                           const QString & userName)
+//                                                                     TCP SERVICE DESTRUCTOR
+TcpService::~TcpService()
 {
-    m_nameToSocket.insert(std::make_pair(userName.toStdString(), userSocket));
-    //m_nameToSocket[userName.toStdString()] = userSocket;
-}
-// ==========================================================================================
-// ==========================================================================================
-// ==========================================================================================
-//                                                         REMOVE USERNAME TO SOCKET RELATION
-void TcpService::removeUserNameSocketRelation(const QString & userName)
-{
-    //m_nameToSocket.erase(m_nameToSocket.find(userName.toStdString()));
-    m_nameToSocket.erase(userName.toStdString());
-}
-// ==========================================================================================
-// ==========================================================================================
-// ==========================================================================================
-//                                                      GET SOCKET OUT OF THE GIVEN USER NAME
-bool TcpService::resolveSocketByUserName(std::shared_ptr<QTcpSocket> & userSocket,
-                                         const QString & userName)
-{
-    // Try to find user name
-    const auto socketPtr = m_nameToSocket.find(userName.toStdString());
-    // Return false if not found
-    if(socketPtr == m_nameToSocket.end())
+    if (mpTcpServer->isListening())
     {
-        return false;
+        // Close server only if it has been launched
+        mpTcpServer->close();
     }
-    // Save socket and return true if found
-    userSocket = socketPtr->second;
-    return true;
 }
-// ==========================================================================================
-// ==========================================================================================
-// ==========================================================================================
-//                                                         GET USER NAME FOR THE GIVEN SOCKET
-bool TcpService::resolveUserNameBySocket(const std::shared_ptr<QTcpSocket> & userSocket,
-                                         QString & userName)
-{
-    // Try to find given socket
-    const auto userNameAndSocket =
-            find_if(m_nameToSocket.begin(),
-                    m_nameToSocket.end(),
-                    [userSocket] (std::pair<std::string,
-                                  std::shared_ptr<QTcpSocket>> nameSocket)
-                    {
-                        return nameSocket.second == userSocket;
-                    });
-    // Return false if not found
-    if(userNameAndSocket == m_nameToSocket.end())
-    {
-        return false;
-    }
-    // Save user name and return true if found
-    userName = QString(userNameAndSocket->first.c_str());
-    return true;
-}
-*/

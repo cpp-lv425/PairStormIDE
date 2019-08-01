@@ -3,25 +3,25 @@
 // ==========================================================================================
 //                                                                    UDP SERVICE CONSTRUCTOR
 UdpService::UdpService(QObject *qObject) :
-    QObject(qObject), m_portNumber(g_defaultUdpPortNumber)
+    QObject(qObject), mcSocketPortNumber(gDefaultUdpPortNumber)
 {
     configureSocket();
 
     // Save received datagrams on readyRead
     connect(
-        m_udpSocketPtr.get(), &QUdpSocket::readyRead,
+        mpUdpSocket.get(), &QUdpSocket::readyRead,
         this,                 &UdpService::saveDatagramOnReceival,
         Qt::UniqueConnection);
 }
 // ==========================================================================================
 // ==========================================================================================
 // ==========================================================================================
-//                                               CONFIGURE SOCKET AND GET BROADCAST ADDRESSES
+//                                              CONFIGURE SOCKET AND SAVE BROADCAST ADDRESSES
 void UdpService::configureSocket()
 {
     // Create & configure QUdpSocket
-    m_udpSocketPtr = std::make_unique<QUdpSocket>(this);
-    m_udpSocketPtr->bind(m_portNumber);
+    mpUdpSocket = std::make_unique<QUdpSocket>(this);
+    mpUdpSocket->bind(mcSocketPortNumber);
 
     // Establish broadcast addresses for each interface
     for (const auto & availableInt : QNetworkInterface::allInterfaces())
@@ -37,18 +37,10 @@ void UdpService::configureSocket()
         {
             if(ipEntry.ip().protocol() == QAbstractSocket::IPv4Protocol)
             {
-                m_broadcastIps.push_back(ipEntry.broadcast());
+                mBroadcastAddresses.push_back(ipEntry.broadcast());
             }
         }
     }
-}
-// ==========================================================================================
-// ==========================================================================================
-// ==========================================================================================
-//                                                                     UDP SERVICE DESTRUCTOR
-UdpService::~UdpService()
-{
-    m_udpSocketPtr->close();
 }
 // ==========================================================================================
 // ==========================================================================================
@@ -60,13 +52,10 @@ void UdpService::broadcastDatagram(const QString & data)
     datagram.append(data);
 
     // Broadcast through all broadcast Ip adresses
-    for (const QHostAddress & broadcastIp : m_broadcastIps)
+    for (const QHostAddress & broadcastIp : mBroadcastAddresses)
     {
         // Broadcast datagram bytes
-        m_udpSocketPtr->writeDatagram(
-                    datagram,
-                    broadcastIp,
-                    m_portNumber);
+        mpUdpSocket->writeDatagram(datagram, broadcastIp, mcSocketPortNumber);
     }
 }
 // ==========================================================================================
@@ -75,30 +64,35 @@ void UdpService::broadcastDatagram(const QString & data)
 //                                                                 GET LAST RECEIVED DATAGRAM
 Datagram UdpService::getReceivedDatagram() const
 {
-    return m_pendingDatagram;
+    return mPendingDatagram;
 }
 // ==========================================================================================
 // ==========================================================================================
 // ==========================================================================================
-//                                                               RECEIVE DATAGRAM AND SAVE IT
+//                                                                  SAVE DATAGRAM ON RECEIVAL
 void UdpService::saveDatagramOnReceival()
 {
     // Get size of the datagram
-    qint64 size(m_udpSocketPtr->pendingDatagramSize());
+    SizeType size(mpUdpSocket->pendingDatagramSize());
 
     // Create & fill datagram attiributes
     QByteArray   data(static_cast<qint32>(size), ' ');
     QHostAddress ip;
     PortNumType  port;
-    m_udpSocketPtr->readDatagram(
-        data.data(), data.size(),
-        &ip,
-        &port);
+    mpUdpSocket->readDatagram(data.data(), data.size(), &ip, &port);
 
     // Save datagram
-    m_pendingDatagram.m_data = data;
-    m_pendingDatagram.m_ip   = ip;
-    m_pendingDatagram.m_port = port;
+    mPendingDatagram.mContent = data;
+    mPendingDatagram.mIp   = ip;
+    mPendingDatagram.mPort = port;
 
     emit newDatagramSaved();
+}
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
+//                                                                     UDP SERVICE DESTRUCTOR
+UdpService::~UdpService()
+{
+    mpUdpSocket->close();
 }
