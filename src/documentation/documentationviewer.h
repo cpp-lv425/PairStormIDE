@@ -7,6 +7,7 @@
 #include <QAction>
 #include <QKeyEvent>
 #include <QToolBar>
+#include <QWebEnginePage>
 
 class DocumentationViewer : public QMainWindow {
 
@@ -17,23 +18,22 @@ public:
 
 private:
     QLineEdit *mUrlEdit;
-    QWebEngineView *mWebView;
-    QProgressBar *mProgressBar;
-    QStackedWidget *stacked_widget;
     QStatusBar *mStatusBar;
+
     QToolBar *mBottomToolBar;
-    QLineEdit *phrase;
+    QWebEngineView *mWebView;
+
+    QProgressBar *mProgressBar;
+    QStackedWidget *mStackedWidget;
+
+    QWebEnginePage *mCurrentPage;
 
     QAction *mPrevPageAction;
     QAction *mNextPageAction;
     QAction *mStopLoadAction;
     QAction *mRefreshPageAction;
 
-
     void setupUI();
-
-protected:
-    void keyPressEvent(QKeyEvent *event);
 
 private slots:
     void onHistoryTriggered();
@@ -49,7 +49,5 @@ private slots:
     void loadFinished(bool ok);
 
     void iconChanged();
-    void linkHovered(const QString &url, const QString &title, const QString &content);
-    //void find();
-
+    void linkHovered(const QString &url);
 };
