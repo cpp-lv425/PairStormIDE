@@ -95,6 +95,7 @@ NewFileDialog::NewFileDialog(QStringList &fileExtensions,
 
 QString NewFileDialog::start()
 {
+    // if user closes dialog
     if (!exec())
     {
         throw QException();

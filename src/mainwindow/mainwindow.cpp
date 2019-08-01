@@ -310,7 +310,6 @@ void MainWindow::createChatWindow()
 
     mpChatWindowDock->setObjectName("mpChatWindowDock");
     addDockWidget(Qt::RightDockWidgetArea, mpChatWindowDock, Qt::Vertical);
-    mpChatWindowDock->setAllowedAreas(Qt::RightDockWidgetArea);
 }
 
 void MainWindow::createButtomPanel()
