@@ -15,9 +15,11 @@ class ChatWidget: public QWidget
     QListWidget *mpUsersList;
     QPlainTextEdit *mpFeed;
     QLineEdit *mpEnterLine;
+    QString mUserName;
 public:
     ChatWidget(QWidget *pParent = nullptr);
     void setUsersList(const QStringList& usersList);
+    void setCurrentUserName(const QString& userName);
 
 private slots:
     void onUserToConnectSelected(QListWidgetItem* item);

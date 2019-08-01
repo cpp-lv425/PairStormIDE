@@ -9,9 +9,10 @@ class ChatWindowDock: public QDockWidget
 {
     Q_OBJECT
 
-    ChatWidget *pChatWidget;
+    ChatWidget *mpChatWidget;
 public:
     ChatWindowDock(QWidget *pParent = nullptr);
+    void setUserName(const QString& userName);
 
 signals:
     void userToConnectSelected(QString);

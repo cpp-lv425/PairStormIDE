@@ -10,11 +10,16 @@
 ChatWindowDock::ChatWindowDock(QWidget *pParent): QDockWidget (pParent)
 {
     setWindowTitle("Chat");
-    pChatWidget = new ChatWidget;
-    connect(pChatWidget, &ChatWidget::userToConnectSelected,
+    mpChatWidget = new ChatWidget;
+    connect(mpChatWidget, &ChatWidget::userToConnectSelected,
             this, &ChatWindowDock::onUserToConnectSelected);
-    setWidget(pChatWidget);
+    setWidget(mpChatWidget);
     setMinimumWidth(200);
+}
+
+void ChatWindowDock::setUserName(const QString &userName)
+{
+    mpChatWidget->setCurrentUserName(userName);
 }
 
 void ChatWindowDock::onUserToConnectSelected(QString userName)

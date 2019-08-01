@@ -60,6 +60,11 @@ void ChatWidget::setUsersList(const QStringList &usersList)
     mpUsersList->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 }
 
+void ChatWidget::setCurrentUserName(const QString &userName)
+{
+    mUserName = userName;
+}
+
 void ChatWidget::onUserToConnectSelected(QListWidgetItem *item)
 {
     qDebug() << "chat slot";
