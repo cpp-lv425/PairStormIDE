@@ -53,7 +53,7 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     //that's why we need to set this position
     updateLineNumberAreaWidth();
     highlightCurrentLine();
-    //this->setTabStopDistance(TAB_SPACE * fontMetrics().width(QLatin1Char('0')));//set tab distance
+
     //fonts and colors configurations
     mFont.setPointSize(mConfigParam.mFontSize);
     mFont.setFamily(mConfigParam.mTextStyle);

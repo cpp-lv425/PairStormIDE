@@ -280,7 +280,6 @@ void CodeEditor::keyPressEvent(QKeyEvent *e)
     if(e->key() == Qt::Key_Z && e->modifiers() & Qt::ControlModifier)
     {
         undo();
-
         return;
     }
 
