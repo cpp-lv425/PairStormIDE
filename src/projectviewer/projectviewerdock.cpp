@@ -3,7 +3,6 @@
 #include <QItemSelectionModel>
 #include <QDockWidget>
 #include <QException>
-#include <QSettings>
 #include <QTreeView>
 #include <QWidget>
 #include <QDebug>
@@ -49,11 +48,5 @@ void ProjectViewerDock::setFilters(QStringList filters)
 void ProjectViewerDock::setDir(QDir curDir)
 {
     mpTreeViewer->setDirectory(curDir);
-}
-
-ProjectViewerDock::~ProjectViewerDock()
-{
-    QSettings settings("425", "PairStorm");
-    settings.setValue("ProjectViewerDockGeometry", saveGeometry());
 }
 

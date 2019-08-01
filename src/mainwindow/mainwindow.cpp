@@ -36,6 +36,7 @@ MainWindow::MainWindow(QWidget *parent) :
     {
         StoreConf conf(this);
     }
+
     // when first started main window is maximized
     setWindowState(Qt::WindowMaximized);
 
@@ -58,6 +59,25 @@ MainWindow::MainWindow(QWidget *parent) :
     setCentralWidget(mpDocsArea);
 
     // create instance of Project Viewer
+
+    mpProjectViewerDock = new ProjectViewerDock(this);
+    addDockWidget(Qt::LeftDockWidgetArea, mpProjectViewerDock);
+    mpProjectViewerDock->setObjectName("mpProjectViewerDock");  // added to avoid Warning in Unix system
+
+    // create instance of Chat Window
+    mpChatWindowDock = new ChatWindowDock(this);
+    mpChatWindowDock->setObjectName("mpChatWindowDock");        // added to avoid Warning in Unix system
+    addDockWidget(Qt::RightDockWidgetArea, mpChatWindowDock);
+
+    // create instance of MDIArea
+    mpDocsArea = new MDIArea(this);
+
+    // create instance of Bottom Panel
+    mpBottomPanelDock = new BottomPanelDock(this);
+    mpBottomPanelDock->setObjectName("mpBottomPanelDock");      // added to avoid Warning in Unix system
+
+    setCentralWidget(mpDocsArea);
+
     createProjectViewer();    
 
     // create instance of Chat Window
