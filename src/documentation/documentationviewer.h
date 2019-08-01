@@ -1,30 +1,51 @@
-#ifndef DOCUMENTATIONVIEWER_H
-#define DOCUMENTATIONVIEWER_H
+#include <QMainWindow>
+#include <QObject>
+#include <QWebEngineView>
+#include <QLineEdit>
+#include <QProgressBar>
+#include <QStackedWidget>
+#include <QAction>
+#include <QKeyEvent>
+#include <QToolBar>
 
-#include <QDialog>
+class DocumentationViewer : public QMainWindow {
 
-QT_BEGIN_NAMESPACE
-class QDir;
-class QListView;
-class QWebEngineView;
-class ConnectionManager;
-class DocumentationWebEngine;
-QT_END_NAMESPACE
-
-class DocumentationViewer : public QDialog
-{
     Q_OBJECT
-public:
-    explicit DocumentationViewer(QWidget *parent = nullptr);
-    ~DocumentationViewer() = default;
-    void setUrl(const QUrl &url);
 
+public:
+    DocumentationViewer(QWidget *parent = nullptr);
 
 private:
+    QLineEdit *mUrlEdit;
     QWebEngineView *mWebView;
-    QListView *mDocumentsView;
-    ConnectionManager *mManager;
-    DocumentationWebEngine *mDocumentationEngine;
-};
+    QProgressBar *mProgressBar;
+    QStackedWidget *stacked_widget;
+    QAction *mPrevPageAction;
+    QAction *mNextPageAction;
+    QAction *mStopLoadAction;
+    QStatusBar *mStatusBar;
+    QToolBar *mBottomToolBar;
+    QLineEdit *phrase;
+    void setupUI();
 
-#endif // DOCUMENTATIONVIEWER_H
+protected:
+    void keyPressEvent(QKeyEvent *event);
+
+private slots:
+    void onHistoryTriggered();
+    void onHelpTrigerred();
+    void onExitTrigerred();
+
+    void updateUrlBar(const QUrl &url);
+    void urlRequested();
+
+    void titleChange(const QString &title);
+
+    void loadStarted();
+    void loadFinished(bool ok);
+
+    void iconChanged();
+    void linkHovered(const QString &url, const QString &title, const QString &content);
+    //void find();
+
+};
