@@ -4,11 +4,12 @@
 
 const int CHANGE_SAVE_TIME = 1000;
 const int TAB_SPACE = 4;
+const int TOP_UNUSED_PIXELS_HEIGHT = 4;
 
-#include<QPlainTextEdit>
-#include<QObject>
+
 #include"ideconfiguration.h"
 #include"changemanager.h"
+#include"addcommentbutton.h"
 #include<utility>
 #include<QAbstractScrollArea>
 #include"highlightercpp.h"
@@ -16,6 +17,9 @@ const int TAB_SPACE = 4;
 #include"ideconfiguration.h"
 #include<QSettings>
 #include<QApplication>
+#include<QPlainTextEdit>
+#include<QObject>
+#include<QMouseEvent>
 
 class QPaintEvent;
 class QResizeEvent;
@@ -32,7 +36,7 @@ class CodeEditor : public QPlainTextEdit
 public:
     CodeEditor(QWidget *parent = nullptr);
     void lineNumberAreaPaintEvent(QPaintEvent *event);
-    int lineNumberAreaWidth();
+    int getLineNumberAreaWidth();
     bool isinsidebracket();
     static QString tabs;
     QString& getFileName();
@@ -44,6 +48,7 @@ public:
 
 protected:
     void resizeEvent(QResizeEvent *event)override;
+    virtual void mouseMoveEvent(QMouseEvent *event);
 
 private slots:
     void updateLineNumberAreaWidth();
@@ -72,7 +77,8 @@ private:
    ChangeManager *changeManager;
    QTimer *timer;
    LexerCPP lexer;
-
+   AddCommentButton *mAddCommentButton;
+   int mLinesCount;
 };
 
 #endif // CODEEDITOR_H

@@ -41,3 +41,5 @@ include($$PWD/settings/settings.pri)
 include($$PWD/startpage/startpage.pri)
 include($$PWD/projectviewer/projectviewer.pri)
 include($$PWD/newfilewizard/newfilewizard.pri)
+
+HEADERS +=

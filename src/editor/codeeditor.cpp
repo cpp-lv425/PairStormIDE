@@ -5,6 +5,7 @@
 #include<QTextCursor>
 #include<QPainter>
 #include <QFontDatabase>
+#include<QScrollBar>
 
 #define TAB_SPACE 4
 
@@ -30,6 +31,12 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     qDebug()<<"type = "<<analizerStyle;
 
     configParam.setConfigParams(analizerFontName,analizerFontSize,analizerStyle);
+
+
+    mAddCommentButton = new AddCommentButton(this);
+    mAddCommentButton->setText("+");
+    mAddCommentButton->setVisible(false);
+    setMouseTracking(true);
 
     lineNumberArea = new LineNumberArea(this);
     timer = new QTimer;
@@ -66,13 +73,6 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     font.setItalic(false);
     this->setFont(font);
 
-
-    QFontDatabase db;
-    foreach(const auto &a, db.families())
-    {
-        qDebug()<<a;
-    }
-
     //configParam.setConfigParams(analizerFontName,analizerFontSize,analizerStyle);
 }
 
@@ -96,7 +96,7 @@ void CodeEditor::runLexerAndHighlight()
     tokens = lexer.getTokens();
 }
 
-int CodeEditor::lineNumberAreaWidth()
+int CodeEditor::getLineNumberAreaWidth()
 {
     int digits = 1;
     int currLineNumber = qMax(1, blockCount());
@@ -137,7 +137,7 @@ void CodeEditor::redo()
 void CodeEditor::updateLineNumberAreaWidth()
 {
     // reset start position for typing (according new linecounter position)
-    setViewportMargins(lineNumberAreaWidth(), 0, 0, 0);
+    setViewportMargins(getLineNumberAreaWidth(), 0, 0, 0);
 }
 
 void CodeEditor::updateLineNumberArea(const QRect &rect, int dy)// rectangle of current block and Y-Axis changing
@@ -159,7 +159,7 @@ void CodeEditor::resizeEvent(QResizeEvent *e)
 
     QPlainTextEdit::resizeEvent(e);
     QRect cr = contentsRect();//whole area inside widget's margins
-    lineNumberArea->setGeometry(QRect(0, 0, lineNumberAreaWidth(), cr.height()));//set the same height as codeEditor for lineCouter
+    lineNumberArea->setGeometry(QRect(0, 0, getLineNumberAreaWidth(), cr.height()));//set the same height as codeEditor for lineCouter
 }
 
 void CodeEditor::highlightCurrentLine()
@@ -197,6 +197,7 @@ void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event)
         bottom += bottom - temp;// bottom - temp = dy which is block height
         ++blockNumber;
     }
+    mLinesCount = blockNumber;
 }
 
 void CodeEditor::saveStateInTheHistory()
@@ -204,3 +205,55 @@ void CodeEditor::saveStateInTheHistory()
     std::string newFileState = this->toPlainText().toUtf8().constData();
     changeManager->writeChange(newFileState);
 }
+
+void CodeEditor::mouseMoveEvent(QMouseEvent *event)
+{
+    if (event->button() == Qt::NoButton)
+    {
+        QTextBlock block = this->firstVisibleBlock();
+
+        int top = static_cast<int>(blockBoundingGeometry(block).translated(contentOffset()).top());//top of currentblock 0
+        int bottom = top + static_cast<int>(blockBoundingRect(block).height());
+        int side = bottom - top;// size of each side of comment button
+
+       // side of rectancge where our bottom will be. X-0 && Y-0 start from the left top, so (top < bottom)
+        const QSize buttonSize = QSize(side, side);
+        mAddCommentButton->setFixedSize(buttonSize);
+
+        auto currSliderPos = this->verticalScrollBar()->sliderPosition();
+
+        int commentAreaRightMargin = this->width() - this->verticalScrollBar()->width() - getLineNumberAreaWidth();
+        int commentAreaLeftMargin = commentAreaRightMargin - side;
+
+       if((event->x() >= commentAreaLeftMargin) && (event->x() <= commentAreaRightMargin))//mouse inside comment block
+       {
+            int linesFromTheTop = event->y() / side;
+            int currLine = linesFromTheTop + currSliderPos + 1;
+            mAddCommentButton->setCurrentLine(currLine);
+            int commentBottonYpos = linesFromTheTop * side;
+
+            if(currLine <= mLinesCount)// check if line exists
+            {
+                int commentBottonXpos = commentAreaLeftMargin + getLineNumberAreaWidth();
+
+                if(currSliderPos)// if we scrolled
+                {
+                    mAddCommentButton->setGeometry(commentBottonXpos, commentBottonYpos, side, side);
+                }
+                else
+                {
+                    //if text wasn't scrolled, we have to add these pixels in order to right drawing level
+                    mAddCommentButton->setGeometry(commentBottonXpos,
+                                                   commentBottonYpos + TOP_UNUSED_PIXELS_HEIGHT, side, side);
+                }
+                mAddCommentButton->setVisible(true);
+            }
+       }
+       else
+       {
+           mAddCommentButton->setVisible(false);
+       }
+    }
+    QPlainTextEdit::mouseMoveEvent(event);
+}
+

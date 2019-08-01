@@ -167,7 +167,7 @@ void CodeEditor::keyPressEvent(QKeyEvent *e)
         {
             this->zoomIn(1);//increase zoom
             currentZoom += 1;
-            setViewportMargins(lineNumberAreaWidth(), 0, 0, 0);// reset text margin in accordance to linecouter change
+            setViewportMargins(getLineNumberAreaWidth(), 0, 0, 0);// reset text margin in accordance to linecouter change
             return;
         }
 
@@ -176,7 +176,7 @@ void CodeEditor::keyPressEvent(QKeyEvent *e)
         {
             this->zoomOut(1);//decrease zoom
             currentZoom -= 1;
-            setViewportMargins(lineNumberAreaWidth(), 0, 0, 0);// reset text margin in accordance to linecouter change
+            setViewportMargins(getLineNumberAreaWidth(), 0, 0, 0);// reset text margin in accordance to linecouter change
             return;
         }
 
@@ -264,7 +264,7 @@ void CodeEditor::keyPressEvent(QKeyEvent *e)
     {
         this->zoomIn(1);//increase zoom
         currentZoom += 1;
-        setViewportMargins(lineNumberAreaWidth(), 0, 0, 0);// reset text margin in accordance to linecouter change
+        setViewportMargins(getLineNumberAreaWidth(), 0, 0, 0);// reset text margin in accordance to linecouter change
         return;
     }
 
@@ -273,7 +273,7 @@ void CodeEditor::keyPressEvent(QKeyEvent *e)
     {
         this->zoomOut(1);//decrease zoom
         currentZoom -= 1;
-        setViewportMargins(lineNumberAreaWidth(), 0, 0, 0);// reset text margin in accordance to linecouter change
+        setViewportMargins(getLineNumberAreaWidth(), 0, 0, 0);// reset text margin in accordance to linecouter change
         return;
     }
 
