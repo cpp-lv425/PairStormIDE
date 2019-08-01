@@ -284,7 +284,6 @@ bool MainWindow::checkIfModified(QList<QMdiSubWindow*> &docsList)
 
 void MainWindow::saveAllModifiedDocuments(QList<QMdiSubWindow*> &docsList)
 {
-    // if appreved then save changes
     for (int i = 0; i < docsList.size(); ++i)
     {
         auto curDoc = qobject_cast<CodeEditor*>(docsList[i]->widget());
@@ -396,17 +395,10 @@ void MainWindow::onSaveFileTriggered()
         return;
     }
 
-    auto curDoc = qobject_cast<CodeEditor*>
-            (mpDocsArea->currentSubWindow()->widget());
-
-    // if ptr to current document is not valid
-    if (!curDoc)
-    {
-        return;
-    }
+    auto curDoc = getCurrentDoc();
 
     // if doc wasn't modified yet
-    if (!curDoc->document()->isModified())
+    if (!curDoc || !curDoc->document()->isModified())
     {
         return;
     }
@@ -417,16 +409,15 @@ void MainWindow::onSaveFileTriggered()
 void MainWindow::onSaveFileAsTriggered()
 {
     // if there are no opened docs
-    if (!mpDocsArea || !mpDocsArea->currentSubWindow())
+    if (!mpDocsArea->currentSubWindow())
     {
         QMessageBox::information(this, "Save", "There are no opened documents to save.");
         return;
     }
 
-    auto curDoc = qobject_cast<CodeEditor*>
-            (mpDocsArea->currentSubWindow()->widget());
+    auto curDoc = getCurrentDoc();
 
-    // if ptr to current document is not valid
+    // if there are no opened docs
     if (!curDoc)
     {
         return;
@@ -440,6 +431,7 @@ void MainWindow::onSaveFileAsTriggered()
              "*.h ;; *.hpp ;; *.cpp ;; *.c ;; *.txt ;; *.json",
              &extension);
 
+    // if user closed dialog
     if (fileName.isEmpty())
     {
         return;
@@ -583,12 +575,12 @@ void MainWindow::onSelectAllTriggered()
 
 void MainWindow::onFindTriggered()
 {
-    qDebug() << "find";
+    //
 }
 
 void MainWindow::onFullScreenTriggered()
 {
-    qDebug() << "full screen";
+    //
 }
 
 void MainWindow::onShowProjectViewerTriggered()
@@ -608,7 +600,7 @@ void MainWindow::onShowBottomPanel()
 
 void MainWindow::onRefactorTriggered()
 {
-    qDebug() << "refactor";
+    //
 }
 
 void MainWindow::onConnectTriggered()
@@ -625,7 +617,7 @@ void MainWindow::onConnectTriggered()
 
 void MainWindow::onSettingsTriggered()
 {
-    qDebug() << "settings";
+    //
 }
 
 void MainWindow::onAboutTriggered()
@@ -640,17 +632,17 @@ void MainWindow::onAboutTriggered()
 
 void MainWindow::onReferenceTriggered()
 {
-    qDebug() << "reference";
+    //
 }
 
 void MainWindow::onUserGuideTriggered()
 {
-    qDebug() << "user guide";
+    //
 }
 
 void MainWindow::onCheckUpdatesTriggered()
 {
-    qDebug() << "check updates";
+    //
 }
 
 void MainWindow::onOpenFileFromProjectViewer(QString fileName)
@@ -672,7 +664,7 @@ void MainWindow::onCloseWindow(CodeEditor *curDoc)
 
 void MainWindow::onUserToConnectSelected(QString userName)
 {
-    qDebug() << userName;
+    //
 }
 
 void MainWindow::onNewMessage(const QString &userName, const QString &message)
@@ -682,7 +674,7 @@ void MainWindow::onNewMessage(const QString &userName, const QString &message)
 
 void MainWindow::onSendMessage(const QString &userName, const QString &message)
 {
-    qDebug() << "onSendMessage" << userName << '\n' << message;
+    //
 }
 
 void MainWindow::onConnectionFailed()
@@ -694,8 +686,6 @@ CodeEditor* MainWindow::createNewDoc()
 {
     CodeEditor *newDoc = new CodeEditor;
 
-    // !!! will be used when CodeEditor will emit closeSignal on closeEvent
-    //connect(curDoc, &CodeEditor::closeSignal, this, &MainWindow::onCloseWindow);
     mpDocsArea->addSubWindow(newDoc);
     connect(newDoc, &CodeEditor::closeDocEventOccured, this, &MainWindow::onCloseWindow);
     newDoc->setAttribute(Qt::WA_DeleteOnClose);
@@ -704,11 +694,7 @@ CodeEditor* MainWindow::createNewDoc()
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
-{
-    if (!mpDocsArea)
-    {
-        return;
-    }
+{    
     // getting all docs
     auto docsList = mpDocsArea->subWindowList();
 
