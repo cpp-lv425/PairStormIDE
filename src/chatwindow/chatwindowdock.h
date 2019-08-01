@@ -22,6 +22,8 @@ signals:
 public slots:
     void onUserToConnectSelected(QString userName);
 
+protected:
+    virtual void keyPressEvent(QKeyEvent *event);
 };
 
 #endif // CHATWINDOWDOCK_H

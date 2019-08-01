@@ -1,7 +1,8 @@
 #include "chatwindowdock.h"
 
 #include <QListWidgetItem>
-#include <QException> // temp
+#include <QException>
+#include <QKeyEvent>
 #include <QDebug>
 
 #include "mainwindow.h"
@@ -31,4 +32,15 @@ void ChatWindowDock::onUserToConnectSelected(QString userName)
 {
     qDebug() << "dock slot";
     emit userToConnectSelected(userName);
+}
+
+void ChatWindowDock::keyPressEvent(QKeyEvent *event)
+{
+    if(event->key() == Qt::Key_Enter ||
+            event->key() == Qt::Key_Return)
+    {
+        mpChatWidget->onSendCommand();
+    }
+
+    QDockWidget::keyPressEvent(event);
 }

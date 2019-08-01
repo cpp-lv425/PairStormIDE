@@ -23,9 +23,11 @@ public:
     void displayMessage(const QString& userName,
                         const QString& message);
 
-private slots:
-    void onUserToConnectSelected(QListWidgetItem* item);
+public slots:
     void onSendCommand();
+
+private slots:
+    void onUserToConnectSelected(QListWidgetItem* item);    
     void updateFeedOnSend();
 
 signals:
