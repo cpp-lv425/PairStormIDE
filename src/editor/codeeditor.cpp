@@ -239,6 +239,12 @@ void CodeEditor::mouseMoveEvent(QMouseEvent *event)
 
 void CodeEditor::closeEvent(QCloseEvent *event)
 {
+    if (!document()->isModified())
+    {
+        event->accept();
+        return;
+    }
+
     QMessageBox::StandardButton reply = QMessageBox::question
             (this,
              "Saving Changes",
@@ -252,7 +258,7 @@ void CodeEditor::closeEvent(QCloseEvent *event)
         return;
     }
     // if document wasn't modified of user doesn't want to save changes
-    if (!document()->isModified() || reply == QMessageBox::No)
+    if (reply == QMessageBox::No)
     {
         event->accept();
         return;
