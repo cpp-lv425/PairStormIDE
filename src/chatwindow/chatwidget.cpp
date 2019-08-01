@@ -9,7 +9,9 @@
 #include <QDebug> // temp
 #include <QLabel>
 
-ChatWidget::ChatWidget(QWidget *pParent): QWidget (pParent)
+ChatWidget::ChatWidget(QWidget *pParent):
+    QWidget (pParent),
+    mUserName("Unnamed")
 {    
     // creating user list
     mpUsersList = new QListWidget;
@@ -42,6 +44,7 @@ ChatWidget::ChatWidget(QWidget *pParent): QWidget (pParent)
     pWindowLayout->addLayout(pLineLayout);
     setLayout(pWindowLayout);
 
+    // temp
     QStringList users;
     users << "London" << "Berlin" << "Paris";
     setUsersList(users);
@@ -65,6 +68,16 @@ void ChatWidget::setCurrentUserName(const QString &userName)
     mUserName = userName;
 }
 
+void ChatWidget::displayMessage(const QString &userName,
+                                const QString &message)
+{
+    QString feed = mpFeed->toPlainText();
+    feed += '\n';
+    QString insertion = "<" + userName + "> " + message;
+    feed += insertion;
+    mpFeed->setPlainText(feed);
+}
+
 void ChatWidget::onUserToConnectSelected(QListWidgetItem *item)
 {
     qDebug() << "chat slot";
@@ -75,10 +88,15 @@ void ChatWidget::onUserToConnectSelected(QListWidgetItem *item)
 
 void ChatWidget::onSendCommand()
 {
+    updateFeedOnSend();
+}
+
+void ChatWidget::updateFeedOnSend()
+{
     QString feed = mpFeed->toPlainText();
     feed += '\n';
-    feed += "> ";
-    feed += mpEnterLine->text();
+    QString insertion = "<" + mUserName + "> " + mpEnterLine->text();
+    feed += insertion;
     mpFeed->setPlainText(feed);
     mpEnterLine->clear();
 }

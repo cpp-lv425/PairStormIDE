@@ -22,6 +22,11 @@ void ChatWindowDock::setUserName(const QString &userName)
     mpChatWidget->setCurrentUserName(userName);
 }
 
+void ChatWindowDock::displayMessage(const QString &userName, const QString &message)
+{
+    mpChatWidget->displayMessage(userName, message);
+}
+
 void ChatWindowDock::onUserToConnectSelected(QString userName)
 {
     qDebug() << "dock slot";

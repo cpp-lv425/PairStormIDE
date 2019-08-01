@@ -93,6 +93,8 @@ public slots:
     void onOpenFileFromProjectViewer(QString fileName);    
     void onCloseWindow(CodeEditor* curDoc);
     void onUserToConnectSelected(QString userName);
+    void onNewMessage(const QString &userName,
+                      const QString &message);
 
 private:
     // creates new doc in MDIArea

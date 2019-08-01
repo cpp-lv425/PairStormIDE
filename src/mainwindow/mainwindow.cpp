@@ -62,6 +62,10 @@ MainWindow::MainWindow(QWidget *parent) :
     createButtomPanel();
 
     restoreMainWindowState();
+
+    // for testing
+    onNewMessage("Valik", "Hello world");
+    onNewMessage("Igor", "How are you?");
 }
 
 QStringList MainWindow::getFileExtensions() const
@@ -681,6 +685,11 @@ void MainWindow::onCloseWindow(CodeEditor *curDoc)
 void MainWindow::onUserToConnectSelected(QString userName)
 {
     qDebug() << userName;
+}
+
+void MainWindow::onNewMessage(const QString &userName, const QString &message)
+{
+    mpChatWindowDock->displayMessage(userName, message);
 }
 
 CodeEditor* MainWindow::createNewDoc()
