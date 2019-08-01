@@ -14,5 +14,3 @@ HEADERS += \
     $$PWD/networkbase.h \
     $$PWD/tcpservice.h \
     $$PWD/udpservice.h
-
-#include($$PWD/changesManager/changesmanager.pri)

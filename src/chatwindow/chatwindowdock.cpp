@@ -33,13 +33,11 @@ void ChatWindowDock::displayMessage(const QString userName, const QString messag
 
 void ChatWindowDock::onUserToConnectSelected(QString userName)
 {
-    qDebug() << "dock slot";
     emit userToConnectSelected(userName);
 }
 
 void ChatWindowDock::onSendMessage(const QString &message)
 {
-    qDebug() << "dock slot send message";
     emit sendMessage(message);
 }
 

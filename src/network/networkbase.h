@@ -52,8 +52,7 @@ struct ServerData {
 
         // Compose the Json bearer string
         QJsonDocument attribDocument(jsonAttrib);
-        QByteArray attribData =
-                attribDocument.toJson(QJsonDocument::Compact);
+        QByteArray attribData(attribDocument.toJson(QJsonDocument::Compact));
         return QString(attribData);
     }
 
@@ -83,8 +82,7 @@ struct ServerData {
         // Get needed values from Json object
         mName = jsonAttrib.value("name").toString();
         mPort = static_cast<quint16>(jsonAttrib.value("port").toInt());
-        QJsonArray jsonIpArr =
-                jsonAttrib.value("ips").toArray();
+        QJsonArray jsonIpArr = jsonAttrib.value("ips").toArray();
         for (const auto ip : jsonIpArr)
         {
             mIps.push_back(QHostAddress(ip.toString()));

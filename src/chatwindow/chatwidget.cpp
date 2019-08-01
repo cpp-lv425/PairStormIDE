@@ -79,7 +79,6 @@ void ChatWidget::displayMessage(const QString &userName,
 
 void ChatWidget::onUserToConnectSelected(QListWidgetItem *item)
 {
-    qDebug() << "chat slot";
     QString userName = item->text();
     int position = userName.lastIndexOf(QChar{':'});
     emit userToConnectSelected(userName.mid(position + 2));
