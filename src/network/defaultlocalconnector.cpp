@@ -73,7 +73,6 @@ void DefaultLocalConnector::startClearingOutdatedAttributes()
         Qt::UniqueConnection);
     mAttributesObsoletionTimer->start(gDefaultOutdatingCycleMs);
 }
-
 // ==========================================================================================
 // ==========================================================================================
 // ==========================================================================================
@@ -98,6 +97,7 @@ void DefaultLocalConnector::clearOutdatedAttributesOnTimerTick()
                 mDiscoveredServersAttrib.end());
     SizeType discoveredServersNumAfter = mDiscoveredServersAttrib.size();
 
+    // If outdated attributes have been removed, inform GUI
     if (discoveredServersNumAfter < discoveredServersNumBefore)
     {
         emit onlineUsersUpdated(getOnlineUsers());
@@ -176,100 +176,89 @@ QStringList DefaultLocalConnector::getConnectedUsers() const
 // ==========================================================================================
 // ==========================================================================================
 // ==========================================================================================
-//                                                                   START SHARING ON REQUEST
-void DefaultLocalConnector::startSharingOnCommand(const QString userName)
+//                                                             TRY ADDING SERVER TO CONNECTED
+ServerData DefaultLocalConnector::pushToConnectedAttributes(const QString & serverName)
 {
-    startSharing(userName, true);
+    ServerData serverAttributes;
+    auto pDiscoveredServerAttributes =
+            std::find_if(mDiscoveredServersAttrib.begin(),
+                         mDiscoveredServersAttrib.end(),
+                         [serverName] (const ServerData & serverData)
+                         {
+                             return serverData.mName == serverName;
+                         });
+    if(pDiscoveredServerAttributes == mDiscoveredServersAttrib.end())
+    {
+        // If there is no such server in the discovered serers
+        return serverAttributes;
+    }
+    auto pConnectedServerAttributes =
+            std::find_if(mConnectedServersAttrib.begin(),
+                         mConnectedServersAttrib.end(),
+                         [serverName] (const ServerData & serverData)
+                         {
+                             return serverData.mName == serverName;
+                         });
+    if(pConnectedServerAttributes == mConnectedServersAttrib.end())
+    {
+        // If server is not already connected
+        serverAttributes = *pDiscoveredServerAttributes;
+        mConnectedServersAttrib.push_back(*pDiscoveredServerAttributes);
+    }
+    return serverAttributes;
 }
 // ==========================================================================================
 // ==========================================================================================
 // ==========================================================================================
-//                                                                    STOP SHARING ON REQUEST
-void DefaultLocalConnector::stopSharingOnCommand(const QString userName)
+//                                                         TRY REMOVING SERVER FROM CONNECTED
+ServerData DefaultLocalConnector::popFromConnectedAttributes(const QString & serverName)
 {
-    stopSharing(userName, true);
+    ServerData serverAttributes;
+    auto pServerAttributes =
+            std::find_if(mConnectedServersAttrib.begin(),
+                         mConnectedServersAttrib.end(),
+                         [serverName] (const ServerData & serverData)
+                         {
+                             return serverData.mName == serverName;
+                         });
+    if(pServerAttributes != mConnectedServersAttrib.end())
+    {
+        serverAttributes = *pServerAttributes;
+        mConnectedServersAttrib.erase(pServerAttributes);
+    }
+    return serverAttributes;
 }
 // ==========================================================================================
 // ==========================================================================================
 // ==========================================================================================
 //                                                                              START SHARING
-void DefaultLocalConnector::startSharing(const QString userName,
-                                         const bool isSelfInitiated)
+void DefaultLocalConnector::startSharing(const QString userName)
 {
-    // Check if user is already connected
-    auto connectedServerAttributesPtr =
-            std::find_if(mConnectedServersAttrib.begin(),
-                         mConnectedServersAttrib.end(),
-                         [userName] (const ServerData & serverData)
-                         {
-                             return serverData.mName == userName;
-                         });
-    if (connectedServerAttributesPtr != mConnectedServersAttrib.end())
+    ServerData serverAttributes = pushToConnectedAttributes(userName);
+    if (!serverAttributes.empty())
     {
-        return;
-    }
+        Message message;
+        message.mType       = Message::Type::StartSharingMessage;
+        message.mSourceName = mpTcpService->getServerAttributes().mName;
+        mpTcpService->sendDataToTcpServer(message.toJsonQString(), serverAttributes);
 
-    auto serverAttributesPtr =
-            std::find_if(mDiscoveredServersAttrib.begin(),
-                         mDiscoveredServersAttrib.end(),
-                         [userName] (const ServerData & serverData)
-                         {
-                             return serverData.mName == userName;
-                         });
-    // Request sharing from user with a given userName
-    if (serverAttributesPtr != mDiscoveredServersAttrib.end())
-    {
-        bool isAllowedToStartSharing = true;
-        if (isSelfInitiated)
-        {
-            Message message;
-            message.mType       = Message::Type::SharingControlMessage;
-            message.mSourceName = mpTcpService->getServerAttributes().mName;
-            message.mContent       = QString("start");
-            isAllowedToStartSharing =
-                    mpTcpService->sendDataToTcpServer(message.toJsonQString(),
-                                                      *serverAttributesPtr);
-        }
-        if (isAllowedToStartSharing)
-        {
-            mConnectedServersAttrib.push_back(*serverAttributesPtr);
-
-            qDebug() << "sharing was started";
-            emit connectedUsersUpdated(getConnectedUsers());
-        }
+        emit connectedUsersUpdated(getConnectedUsers());
     }
 }
 // ==========================================================================================
 // ==========================================================================================
 // ==========================================================================================
 //                                                                               STOP SHARING
-void DefaultLocalConnector::stopSharing(const QString userName,
-                                        const bool isSelfInitiated)
+void DefaultLocalConnector::stopSharing(const QString userName)
 {
-    auto serverAttributesPtr =
-            std::find_if(mConnectedServersAttrib.begin(),
-                         mConnectedServersAttrib.end(),
-                         [userName] (const ServerData & serverData)
-                         {
-                             return serverData.mName == userName;
-                         });
-
-    // Request sharing from user with a given userName
-    if (serverAttributesPtr != mConnectedServersAttrib.end())
+    ServerData serverAttributes = popFromConnectedAttributes(userName);
+    if (!serverAttributes.empty())
     {
-        if (isSelfInitiated)
-        {
-            Message message;
-            message.mType       = Message::Type::SharingControlMessage;
-            message.mSourceName = mpTcpService->getServerAttributes().mName;
-            message.mContent       = QString("stop");
-            mpTcpService->sendDataToTcpServer(message.toJsonQString(),
-                                              *serverAttributesPtr);
-        }
+        Message message;
+        message.mType       = Message::Type::StopSharingMessage;
+        message.mSourceName = mpTcpService->getServerAttributes().mName;
+        mpTcpService->sendDataToTcpServer(message.toJsonQString(), serverAttributes);
 
-        mConnectedServersAttrib.erase(serverAttributesPtr);
-
-        qDebug() << "sharing was stopped";
         emit connectedUsersUpdated(getConnectedUsers());
     }
 }
@@ -282,7 +271,7 @@ void DefaultLocalConnector::shareMessage(const QString messageContent)
     Message message;
     message.mType       = Message::Type::ChatMessage;
     message.mSourceName = mpTcpService->getServerAttributes().mName;
-    message.mContent       = messageContent;
+    message.mContent    = messageContent;
     for(const auto & serverAttrib : mConnectedServersAttrib)
     {
         mpTcpService->sendDataToTcpServer(message.toJsonQString(),
@@ -292,7 +281,23 @@ void DefaultLocalConnector::shareMessage(const QString messageContent)
 // ==========================================================================================
 // ==========================================================================================
 // ==========================================================================================
-//                                                             TRANSLATE RECEIVED TCP SEGMENT
+//                                                       SHARE CHANGE BETWEEN CONNECTED USERS
+void DefaultLocalConnector::shareChange(const QString changeContent)
+{
+    Message message;
+    message.mType       = Message::Type::ChangesMessage;
+    message.mSourceName = mpTcpService->getServerAttributes().mName;
+    message.mContent    = changeContent;
+    for(const auto & serverAttrib : mConnectedServersAttrib)
+    {
+        mpTcpService->sendDataToTcpServer(message.toJsonQString(),
+                                          serverAttrib);
+    }
+}
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
+//                                                             COORDINATE RECEIVED TCP SEGMENT
 void DefaultLocalConnector::processTcpSegmentOnReceive()
 {
     Segment segment = mpTcpService->getReceivedSegment();
@@ -306,20 +311,22 @@ void DefaultLocalConnector::processTcpSegmentOnReceive()
 
     switch(message.mType)
     {
-    case Message::Type::SharingControlMessage:
-        if (message.mContent == "start")
+    case Message::Type::StartSharingMessage:
+        qDebug() << message.mSourceName << " wants to start sharing his workflow";
+        if(!pushToConnectedAttributes(message.mSourceName).empty())
         {
-            startSharing(message.mSourceName, false);
-
-            qDebug() << message.mSourceName << " wants to start share his workflow";
-            emit startSharingRequested(message.mSourceName);
+            // Emit signal if user is successfully connected
+            emit startSharingRequested (message.mSourceName);
+            emit connectedUsersUpdated(getConnectedUsers());
         }
-        if (message.mContent == "stop")
+        break;
+    case Message::Type::StopSharingMessage:
+        qDebug() << message.mSourceName << " wants to stop sharing his workflow";
+        if(!popFromConnectedAttributes(message.mSourceName).empty())
         {
-            stopSharing(message.mSourceName, false);
-
-            qDebug() << message.mSourceName << " wants to stop share his workflow";
-            emit stopSharingRequested(message.mSourceName);
+            // Emit signal if user is successfully disconnected
+            emit stopSharingRequested (message.mSourceName);
+            emit connectedUsersUpdated(getConnectedUsers());
         }
         break;
     case Message::Type::ChatMessage:
@@ -331,15 +338,6 @@ void DefaultLocalConnector::processTcpSegmentOnReceive()
         // TODO on second sprint
         break;
     }
-
-#ifdef CUSTOM_DEBUG
-    qDebug() << "____________________________________________________________";
-    qDebug() << "TCP SEGMENT HAS BEEN RECEIVED: ";
-    qDebug() << "data ->" << segment.mContent;
-    qDebug() << "ip -> "  << segment.mIp.toString();
-    qDebug() << "port ->" << segment.mPort;
-    qDebug() << "____________________________________________________________";
-#endif // CUSTOM_DEBUG
 }
 
 

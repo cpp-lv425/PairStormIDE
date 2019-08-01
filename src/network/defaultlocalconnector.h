@@ -41,15 +41,12 @@ private:
 
     void startSharingAttributes();
     void startClearingOutdatedAttributes();
-    void startSharing(const QString userName,
-                      const bool isSelfInitiated = true);
-    void stopSharing(const QString userName,
-                     const bool isSelfInitiated = true);
+
+    ServerData popFromConnectedAttributes(const QString & serverName);
+    ServerData pushToConnectedAttributes(const QString & serverName);
+    void removeFromDiscoveredAttributes();
 
 private slots:
-
-    virtual void startSharingOnCommand(const QString userName) override;
-    virtual void stopSharingOnCommand (const QString userName) override;
 
     void shareAttributesOnTimerTick();
     void clearOutdatedAttributesOnTimerTick();
@@ -60,8 +57,11 @@ private slots:
 public slots:
     virtual void configureOnLogin(const QString & userName) override;
 
+    virtual void startSharing(const QString userName) override;
+    virtual void stopSharing (const QString userName) override;
 
     virtual void shareMessage(const QString messageContent) override;
+    virtual void shareChange(const QString changeContent)   override;
 
 
 //Experimental features ======================================================

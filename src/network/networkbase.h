@@ -103,7 +103,8 @@ struct Message {
     QString mContent;
     enum Type : int
     {
-        SharingControlMessage,
+        StartSharingMessage,
+        StopSharingMessage,
         ChangesMessage,
         ChatMessage
     } mType;

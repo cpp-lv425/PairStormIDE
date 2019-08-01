@@ -333,8 +333,6 @@ void MainWindow::createChatWindow()
 {
     // create instance of Chat Window
     mpChatWindowDock = new ChatWindowDock(this);
-    connect(mpChatWindowDock, &ChatWindowDock::userToConnectSelected,
-            this, &MainWindow::onUserToConnectSelected);
 
     // Add updating user list on discovering new users
     connect(mplocalConnector, &LocalConnectorInterface::onlineUsersUpdated,
@@ -342,7 +340,7 @@ void MainWindow::createChatWindow()
             Qt::UniqueConnection);
 
     connect(mpChatWindowDock, &ChatWindowDock::userToConnectSelected,
-            mplocalConnector, &LocalConnectorInterface::startSharingOnCommand,
+            mplocalConnector, &LocalConnectorInterface::startSharing,
             Qt::UniqueConnection);
 
     connect(mpChatWindowDock, &ChatWindowDock::sendMessage,
@@ -738,12 +736,6 @@ void MainWindow::onCloseWindow(CodeEditor *curDoc)
 
         saveDocument(curDoc, curDoc->getFileName());
     }
-}
-
-void MainWindow::onUserToConnectSelected(QString userName)
-{
-    mplocalConnector->startSharingOnCommand(userName);
-    qDebug() << userName;
 }
 
 CodeEditor* MainWindow::createNewDoc()

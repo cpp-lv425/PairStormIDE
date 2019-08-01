@@ -24,11 +24,12 @@ public slots:
     //======================= Slots for GUI events ===========================
     virtual void configureOnLogin(const QString & userName) = 0;
 
-    virtual void startSharingOnCommand(const QString userName) = 0;
-    virtual void stopSharingOnCommand (const QString userName) = 0;
+    virtual void startSharing(const QString userName) = 0;
+    virtual void stopSharing (const QString userName) = 0;
 
     //======================= Slots for Editor & Chat events =================
     virtual void shareMessage(const QString messageContent) = 0;
+    virtual void shareChange(const QString changeContent)   = 0;
 
 signals:
 
