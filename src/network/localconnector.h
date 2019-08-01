@@ -39,8 +39,8 @@ signals:
     //======================= Signals to GUI =================================
     void serviceFailed ();
 
-    void onlineUsersUpdated    (const LocalConnectorInterface * connector);
-    void connectedUsersUpdated (const LocalConnectorInterface * connector);
+    void onlineUsersUpdated    (const QStringList users);
+    void connectedUsersUpdated (const QStringList users);
 
     void startSharingRequested (const QString userName);
     void stopSharingRequested  (const QString userName);

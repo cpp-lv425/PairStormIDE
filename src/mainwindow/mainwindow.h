@@ -12,6 +12,7 @@ class LocalConnectorInterface;
 class ProjectViewerDock;
 class QFileSystemModel;
 class BottomPanelDock;
+class QListWidgetItem;
 class ChatWindowDock;
 class QMdiSubWindow;
 class QDockWidget;
@@ -46,9 +47,12 @@ private:
     bool checkIfModified(QList<QMdiSubWindow*> &docsList);
     void saveAllModifiedDocuments(QList<QMdiSubWindow*> &docsList);
     void createProjectViewer();
+    void createChatWindow();
+    void createButtomPanel();
 
     void saveMainWindowState();
     void restoreMainWindowState();
+
 private slots:
     // file menu actions
     void onNewFileTriggered();
@@ -74,6 +78,7 @@ private slots:
     void onFullScreenTriggered();
     void onShowProjectViewerTriggered();
     void onShowChatWindowDockTriggered();
+    void onShowBottomPanel();
 
     // tools menu
     void onRefactorTriggered();
@@ -90,6 +95,11 @@ private slots:
 public slots:
     void onOpenFileFromProjectViewer(QString fileName);    
     void onCloseWindow(CodeEditor* curDoc);
+    void onUserToConnectSelected(QString userName);
+    void onNewMessage(const QString &userName,
+                      const QString &message);
+    void onSendMessage(const QString &userName,
+                       const QString &message);
 
 private:
     // creates new doc in MDIArea

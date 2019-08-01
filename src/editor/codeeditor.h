@@ -1,6 +1,7 @@
 #ifndef CODEEDITOR_H
 #define CODEEDITOR_H
 
+
 const int CHANGE_SAVE_TIME = 1000;
 const int TAB_SPACE = 4;
 
@@ -9,8 +10,10 @@ const int TAB_SPACE = 4;
 #include"ideconfiguration.h"
 #include"changemanager.h"
 #include<utility>
-#include"lexercpp.h"
-#include"ideconfiguration.h"
+#include<QAbstractScrollArea>
+#include "highlightercpp.h"
+#include "lexercpp.h"
+#include "ideconfiguration.h"
 
 class QPaintEvent;
 class QResizeEvent;
@@ -28,9 +31,12 @@ public:
     CodeEditor(QWidget *parent = nullptr);
     void lineNumberAreaPaintEvent(QPaintEvent *event);
     int lineNumberAreaWidth();
+    bool isinsidebracket();
+    static QString tabs;
     QString& getFileName();
-    void setFileName(const QString &fileame);
+    void setFileName(const QString &flename);
     std::pair<const QString &, const QString &> getChangedFileInfo();
+
     void undo();
     void redo();
 
@@ -38,28 +44,33 @@ protected:
     void resizeEvent(QResizeEvent *event)override;
 
 private slots:
-   void updateLineNumberAreaWidth();
-   void highlightCurrentLine();
-   void updateLineNumberArea(const QRect &rect, int dy);
-   void runLexer();
+    void updateLineNumberAreaWidth();
+    void highlightCurrentLine();
+    void updateLineNumberArea(const QRect &rect, int dy);
+    void runLexerAndHighlight();
 
-public
-slots:
-   void keyPressEvent(QKeyEvent *e) override;
-   void saveStateInTheHistory();
+public slots:
+    void keyPressEvent(QKeyEvent *e) override;
+    void autotab();
+    void saveStateInTheHistory();
+
 signals:
-   void changesAppeared();
+    void changesAppeared();
+
 
 private:
    QWidget *lineNumberArea;
    ConfigParams configParam;
    int currentZoom = 100;
    QFont font;
+   QVector<Token> tokens;
+   Highlightercpp *hcpp;
+   LexerCPP *lcpp;
    QString fileName;
    ChangeManager *changeManager;
    QTimer *timer;
    LexerCPP lexer;
-   QVector<Token> tokens;
+
 };
 
 #endif // CODEEDITOR_H

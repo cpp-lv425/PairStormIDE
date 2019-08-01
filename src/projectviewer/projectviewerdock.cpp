@@ -38,6 +38,7 @@ ProjectViewerDock::ProjectViewerDock(QWidget *pParent): QDockWidget(pParent)
 
     connect(mpTreeViewer, &ProjectTreeView::codeFileSelected,
             pMainWindow, &MainWindow::onOpenFileFromProjectViewer);
+    setMinimumWidth(150);
 }
 
 void ProjectViewerDock::setFilters(QStringList filters)
@@ -54,6 +55,5 @@ ProjectViewerDock::~ProjectViewerDock()
 {
     QSettings settings("425", "PairStorm");
     settings.setValue("ProjectViewerDockGeometry", saveGeometry());
-    qDebug() << "~ProjectViewerDock()";
 }
 

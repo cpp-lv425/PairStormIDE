@@ -63,18 +63,20 @@ bool LexerCPP::isBlockComments(QString lexem)
     return rx.exactMatch(lexem);
 }
 
-bool LexerCPP::isSpace(char sym)
+
+bool LexerCPP::isSpace(QChar sym)
 {
     return SPACES.contains(sym);
 }
 
-bool LexerCPP::isAlpha(char sym)
+bool LexerCPP::isAlpha(QChar sym)
+
 {
     QRegExp rx("[A-Za-z]");
     return rx.exactMatch(QString(sym));
 }
 
-bool LexerCPP::isDigit(char sym)
+bool LexerCPP::isDigit(QChar sym)
 {
     QRegExp rx("[0-9]");
     return rx.exactMatch(QString(sym));
@@ -82,31 +84,48 @@ bool LexerCPP::isDigit(char sym)
 
 void LexerCPP::addLexem()
 {
-    stream.seek(stream.pos() - 1);
-    tokens.append(Token(QString(current_lexem), Type(state), stream.pos() - current_lexem.size(), stream.pos()));
+    --it;
+    tokens.append(Token(QString(current_lexem), States(state), it - symbolCount - current_lexem.size(), it - symbolCount, current_line));
     current_lexem.clear();
     state = ST;
 }
 
-void LexerCPP::changeState(States st, char sym)
+
+void LexerCPP::changeState(States st, QChar sym)
 {
     state = st;
     current_lexem += sym;
 }
 
+void LexerCPP::clear()
+{
+    tokens.clear();
+    current_lexem.clear();
+    state = ST;
+    symbolCount = 0;
+    current_line = 0;
+}
+
 void LexerCPP::lexicalAnalysis(QString code)
 {
-    stream.setString(&code);
-    char sym;
-
-    while(!stream.atEnd())
+    it = 0;
+    QChar sym = 0;
+    while(code.size() - it)
     {
-
-        stream >> sym;
+        sym = code[it];
+        ++it;
         switch(state)
         {
             case ST:
-                if(isSpace(sym)) break;
+                if(isSpace(sym)) {
+                    if(sym == '\n')
+                    {
+                        symbolCount = it;
+                        ++current_line;
+                    }
+                    break;
+                }
+
                 if(isAlpha(sym))
                     changeState(ID, sym);
                 else if(isDigit(sym))

@@ -98,7 +98,7 @@ void DefaultLocalConnector::clearOutdatedAttributesOnTimerTick()
                                }));
     if (oldSize != m_discoveredTcpServersAttrib.size())
     {
-        emit onlineUsersUpdated(this);
+        emit onlineUsersUpdated(getOnlineUsers());
     }
 }
 // ==========================================================================================
@@ -144,7 +144,7 @@ void DefaultLocalConnector::addServerFromUdpDatagramOnReceive()
     // Finally, save information about server & emit "user discovered" signal
     m_discoveredTcpServersAttrib.push_back(discoveredServerAttributes);
 
-    emit onlineUsersUpdated(this);
+    emit onlineUsersUpdated(getOnlineUsers());
 }
 // ==========================================================================================
 // ==========================================================================================
@@ -205,7 +205,7 @@ void DefaultLocalConnector::startSharing(const QString & userName,
             m_connectedTcpServersAttrib.push_back(*serverAttributesPtr);
 
             qDebug() << "sharing was started";
-            emit connectedUsersUpdated(this);
+            emit connectedUsersUpdated(getConnectedUsers());
         }
     }
 }
@@ -240,7 +240,7 @@ void DefaultLocalConnector::stopSharing(const QString & userName,
         m_connectedTcpServersAttrib.erase(serverAttributesPtr, std::next(serverAttributesPtr));
 
         qDebug() << "sharing was stopped";
-        emit connectedUsersUpdated(this);
+        emit connectedUsersUpdated(getConnectedUsers());
     }
 }
 // ==========================================================================================

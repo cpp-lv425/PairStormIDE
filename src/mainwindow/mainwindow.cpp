@@ -1,15 +1,16 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-#include <QPlainTextEdit> // temporarily included
+#include <QListWidgetItem>
 #include <QMdiSubWindow>
 #include <QStyleFactory>
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QException> // temporarily included
+#include <QSettings>
+#include <QStyle>
 #include <QDebug> // temporarily included
 #include <QFile>
-#include <QSettings>
 
 #include "localconnectorgenerator.h"
 #include "projectviewerdock.h"
@@ -19,9 +20,9 @@
 #include "logindialog.h"
 #include "filemanager.h"
 #include "codeeditor.h"
+#include "storeconf.h"
 #include "startpage.h"
 #include "mdiarea.h"
-#include "storeconf.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -52,30 +53,24 @@ MainWindow::MainWindow(QWidget *parent) :
 
     setupMainMenu();
 
+    // create instance of MDIArea
+    mpDocsArea = new MDIArea(this);
+    setCentralWidget(mpDocsArea);
+
     // create instance of Project Viewer
     createProjectViewer();    
 
     // create instance of Chat Window
-    mpChatWindowDock = new ChatWindowDock(this);
-    mpChatWindowDock->setObjectName("mpChatWindowDock");
-    addDockWidget(Qt::RightDockWidgetArea, mpChatWindowDock);
-
-    // Add updating user list on discovering new users
-    connect(mplocalConnector, &LocalConnectorInterface::onlineUsersUpdated,
-            mpChatWindowDock, &ChatWindowDock::updateUsersListOnDiscovery,
-            Qt::AutoConnection);
-
-    // create instance of MDIArea
-    mpDocsArea = new MDIArea(this);
+    createChatWindow();
 
     // create instance of Bottom Panel
-    mpBottomPanelDock = new BottomPanelDock(this);
-    mpBottomPanelDock->setObjectName("mpBottomPanelDock");
+    createButtomPanel();
 
-    setCentralWidget(mpDocsArea);
+    restoreMainWindowState();
 
-    restoreMainWindowState();    
-
+    // for testing
+    onNewMessage("Valik", "Hello world");
+    onNewMessage("Igor", "How are you?");
 }
 
 QStringList MainWindow::getFileExtensions() const
@@ -98,10 +93,21 @@ void MainWindow::setupMainMenu()
 {
     // file menu
     QMenu *fileMenu = new QMenu("&File");
+    // main tool bar
+    QToolBar *pToolbar = new QToolBar("Main Tool Bar");
+    pToolbar->setObjectName("pToolbar");
+
     // working with files
-    fileMenu->addAction("&New file", this, &MainWindow::onNewFileTriggered, Qt::CTRL + Qt::Key_N);
-    fileMenu->addAction("&Open file...", this, &MainWindow::onOpenFileTriggered, Qt::CTRL + Qt::Key_O);
-    fileMenu->addAction("Open &folder...", this, &MainWindow::onOpenFolderTriggered);
+    QAction *pNewFileAction = fileMenu->addAction("&New file", this, &MainWindow::onNewFileTriggered, Qt::CTRL + Qt::Key_N);
+    pNewFileAction->setIcon(style()->standardIcon(QStyle::SP_FileIcon));
+    pToolbar->addAction(pNewFileAction);
+
+    QAction *pOpenFileAction = fileMenu->addAction("&Open file...", this, &MainWindow::onOpenFileTriggered, Qt::CTRL + Qt::Key_O);
+    pOpenFileAction->setIcon(style()->standardIcon(QStyle::SP_DialogOpenButton));
+    pToolbar->addAction(pOpenFileAction);
+    QAction *pOpenFolderAction = fileMenu->addAction("Open &folder...", this, &MainWindow::onOpenFolderTriggered);
+    pOpenFolderAction->setIcon(style()->standardIcon(QStyle::SP_DirHomeIcon));
+    pToolbar->addAction(pOpenFolderAction);
     fileMenu->addSeparator();
 
     // opening start page
@@ -109,7 +115,9 @@ void MainWindow::setupMainMenu()
     fileMenu->addSeparator();
 
     // saving files
-    fileMenu->addAction("&Save...", this, &MainWindow::onSaveFileTriggered, Qt::CTRL + Qt::Key_S);
+    QAction *pSaveAction = fileMenu->addAction("&Save...", this, &MainWindow::onSaveFileTriggered, Qt::CTRL + Qt::Key_S);
+    pSaveAction->setIcon(style()->standardIcon(QStyle::SP_DialogSaveButton));
+    pToolbar->addAction(pSaveAction);
     fileMenu->addAction("Save &As...", this, &MainWindow::onSaveFileAsTriggered);
     fileMenu->addAction("Save A&ll...", this, &MainWindow::onSaveAllFilesTriggered, Qt::CTRL + Qt::SHIFT + Qt::Key_S);
     fileMenu->addSeparator();
@@ -134,43 +142,56 @@ void MainWindow::setupMainMenu()
     editMenu->addSeparator();
 
     // find patterns in docs
-    editMenu->addAction("&Find/Replace...", this, &MainWindow::onFindTriggered, Qt::CTRL + Qt::Key_F);
+    QAction *pFindAction = editMenu->addAction("&Find/Replace...", this, &MainWindow::onFindTriggered, Qt::CTRL + Qt::Key_F);
+    pFindAction->setDisabled(true);
 
     // view menu
     QMenu *viewMenu = new QMenu("&View");
-    viewMenu->addAction("&Full screen", this, &MainWindow::onFullScreenTriggered, Qt::CTRL + Qt::SHIFT + Qt::Key_F11);
+    QAction *pFullScreenActoin = viewMenu->addAction("&Full screen", this, &MainWindow::onFullScreenTriggered, Qt::CTRL + Qt::SHIFT + Qt::Key_F11);
+    pFullScreenActoin->setDisabled(true);
+
     QMenu *scaleSubMenu = new QMenu("&Scale");
-    viewMenu->addMenu(scaleSubMenu);
+    QAction *pScaleSubMenu = viewMenu->addMenu(scaleSubMenu);
+    pScaleSubMenu->setDisabled(true);
+
     viewMenu->addSeparator();
     viewMenu->addAction("Show &Project Viewer", this, &MainWindow::onShowProjectViewerTriggered);
     viewMenu->addAction("Show &Chat Window", this, &MainWindow::onShowChatWindowDockTriggered);
+    viewMenu->addAction("Show &Bottom Panel", this, &MainWindow::onShowBottomPanel);
 
     // tools menu
     QMenu *toolsMenu = new QMenu("&Tools");
 
     // opening refactoring toolbar
-    toolsMenu->addAction("&Refactor...", this, &MainWindow::onRefactorTriggered);
+    QAction *pRefactorAction = toolsMenu->addAction("&Refactor...", this, &MainWindow::onRefactorTriggered);
+    pRefactorAction->setDisabled(true);
     toolsMenu->addSeparator();
 
     // opening chat window
-    toolsMenu->addAction("&Connect...", this, &MainWindow::onConnectTriggered);
+    QAction *pConnectAction = toolsMenu->addAction("&Connect...", this, &MainWindow::onConnectTriggered);
+    pConnectAction->setIcon(style()->standardIcon(QStyle::SP_DialogYesButton));
+    pToolbar->addAction(pConnectAction);
     toolsMenu->addSeparator();
 
     // buidling solution
     QMenu *buildSubMenu = new QMenu("&Build");
-    toolsMenu->addMenu(buildSubMenu);
+    QAction *pBuildActoin = toolsMenu->addMenu(buildSubMenu);
+    pBuildActoin->setDisabled(true);
 
     // debugging program
     QMenu *debugSubMenu = new QMenu("&Debug");
-    toolsMenu->addMenu(debugSubMenu);
+    QAction *pDebugAction = toolsMenu->addMenu(debugSubMenu);
+    pDebugAction->setDisabled(true);
 
     // git
     QMenu *gitSubMenu = new QMenu("&Git");
-    toolsMenu->addMenu(gitSubMenu);
+    QAction *pGitActoin = toolsMenu->addMenu(gitSubMenu);
+    pGitActoin->setDisabled(true);
     toolsMenu->addSeparator();
 
     // opening settings window
-    toolsMenu->addAction("&Settings...", this, &MainWindow::onSettingsTriggered);
+    QAction *pSettingsAction = toolsMenu->addAction("&Settings...", this, &MainWindow::onSettingsTriggered);
+    pSettingsAction->setDisabled(true);
 
     // for Valik for testing purposes
     toolsMenu->addAction("&Test", this, &MainWindow::onTest, Qt::CTRL + Qt::SHIFT + Qt::Key_T);
@@ -186,11 +207,13 @@ void MainWindow::setupMainMenu()
     helpMenu->addAction("&Reference Assistant...", this, &MainWindow::onReferenceTriggered, Qt::CTRL + Qt::Key_F1);
 
     // user guide
-    helpMenu->addAction("User &Guide...", this, &MainWindow::onUserGuideTriggered, Qt::Key_F1);
+    QAction *pUserGuideActoin = helpMenu->addAction("User &Guide...", this, &MainWindow::onUserGuideTriggered, Qt::Key_F1);
+    pUserGuideActoin->setDisabled(true);
     helpMenu->addSeparator();
 
     // checking updates
-    helpMenu->addAction("Check for &Updates...", this, &MainWindow::onCheckUpdatesTriggered);
+    QAction *pUpdatesAction = helpMenu->addAction("Check for &Updates...", this, &MainWindow::onCheckUpdatesTriggered);
+    pUpdatesAction->setDisabled(true);
 
     // adding all menus to MainMenuBar
     menuBar()->addMenu(fileMenu);
@@ -198,15 +221,17 @@ void MainWindow::setupMainMenu()
     menuBar()->addMenu(viewMenu);
     menuBar()->addMenu(toolsMenu);
     menuBar()->addMenu(helpMenu);
+
+    addToolBar(Qt::TopToolBarArea, pToolbar);
 }
 
 void MainWindow::saveDocument(CodeEditor *pDoc, QString fileName)
-{
-    qDebug() << "saving";
+{    
     try
     {
         // writing to file
         FileManager().writeToFile(fileName, pDoc->toPlainText());
+        statusBar()->showMessage(tr("Changes to document have been saved"), 5000);
     } catch (const QException&)
     {
         QMessageBox::warning(this, "Error", "Unable to open file for saving");
@@ -285,19 +310,44 @@ void MainWindow::createProjectViewer()
 {
     mpProjectViewerDock = new ProjectViewerDock(this);
     addDockWidget(Qt::LeftDockWidgetArea, mpProjectViewerDock);
+    mpProjectViewerDock->setObjectName("mpProjectViewerDock");
+}
+
+void MainWindow::createChatWindow()
+{
+    // create instance of Chat Window
+    mpChatWindowDock = new ChatWindowDock(this);
+    connect(mpChatWindowDock, &ChatWindowDock::userToConnectSelected,
+            this, &MainWindow::onUserToConnectSelected);
+    connect(mpChatWindowDock, &ChatWindowDock::sendMessage,
+            this, &MainWindow::onSendMessage);
+
+    // Add updating user list on discovering new users
+    connect(mplocalConnector, &LocalConnectorInterface::onlineUsersUpdated,
+            mpChatWindowDock, &ChatWindowDock::updateOnlineUsersOnChange,
+            Qt::AutoConnection);
+
+    mpChatWindowDock->setObjectName("mpChatWindowDock");
+    addDockWidget(Qt::RightDockWidgetArea, mpChatWindowDock, Qt::Vertical);
+    mpChatWindowDock->setAllowedAreas(Qt::RightDockWidgetArea);
+}
+
+void MainWindow::createButtomPanel()
+{
+    // create instance of Bottom Panel
+    mpBottomPanelDock = new BottomPanelDock(this);
+    mpBottomPanelDock->setObjectName("mpBottomPanelDock");
 }
 
 void MainWindow::onNewFileTriggered()
 {
     QStringList fileExtensions = getFileExtensions();
+
     NewFileDialog newFileDialog(fileExtensions, this);
 
     // new file dialog is called
     // name of newly created file is received
-    QString newFileName = newFileDialog.start();
-
-    if(newFileName.isEmpty())
-        return;
+    QString newFileName = newFileDialog.start();    
 
     // new doc is created & shown
     CodeEditor *newDoc = createNewDoc();
@@ -448,55 +498,25 @@ void MainWindow::onCloseFileTriggered()
                 this,
                 "Save changes",
                 "Do you want to save changes to current document?",
-                QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No
+                QMessageBox::StandardButton::Yes |
+                QMessageBox::StandardButton::No |
+                QMessageBox::StandardButton::Cancel
                 );
 
     // checking user's answer
-    if(reply == QMessageBox::StandardButton::Yes)
+    if(reply == QMessageBox::Yes)
     {
         saveDocument(curDoc, curDoc->getFileName());
     }
+    if(reply == QMessageBox::Cancel)
+        return;
+
     // closing doc
     mpDocsArea->closeActiveSubWindow();
 }
 
 void MainWindow::onExitTriggered()
 {
-    if(!mpDocsArea)
-        return;
-
-    // getting all docs
-    auto docsList = mpDocsArea->subWindowList();
-
-    // if there are no docs
-    if(docsList.empty())
-    {
-        QApplication::closeAllWindows();
-        return;
-    }
-
-    // if doc is modified then we should ask user if changes have to be saved
-    if(!checkIfModified(docsList))
-    {
-        QApplication::closeAllWindows();
-        return;
-    }
-
-    QMessageBox::StandardButton reply = QMessageBox::question
-            (
-                this,
-                "Saving Changes",
-                "Do you want to save changes to opened documents?",
-                QMessageBox::Yes | QMessageBox::No
-                );
-
-    if(reply == QMessageBox::No)
-    {
-        QApplication::closeAllWindows();
-        return;
-    }
-
-    saveAllModifiedDocuments(docsList);
     QApplication::closeAllWindows();
 }
 
@@ -526,22 +546,50 @@ void MainWindow::onRedoTriggered()
 
 void MainWindow::onCutTriggered()
 {
-    qDebug() << "cut";
+    auto curDoc = qobject_cast<CodeEditor*>
+            (mpDocsArea->currentSubWindow()->widget());
+
+    // if ptr to current document is not valid
+    if(!curDoc)
+        return;
+
+    curDoc->cut();
 }
 
 void MainWindow::onCopyTriggered()
 {
-    qDebug() << "copy";
+    auto curDoc = qobject_cast<CodeEditor*>
+            (mpDocsArea->currentSubWindow()->widget());
+
+    // if ptr to current document is not valid
+    if(!curDoc)
+        return;
+
+    curDoc->copy();
 }
 
 void MainWindow::onPasteTriggered()
 {
-    qDebug() << "paste";
+    auto curDoc = qobject_cast<CodeEditor*>
+            (mpDocsArea->currentSubWindow()->widget());
+
+    // if ptr to current document is not valid
+    if(!curDoc)
+        return;
+
+    curDoc->paste();
 }
 
 void MainWindow::onSelectAllTriggered()
 {
-    qDebug() << "select all";
+    auto curDoc = qobject_cast<CodeEditor*>
+            (mpDocsArea->currentSubWindow()->widget());
+
+    // if ptr to current document is not valid
+    if(!curDoc)
+        return;
+
+    curDoc->selectAll();
 }
 
 void MainWindow::onFindTriggered()
@@ -564,6 +612,11 @@ void MainWindow::onShowChatWindowDockTriggered()
     mpChatWindowDock->show();
 }
 
+void MainWindow::onShowBottomPanel()
+{
+    mpBottomPanelDock->show();
+}
+
 void MainWindow::onRefactorTriggered()
 {
     qDebug() << "refactor";
@@ -572,7 +625,13 @@ void MainWindow::onRefactorTriggered()
 void MainWindow::onConnectTriggered()
 {
     LoginDialog loginDialog(this);
-    mCurrentUserName = loginDialog.start();
+    QString userInput = loginDialog.start();
+    if (userInput.isEmpty())
+    {
+        return;
+    }
+    mCurrentUserName = userInput;
+    mpChatWindowDock->setUserName(userInput);
     mplocalConnector->configureServiceOnLogin(mCurrentUserName);
 }
 
@@ -596,7 +655,12 @@ void MainWindow::onTest()
 
 void MainWindow::onAboutTriggered()
 {
-    qDebug() << "about";
+    QString info = "This application has been "
+            "developed by students of group LV-425.C++ of SoftServe IT Academy. "
+             "\n\nIt is designed to provide tools for "
+            "pair programming as well as facilities "
+            "of high-end development environment.";
+    QMessageBox::about(this, "About PairStorm", info);
 }
 
 void MainWindow::onReferenceTriggered()
@@ -638,14 +702,29 @@ void MainWindow::onCloseWindow(CodeEditor *curDoc)
                     this,
                     "Saving Changes",
                     "Do you want to save changes to opened documents?",
-                    QMessageBox::Yes | QMessageBox::No
+                    QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel
                     );
 
-        if(reply == QMessageBox::No)
+        if(reply == QMessageBox::No | reply == QMessageBox::Cancel)
             return;
 
         saveDocument(curDoc, curDoc->getFileName());
     }
+}
+
+void MainWindow::onUserToConnectSelected(QString userName)
+{
+    qDebug() << userName;
+}
+
+void MainWindow::onNewMessage(const QString &userName, const QString &message)
+{
+    mpChatWindowDock->displayMessage(userName, message);
+}
+
+void MainWindow::onSendMessage(const QString &userName, const QString &message)
+{
+    qDebug() << "onSendMessage" << userName << '\n' << message;
 }
 
 CodeEditor* MainWindow::createNewDoc()
@@ -687,7 +766,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
                 this,
                 "Saving Changes",
                 "Do you want to save changes to opened documents?",
-                QMessageBox::Yes | QMessageBox::No
+                QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel
                 );
 
     if(reply == QMessageBox::No)
@@ -695,11 +774,15 @@ void MainWindow::closeEvent(QCloseEvent *event)
         event->accept();
         return;
     }
+    if(reply == QMessageBox::Yes)
+    {
+        // if appreved then save changes
+        saveAllModifiedDocuments(docsList);
+        event->accept();
+        return;
+    }
 
-    // if appreved then save changes
-    saveAllModifiedDocuments(docsList);
-
-    event->accept();
+    event->ignore();
 }
 
 MainWindow::~MainWindow()
