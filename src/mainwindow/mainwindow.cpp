@@ -311,6 +311,9 @@ void MainWindow::createChatWindow()
     mpChatWindowDock = new ChatWindowDock(this);
     connect(mpChatWindowDock, &ChatWindowDock::userToConnectSelected,
             this, &MainWindow::onUserToConnectSelected);
+    connect(mpChatWindowDock, &ChatWindowDock::sendMessage,
+            this, &MainWindow::onSendMessage);
+
     mpChatWindowDock->setObjectName("mpChatWindowDock");
     addDockWidget(Qt::RightDockWidgetArea, mpChatWindowDock, Qt::Vertical);
     mpChatWindowDock->setAllowedAreas(Qt::RightDockWidgetArea);
@@ -690,6 +693,11 @@ void MainWindow::onUserToConnectSelected(QString userName)
 void MainWindow::onNewMessage(const QString &userName, const QString &message)
 {
     mpChatWindowDock->displayMessage(userName, message);
+}
+
+void MainWindow::onSendMessage(const QString &userName, const QString &message)
+{
+    qDebug() << "onSendMessage" << userName << '\n' << message;
 }
 
 CodeEditor* MainWindow::createNewDoc()

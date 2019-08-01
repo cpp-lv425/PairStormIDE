@@ -32,6 +32,7 @@ private slots:
 
 signals:
     void userToConnectSelected(QString);
+    void sendMessage(const QString&, const QString&);
 };
 
 #endif // CHATWIDGET_H

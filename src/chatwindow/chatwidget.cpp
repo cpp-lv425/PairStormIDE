@@ -88,7 +88,9 @@ void ChatWidget::onUserToConnectSelected(QListWidgetItem *item)
 
 void ChatWidget::onSendCommand()
 {
+    emit sendMessage(mUserName, mpEnterLine->text());
     updateFeedOnSend();
+
 }
 
 void ChatWidget::updateFeedOnSend()

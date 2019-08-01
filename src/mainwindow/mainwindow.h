@@ -95,6 +95,8 @@ public slots:
     void onUserToConnectSelected(QString userName);
     void onNewMessage(const QString &userName,
                       const QString &message);
+    void onSendMessage(const QString &userName,
+                       const QString &message);
 
 private:
     // creates new doc in MDIArea

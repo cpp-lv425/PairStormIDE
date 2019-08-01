@@ -14,6 +14,9 @@ ChatWindowDock::ChatWindowDock(QWidget *pParent): QDockWidget (pParent)
     mpChatWidget = new ChatWidget;
     connect(mpChatWidget, &ChatWidget::userToConnectSelected,
             this, &ChatWindowDock::onUserToConnectSelected);
+    connect(mpChatWidget, &ChatWidget::sendMessage,
+            this, &ChatWindowDock::onSendMessage);
+
     setWidget(mpChatWidget);
     setMinimumWidth(200);
 }
@@ -32,6 +35,12 @@ void ChatWindowDock::onUserToConnectSelected(QString userName)
 {
     qDebug() << "dock slot";
     emit userToConnectSelected(userName);
+}
+
+void ChatWindowDock::onSendMessage(const QString &userName, const QString &message)
+{
+    qDebug() << "dock slot send message";
+    emit sendMessage(userName, message);
 }
 
 void ChatWindowDock::keyPressEvent(QKeyEvent *event)

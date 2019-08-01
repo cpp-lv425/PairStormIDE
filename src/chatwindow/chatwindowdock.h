@@ -18,9 +18,12 @@ public:
 
 signals:
     void userToConnectSelected(QString);
+    void sendMessage(const QString&, const QString&);
 
 public slots:
     void onUserToConnectSelected(QString userName);
+    void onSendMessage(const QString& userName,
+                       const QString& message);
 
 protected:
     virtual void keyPressEvent(QKeyEvent *event);
