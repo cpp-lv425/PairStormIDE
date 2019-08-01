@@ -256,18 +256,15 @@ bool MainWindow::checkIfOpened(const QString &fileName) const
     // getting all docs
     auto docsList = mpDocsArea->subWindowList();
 
-    // if there are no docs
-    if (!docsList.empty())
+    for (const auto &doc : docsList)
     {
-        for (const auto &doc : docsList)
+        auto curDoc = qobject_cast<CodeEditor*>(doc->widget());
+        if (curDoc && curDoc->getFileName() == fileName)
         {
-            auto curDoc = qobject_cast<CodeEditor*>(doc->widget());
-            if (curDoc && curDoc->getFileName() == fileName)
-            {
-                return true;
-            }
+            return true;
         }
     }
+
     return false;
 }
 
@@ -333,8 +330,8 @@ void MainWindow::onNewFileTriggered()
         // new file dialog is called
         // name of newly created file is received
         newFileName = newFileDialog.start();
-
-    } catch (const QException&)
+    }
+    catch (const QException&)
     {
         return;
     }
@@ -379,7 +376,7 @@ void MainWindow::onOpenStartPage()
 void MainWindow::onSaveFileTriggered()
 {
     // if there are no opened docs
-    if (!mpDocsArea || !mpDocsArea->currentSubWindow())
+    if (!mpDocsArea->currentSubWindow())
     {
         QMessageBox::information(this, "Save", "There are no opened documents to save.");
         return;
@@ -443,9 +440,6 @@ void MainWindow::onSaveFileAsTriggered()
 
 void MainWindow::onSaveAllFilesTriggered()
 {
-    if (!mpDocsArea)
-        return;
-
     // getting all docs
     auto docsList = mpDocsArea->subWindowList();
 
@@ -460,11 +454,9 @@ void MainWindow::onSaveAllFilesTriggered()
     for (int i = 0; i < docsList.size(); ++i)
     {
         auto curDoc = qobject_cast<CodeEditor*>(docsList[i]->widget());
-        if(!curDoc)
-            qDebug() << "invalid ptr";
+
         if(curDoc && curDoc->document()->isModified())
         {
-            qDebug() << curDoc->getFileName();
             saveDocument(curDoc, curDoc->getFileName());
         }
     }
@@ -526,7 +518,6 @@ void MainWindow::onUndoTriggered()
     {
         return;
     }
-    qDebug() << "undo";
     curDoc->undo();
 }
 
@@ -688,12 +679,10 @@ void MainWindow::onCloseWindow(CodeEditor *curDoc)
     if (curDoc->document()->isModified())
     {
         QMessageBox::StandardButton reply = QMessageBox::question
-                (
-                    this,
-                    "Saving Changes",
-                    "Do you want to save changes to opened documents?",
-                    QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel
-                    );
+                (this,
+                 "Saving Changes",
+                 "Do you want to save changes to opened documents?",
+                 QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
 
         if (reply == QMessageBox::No | reply == QMessageBox::Cancel)
         {
