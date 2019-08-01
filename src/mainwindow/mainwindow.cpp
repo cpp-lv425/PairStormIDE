@@ -477,11 +477,10 @@ void MainWindow::onSaveAllFilesTriggered()
 }
 
 void MainWindow::onCloseFileTriggered()
-{
-    auto curDoc = qobject_cast<CodeEditor*>
-            (mpDocsArea->currentSubWindow()->widget());
+{    
+    auto curDoc = getCurrentDoc();
 
-    // if ptr to current document is not valid
+    // if there are no opened documents
     if (!curDoc)
     {
         return;
