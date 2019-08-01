@@ -2,7 +2,6 @@
 #define CHATWINDOWDOCK_H
 
 #include <QDockWidget>
-#include "localconnector.h"
 
 class ChatWidget;
 
