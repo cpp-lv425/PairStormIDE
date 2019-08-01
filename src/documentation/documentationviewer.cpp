@@ -1,15 +1,16 @@
 #include "documentationviewer.h"
 
 #include <QMenu>
-#include <QMenuBar>
-#include <QStatusBar>
-#include <QToolBar>
-#include <QIcon>
-#include <QUrl>
-#include <QString>
-#include <QWebEngineHistory>
-#include <QLabel>
 #include <QToolTip>
+#include <QToolBar>
+#include <QMenuBar>
+#include <QLineEdit>
+#include <QStatusBar>
+#include <QProgressBar>
+#include <QWebEngineView>
+#include <QWebEnginePage>
+#include <QStackedWidget>
+#include <QWebEngineHistory>
 
 DocumentationViewer::DocumentationViewer(QWidget *parent)
     : QMainWindow (parent)
@@ -20,6 +21,7 @@ DocumentationViewer::DocumentationViewer(QWidget *parent)
     mWebView = new QWebEngineView(this);
     mWebView->load(QUrl("http://www.google.com"));
     setCentralWidget(mWebView);
+    mStatusBar = new QStatusBar(this);
 
     mBottomToolBar = new QToolBar(this);
     addToolBar(Qt::BottomToolBarArea, mBottomToolBar);
@@ -52,7 +54,7 @@ DocumentationViewer::DocumentationViewer(QWidget *parent)
     pToolBar->addAction(mStopLoadAction);
     pToolBar->addWidget(mUrlEdit);
 
-   // menuBar()->addMenu(pViewMenu);
+    menuBar()->addMenu(pViewMenu);
     menuBar()->addMenu(pPageMenu);
 
     connect(mWebView, &QWebEngineView::urlChanged, this, &DocumentationViewer::updateUrlBar);
@@ -64,11 +66,10 @@ DocumentationViewer::DocumentationViewer(QWidget *parent)
 
     pToolBar->addWidget(mStackedWidget);
     mStackedWidget->addWidget(mUrlEdit);
-    qDebug()<<mStackedWidget->currentWidget();
     mStackedWidget->addWidget(mProgressBar);
 
     mStackedWidget->setCurrentWidget(mUrlEdit);
-    connect(mWebView, SIGNAL(loadStarted()), this, SLOT(loadStarted()));
+    connect(mWebView, &QWebEngineView::loadStarted, this, &DocumentationViewer::loadStarted);
     connect(mWebView, &QWebEngineView::loadFinished, this, &DocumentationViewer::loadFinished);
     connect(mWebView, &QWebEngineView::loadProgress, mProgressBar, &QProgressBar::setValue);
     //connect(mWebView, SIGNAL(iconChanged()), this, SLOT(iconChanged()));
@@ -112,7 +113,6 @@ void DocumentationViewer::loadStarted()
     mStackedWidget->setCurrentWidget(mProgressBar);
     mStopLoadAction->setDisabled(false);
     mStatusBar->showMessage(mUrlEdit->text());
-
 }
 
 void DocumentationViewer::loadFinished(bool ok)

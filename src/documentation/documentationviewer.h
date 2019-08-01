@@ -1,16 +1,14 @@
 #include <QMainWindow>
-#include <QObject>
-#include <QWebEngineView>
-#include <QLineEdit>
-#include <QProgressBar>
-#include <QStackedWidget>
-#include <QAction>
-#include <QKeyEvent>
-#include <QToolBar>
-#include <QWebEnginePage>
 
-class DocumentationViewer : public QMainWindow {
-
+QT_BEGIN_NAMESPACE
+class QLineEdit;
+class QProgressBar;
+class QWebEngineView;
+class QStackedWidget;
+class QWebEnginePage;
+QT_END_NAMESPACE
+class DocumentationViewer : public QMainWindow
+{
     Q_OBJECT
 
 public:
