@@ -12,7 +12,7 @@ class NewFileDialog: public QDialog
     Q_OBJECT
 
 public:
-    NewFileDialog(QStringList &fileExtensions,
+    explicit NewFileDialog(QStringList &fileExtensions,
                  QWidget *pParent = nullptr);
     QString start();
 

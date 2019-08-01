@@ -10,7 +10,7 @@ class LoginDialog: public QDialog
     QLineEdit *mpUserNameLineEdit;
     QString mUserName;
 public:    
-    LoginDialog(QWidget *pParent = nullptr);
+    explicit LoginDialog(QWidget *pParent = nullptr);
     QString start();
 
 private slots:

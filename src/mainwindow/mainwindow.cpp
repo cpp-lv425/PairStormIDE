@@ -215,11 +215,12 @@ void MainWindow::saveDocument(CodeEditor *pDoc, const QString &fileName)
     {
         // writing to file
         FileManager().writeToFile(fileName, pDoc->toPlainText());
-        statusBar()->showMessage(tr("Changes to document have been saved"), 5000);
+        statusBar()->showMessage(tr("Changes to document have been saved"), 3000);
     } catch (const QException&)
     {
         QMessageBox::warning(this, "Error", "Unable to open file for saving");
     }
+    pDoc->document()->setModified(false);
 }
 
 void MainWindow::openDoc(QString fileName)
@@ -428,6 +429,11 @@ void MainWindow::onSaveFileAsTriggered()
              "*.h ;; *.hpp ;; *.cpp ;; *.c ;; *.txt ;; *.json",
              &extension);
 
+    if (fileName.isEmpty())
+    {
+        return;
+    }
+
     int position = fileName.indexOf(QChar{'.'});
     fileName += extension.mid(position + 1);
 
@@ -520,6 +526,7 @@ void MainWindow::onUndoTriggered()
     {
         return;
     }
+    qDebug() << "undo";
     curDoc->undo();
 }
 

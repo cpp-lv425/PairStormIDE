@@ -17,7 +17,7 @@ class ChatWidget: public QWidget
     QLineEdit *mpEnterLine;
     QString mUserName;
 public:
-    ChatWidget(QWidget *pParent = nullptr);
+    explicit ChatWidget(QWidget *pParent = nullptr);
     void setUsersList(const QStringList &usersList);
     void setCurrentUserName(const QString &userName);
     void displayMessage(const QString &userName,

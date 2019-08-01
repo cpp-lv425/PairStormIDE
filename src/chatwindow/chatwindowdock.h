@@ -11,7 +11,7 @@ class ChatWindowDock: public QDockWidget
 
     ChatWidget *mpChatWidget;
 public:
-    ChatWindowDock(QWidget *pParent = nullptr);
+    explicit ChatWindowDock(QWidget *pParent = nullptr);
     void setUserName(const QString &userName);
     void displayMessage(const QString &userName,
                         const QString &message);
