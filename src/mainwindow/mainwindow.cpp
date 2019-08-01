@@ -31,6 +31,7 @@ MainWindow::MainWindow(QWidget *parent) :
     {
         StoreConf conf(this);
     }
+
     // when first started main window is maximized
     setWindowState(Qt::WindowMaximized);
 
@@ -60,7 +61,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
 QStringList MainWindow::getFileExtensions() const
 {
-    return QStringList() << ".c" << ".cpp" << ".h" << ".hpp" << ".txt" << ".json";
+    QSettings settings;
+    return QStringList {settings.value("cppExtentionsList").toStringList()};
 }
 
 void MainWindow::showStartPage()

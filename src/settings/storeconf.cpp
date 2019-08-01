@@ -1,20 +1,20 @@
 #include "storeconf.h"
 
-#include <QString>
-#include <QFileDialog>
-#include <QDebug>
-#include <QJsonArray>
-#include <QApplication>
-#include <QSettings>
+#include <regex>
 
-using std::string;
+#include <QDebug>
+#include <QString>
+#include <QSettings>
+#include <QJsonArray>
+#include <QFileDialog>
+#include <QApplication>
 
 StoreConf::StoreConf(QWidget * parent)
     : QWidget (parent)
 {
     conFile = getPathToConFile();
-    if (!conFile.size()) // keep all fields with default values, create conf.json with these values
-    {
+    if (!conFile.size()) // conf.json file not exist. keep all fields with default values,
+    {                   // create conf.json with these values
         writeJson();
         saveData();
     } else {
@@ -24,8 +24,6 @@ StoreConf::StoreConf(QWidget * parent)
     }
 }
 
-StoreConf::~StoreConf() { }
-
 QString StoreConf::getPathToConFile()
 {
     QString currentPath = QDir::currentPath();
@@ -33,16 +31,8 @@ QString StoreConf::getPathToConFile()
     QFile file(currentPath);
     if(file.exists())
         return "conf.json";
-
-    QFileDialog fd(this);
-    fd.setObjectName("fileDialog");
-    QString str = fd.getOpenFileName(this, "Choose configuration file *.json", "", "*.json");
-    //QString str = QFileDialog::getOpenFileName(this, "Choose configuration file *.json", "", "*.json");
-    std::string utf8_text = str.toUtf8().constData();
-    if (utf8_text.size() == 0) {    // user chose Cancel button.
+    else
         return "";
-    }
-    return str;
 }
 
 void StoreConf::writeJson()
@@ -59,8 +49,7 @@ void StoreConf::writeJson()
     QJsonDocument json_doc(root_obj);
     QString json_string = json_doc.toJson();
 
-    //if (!conFile.size())
-        conFile = conFileDefault;
+    conFile = conFileDefault;
 
     QFile save_file(conFile);
     if(!save_file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
@@ -76,7 +65,7 @@ void StoreConf::readJson()
 {
     QFile loadFile(conFile);        // close in destructor
     if (loadFile.open(QIODevice::ReadOnly))
-            readStatus = true;
+        readStatus = true;
     else {
         readStatus = false;
         return;
@@ -114,6 +103,17 @@ void StoreConf::parseJson()
 
     if (json.contains("cppExtentions") && json["cppExtentions"].isString())
         cppExtentions = json["cppExtentions"].toString();
+
+    cppExtentionsList.clear();
+
+    std::string cppExtentionsS = cppExtentions.toStdString();
+    std::vector<std::string> tokens;
+    std::regex re("\\;+");
+    std::sregex_token_iterator begin(cppExtentionsS.begin(), cppExtentionsS.end(), re, -1);
+    std::sregex_token_iterator end;
+    std::copy(begin, end, std::back_inserter(tokens));
+    for (unsigned i = 0; i < tokens.size() ; i++)
+        cppExtentionsList << tokens[i].c_str();
 }
 
 void StoreConf::saveData()
@@ -126,6 +126,7 @@ void StoreConf::saveData()
     settings.setValue("analizerFontSize", analizerFontSize);
     settings.setValue("analizerFontName", analizerFontName);
     settings.setValue("cppExtentions", cppExtentions);
+    settings.setValue("cppExtentionsList", QVariant::fromValue(cppExtentionsList));
 
     QApplication::setOrganizationName(organizationName);
     QApplication::setApplicationVersion(applicationVersion);
