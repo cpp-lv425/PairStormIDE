@@ -103,7 +103,28 @@ void Browser::newTab(const QString &keyword)
 
 void Browser::emptyDocumentationTab()
 {
+    DocumentationViewer *newWindow = new DocumentationViewer(this);
+
+    bool isPairStormExist;
+    QDir dir = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
+
+    isPairStormExist = dir.cd("PairStorm");
+
+    if(mConnectionManager->hasConnection())
+    {
+        newWindow->webView()->load(QUrl("https://en.cppreference.com/w/"));
+    }
+    else
+    {
+        dir.cd("reference");
+        dir.cd("en");
+        QString indexPath{dir.path() + "/" + "index.html"};
+        qDebug()<<indexPath;
+        newWindow->webView()->load(QUrl::fromLocalFile(indexPath));
+    }
 
 
+    mBrowseArea->addSubWindow(newWindow);
+    newWindow->setAttribute(Qt::WA_DeleteOnClose);
 }
 
