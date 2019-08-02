@@ -6,22 +6,22 @@
 #include <QVector>
 #include <QFileInfo>
 
-class DocumentationWebEngine : public QObject
+class DocumentationEngine : public QObject
 {
     Q_OBJECT
 public:
-    explicit DocumentationWebEngine(QObject *parent = nullptr);
+    explicit DocumentationEngine(QObject *parent = nullptr);
     void searchByKeyword(const QString &keyword);
     void searchByLibraryAndFunction(const QString &include, const QString &function);
 
-    QVector<QUrl> documentationLinks() const;
+    QVector<QFileInfo> documentationLinks() const;
 
 signals:
 
 public slots:
 
 private:
-    QVector<QUrl> mDocumentationLinks;
+    QVector<QFileInfo> mDocumentationLinks;
 };
 
 #endif // DOCUMENTATIONENGINE_H

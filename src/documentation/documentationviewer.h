@@ -14,6 +14,10 @@ class DocumentationViewer : public QMainWindow
 public:
     DocumentationViewer(QWidget *parent = nullptr);
 
+    QWebEngineView *webView() const;
+
+    void setHtml(const QString &html);
+
 private:
     QLineEdit *mUrlEdit;
     QStatusBar *mStatusBar;
@@ -32,7 +36,6 @@ private:
     QAction *mRefreshPageAction;
 
     void setupUI();
-
 private slots:
     void onHistoryTriggered();
     void onHelpTrigerred();

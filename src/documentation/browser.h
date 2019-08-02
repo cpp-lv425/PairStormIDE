@@ -3,7 +3,11 @@
 
 #include <QMainWindow>
 
-#include "mdiarea.h"
+QT_BEGIN_NAMESPACE
+class MDIArea;
+class ConnectionManager;
+class DocumentationEngine;
+QT_END_NAMESPACE
 
 class Browser : public QMainWindow
 {
@@ -14,8 +18,11 @@ signals:
 
 public slots:
     void newTab(const QString &keyword);
+    void emptyDocumentationTab();
 private:
     MDIArea *mBrowseArea;
+    ConnectionManager *mConnectionManager;
+    DocumentationEngine *mDocumentationEngine;
 };
 
 #endif // BROWSER_H

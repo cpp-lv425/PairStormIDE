@@ -3,13 +3,13 @@
 
 #include <QDir>
 
-DocumentationWebEngine::DocumentationWebEngine(QObject *parent)
+DocumentationEngine::DocumentationEngine(QObject *parent)
     : QObject(parent)
 {
 
 }
 
-void DocumentationWebEngine::searchByKeyword(const QString &keyword)
+void DocumentationEngine::searchByKeyword(const QString &keyword)
 {
     mDocumentationLinks.clear();
     bool result{false};
@@ -19,16 +19,13 @@ void DocumentationWebEngine::searchByKeyword(const QString &keyword)
         auto temp = DocumentationSearch::search(documentation,keyword);
         foreach(const auto &a, temp)
         {
-            mDocumentationLinks.push_back(DocumentationSearch::getUrl(a));
+            mDocumentationLinks.push_back(a);
         }
     }
-    else
-    {
-        mDocumentationLinks.push_back(QUrl("https://en.cppreference.com/w/"));
-    }
+
 }
 
-void DocumentationWebEngine::searchByLibraryAndFunction(const QString &include, const QString &function)
+void DocumentationEngine::searchByLibraryAndFunction(const QString &include, const QString &function)
 {
     mDocumentationLinks.clear();
     bool result{false};
@@ -38,16 +35,12 @@ void DocumentationWebEngine::searchByLibraryAndFunction(const QString &include, 
         auto temp = DocumentationSearch::search(documentation,include,function);
         foreach(const auto &a, temp)
         {
-            mDocumentationLinks.push_back(DocumentationSearch::getUrl(a));
+            mDocumentationLinks.push_back(a);
         }
-    }
-    else
-    {
-        mDocumentationLinks.push_back(QUrl("https://en.cppreference.com/w/"));
     }
 }
 
-QVector<QUrl> DocumentationWebEngine::documentationLinks() const
+QVector<QFileInfo> DocumentationEngine::documentationLinks() const
 {
     return mDocumentationLinks;
 }

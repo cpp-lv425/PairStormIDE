@@ -99,7 +99,8 @@ std::string HTMLContentGenerator::generate(const QVector<QFileInfo> &files)
 
         // File Name
         dirEntryMustashe.set("fileName", files.at(fileIndex).fileName().toStdString());
-        dirEntryMustashe.set("fileIndex", files.at(fileIndex).filePath().toStdString());
+        QUrl url{QUrl::fromLocalFile(files.at(fileIndex).filePath())};
+        dirEntryMustashe.set("fileIndex", url.toString().toStdString());
 
 
 

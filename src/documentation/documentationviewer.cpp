@@ -72,7 +72,6 @@ DocumentationViewer::DocumentationViewer(QWidget *parent)
     connect(mWebView, &QWebEngineView::loadStarted, this, &DocumentationViewer::loadStarted);
     connect(mWebView, &QWebEngineView::loadFinished, this, &DocumentationViewer::loadFinished);
     connect(mWebView, &QWebEngineView::loadProgress, mProgressBar, &QProgressBar::setValue);
-    //connect(mWebView, SIGNAL(iconChanged()), this, SLOT(iconChanged()));
     setWindowIcon(mWebView->icon());
 
     mCurrentPage = mWebView->page();
@@ -83,10 +82,14 @@ DocumentationViewer::DocumentationViewer(QWidget *parent)
 
 }
 
-void DocumentationViewer::setupUI()
+QWebEngineView *DocumentationViewer::webView() const
 {
+    return mWebView;
+}
 
-
+void DocumentationViewer::setHtml(const QString &html)
+{
+    mWebView->setHtml(html);
 }
 
 void DocumentationViewer::updateUrlBar(const QUrl &url)
@@ -98,14 +101,11 @@ void DocumentationViewer::updateUrlBar(const QUrl &url)
 
 void DocumentationViewer::urlRequested() {
     QString url = mUrlEdit->text();
-    if (!url.startsWith("http://")) {
-        url.push_front("http://");
-    }
     mWebView->load(QUrl(url));
 }
 
 void DocumentationViewer::titleChange(const QString &title) {
-    setWindowTitle(title + " - Browser");
+    setWindowTitle(title);
 }
 
 void DocumentationViewer::loadStarted()
@@ -132,6 +132,7 @@ void DocumentationViewer::iconChanged()
 
 void DocumentationViewer::linkHovered(const QString &url)
 {
+    qDebug()<<url;
     QToolTip::showText(cursor().pos(),url,this, rect() );
 }
 
