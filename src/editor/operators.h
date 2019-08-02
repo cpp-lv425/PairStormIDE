@@ -1,8 +1,9 @@
 #ifndef OPERATORS_H
 #define OPERATORS_H
+
 #include <QSet>
 
-const QSet<QString> OPERATORS = {"=", "+", "-", "*", "/", "%",
+const QSet<QString> cOperators = {"=", "+", "-", "*", "/", "%",
                                  "++", "--", "==", "!=", ">", "<",
                                  ">=", "<=", "!", "&&", "||", "~",
                                  "&", "|", "^", "<<", ">>", "+=",
@@ -10,5 +11,8 @@ const QSet<QString> OPERATORS = {"=", "+", "-", "*", "/", "%",
                                  "^=", "<<=", ">>=", "[", "]", "*",
                                  "&", "->", ".", "->*", ".*", "(",
                                  ")", ",", "?", ":", "::", "{", "}", ";"};
+
+const QString cBeginCommentBlock = "/*";
+const QChar cDot = '.';
 
 #endif // OPERATORS_H

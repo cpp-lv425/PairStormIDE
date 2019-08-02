@@ -1,4 +1,5 @@
 #include "codeeditor.h"
+#include <QDebug>
 
 
 #include <QRegularExpression>

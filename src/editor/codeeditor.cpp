@@ -1,7 +1,6 @@
 #include "codeeditor.h"
 #include "linenumberarea.h"
 #include<QtGui>
-#include<QDebug>
 #include<QTextCursor>
 #include<QPainter>
 #include <QFontDatabase>
@@ -42,6 +41,7 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     //This signal is emitted when the text document needs an update of the specified rect.
     //If the text is scrolled, rect will cover the entire viewport area.
     //If the text is scrolled vertically, dy carries the amount of pixels the viewport was scrolled.
+
     connect(this,  SIGNAL(updateRequest(QRect,int)), this, SLOT(updateLineNumberArea(QRect,int)));
     connect(this,  SIGNAL(cursorPositionChanged()), this, SLOT(runLexer()));
     connect(mTimer, SIGNAL(timeout()), this, SLOT(saveStateInTheHistory()));

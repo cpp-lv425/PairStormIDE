@@ -1,215 +1,307 @@
 #include "lexercpp.h"
-#include <QDebug>
 
-LexerCPP::LexerCPP()
+inline bool LexerCPP::isKeyword(const QString &lexem)
 {
-
+    return cKeywords.contains(lexem);
 }
 
-LexerCPP::~LexerCPP()
+inline bool LexerCPP::isIdentifier(const QString &lexem)
 {
-
+    const QRegExp cRx("[A-Za-z_][A-Za-z0-9_]*");
+    return cRx.exactMatch(lexem);
 }
 
-bool LexerCPP::isKeyword(QString lexem)
+inline bool LexerCPP::isNumber(const QString &lexem)
 {
-    return KEYWORDS.contains(lexem);
+    const QRegExp cRx("[0-9]+");
+    return cRx.exactMatch(lexem);
 }
 
-bool LexerCPP::isIdentifier(QString lexem)
+inline bool LexerCPP::isFloatNumber(const QString &lexem)
 {
-    QRegExp rx("[A-Za-z_][A-Za-z0-9_]*");
-    return rx.exactMatch(lexem);
+    const QRegExp cRx("[0-9]+\\.[0-9]+");
+    return cRx.exactMatch(lexem);
 }
 
-bool LexerCPP::isNumber(QString lexem)
+inline bool LexerCPP::isOperator(const QString &lexem)
 {
-    QRegExp rx("[0-9]+");
-    return rx.exactMatch(lexem);
+    return cOperators.contains(lexem);
 }
 
-bool LexerCPP::isFloatNumber(QString lexem)
+inline bool LexerCPP::isSymbolLiteral(const QString &lexem)
 {
-    QRegExp rx("[0-9]+\\.[0-9]+");
-    return rx.exactMatch(lexem);
+    const QRegExp cRx("'.'|'\.+'");
+    return cRx.exactMatch(lexem);
 }
 
-bool LexerCPP::isOperator(QString lexem)
+inline bool LexerCPP::isStringLiteral(const QString &lexem)
 {
-    return OPERATORS.contains(lexem);
+    const QRegExp cRx("\".*\"");
+    return cRx.exactMatch(lexem);
 }
 
-bool LexerCPP::isSymbolLiteral(QString lexem)
+inline bool LexerCPP::isOneLineComment(const QString &lexem)
 {
-    QRegExp rx("'.'|'\.+'");
-    return rx.exactMatch(lexem);
+    const QRegExp cRx("//.*");
+    return cRx.exactMatch(lexem);
 }
 
-bool LexerCPP::isStringLiteral(QString lexem)
+inline bool LexerCPP::isBlockComments(const QString &lexem)
 {
-    QRegExp rx("\".*\"");
-    return rx.exactMatch(lexem);
-}
-
-bool LexerCPP::isOneLineComment(QString lexem)
-{
-    QRegExp rx("//.*");
-    return rx.exactMatch(lexem);
-}
-
-bool LexerCPP::isBlockComments(QString lexem)
-{
-    QRegExp rx("/\\*[\\s\\S]*\\*/");
-    return rx.exactMatch(lexem);
+    const QRegExp cRx("/\\*[\\s\\S]*\\*/");
+    return cRx.exactMatch(lexem);
 }
 
 
-bool LexerCPP::isSpace(QChar sym)
+inline bool LexerCPP::isSpace(const QChar& sym)
 {
-    return SPACES.contains(sym);
+    return cSpaces.contains(sym);
 }
 
-bool LexerCPP::isAlpha(QChar sym)
+inline bool LexerCPP::isLetter(const QChar& sym)
 
 {
-    QRegExp rx("[A-Za-z]");
-    return rx.exactMatch(QString(sym));
+    const QRegExp cRx("[A-Za-z]");
+    return cRx.exactMatch(sym);
 }
 
-bool LexerCPP::isDigit(QChar sym)
+inline bool LexerCPP::isDigit(const QChar& sym)
 {
-    QRegExp rx("[0-9]");
-    return rx.exactMatch(QString(sym));
+    const QRegExp cRx("[0-9]");
+    return cRx.exactMatch(sym);
 }
 
-void LexerCPP::addLexem()
+inline bool LexerCPP::isQuote(const QChar& sym)
 {
-    --it;
-    tokens.append(Token(QString(current_lexem), States(state), it - symbolCount - current_lexem.size(), it - symbolCount, current_line));
-    current_lexem.clear();
-    state = ST;
+    return sym == '\'' || sym == '\"';
+}
+
+inline bool LexerCPP::isLexemEnd(const QChar& sym)
+{
+    return isSpace(sym) || isOperator(sym) || isQuote(sym);
+}
+
+inline void LexerCPP::addLexem()
+{
+    --mIndex;
+    mTokens.append(Token(QString(mCurrentLexem), State(mState), mIndex - mCurrentLexem.size(), mIndex));
+    mCurrentLexem.clear();
+    mState = State::ST;
 }
 
 
-void LexerCPP::changeState(States st, QChar sym)
+inline void LexerCPP::changeState(State state, QChar sym)
 {
-    state = st;
-    current_lexem += sym;
+    mState = state;
+    mCurrentLexem += sym;
 }
 
 void LexerCPP::clear()
 {
-    tokens.clear();
-    current_lexem.clear();
-    state = ST;
-    symbolCount = 0;
-    current_line = 0;
+    mTokens.clear();
+    mCurrentLexem.clear();
+    mState = State::ST;
+}
+
+QVector<Token> LexerCPP::getTokens() const
+{
+    return mTokens;
+}
+
+void LexerCPP::handleStartState(const QChar &sym)
+{
+    if(isLetter(sym))
+    {
+        changeState(State::ID, sym);
+    }
+    else if(isDigit(sym))
+    {
+        changeState(State::NUM, sym);
+    }
+    else if(isOperator(QString(sym)))
+    {
+        changeState(State::OPER, sym);
+    }
+    else if(isQuote(sym))
+    {
+        changeState(State::LIT, sym);
+    }
+}
+
+void LexerCPP::handleIdentifierState(const QChar &sym)
+{
+    if(isLexemEnd(sym))
+    {
+        addLexem();
+    }
+    else if(isIdentifier(mCurrentLexem + sym))
+    {
+        mCurrentLexem += sym;
+        if(isKeyword(mCurrentLexem))
+        {
+            mState = State::KW;
+        }
+    }
+    else
+    {
+        mState = State::UNDEF;
+    }
+}
+
+void LexerCPP::handleKeywordState(const QChar &sym)
+{
+    if(isLexemEnd(sym))
+    {
+        addLexem();
+    }
+    else if(isKeyword(mCurrentLexem + sym))
+    {
+        mCurrentLexem += sym;
+    }
+    else if (isIdentifier(mCurrentLexem + sym))
+    {
+        changeState(State::ID, sym);
+    }
+    else
+    {
+        mState = State::UNDEF;
+    }
+}
+
+void LexerCPP::handleNumberState(const QChar &sym)
+{
+    if(sym == cDot)
+    {
+        changeState(State::FNUM, sym);
+    }
+    else if(isLexemEnd(sym))
+    {
+        addLexem();
+    }
+    else if(isNumber(mCurrentLexem + sym))
+    {
+        mCurrentLexem += sym;
+    }
+    else
+    {
+        mState = State::UNDEF;
+    }
+}
+
+void LexerCPP::handleFloatNumberState(const QChar &sym)
+{
+    if(isLexemEnd(sym))
+    {
+        addLexem();
+    }
+    else if(isFloatNumber(mCurrentLexem + sym))
+    {
+        mCurrentLexem += sym;
+    }
+    else
+    {
+        mState = State::UNDEF;
+    }
+}
+
+void LexerCPP::handleOperatorState(const QChar &sym)
+{
+    if(isOneLineComment(mCurrentLexem + sym) || (mCurrentLexem + sym) == cBeginCommentBlock)
+    {
+        changeState(State::COM, sym);
+    }
+    else if(isSpace(sym) || !isOperator(mCurrentLexem + sym) || isQuote(sym))
+    {
+        addLexem();
+    }
+    else if(isOperator(mCurrentLexem + sym))
+    {
+        mCurrentLexem += sym;
+    }
+    else
+    {
+        mState = State::UNDEF;
+    }
+}
+
+void LexerCPP::handleCommentState(const QChar &sym)
+{
+    if((isOneLineComment(mCurrentLexem) && (sym == cNextLine) || isBlockComments(mCurrentLexem)))
+    {
+        addLexem();
+    }
+    else
+    {
+        mCurrentLexem += sym;
+    }
+}
+
+void LexerCPP::handleLiteralState(const QChar &sym)
+{
+    if(isSymbolLiteral(mCurrentLexem) || isStringLiteral(mCurrentLexem))
+    {
+        addLexem();
+    }
+    else if(sym == cNextLine)
+    {
+        addLexem();
+    }
+    else
+    {
+        mCurrentLexem += sym;
+    }
 }
 
 void LexerCPP::lexicalAnalysis(QString code)
 {
-    it = 0;
+    mIndex = 0;
     QChar sym = 0;
-    while(code.size() - it)
+
+    while(mIndex < code.size())
     {
-        sym = code[it];
-        ++it;
-        switch(state)
+        sym = code[mIndex];
+        ++mIndex;
+
+        switch(mState)
         {
-            case ST:
-                if(isSpace(sym)) {
-                    if(sym == '\n')
-                    {
-                        symbolCount = it;
-                        ++current_line;
-                    }
-                    break;
-                }
-
-                if(isAlpha(sym))
-                    changeState(ID, sym);
-                else if(isDigit(sym))
-                    changeState(NUM, sym);
-                else if(isOperator(QString(sym)))
-                    changeState(OPER, sym);
-                else if(sym == '\'' || sym == '"')
-                    changeState(LIT, sym);
+        case State::ST:
+            if(isSpace(sym))
+            {
+                break;
+            }
+            handleStartState(sym);
             break;
 
-            case ID:
-                if(isSpace(sym) || isOperator((QString)sym) || sym == '\"' || sym == '\'')
-                    addLexem();
-                else if(isIdentifier(current_lexem + sym))
-                {
-                    current_lexem += sym;
-                    if(isKeyword(current_lexem))
-                        state = KW;
-                }
-                else
-                    state = UNDEF;
+        case State::ID:
+            handleIdentifierState(sym);
             break;
 
-            case KW:
-                if(isSpace(sym) || isOperator((QString)sym) || sym == '\"' || sym == '\'')
-                    addLexem();
-                else if(isKeyword(current_lexem + sym))
-                    current_lexem += sym;
-                else if (isIdentifier(current_lexem + sym))
-                    changeState(ID, sym);
-                else
-                    state = UNDEF;
+        case State::KW:
+            handleKeywordState(sym);
             break;
 
-            case NUM:
-                if(sym == '.')
-                    changeState(FNUM, sym);
-                else if(isSpace(sym) || isOperator((QString)sym) || sym == '\"' || sym == '\'')
-                    addLexem();
-                else if(isNumber(current_lexem + sym))
-                    current_lexem += sym;
-                else
-                    state = UNDEF;
+        case State::NUM:
+            handleNumberState(sym);
             break;
 
-            case FNUM:
-                if(isSpace(sym) || isOperator((QString)sym) || sym == '\"' || sym == '\'')
-                    addLexem();
-                else if(isFloatNumber(current_lexem + sym))
-                    current_lexem += sym;
-                else
-                    state = UNDEF;
+        case State::FNUM:
+            handleFloatNumberState(sym);
             break;
 
-            case OPER:
-                if(isOneLineComment(current_lexem + sym) || (current_lexem + sym) == "/*")
-                    changeState(COM, sym);
-                else if(isSpace(sym) || !isOperator(current_lexem + sym) || sym == '\"' || sym == '\'')
-                    addLexem();
-                else if(isOperator(current_lexem + sym))
-                    current_lexem += sym;
-                else
-                    state = UNDEF;
+        case State::OPER:
+            handleOperatorState(sym);
             break;
 
-            case COM:
-                if((isOneLineComment(current_lexem) && sym == '\n') ||
-                    isBlockComments(current_lexem))
-                    addLexem();
-                else
-                    current_lexem += sym;
+        case State::COM:
+            handleCommentState(sym);
             break;
 
-            case LIT:
-                if(isSymbolLiteral(current_lexem) || isStringLiteral(current_lexem))
-                    addLexem();
-                else if(sym == '\n')
-                    addLexem();
-                else
-                    current_lexem += sym;
+        case State::LIT:
+            handleLiteralState(sym);
             break;
 
-            case UNDEF:
-                addLexem();
+        case State::UNDEF:
+            addLexem();
             break;
         }
     }

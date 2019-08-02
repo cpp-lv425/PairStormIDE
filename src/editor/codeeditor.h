@@ -54,6 +54,7 @@ public slots:
 
 signals:
     void changesAppeared();
+    void sendLexem(QString);
     void closeDocEventOccured(CodeEditor*);
 
 private:
