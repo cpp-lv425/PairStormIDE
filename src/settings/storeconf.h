@@ -31,9 +31,9 @@ private:
     QString organizationName        = "Lv-425.C++";
     QString applicationVersion      = "0.1";
     QString applicationName         = "Pair Storm";
-    QString analizerStyle           = "white";
+    QString analizerStyle           = "WHITE";
     QString analizerFontSize        = "12";
-    QString analizerFontName        = "Courier 10 Pitch";
+    QString analizerFontName        = "Consolas";// Courier 10 Pitch
     QString cppExtentions           = ".c;.cpp;.h;.hpp;.json;.txt";
     QStringList cppExtentionsList {".c", ".cpp", ".h", ".hpp", ".json", ".txt"};
 

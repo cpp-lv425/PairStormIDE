@@ -625,7 +625,6 @@ void MainWindow::onConnectTriggered()
 
 void MainWindow::onSettingsTriggered()
 {
-    qDebug() << "settings";
     MenuOptions *pMenuOptions = new MenuOptions(this);
 }
 
@@ -759,6 +758,8 @@ void MainWindow::saveMainWindowState()
 void MainWindow::restoreMainWindowState()
 {
     QSettings settings(QApplication::organizationName(), QApplication::applicationName());
-    restoreGeometry(settings.value("mainWindowGeometry").toByteArray());
-    restoreState(settings.value("mainWindowState").toByteArray());
+    if (settings.contains("mainWindowGeometry"))
+        restoreGeometry(settings.value("mainWindowGeometry").toByteArray());
+    if (settings.contains("mainWindowState"))
+        restoreState(settings.value("mainWindowState").toByteArray());
 }
