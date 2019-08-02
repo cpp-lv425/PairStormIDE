@@ -17,6 +17,7 @@ public:
     AddCommentButton(QWidget *parent = nullptr);
     ~AddCommentButton();
     void setCurrentLine(int currentLine);
+    int getCurrentLine();
 
 signals:
     void addCommentButtonPressed(int);

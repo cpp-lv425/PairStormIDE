@@ -8,6 +8,7 @@ class MainWindow;
 }
 
 QT_BEGIN_NAMESPACE
+class LocalConnectorInterface;
 class ProjectViewerDock;
 class QFileSystemModel;
 class BottomPanelDock;
@@ -30,6 +31,7 @@ public:
     ~MainWindow();
 
 private:
+    LocalConnectorInterface * mplocalConnector;
     Ui::MainWindow *ui;
     ProjectViewerDock *mpProjectViewerDock;
     ChatWindowDock *mpChatWindowDock;
@@ -83,6 +85,7 @@ private slots:
     void onRefactorTriggered();
     void onConnectTriggered();
     void onSettingsTriggered();
+    void onTest();
 
     // help menu
     void onAboutTriggered();
@@ -92,12 +95,7 @@ private slots:
 
 public slots:
     void onOpenFileFromProjectViewer(QString fileName);    
-    void onCloseWindow(CodeEditor *curDoc);
-    void onUserToConnectSelected(QString userName);
-    void onNewMessage(const QString &userName,
-                      const QString &message);
-    void onSendMessage(const QString &userName,
-                       const QString &message);
+    void onCloseWindow(CodeEditor *curDoc);   
     void onConnectionFailed();
 
 private:

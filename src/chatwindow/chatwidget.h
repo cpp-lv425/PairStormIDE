@@ -13,15 +13,22 @@ class ChatWidget: public QWidget
     Q_OBJECT
 
     QListWidget *mpUsersList;
+    QStringList  mOnlineUsers;
+    QStringList  mConnectedUsers;
+    QString      mUserName;
+
     QPlainTextEdit *mpFeed;
-    QLineEdit *mpEnterLine;
-    QString mUserName;
+    QLineEdit      *mpEnterLine;
+
+    void updateUsersList();
+
 public:
     explicit ChatWidget(QWidget *pParent = nullptr);
-    void setUsersList(const QStringList &usersList);
-    void setCurrentUserName(const QString &userName);
-    void displayMessage(const QString &userName,
-                        const QString &message);
+    void setOnlineUsers(const QStringList & onlineUsers);
+    void setConnectedUsers(const QStringList & connectedUsers);
+    void setCurrentUserName(const QString& userName);
+    void displayMessage(const QString& userName,
+                        const QString& message);
 
 public slots:
     void onSendCommand();
@@ -32,7 +39,7 @@ private slots:
 
 signals:
     void userToConnectSelected(QString);
-    void sendMessage(const QString&, const QString&);
+    void sendMessage(const QString&);
 };
 
 #endif // CHATWIDGET_H

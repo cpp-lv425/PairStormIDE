@@ -11,6 +11,7 @@
 #include <QDebug> // temporarily included
 #include <QFile>
 
+#include "localconnectorgenerator.h"
 #include "projectviewerdock.h"
 #include "bottompaneldock.h"
 #include "chatwindowdock.h"
@@ -28,6 +29,10 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
+    // Generate default local network connector
+    mplocalConnector =
+            LocalConnectorGenerator::getDefaultConnector();
+
     ui->setupUi(this);
     {
         StoreConf conf(this);
@@ -181,6 +186,9 @@ void MainWindow::setupMainMenu()
     QAction *pSettingsAction = toolsMenu->addAction("&Settings...", this, &MainWindow::onSettingsTriggered);
     pSettingsAction->setDisabled(true);
 
+    // for Valik for testing purposes
+    toolsMenu->addAction("&Test", this, &MainWindow::onTest, Qt::CTRL + Qt::SHIFT + Qt::Key_T);
+
     // help menu
     QMenu *helpMenu = new QMenu("&Help");
 
@@ -308,10 +316,30 @@ void MainWindow::createChatWindow()
 {
     // create instance of Chat Window
     mpChatWindowDock = new ChatWindowDock(this);
+
+    // Add updating users list on discovering new users
+    connect(mplocalConnector, &LocalConnectorInterface::onlineUsersUpdated,
+            mpChatWindowDock, &ChatWindowDock::updateOnlineUsersOnChange,
+            Qt::UniqueConnection);
+
+    // Add updating users list on connecting new users
+    connect(mplocalConnector, &LocalConnectorInterface::onlineUsersUpdated,
+            mpChatWindowDock, &ChatWindowDock::updateConnectedUsersOnChange,
+            Qt::UniqueConnection);
+
     connect(mpChatWindowDock, &ChatWindowDock::userToConnectSelected,
-            this, &MainWindow::onUserToConnectSelected);
+            mplocalConnector, &LocalConnectorInterface::startSharing,
+            Qt::UniqueConnection);
+
     connect(mpChatWindowDock, &ChatWindowDock::sendMessage,
-            this, &MainWindow::onSendMessage);
+            mplocalConnector, &LocalConnectorInterface::shareMessage,
+            Qt::UniqueConnection);
+
+    connect(mplocalConnector, &LocalConnectorInterface::messageReceived,
+            mpChatWindowDock, &ChatWindowDock::displayMessage,
+            Qt::UniqueConnection);
+
+
 
     mpChatWindowDock->setObjectName("mpChatWindowDock");
     addDockWidget(Qt::RightDockWidgetArea, mpChatWindowDock, Qt::Vertical);
@@ -634,12 +662,26 @@ void MainWindow::onConnectTriggered()
     }
     mCurrentUserName = userInput;
     mpChatWindowDock->setUserName(userInput);
+    mplocalConnector->configureOnLogin(mCurrentUserName);
 }
 
 void MainWindow::onSettingsTriggered()
 {
     //
 }
+
+//==================================================================================================
+//                                                                              FOR TESTING PURPOSES
+void MainWindow::onTest()
+{
+    qDebug() << "===========================================";
+    qDebug() << "==============               ==============";
+    qDebug() << "=============   VALIK TESTS   =============";
+    qDebug() << "==============               ==============";
+    qDebug() << "===========================================";
+    //mplocalConnector->testSendHelloToLastServer();
+}
+//==================================================================================================
 
 void MainWindow::onAboutTriggered()
 {
@@ -684,21 +726,6 @@ void MainWindow::onOpenFileFromProjectViewer(QString fileName)
 void MainWindow::onCloseWindow(CodeEditor *curDoc)
 {
     saveDocument(curDoc, curDoc->getFileName());
-}
-
-void MainWindow::onUserToConnectSelected(QString userName)
-{
-    //
-}
-
-void MainWindow::onNewMessage(const QString &userName, const QString &message)
-{
-    mpChatWindowDock->displayMessage(userName, message);
-}
-
-void MainWindow::onSendMessage(const QString &userName, const QString &message)
-{
-    //
 }
 
 void MainWindow::onConnectionFailed()

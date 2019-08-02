@@ -18,6 +18,7 @@ const int TOP_UNUSED_PIXELS_HEIGHT = 4;
 #include<QPlainTextEdit>
 #include<QObject>
 #include<QMouseEvent>
+#include<QLabel>
 
 class CodeEditor : public QPlainTextEdit
 {
@@ -68,6 +69,7 @@ private:
    QTimer *mTimer;
    LexerCPP mLexer;
    AddCommentButton *mAddCommentButton;
+   QLabel *mCurrentCommentLable;
    int mLinesCount;
 };
 
