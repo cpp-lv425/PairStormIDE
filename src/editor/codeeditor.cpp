@@ -193,7 +193,7 @@ void CodeEditor::zoom(int val)
 
 void CodeEditor::setZoom(int zoomVal)
 {
-    int val = zoomVal < mCurrentZoom ? 1: -1;
+    int val = zoomVal > mCurrentZoom ? 1: -1;
     while(zoomVal != mCurrentZoom)
          zoom(val);
 }
