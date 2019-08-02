@@ -11,9 +11,13 @@ StartPage::StartPage(QWidget *parent) :
     ui(new Ui::StartPage)
 {    
     ui->setupUi(this);
-    setWindowTitle("Start Page");    
+    setWindowTitle("Start Page");
 
     int maxButtonsWidth = 200;
+    QFont lblFont("Segoe UI", 12);
+    //lblFont.setBold(true);
+    QPalette palette;
+    palette.setColor(QPalette::WindowText, Qt::blue);
 
     // creating & configuring new file button
     pNewBtn = new QPushButton(tr("   New File"));
@@ -27,7 +31,7 @@ StartPage::StartPage(QWidget *parent) :
 
     // creating & configuring open folder button
     pOpenDirBtn = new QPushButton(tr("   Open Folder"));
-    setupButton(pOpenDirBtn, style()->standardIcon(QStyle::SP_DirHomeIcon), maxButtonsWidth);
+    setupButton(pOpenDirBtn, style()->standardIcon(QStyle::SP_DriveHDIcon), maxButtonsWidth);
     connect(pOpenDirBtn, &QPushButton::pressed, this, &StartPage::openDirPressed);
 
     // creating & configuring reference call button
@@ -38,6 +42,7 @@ StartPage::StartPage(QWidget *parent) :
     // creating & configuring settings call button
     pSettingsBtn = new QPushButton(tr("   Settings"));
     setupButton(pSettingsBtn, style()->standardIcon(QStyle::SP_BrowserReload), maxButtonsWidth);
+    pSettingsBtn->setDisabled(true);
     connect(pSettingsBtn, &QPushButton::pressed, this, &StartPage::settingsBtnPressed);
 
     // bindong buttons
@@ -50,15 +55,20 @@ StartPage::StartPage(QWidget *parent) :
 
     // creating & laying out labels
     QLabel *pNewLbl = new QLabel(tr("Create new file"));
-    pNewLbl->setAlignment(Qt::AlignCenter);
+    setupLabels(pNewLbl, lblFont, palette);
+
     QLabel *pOpenLbl = new QLabel(tr("Open existing file"));
-    pOpenLbl->setAlignment(Qt::AlignCenter);
+    setupLabels(pOpenLbl, lblFont, palette);
+
     QLabel *pOpenDirLbl = new QLabel(tr("Open existing project directory"));
-    pOpenDirLbl->setAlignment(Qt::AlignCenter);
+    setupLabels(pOpenDirLbl, lblFont, palette);
+
     QLabel *pReferenceLbl = new QLabel(tr("Open Reference Assistant"));
-    pReferenceLbl->setAlignment(Qt::AlignCenter);
+    setupLabels(pReferenceLbl, lblFont, palette);
+
     QLabel *pSettingsLbl = new QLabel(tr("Configure IDE"));
-    pSettingsLbl->setAlignment(Qt::AlignCenter);
+    setupLabels(pSettingsLbl, lblFont, palette);
+    pSettingsLbl->setDisabled(true);
 
     QVBoxLayout *pLblLayout = new QVBoxLayout;
     pLblLayout->addWidget(pNewLbl);
@@ -79,7 +89,7 @@ StartPage::StartPage(QWidget *parent) :
     QPoint cntr = parent->geometry().center();
     int x = cntr.x() - width() / 2;
     int y = cntr.y() - height() / 2;
-    move(x, y);    
+    move(x, y);
 }
 
 void StartPage::showStartPage()
@@ -131,4 +141,13 @@ void StartPage::settingsBtnPressed()
 {
     emit onSettingsBtnPressed();
     accept();
+}
+
+void StartPage::setupLabels(QLabel *pLabel,
+                            QFont &lblFont,
+                            QPalette &palette)
+{
+    pLabel->setAlignment(Qt::AlignCenter);
+    pLabel->setFont(lblFont);
+    pLabel->setPalette(palette);
 }

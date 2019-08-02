@@ -2,6 +2,8 @@
 
 #include <QDebug>
 #include <QRegularExpression>
+#include<QTextCursor>
+#include<QDebug>
 
 QString CodeEditor::tabs="";
 bool CodeEditor::ispressSlesh=false;
@@ -76,6 +78,7 @@ void removeMultilineComment(CodeEditor *editor, QTextCursor &cursor, int start, 
 
 void CodeEditor::eventBracketLeft(QKeyEvent *e)
 {
+
     QPlainTextEdit::keyPressEvent(e);
     this->insertPlainText("]");
     this->moveCursor(QTextCursor::Left);
@@ -90,6 +93,7 @@ void CodeEditor::eventBraceLeft(QKeyEvent *e)
     this->verticalScrollBar();
     return;
 }
+
 
 void CodeEditor::eventSlash(QKeyEvent *e)
 {

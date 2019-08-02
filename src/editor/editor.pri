@@ -2,6 +2,7 @@ DEPENDPATH += $$PWD
 INCLUDEPATH += $$PWD
 
 SOURCES += \
+        $$PWD/addcommentbutton.cpp \
         $$PWD/changesmanager.cpp \
         $$PWD/codeeditor.cpp \
         $$PWD/hotkeys.cpp \
@@ -12,6 +13,7 @@ SOURCES += \
         $$PWD/widget.cpp
 
 HEADERS += \
+        $$PWD/addcommentbutton.h \
         $$PWD/changemanager.h \
         $$PWD/codeeditor.h \
         $$PWD/fmstates.h \
@@ -30,3 +32,5 @@ HEADERS += \
 FORMS += \
         $$PWD/inputcommentwidget.ui \
         $$PWD/widget.ui
+
+DISTFILES +=
