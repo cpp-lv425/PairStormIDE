@@ -15,6 +15,7 @@ public:
     explicit NewFileDialog(QStringList &fileExtensions,
                  QWidget *pParent = nullptr);
     QString start();
+    bool checkIfValid(const QString& fileName);
 
 private:
     QLineEdit *mpLine;

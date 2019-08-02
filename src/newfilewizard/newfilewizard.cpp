@@ -105,6 +105,11 @@ QString NewFileDialog::start()
     return mFileName;
 }
 
+bool NewFileDialog::checkIfValid(const QString &fileName)
+{
+    return !fileName.contains(QRegExp("[*./:;|=,]"));
+}
+
 void NewFileDialog::onSelectDirectory()
 {
     mPath = QFileDialog::getExistingDirectory(this, "Select project directory", QDir::homePath());
@@ -125,10 +130,16 @@ void NewFileDialog::onCreateFile()
     }
 
     // if file name is empty string
-    if(mpLine->text().isEmpty())
+    if (mpLine->text().isEmpty())
     {
         QMessageBox::warning(this, "Incorrect name",
                              "Please enter file name.");
+        return;
+    }
+    if (!checkIfValid(mpLine->text()))
+    {
+        QMessageBox::warning(this, "Incorrect name",
+                             "Invalid file name.");
         return;
     }
 
