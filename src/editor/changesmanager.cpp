@@ -11,13 +11,13 @@ ChangeManager::~ChangeManager() = default;
 
 void ChangeManager::limitCheck()
 {
-    if(mChangesHistory.size() > CHANGES_HISTORY_MAX_SIZE)
+    if (mChangesHistory.size() > CHANGES_HISTORY_MAX_SIZE)
         mChangesHistory.pop_front();
 }
 
 void ChangeManager::removeHistory()//it's not necessary to hold history if we returned to the start and didn't press ctrl + Y
 {
-    if(!mChangesHistory.size())
+    if (!mChangesHistory.size())
         return;
     mChangesHistory.erase(std::next(mCurrentFileStateIter, 1), mChangesHistory.end());
 }
@@ -30,7 +30,7 @@ bool ChangeManager::isFileChanged(const std::string &newFileState)
 int ChangeManager::getCursorPosNext()
 {
     auto tempIter = mCurrentFileStateIter;
-    if(tempIter == mChangesHistory.end() - 1)
+    if (tempIter == mChangesHistory.end() - 1)
     {
         return static_cast<int>(tempIter->beginChangePos);
     }
@@ -42,7 +42,7 @@ int ChangeManager::getCursorPosPrev()
 {
     auto tempIter = mCurrentFileStateIter;
     tempIter++;
-    if(tempIter == mChangesHistory.end())
+    if (tempIter == mChangesHistory.end())
         tempIter--;
     return static_cast<int>(tempIter->beginChangePos);
 }
@@ -97,7 +97,6 @@ std::string ChangeManager::undo()
 {
     if (mCurrentFileStateIter == mChangesHistory.begin())
         return mCurrentFileState;
-//TEST
     auto pos = mCurrentFileStateIter->beginChangePos;
     std::string from = mCurrentFileStateIter->after;
     std::string to = mCurrentFileStateIter->before;
@@ -111,17 +110,17 @@ std::string ChangeManager::undo()
 
 std::string ChangeManager::redo()
 {
-    if (mCurrentFileStateIter == (mChangesHistory.end() - 1) ||
-        mCurrentFileStateIter == (mChangesHistory.end()))//if is no any record in the change history list
-        return mCurrentFileState;
+    if (mCurrentFileStateIter == (mChangesHistory.end() - 1)
+        || mCurrentFileStateIter == (mChangesHistory.end()))//if is no any record in the change history list
+            return mCurrentFileState;
 
     mCurrentFileStateIter++;
 
-    auto pos = mCurrentFileStateIter->beginChangePos;
     std::string to   = mCurrentFileStateIter->after;
     std::string from = mCurrentFileStateIter->before;
 
-    auto begin_replace_pos = mCurrentFileState.begin() + static_cast<long long>(pos);
+    auto begin_replace_pos = mCurrentFileState.begin() +
+                           static_cast<long long>(mCurrentFileStateIter->beginChangePos);
     auto end_replace_pos   = begin_replace_pos + static_cast<long long>(from.length());
 
     mCurrentFileState.replace(begin_replace_pos, end_replace_pos, to);
