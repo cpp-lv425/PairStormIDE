@@ -50,4 +50,3 @@ void ProjectViewerDock::setDir(QDir curDir)
     mpTreeViewer->setDirectory(curDir);
 }
 
-
