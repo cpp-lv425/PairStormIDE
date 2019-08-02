@@ -87,7 +87,7 @@ StartPage::StartPage(QWidget *parent) :
     setLayout(pWdwLayout);
 
     // resizing & centring dialog
-    setGeometry(geometry().x(), geometry().y(), 500, 300);
+    setGeometry(geometry().x(), geometry().y(), 500, 250);
     QPoint cntr = parent->geometry().center();
     int x = cntr.x() - width() / 2;
     int y = cntr.y() - height() / 2;

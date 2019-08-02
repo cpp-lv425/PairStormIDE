@@ -187,8 +187,7 @@ void MainWindow::setupMainMenu()
     toolsMenu->addSeparator();
 
     // opening settings window
-    QAction *pSettingsAction = toolsMenu->addAction("&Settings...", this, &MainWindow::onSettingsTriggered);
-    pSettingsAction->setDisabled(true);
+    toolsMenu->addAction("&Settings...", this, &MainWindow::onSettingsTriggered);
 
     // help menu
     QMenu *helpMenu = new QMenu("&Help");
