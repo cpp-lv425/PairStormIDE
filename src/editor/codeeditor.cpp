@@ -1,7 +1,6 @@
 #include "codeeditor.h"
 #include "linenumberarea.h"
 #include<QtGui>
-#include<QDebug>
 #include<QTextCursor>
 #include<QPainter>
 #include <QFontDatabase>
@@ -65,14 +64,6 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
 
 void CodeEditor::runLexerAndHighlight()
 {
-<<<<<<< HEAD
-    lcpp->clear();
-    lcpp->lexicalAnalysis(document()->toPlainText());
-    tokens = lcpp->getTokens();
-    for(auto it: tokens)
-    {
-        qDebug() << it.name << ' ' << it.begin << ' ' << it.end << ' ' << it.type << '\n';
-=======
     //run lexer
     mLcpp->clear();
     mLcpp->lexicalAnalysis(document()->toPlainText());
@@ -83,7 +74,6 @@ void CodeEditor::runLexerAndHighlight()
     for(int i = 0; i < mHcpp->mLines.size(); i++)
     {
         mHcpp->highlightBlock(mHcpp->mLines[i]);
->>>>>>> develop
     }
 }
 
