@@ -2,6 +2,7 @@
 #define NEWFILEWIZARD_H
 
 #include <QDialog>
+#include <QMap>
 
 class QListWidget;
 class QLineEdit;
@@ -10,10 +11,12 @@ class QLabel;
 class NewFileDialog: public QDialog
 {
     Q_OBJECT
+
 public:
-    NewFileDialog(QStringList &fileExtensions,
+    explicit NewFileDialog(QStringList &fileExtensions,
                  QWidget *pParent = nullptr);
     QString start();
+    bool isValidFilename(const QString& fileName);
 
 private:
     QLineEdit *mpLine;

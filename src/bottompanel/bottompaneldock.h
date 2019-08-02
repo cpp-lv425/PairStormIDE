@@ -11,9 +11,9 @@ class BottomPanelDock: public QDockWidget
 {
     Q_OBJECT
 
-    QTabWidget *pTabWgt;
+    QTabWidget *mpTabWgt;
 public:
-    BottomPanelDock(QWidget *pParent = nullptr);
+    explicit BottomPanelDock(QWidget *pParent = nullptr);
 };
 
 #endif // BOTTOMPANELDOCK_H
