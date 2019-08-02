@@ -6,12 +6,12 @@
 #include <QFileDialog>
 #include <QPushButton>
 #include <QMessageBox>
-#include <QException>
 #include <QLineEdit>
 #include <QLabel>
 #include <QDir>
 
 #include "filemanager.h"
+#include "utils.h"
 
 NewFileDialog::NewFileDialog(QStringList &fileExtensions,
                              QWidget *pParent): QDialog (pParent)
@@ -157,7 +157,7 @@ void NewFileDialog::onCreateFile()
     try
     {
         FileManager().createFile(dirName + '/' + fileName);
-    } catch (const QException&)
+    } catch (const FileOpeningFailure&)
     {
         QMessageBox::warning(this, "Error", "Unable to create file");
         return;

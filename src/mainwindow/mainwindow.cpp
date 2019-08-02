@@ -216,7 +216,7 @@ void MainWindow::saveDocument(CodeEditor *pDoc, const QString &fileName)
         // writing to file
         FileManager().writeToFile(fileName, pDoc->toPlainText());
         statusBar()->showMessage(tr("Changes to document have been saved"), 3000);
-    } catch (const QException&)
+    } catch (const FileOpeningFailure&)
     {
         QMessageBox::warning(this, "Error", "Unable to open file for saving");
     }
@@ -235,7 +235,7 @@ void MainWindow::openDoc(QString fileName)
     {
         return;
     }
-    catch (const QException&)
+    catch (const FileOpeningFailure&)
     {
         QMessageBox::warning(this, tr("Error"),
                              tr("Unable to open specified file."));
