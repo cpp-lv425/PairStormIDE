@@ -3,6 +3,8 @@
 
 
 #include <QRegularExpression>
+#include<QTextCursor>
+#include<QDebug>
 
 QString CodeEditor::tabs="";
 
@@ -85,6 +87,11 @@ void CodeEditor::keyPressEvent(QKeyEvent *e)
             e = new QKeyEvent(e->type(), e->key(), e->modifiers()&Qt::MetaModifier &Qt::KeypadModifier);
         }
 
+        if(e->key() == Qt::Key_Enter || e->key() == Qt::Key_Return || e->key() == Qt::Key_Space)
+        {
+            saveStateInTheHistory();
+        }
+
         if(e->key() == Qt::Key_Enter || e->key() == Qt::Key_Return)
         {
             if(isinsidebracket())
@@ -157,20 +164,16 @@ void CodeEditor::keyPressEvent(QKeyEvent *e)
             return;
         }
         if((e->key() == Qt::Key_Plus && e->modifiers() & Qt::ControlModifier)//ctrl & +
-                && currentZoom <= 150)// forbid to zoom so much
+                && mCurrentZoom <= 150)// forbid to zoom so much
         {
-            this->zoomIn(1);//increase zoom
-            currentZoom += 1;
-            setViewportMargins(lineNumberAreaWidth(), 0, 0, 0);// reset text margin in accordance to linecouter change
+            zoom(1);
             return;
         }
 
         if((e->key() == Qt::Key_Minus && e->modifiers() & Qt::ControlModifier)//ctrl & -
-                && currentZoom >= 50)//forbid to zoom so much
+                && mCurrentZoom >= 50)//forbid to zoom so much
         {
-            this->zoomOut(1);//decrease zoom
-            currentZoom -= 1;
-            setViewportMargins(lineNumberAreaWidth(), 0, 0, 0);// reset text margin in accordance to linecouter change
+            zoom(-1);
             return;
         }
 
@@ -254,37 +257,30 @@ void CodeEditor::keyPressEvent(QKeyEvent *e)
     }
 
     if((e->key() == Qt::Key_Plus && e->modifiers() & Qt::ControlModifier)//ctrl & +
-            && currentZoom <= 150)// forbid to zoom so much
+            && mCurrentZoom <= 150)// forbid to zoom so much
     {
-        this->zoomIn(1);//increase zoom
-        currentZoom += 1;
-        setViewportMargins(lineNumberAreaWidth(), 0, 0, 0);// reset text margin in accordance to linecouter change
-        return;
+       zoom(1);
+       return;
     }
 
     if((e->key() == Qt::Key_Minus && e->modifiers() & Qt::ControlModifier)//ctrl & -
-            && currentZoom >= 50)//forbid to zoom so much
+            && mCurrentZoom >= 50)//forbid to zoom so much
     {
-        this->zoomOut(1);//decrease zoom
-        currentZoom -= 1;
-        setViewportMargins(lineNumberAreaWidth(), 0, 0, 0);// reset text margin in accordance to linecouter change
+        zoom(-1);
         return;
     }
 
     if(e->key() == Qt::Key_Z && e->modifiers() & Qt::ControlModifier)
     {
-        QString text = QString::fromStdString(this->changeManager->undo());
-        this->document()->setPlainText(text);
+        undo();
         return;
     }
 
     if(e->key() == Qt::Key_Y && e->modifiers() & Qt::ControlModifier)
     {
+        redo();
 
-        QString text = QString::fromStdString(this->changeManager->redo());
-        this->document()->setPlainText(text);
         return;
     }
     QPlainTextEdit::keyPressEvent(e);
 }
-

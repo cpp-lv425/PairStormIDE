@@ -21,8 +21,6 @@ public:
 
     void setFilters(QStringList filters);
     void setDir(QDir curDir);
-    ~ProjectViewerDock();
-
 };
 
 #endif // PROJECTVIEWERDOCK_H
