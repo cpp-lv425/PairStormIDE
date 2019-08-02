@@ -447,8 +447,6 @@ void MainWindow::onSaveFileTriggered()
     }
     // saving doc
     saveDocument(curDoc, curDoc->getFileName());
-
-
 }
 
 void MainWindow::onSaveFileAsTriggered()
@@ -708,7 +706,7 @@ CodeEditor* MainWindow::createNewDoc()
     mpDocsArea->addSubWindow(newDoc);
     connect(newDoc, &CodeEditor::closeDocEventOccured, this, &MainWindow::onCloseWindow);
     newDoc->setAttribute(Qt::WA_DeleteOnClose);
-
+    newDoc->document()->setModified(false);
     return newDoc;
 }
 
