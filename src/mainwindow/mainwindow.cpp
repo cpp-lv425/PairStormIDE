@@ -736,7 +736,7 @@ void MainWindow::onCloseWindow(CodeEditor *curDoc)
                     QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel
                     );
 
-        if(reply == QMessageBox::No | reply == QMessageBox::Cancel)
+        if((reply == QMessageBox::No) | (reply == QMessageBox::Cancel))
             return;
 
         saveDocument(curDoc, curDoc->getFileName());
