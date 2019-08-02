@@ -232,8 +232,8 @@ void CodeEditor::keyPressEvent(QKeyEvent *e)
 
     if((e->key() == Qt::Key_V && e->modifiers() & Qt::ControlModifier))
     {
-        saveStateInTheHistory();
         QPlainTextEdit::keyPressEvent(e);
+        saveStateInTheHistory();
         return;
     }
 
