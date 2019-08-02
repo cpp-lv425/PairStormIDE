@@ -248,7 +248,6 @@ void CodeEditor::closeEvent(QCloseEvent *event)
         event->accept();
         return;
     }
-
     QMessageBox::StandardButton reply = QMessageBox::question
             (this,
              "Saving Changes",

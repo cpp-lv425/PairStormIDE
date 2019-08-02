@@ -519,40 +519,6 @@ void MainWindow::onSaveAllFilesTriggered()
 
 void MainWindow::onCloseFileTriggered()
 {    
-    auto curDoc = getCurrentDoc();
-
-    // if there are no opened documents
-    if (!curDoc)
-    {
-        return;
-    }
-    // if doc wasn't modified then just close doc
-    if (!curDoc->document()->isModified())
-    {
-        mpDocsArea->closeActiveSubWindow();
-        return;
-    }
-
-    // ask user whether changes should be saved
-    QMessageBox::StandardButton reply
-            = QMessageBox::question
-            (this,
-             userMessages[UserMessages::PromptSaveTitle],
-            userMessages[UserMessages::SaveQuestion],
-            QMessageBox::StandardButton::Yes |
-            QMessageBox::StandardButton::No |
-            QMessageBox::StandardButton::Cancel);
-
-    // checking user's answer
-    if (reply == QMessageBox::Yes)
-    {
-        saveDocument(curDoc, curDoc->getFileName());
-    }
-    if (reply == QMessageBox::Cancel)
-    {
-        return;
-    }
-
     // closing doc
     mpDocsArea->closeActiveSubWindow();
 }

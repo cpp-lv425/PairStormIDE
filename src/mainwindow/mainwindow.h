@@ -15,7 +15,6 @@ class BottomPanelDock;
 class QListWidgetItem;
 class ChatWindowDock;
 class QMdiSubWindow;
-class QDockWidget;
 class CodeEditor;
 class MDIArea;
 QT_END_NAMESPACE
