@@ -10,6 +10,7 @@
 #include <QLabel>
 #include <QDir>
 
+#include "usermessages.h"
 #include "filemanager.h"
 #include "utils.h"
 
@@ -19,7 +20,7 @@ NewFileDialog::NewFileDialog(QStringList &fileExtensions,
     setWindowTitle("New File");
 
     // info label
-    QLabel *pLabel = new QLabel(tr("Please specify file name, file extension and project directory."));
+    QLabel *pLabel = new QLabel(userMessages[UserMessages::NewFileWizardMsg]);
     pLabel->setWordWrap(true);
     QFont lblFont("Segoe UI", 12);
     lblFont.setBold(true);
@@ -112,7 +113,10 @@ bool NewFileDialog::isValidFilename(const QString &fileName)
 
 void NewFileDialog::onSelectDirectory()
 {
-    mPath = QFileDialog::getExistingDirectory(this, "Select project directory", QDir::homePath());
+    mPath = QFileDialog::getExistingDirectory
+            (this,
+             userMessages[UserMessages::SelectDirectoryTitle],
+             QDir::homePath());
     mpDirLbl->setText(mPath);
 }
 
@@ -124,22 +128,22 @@ void NewFileDialog::onCreateFile()
     // check if directory is not empty
     if (dirName.isEmpty())
     {
-        QMessageBox::warning(this, "Wrong directory",
-                             "Please specify correct file directory.");
+        QMessageBox::warning(this, userMessages[UserMessages::WrongDirectoryTitle],
+                             userMessages[UserMessages::WrongDirectoryMsg]);
         return;
     }
 
     // if file name is empty string
     if (mpLine->text().isEmpty())
     {
-        QMessageBox::warning(this, "Incorrect name",
-                             "Please enter file name.");
+        QMessageBox::warning(this, userMessages[UserMessages::WrongFileNameTitle],
+                             userMessages[UserMessages::EmptyFileNameMsg]);
         return;
     }
     if (!isValidFilename(mpLine->text()))
     {
-        QMessageBox::warning(this, "Incorrect name",
-                             "Invalid file name.");
+        QMessageBox::warning(this, userMessages[UserMessages::WrongFileNameTitle],
+                             userMessages[UserMessages::InvalidFileNameMsg]);
         return;
     }
 
@@ -147,9 +151,8 @@ void NewFileDialog::onCreateFile()
     QDir dir(dirName);
     if (dir.exists(fileName))
     {
-        QMessageBox::warning(this, "File exists",
-                             "File with specified name already exists. "
-                             "Please select other file name.");
+        QMessageBox::warning(this, userMessages[UserMessages::FileAlreadyExistsTitle],
+                             userMessages[UserMessages::FileAlreadyExistsMsg]);
         return;
     }
 
@@ -159,19 +162,14 @@ void NewFileDialog::onCreateFile()
         FileManager().createFile(dirName + '/' + fileName);
     } catch (const FileOpeningFailure&)
     {
-        QMessageBox::warning(this, "Error", "Unable to create file");
+        QMessageBox::warning(this, userMessages[UserMessages::ErrorTitle],
+                userMessages[UserMessages::CreatingFileFailureMsg]);
         return;
     }
-    QMessageBox::information(this, "File Created", "Specified file has been successfully created.");
+    QMessageBox::information(this, userMessages[UserMessages::FileCreatedTitle],
+            userMessages[UserMessages::FileCreatedMsg]);
 
-    // check if filename is an empty string
-    if (fileName.isEmpty())
-    {
-        mFileName = QString();
-    }
-    else
-    {
-        mFileName = dirName + '/' + fileName;
-    }
+    mFileName = dirName + '/' + fileName;
+
     accept();
 }

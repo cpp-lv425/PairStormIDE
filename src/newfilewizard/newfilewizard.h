@@ -2,6 +2,7 @@
 #define NEWFILEWIZARD_H
 
 #include <QDialog>
+#include <QMap>
 
 class QListWidget;
 class QLineEdit;

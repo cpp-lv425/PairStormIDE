@@ -22,7 +22,7 @@ FileOpeningFailure::FileOpeningFailure(): QException()
 {
 }
 
-const char *FileOpeningFailure::what() const
+const char* FileOpeningFailure::what() const
 {
     return "Unable to open file\n";
 }

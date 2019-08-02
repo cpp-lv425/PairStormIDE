@@ -15,6 +15,7 @@
 #include "bottompaneldock.h"
 #include "chatwindowdock.h"
 #include "newfilewizard.h"
+#include "usermessages.h"
 #include "logindialog.h"
 #include "filemanager.h"
 #include "codeeditor.h"
@@ -215,10 +216,13 @@ void MainWindow::saveDocument(CodeEditor *pDoc, const QString &fileName)
     {
         // writing to file
         FileManager().writeToFile(fileName, pDoc->toPlainText());
-        statusBar()->showMessage(tr("Changes to document have been saved"), 3000);
+        statusBar()->showMessage(userMessages[UserMessages::DocumentSavedMsg], 3000);
     } catch (const FileOpeningFailure&)
     {
-        QMessageBox::warning(this, "Error", "Unable to open file for saving");
+        QMessageBox::warning
+                (this,
+                 userMessages[UserMessages::ErrorTitle],
+                userMessages[UserMessages::FileOpeningForSavingErrorMsg]);
     }
     pDoc->document()->setModified(false);
 }
@@ -237,8 +241,10 @@ void MainWindow::openDoc(QString fileName)
     }
     catch (const FileOpeningFailure&)
     {
-        QMessageBox::warning(this, tr("Error"),
-                             tr("Unable to open specified file."));
+        QMessageBox::warning
+                (this,
+                 userMessages[UserMessages::ErrorTitle],
+                userMessages[UserMessages::FileOpeningErrorMsg]);
         return;
     }
 
@@ -368,7 +374,10 @@ void MainWindow::onOpenFileTriggered()
     // if document already opened then return
     if (isOpened(fileName))
     {
-        QMessageBox::warning(this, "Document already opened", "Selected document already opened.");
+        QMessageBox::warning
+                (this,
+                 userMessages[UserMessages::DocumentAlreadyOpenedTitle],
+                userMessages[UserMessages::DocumentAlreadyOpenedMsg]);
         return;
     }
 
@@ -377,7 +386,10 @@ void MainWindow::onOpenFileTriggered()
 
 void MainWindow::onOpenFolderTriggered()
 {
-    QString dirName = QFileDialog::getExistingDirectory(this, "Open Directory", QDir::currentPath());
+    QString dirName = QFileDialog::getExistingDirectory
+            (this,
+             userMessages[UserMessages::OpenDirectoryTitle],
+            QDir::currentPath());
     mpProjectViewerDock->setDir(dirName);
 }
 
@@ -391,7 +403,10 @@ void MainWindow::onSaveFileTriggered()
     // if there are no opened docs
     if (!mpDocsArea->currentSubWindow())
     {
-        QMessageBox::information(this, "Save", "There are no opened documents to save.");
+        QMessageBox::information
+                (this,
+                 userMessages[UserMessages::SaveTitle],
+                userMessages[UserMessages::NoFilesToSaveMsg]);
         return;
     }
 
@@ -411,7 +426,10 @@ void MainWindow::onSaveFileAsTriggered()
     // if there are no opened docs
     if (!mpDocsArea->currentSubWindow())
     {
-        QMessageBox::information(this, "Save", "There are no opened documents to save.");
+        QMessageBox::information
+                (this,
+                 userMessages[UserMessages::SaveTitle],
+                userMessages[UserMessages::NoFilesToSaveMsg]);
         return;
     }
 
@@ -426,10 +444,10 @@ void MainWindow::onSaveFileAsTriggered()
 
     QString fileName = QFileDialog::getSaveFileName
             (this,
-             "Save As",
-             QDir::currentPath() + "/Unnamed",
-             "*.h ;; *.hpp ;; *.cpp ;; *.c ;; *.txt ;; *.json",
-             &extension);
+             userMessages[UserMessages::SaveAsTitle],
+            QDir::currentPath() + "/Unnamed",
+            "*.h ;; *.hpp ;; *.cpp ;; *.c ;; *.txt ;; *.json",
+            &extension);
 
     // if user closed dialog
     if (fileName.isEmpty())
@@ -452,7 +470,10 @@ void MainWindow::onSaveAllFilesTriggered()
     // if there are no docs
     if(docsList.empty())
     {
-        QMessageBox::information(this, "Save", "There are no opened documents to save.");
+        QMessageBox::information
+                (this,
+                 userMessages[UserMessages::SaveTitle],
+                userMessages[UserMessages::NoFilesToSaveMsg]);
         return;
     }
 
@@ -488,11 +509,11 @@ void MainWindow::onCloseFileTriggered()
     QMessageBox::StandardButton reply
             = QMessageBox::question
             (this,
-             "Save changes",
-             "Do you want to save changes to current document?",
-             QMessageBox::StandardButton::Yes |
-             QMessageBox::StandardButton::No |
-             QMessageBox::StandardButton::Cancel);
+             userMessages[UserMessages::PromptSaveTitle],
+            userMessages[UserMessages::SaveQuestion],
+            QMessageBox::StandardButton::Yes |
+            QMessageBox::StandardButton::No |
+            QMessageBox::StandardButton::Cancel);
 
     // checking user's answer
     if (reply == QMessageBox::Yes)
@@ -650,7 +671,10 @@ void MainWindow::onOpenFileFromProjectViewer(QString fileName)
     // if document already opened then return
     if (isOpened(fileName))
     {
-        QMessageBox::warning(this, "Document already opened", "Selected document already opened.");
+        QMessageBox::warning
+                (this,
+                 userMessages[UserMessages::DocumentAlreadyOpenedTitle],
+                userMessages[UserMessages::DocumentAlreadyOpenedMsg]);
         return;
     }
 
@@ -679,7 +703,10 @@ void MainWindow::onSendMessage(const QString &userName, const QString &message)
 
 void MainWindow::onConnectionFailed()
 {
-    QMessageBox::warning(this, "Connection error", "Connection failed");
+    QMessageBox::warning
+            (this,
+            userMessages[UserMessages::ConnectionFailureTitle],
+            userMessages[UserMessages::ConnectionFailureMsg]);
 }
 
 CodeEditor* MainWindow::createNewDoc()
@@ -714,8 +741,8 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
     QMessageBox::StandardButton reply = QMessageBox::question
             (this,
-             "Saving Changes",
-             "Do you want to save changes to opened documents?",
+             userMessages[UserMessages::PromptSaveTitle],
+             userMessages[UserMessages::SaveQuestion],
              QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
 
     if (reply == QMessageBox::No)
