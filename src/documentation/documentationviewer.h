@@ -20,7 +20,6 @@ public:
 
 private:
     QLineEdit *mUrlEdit;
-    QStatusBar *mStatusBar;
 
     QToolBar *mBottomToolBar;
     QWebEngineView *mWebView;

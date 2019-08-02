@@ -15,13 +15,11 @@
 DocumentationViewer::DocumentationViewer(QWidget *parent)
     : QMainWindow (parent)
 {
-   // setupUI();
     mUrlEdit = new QLineEdit(this);
     mProgressBar = new QProgressBar(this);
     mWebView = new QWebEngineView(this);
     mWebView->load(QUrl("http://www.google.com"));
     setCentralWidget(mWebView);
-    mStatusBar = new QStatusBar(this);
 
     mBottomToolBar = new QToolBar(this);
     addToolBar(Qt::BottomToolBarArea, mBottomToolBar);
@@ -61,8 +59,6 @@ DocumentationViewer::DocumentationViewer(QWidget *parent)
     connect(mUrlEdit, &QLineEdit::returnPressed, this, &DocumentationViewer::urlRequested);
     connect(mWebView, &QWebEngineView::titleChanged, this, &DocumentationViewer::titleChange);
 
-    mStatusBar = statusBar();
-
 
     pToolBar->addWidget(mStackedWidget);
     mStackedWidget->addWidget(mUrlEdit);
@@ -95,7 +91,7 @@ void DocumentationViewer::setHtml(const QString &html)
 void DocumentationViewer::updateUrlBar(const QUrl &url)
 {
     mCurrentPage = mWebView->page();
-    mUrlEdit->setText(url.toString()); //change from QUrl to QString
+    mUrlEdit->setText(url.toString());
     mUrlEdit->setCursorPosition(0);
 }
 
@@ -112,16 +108,14 @@ void DocumentationViewer::loadStarted()
 {
     mStackedWidget->setCurrentWidget(mProgressBar);
     mStopLoadAction->setDisabled(false);
-    mStatusBar->showMessage(mUrlEdit->text());
 }
 
 void DocumentationViewer::loadFinished(bool ok)
 {
     mStackedWidget->setCurrentWidget(mUrlEdit);
-    mStopLoadAction->setDisabled(true);
+    mStopLoadAction->setDisabled(ok);
     mPrevPageAction->setDisabled(!mWebView->history()->canGoBack());
     mNextPageAction->setDisabled(!mWebView->history()->canGoForward());
-    mStatusBar->clearMessage();
 }
 
 void DocumentationViewer::iconChanged()
@@ -131,7 +125,6 @@ void DocumentationViewer::iconChanged()
 
 void DocumentationViewer::linkHovered(const QString &url)
 {
-    qDebug()<<url;
     QToolTip::showText(cursor().pos(),url,this, rect() );
 }
 
@@ -149,11 +142,3 @@ void DocumentationViewer::onExitTrigerred()
 {
     qDebug()<<"Ok";
 }
-
-//void Browser::find() {
-//    if (web_view->findText(phrase->text(),web_view->page()->findText(phrase->text()))) {
-//		status_bar->showMessage("Found: \"" + phrase->text() + "\"");
-//	} else {
-//		status_bar->showMessage("Not found: \"" + phrase->text() + "\"");
-//	}
-//}
