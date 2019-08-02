@@ -8,7 +8,7 @@
 #include<QScrollBar>
 #include<QMessageBox>
 #include<iostream>
-#include<thread>
+#include<QLabel>
 
 #define TAB_SPACE 4
 
@@ -37,6 +37,7 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     mAddCommentButton = new AddCommentButton(this);
     mAddCommentButton->setText("+");
     mAddCommentButton->setVisible(false);
+    mCurrentCommentLable = new QLabel(this);
     setMouseTracking(true);
 
     //This signal is emitted when the text document needs an update of the specified rect.
@@ -159,8 +160,6 @@ void CodeEditor::resizeEvent(QResizeEvent *e)
     lineNumberArea->setGeometry(QRect(0, 0, getLineNumberAreaWidth(), cr.height()));//set the same height as codeEditor for lineCouter
 }
 
-
-
 void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event)
 {
     QPainter painter(lineNumberArea);
@@ -191,7 +190,6 @@ void CodeEditor::saveStateInTheHistory()
     std::string newFileState = this->toPlainText().toUtf8().constData();
     mChangeManager->writeChange(newFileState);
 }
-
 
 void CodeEditor::mouseMoveEvent(QMouseEvent *event)
 {
@@ -225,13 +223,18 @@ void CodeEditor::mouseMoveEvent(QMouseEvent *event)
 
                 mAddCommentButton->setGeometry(commentBottonXpos, currSliderPos ? commentBottonYpos :
                                           commentBottonYpos + TOP_UNUSED_PIXELS_HEIGHT , side, side);
-
                 mAddCommentButton->setVisible(true);
+                //label for line showing
+                mCurrentCommentLable->setGeometry(mAddCommentButton->x() - getLineNumberAreaWidth(), mAddCommentButton->y(),
+                                                  getLineNumberAreaWidth(), mAddCommentButton->height());
+                mCurrentCommentLable->setText(QString::number(mAddCommentButton->getCurrentLine()));
+                mCurrentCommentLable->setVisible(true);
             }
        }
        else
        {
            mAddCommentButton->setVisible(false);
+           mCurrentCommentLable->setVisible(false);
        }
     }
     QPlainTextEdit::mouseMoveEvent(event);
