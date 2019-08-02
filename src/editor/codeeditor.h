@@ -51,9 +51,11 @@ public slots:
     void keyPressEvent(QKeyEvent *e) override;
     void autotab();
     void saveStateInTheHistory();
+    void setZoom(int zoomVal);
 
 signals:
     void changesAppeared();
+
 
 private:
    QWidget *lineNumberArea;

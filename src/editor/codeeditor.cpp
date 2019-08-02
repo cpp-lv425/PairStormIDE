@@ -126,13 +126,6 @@ void CodeEditor::redo()
     this->setTextCursor(cursor);
 }
 
-void CodeEditor::zoom(int val)
-{
-    val > 0 ?this->zoomIn(val):this->zoomOut(-val);
-    mCurrentZoom+=val;
-    setViewportMargins(getLineNumberAreaWidth(), 0, 0, 0);// reset text margin in accordance to linecouter change
-}
-
 void CodeEditor::updateLineNumberAreaWidth()
 {
     // reset start position for typing (according new linecounter position)
@@ -189,6 +182,20 @@ void CodeEditor::saveStateInTheHistory()
 {
     std::string newFileState = this->toPlainText().toUtf8().constData();
     mChangeManager->writeChange(newFileState);
+}
+
+void CodeEditor::zoom(int val)
+{
+    val > 0 ?this->zoomIn(val):this->zoomOut(-val);
+    mCurrentZoom+=val;
+    setViewportMargins(getLineNumberAreaWidth(), 0, 0, 0);// reset text margin in accordance to linecouter change
+}
+
+void CodeEditor::setZoom(int zoomVal)
+{
+    int val = zoomVal < mCurrentZoom ? 1: -1;
+    while(zoomVal != mCurrentZoom)
+         zoom(val);
 }
 
 void CodeEditor::mouseMoveEvent(QMouseEvent *event)
