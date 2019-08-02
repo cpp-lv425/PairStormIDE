@@ -84,22 +84,38 @@ void DefaultLocalConnector::clearOutdatedAttributesOnTimerTick()
         return;
     }
 
-    SizeType discoveredServersNumBefore = mDiscoveredServersAttrib.size();
+    QStringList outdatedServerNames;
     SizeType currentMs = QDateTime::currentMSecsSinceEpoch();
     mDiscoveredServersAttrib.erase(
                 std::remove_if(mDiscoveredServersAttrib.begin(),
                                mDiscoveredServersAttrib.end(),
-                               [currentMs] (const ServerData & serverAttributes)
+                               [currentMs, &outdatedServerNames] (const ServerData & serverAttributes) -> bool
                                {
-                                   return (currentMs - serverAttributes.mDiscoveryMoment) >
-                                           gDefaultOutdatingCycleMs;
+                                   bool isOutdated = (currentMs - serverAttributes.mDiscoveryMoment) >
+                                                      gDefaultOutdatingCycleMs;
+                                   if (isOutdated)
+                                   {
+                                       outdatedServerNames.push_back(serverAttributes.mName);
+                                   }
+                                   return isOutdated;
                                }),
                 mDiscoveredServersAttrib.end());
-    SizeType discoveredServersNumAfter = mDiscoveredServersAttrib.size();
 
     // If outdated attributes have been removed, inform GUI
-    if (discoveredServersNumAfter < discoveredServersNumBefore)
+    if (!outdatedServerNames.empty())
     {
+        bool isAnyConnectedAttributesOutdated = false;
+        for(const auto & serverName : outdatedServerNames)
+        {
+            if(!popFromConnectedAttributes(serverName).empty())
+            {
+                isAnyConnectedAttributesOutdated = true;
+            }
+        }
+        if (isAnyConnectedAttributesOutdated)
+        {
+            emit connectedUsersUpdated(getConnectedUsers());
+        }
         emit onlineUsersUpdated(getOnlineUsers());
     }
 }

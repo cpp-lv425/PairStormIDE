@@ -45,21 +45,40 @@ ChatWidget::ChatWidget(QWidget *pParent):
     setLayout(pWindowLayout);
 
     // Set empty users list
-    setUsersList(QStringList());
+    updateUsersList();
 }
 
-void ChatWidget::setUsersList(const QStringList &usersList)
+void ChatWidget::updateUsersList()
 {
     QListWidgetItem *pItem;
     mpUsersList->clear();
-    for (const QString& userName: usersList)
+    for (const QString& userName: mOnlineUsers)
     {
         pItem = new QListWidgetItem;
         pItem->setText("Connect to: " + userName);
-        pItem->setIcon(style()->standardIcon(QStyle::SP_DialogNoButton));
+        if (mConnectedUsers.contains(userName))
+        {
+            pItem->setIcon(style()->standardIcon(QStyle::SP_DialogYesButton));
+        }
+        else
+        {
+            pItem->setIcon(style()->standardIcon(QStyle::SP_DialogNoButton));
+        }
         mpUsersList->addItem(pItem);
     }
     mpUsersList->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+}
+
+void ChatWidget::setOnlineUsers(const QStringList &onlineUsers)
+{
+    mOnlineUsers = onlineUsers;
+    updateUsersList();
+}
+
+void ChatWidget::setConnectedUsers(const QStringList &connectedUsers)
+{
+    mConnectedUsers = connectedUsers;
+    updateUsersList();
 }
 
 void ChatWidget::setCurrentUserName(const QString &userName)

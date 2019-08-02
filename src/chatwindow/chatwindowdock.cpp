@@ -54,5 +54,10 @@ void ChatWindowDock::keyPressEvent(QKeyEvent *event)
 
 void ChatWindowDock::updateOnlineUsersOnChange(const QStringList onlineUsers)
 {
-    mpChatWidget->setUsersList(onlineUsers);
+    mpChatWidget->setOnlineUsers(onlineUsers);
+}
+
+void ChatWindowDock::updateConnectedUsersOnChange(const QStringList connectedUsers)
+{
+    mpChatWidget->setConnectedUsers(connectedUsers);
 }

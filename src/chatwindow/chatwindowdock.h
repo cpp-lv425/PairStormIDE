@@ -23,6 +23,7 @@ signals:
 
 public slots:
     void updateOnlineUsersOnChange(const QStringList onlineUsers);
+    void updateConnectedUsersOnChange(const QStringList connectedUsers);
     void onUserToConnectSelected(QString userName);
     void onSendMessage(const QString & message);
 
