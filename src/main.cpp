@@ -13,6 +13,7 @@
 #include <thread>
 #include <QCommandLineParser>
 
+#include "mdiarea.h"
 #include "browser.h"
 #include "mainwindow.h"
 #include "documentationsearch.h"
@@ -30,19 +31,13 @@ int main(int argc, char *argv[])
     QWebEngineSettings::defaultSettings()->setAttribute(QWebEngineSettings::DnsPrefetchEnabled, true);
     QWebEngineSettings::defaultSettings()->setAttribute(QWebEngineSettings::LocalStorageEnabled, true);
 
-   // DocumentationViewer w;
-  //  w.show();
-    //DocumentationViewer view;
-  //  view.show();
-    //..QWebEngineView w;
-    //w.setUrl(QUrl("http://www.google.com"));
-    //w.show();
-    Browser b;
-           b.newTab("array");
-           b.newTab("vector");
-               b.show();
-//    b.newTab("daniv");
-//    b.newTab("Danissimo");
 
+    Browser *b = new Browser;
+           b->newTab("array");
+          // b.newTab("vector");
+          // b.newTab("igorast");
+           b->emptyDocumentationTab();
+           //b.emptyDocumentationTab();
+           b->show();
     return a.exec();
 }

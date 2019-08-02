@@ -1,6 +1,7 @@
 #include "browser.h"
 
 #include <QDir>
+#include <QSizePolicy>
 #include <QStandardPaths>
 #include <QWebEngineView>
 #include <QWebEnginePage>
@@ -16,7 +17,8 @@ Browser::Browser(QWidget *parent) : QMainWindow (parent)
 {
     mConnectionManager = new ConnectionManager(this);
     mDocumentationEngine = new DocumentationEngine(this);
-    mBrowseArea = new MDIArea(this);
+    mBrowseArea = new MDIArea;
+    mBrowseArea->setViewMode(QMdiArea::ViewMode::TabbedView);
     setCentralWidget(mBrowseArea);
 }
 
@@ -104,7 +106,6 @@ void Browser::newTab(const QString &keyword)
 void Browser::emptyDocumentationTab()
 {
     DocumentationViewer *newWindow = new DocumentationViewer(this);
-
     bool isPairStormExist;
     QDir dir = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
 
