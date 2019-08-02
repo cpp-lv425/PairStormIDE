@@ -110,10 +110,6 @@ void CodeEditor::keyPressEvent(QKeyEvent *e)
             return;
 
         }
-        if(e->key() == Qt::Key_0)
-        {
-            setZoom(120);
-        }
         if(e->key() == Qt::Key_BraceLeft)
         {
             QPlainTextEdit::keyPressEvent(e);

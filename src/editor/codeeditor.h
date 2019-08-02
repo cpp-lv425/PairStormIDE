@@ -37,6 +37,7 @@ public:
     void redo();
     void zoom(int val);
 
+
 protected:
     void resizeEvent(QResizeEvent *event)override;
     virtual void mouseMoveEvent(QMouseEvent *event) override;
