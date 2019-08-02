@@ -354,39 +354,3 @@ void DefaultLocalConnector::parseTcpSegmentOnReceive()
         break;
     }
 }
-
-
-
-#ifdef CUSTOM_DEBUG
-
-void DefaultLocalConnector::testSendHelloToLastServer()
-{
-    ServerData serverData;
-    if(!mDiscoveredServersAttrib.empty())
-    {
-        serverData = mDiscoveredServersAttrib.back();
-    }
-
-    qDebug() << "try to send hello to server " << serverData.mName;
-
-    QString data("hello from ");
-    data.append(mpTcpService->getServerAttributes().mName);
-    data.append(" to ");
-    data.append(serverData.mName);
-
-    Message message;
-    message.mContent = data;
-    message.mType = Message::Type::ChatMessage;
-    message.mSourceName = mpTcpService->getServerAttributes().mName;
-
-    if(mpTcpService->sendDataToTcpServer(message.toJsonQString(), serverData))
-    {
-        qDebug() << "message is sent";
-    }
-    else
-    {
-        qDebug() << "message is not sent";
-    }
-    //startSharing(serverData.m_name);
-}
-#endif //CUSTOM_DEBUG

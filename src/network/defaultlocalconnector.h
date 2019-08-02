@@ -60,15 +60,6 @@ private slots:
 
     void addServerAttributesOnReceive();
     void parseTcpSegmentOnReceive();
-
-
-
-//Experimental features ======================================================
-#ifdef CUSTOM_DEBUG
-public:
-    void testSendHelloToLastServer();
-#endif //CUSTOM_DEBUG
-//============================================================================
 };
 
 #endif // APIPARSER_H

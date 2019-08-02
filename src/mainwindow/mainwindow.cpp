@@ -186,9 +186,6 @@ void MainWindow::setupMainMenu()
     QAction *pSettingsAction = toolsMenu->addAction("&Settings...", this, &MainWindow::onSettingsTriggered);
     pSettingsAction->setDisabled(true);
 
-    // for Valik for testing purposes
-    toolsMenu->addAction("&Test", this, &MainWindow::onTest, Qt::CTRL + Qt::SHIFT + Qt::Key_T);
-
     // help menu
     QMenu *helpMenu = new QMenu("&Help");
 
@@ -669,19 +666,6 @@ void MainWindow::onSettingsTriggered()
 {
     //
 }
-
-//==================================================================================================
-//                                                                              FOR TESTING PURPOSES
-void MainWindow::onTest()
-{
-    qDebug() << "===========================================";
-    qDebug() << "==============               ==============";
-    qDebug() << "=============   VALIK TESTS   =============";
-    qDebug() << "==============               ==============";
-    qDebug() << "===========================================";
-    //mplocalConnector->testSendHelloToLastServer();
-}
-//==================================================================================================
 
 void MainWindow::onAboutTriggered()
 {

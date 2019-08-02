@@ -85,7 +85,6 @@ private slots:
     void onRefactorTriggered();
     void onConnectTriggered();
     void onSettingsTriggered();
-    void onTest();
 
     // help menu
     void onAboutTriggered();
