@@ -7,13 +7,14 @@ void DefaultLocalConnector::configureOnLogin(const QString & userName)
     if (mpUdpService && mpTcpService)
     {
         // If services has previously been configured
+        emit serviceStatusChanged(mpTcpService->isServerActive()? true : false);
         return;
     }
     // Configure the UDP service & TCP service
     mpUdpService = std::unique_ptr<UdpService>(new UdpService());
     mpTcpService = std::unique_ptr<TcpService>(new TcpService(userName));
 
-    emit serviceStatus(mpTcpService->isServerActive()? true : false);
+    emit serviceStatusChanged(mpTcpService->isServerActive()? true : false);
     if (!mpTcpService->isServerActive())
     {
         return;
@@ -311,7 +312,7 @@ void DefaultLocalConnector::shareChange(const QString changeContent)
 // ==========================================================================================
 // ==========================================================================================
 // ==========================================================================================
-//                                                             COORDINATE RECEIVED TCP SEGMENT
+//                                                            COORDINATE RECEIVED TCP SEGMENT
 void DefaultLocalConnector::parseTcpSegmentOnReceive()
 {
     Segment segment = mpTcpService->getReceivedSegment();
@@ -354,39 +355,3 @@ void DefaultLocalConnector::parseTcpSegmentOnReceive()
         break;
     }
 }
-
-
-
-#ifdef CUSTOM_DEBUG
-
-void DefaultLocalConnector::testSendHelloToLastServer()
-{
-    ServerData serverData;
-    if(!mDiscoveredServersAttrib.empty())
-    {
-        serverData = mDiscoveredServersAttrib.back();
-    }
-
-    qDebug() << "try to send hello to server " << serverData.mName;
-
-    QString data("hello from ");
-    data.append(mpTcpService->getServerAttributes().mName);
-    data.append(" to ");
-    data.append(serverData.mName);
-
-    Message message;
-    message.mContent = data;
-    message.mType = Message::Type::ChatMessage;
-    message.mSourceName = mpTcpService->getServerAttributes().mName;
-
-    if(mpTcpService->sendDataToTcpServer(message.toJsonQString(), serverData))
-    {
-        qDebug() << "message is sent";
-    }
-    else
-    {
-        qDebug() << "message is not sent";
-    }
-    //startSharing(serverData.m_name);
-}
-#endif //CUSTOM_DEBUG

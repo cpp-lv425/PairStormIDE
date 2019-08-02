@@ -1,9 +1,7 @@
 #include "chatwindowdock.h"
 
 #include <QListWidgetItem>
-#include <QException>
 #include <QKeyEvent>
-#include <QDebug>
 
 #include "mainwindow.h"
 #include "chatwidget.h"
@@ -12,6 +10,7 @@ ChatWindowDock::ChatWindowDock(QWidget *pParent): QDockWidget (pParent)
 {
     setWindowTitle("Chat");
     mpChatWidget = new ChatWidget;
+
     connect(mpChatWidget, &ChatWidget::userToConnectSelected,
             this, &ChatWindowDock::onUserToConnectSelected);
     connect(mpChatWidget, &ChatWidget::sendMessage,
@@ -33,7 +32,14 @@ void ChatWindowDock::displayMessage(const QString userName, const QString messag
 
 void ChatWindowDock::onUserToConnectSelected(QString userName)
 {
-    emit userToConnectSelected(userName);
+    if (!mpChatWidget->isUserConnected(userName))
+    {
+        emit userToConnectSelected(userName);
+    }
+    else
+    {
+        emit userToDisconnectSelected(userName);
+    }
 }
 
 void ChatWindowDock::onSendMessage(const QString &message)
@@ -43,8 +49,8 @@ void ChatWindowDock::onSendMessage(const QString &message)
 
 void ChatWindowDock::keyPressEvent(QKeyEvent *event)
 {
-    if(event->key() == Qt::Key_Enter ||
-            event->key() == Qt::Key_Return)
+    if(event->key() == Qt::Key_Enter
+       || event->key() == Qt::Key_Return)
     {
         mpChatWidget->onSendCommand();
     }

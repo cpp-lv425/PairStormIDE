@@ -1,4 +1,5 @@
 #include "codeeditor.h"
+#include <QDebug>
 
 
 #include <QRegularExpression>
@@ -89,6 +90,19 @@ void CodeEditor::keyPressEvent(QKeyEvent *e)
         if(e->key() == Qt::Key_Enter || e->key() == Qt::Key_Return || e->key() == Qt::Key_Space)
         {
             saveStateInTheHistory();
+        }
+
+        if(e->key() == Qt::Key_D && e->modifiers() & Qt::ControlModifier)
+        {
+            QTextCursor cursor = textCursor();
+            int position = cursor.position();
+            for(auto &it: mTokens)
+            {
+                if(it.mType == State::KW && it.mBegin <= position && it.mEnd >= position)
+                {
+                    emit sendLexem(it.mName);
+                }
+            }
         }
 
         if(e->key() == Qt::Key_Enter || e->key() == Qt::Key_Return)

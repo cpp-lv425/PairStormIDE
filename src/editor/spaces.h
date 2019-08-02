@@ -1,7 +1,9 @@
 #ifndef SPACES_H
 #define SPACES_H
+
 #include <QSet>
 
-const QSet<QChar> SPACES = {'\n', ' ', '\r', '\t'};
+const QChar cNextLine = '\n';
+const QSet<QChar> cSpaces = {'\n', ' ', '\r', '\t', '\0', '\v'};
 
 #endif // SPACES_H
