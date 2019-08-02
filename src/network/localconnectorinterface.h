@@ -29,7 +29,7 @@ public slots:
 signals:
 
     //======================= Signals to GUI =================================
-    void serviceStatus (bool status);
+    void serviceStatusChanged (bool status);
 
     void onlineUsersUpdated    (const QStringList users);
     void connectedUsersUpdated (const QStringList users);

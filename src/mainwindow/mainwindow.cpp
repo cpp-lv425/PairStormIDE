@@ -33,6 +33,11 @@ MainWindow::MainWindow(QWidget *parent) :
     // Generate default local network connector
     mplocalConnector =
             LocalConnectorGenerator::getDefaultConnector();
+    // And output its state in case of changes
+    connect(
+        mplocalConnector, &LocalConnectorInterface::serviceStatusChanged,
+        this,             &MainWindow::onConnectionStatusChanged,
+        Qt::UniqueConnection);
 
     ui->setupUi(this);
     {
@@ -727,12 +732,15 @@ void MainWindow::onCloseWindow(CodeEditor *curDoc)
     saveDocument(curDoc, curDoc->getFileName());
 }
 
-void MainWindow::onConnectionFailed()
+void MainWindow::onConnectionStatusChanged(bool status)
 {
-    QMessageBox::warning
-            (this,
-            userMessages[UserMessages::ConnectionFailureTitle],
-            userMessages[UserMessages::ConnectionFailureMsg]);
+    if(!status)
+    {
+        QMessageBox::warning
+                (this,
+                userMessages[UserMessages::ConnectionFailureTitle],
+                userMessages[UserMessages::ConnectionFailureMsg]);
+    }
 }
 
 CodeEditor* MainWindow::createNewDoc()

@@ -99,7 +99,7 @@ private slots:
 public slots:
     void onOpenFileFromProjectViewer(QString fileName);    
     void onCloseWindow(CodeEditor *curDoc);   
-    void onConnectionFailed();
+    void onConnectionStatusChanged(bool status);
 
 private:
     // creates new doc in MDIArea

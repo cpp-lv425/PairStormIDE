@@ -54,6 +54,7 @@ public slots:
 
 signals:
     void changesAppeared();
+    void sendLexem(QString);
     void closeDocEventOccured(CodeEditor*);
 
 private:
@@ -74,7 +75,7 @@ private:
     QTextCharFormat fmtLiteral;
     QTextCharFormat fmtComment;
     QTextCharFormat fmtKeyword;
-
+    QTextCharFormat fmtRegular;
 };
 
 #endif // CODEEDITOR_H

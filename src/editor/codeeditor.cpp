@@ -1,7 +1,6 @@
 #include "codeeditor.h"
 #include "linenumberarea.h"
 #include<QtGui>
-#include<QDebug>
 #include<QTextCursor>
 #include<QPainter>
 #include <QFontDatabase>
@@ -42,11 +41,14 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     //This signal is emitted when the text document needs an update of the specified rect.
     //If the text is scrolled, rect will cover the entire viewport area.
     //If the text is scrolled vertically, dy carries the amount of pixels the viewport was scrolled.
+
     connect(this,  SIGNAL(updateRequest(QRect,int)), this, SLOT(updateLineNumberArea(QRect,int)));
     connect(this,  SIGNAL(cursorPositionChanged()), this, SLOT(runLexer()));
     connect(mTimer, SIGNAL(timeout()), this, SLOT(saveStateInTheHistory()));
     connect(this,  SIGNAL(textChanged()), this, SLOT(changesAppeared()));
-    connect(this,  SIGNAL(cursorPositionChanged()), this, SLOT(highlighText()));;
+    connect(this,  SIGNAL(cursorPositionChanged()), this, SLOT(highlighText()));
+
+    //connect(this,  SIGNAL(sendLexem(QString)), this, SLOT(/*SLOT Igorya*/));;
 
     mTimer->start(CHANGE_SAVE_TIME);//save text by this time
 
@@ -65,6 +67,7 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     fmtLiteral.setForeground(Qt::red);
     fmtKeyword.setForeground(Qt::blue);
     fmtComment.setForeground(Qt::green);
+    fmtRegular.setForeground(Qt::black);
 }
 
 void CodeEditor::runLexer()
@@ -273,30 +276,34 @@ void CodeEditor::highlighText()
     QTextCursor cursor = textCursor();
     for(const auto &i: mTokens)
     {
-        qDebug() << i.name << ' ' << i.type << ' ' << i.begin << ' ' << i.end << '\n';
-        switch(i.type)
+        switch(i.mType)
         {
-        case(KW):
+        case(State::KW):
         {
-            cursor.setPosition(i.begin, QTextCursor::MoveAnchor);
-            cursor.setPosition(i.end, QTextCursor::KeepAnchor);
+            cursor.setPosition(i.mBegin, QTextCursor::MoveAnchor);
+            cursor.setPosition(i.mEnd, QTextCursor::KeepAnchor);
             cursor.setCharFormat(fmtKeyword);
             break;
         }
-        case(LIT):
+        case(State::LIT):
         {
-            cursor.setPosition(i.begin, QTextCursor::MoveAnchor);
-            cursor.setPosition(i.end, QTextCursor::KeepAnchor);
+            cursor.setPosition(i.mBegin, QTextCursor::MoveAnchor);
+            cursor.setPosition(i.mEnd, QTextCursor::KeepAnchor);
             cursor.setCharFormat(fmtLiteral);
             break;
         }
-        case(COM):
+        case(State::COM):
         {
-            cursor.setPosition(i.begin, QTextCursor::MoveAnchor);
-            cursor.setPosition(i.end, QTextCursor::KeepAnchor);
+            cursor.setPosition(i.mBegin, QTextCursor::MoveAnchor);
+            cursor.setPosition(i.mEnd, QTextCursor::KeepAnchor);
             cursor.setCharFormat(fmtComment);
             break;
         }
+        default:
+            cursor.setPosition(i.mBegin, QTextCursor::MoveAnchor);
+            cursor.setPosition(i.mEnd, QTextCursor::KeepAnchor);
+            cursor.setCharFormat(fmtRegular);
+            break;
         }
     }
 }

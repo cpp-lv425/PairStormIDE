@@ -26,7 +26,7 @@ QMap<UserMessages, QString> userMessages =
     std::pair<UserMessages, QString>(UserMessages::SaveAsTitle, "Save As"),
     std::pair<UserMessages, QString>(UserMessages::PromptSaveTitle, "Save Changes"),
     std::pair<UserMessages, QString>(UserMessages::SaveQuestion, "Do you want to save changes to current document?"),
-    std::pair<UserMessages, QString>(UserMessages::ConnectionFailureTitle, "Connection error"),
-    std::pair<UserMessages, QString>(UserMessages::ConnectionFailureMsg, "Connection Failed"),
+    std::pair<UserMessages, QString>(UserMessages::ConnectionFailureTitle, "Launching server"),
+    std::pair<UserMessages, QString>(UserMessages::ConnectionFailureMsg, "Startup Failed"),
     std::pair<UserMessages, QString>(UserMessages::OpenFileTitle, "Open File"),
 };
