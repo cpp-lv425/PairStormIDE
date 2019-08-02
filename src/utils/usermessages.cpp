@@ -1,0 +1,32 @@
+#include "usermessages.h"
+
+QMap<UserMessages, QString> userMessages =
+{
+    std::pair<UserMessages, QString>(UserMessages::WrongDirectoryTitle, "Wrong directory"),
+    std::pair<UserMessages, QString>(UserMessages::WrongDirectoryMsg, "Please specify correct file directory."),
+    std::pair<UserMessages, QString>(UserMessages::WrongFileNameTitle, "Incorrect name"),
+    std::pair<UserMessages, QString>(UserMessages::EmptyFileNameMsg, "Please enter file name."),
+    std::pair<UserMessages, QString>(UserMessages::InvalidFileNameMsg, "Invalid file name."),
+    std::pair<UserMessages, QString>(UserMessages::FileAlreadyExistsTitle, "File exists"),
+    std::pair<UserMessages, QString>(UserMessages::FileAlreadyExistsMsg, "File with specified name already exists. Please select other file name."),
+    std::pair<UserMessages, QString>(UserMessages::ErrorTitle, "Error"),
+    std::pair<UserMessages, QString>(UserMessages::CreatingFileFailureMsg, "Unable to create file"),
+    std::pair<UserMessages, QString>(UserMessages::FileCreatedTitle, "File Created"),
+    std::pair<UserMessages, QString>(UserMessages::FileCreatedMsg, "Specified file has been successfully created."),
+    std::pair<UserMessages, QString>(UserMessages::SelectDirectoryTitle, "Select project directory"),
+    std::pair<UserMessages, QString>(UserMessages::NewFileWizardMsg, "Please specify file name, file extension and project directory."),
+    std::pair<UserMessages, QString>(UserMessages::DocumentSavedMsg, "Changes to document have been saved"),
+    std::pair<UserMessages, QString>(UserMessages::FileOpeningForSavingErrorMsg, "Unable to open file for saving"),
+    std::pair<UserMessages, QString>(UserMessages::FileOpeningErrorMsg, "Unable to open specified file."),
+    std::pair<UserMessages, QString>(UserMessages::DocumentAlreadyOpenedTitle, "Document already opened"),
+    std::pair<UserMessages, QString>(UserMessages::DocumentAlreadyOpenedMsg, "Selected document is already opened."),
+    std::pair<UserMessages, QString>(UserMessages::OpenDirectoryTitle, "Open Directory"),
+    std::pair<UserMessages, QString>(UserMessages::SaveTitle, "Save"),
+    std::pair<UserMessages, QString>(UserMessages::NoFilesToSaveMsg, "There are no opened documents to save."),
+    std::pair<UserMessages, QString>(UserMessages::SaveAsTitle, "Save As"),
+    std::pair<UserMessages, QString>(UserMessages::PromptSaveTitle, "Save Changes"),
+    std::pair<UserMessages, QString>(UserMessages::SaveQuestion, "Do you want to save changes to current document?"),
+    std::pair<UserMessages, QString>(UserMessages::ConnectionFailureTitle, "Connection error"),
+    std::pair<UserMessages, QString>(UserMessages::ConnectionFailureMsg, "Connection Failed"),
+    std::pair<UserMessages, QString>(UserMessages::OpenFileTitle, "Open File"),
+};

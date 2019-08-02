@@ -242,5 +242,30 @@ void CodeEditor::mouseMoveEvent(QMouseEvent *event)
 
 void CodeEditor::closeEvent(QCloseEvent *event)
 {
-    //to do
+    if (!document()->isModified())
+    {
+        event->accept();
+        return;
+    }
+
+    QMessageBox::StandardButton reply = QMessageBox::question
+            (this,
+             "Saving Changes",
+             "Do you want to save changes to opened documents?",
+             QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+
+    // if user closes dialog event is ignored
+    if (reply == QMessageBox::Cancel)
+    {
+        event->ignore();
+        return;
+    }
+    // if document wasn't modified of user doesn't want to save changes
+    if (reply == QMessageBox::No)
+    {
+        event->accept();
+        return;
+    }
+    // saving document
+    emit closeDocEventOccured(this);
 }

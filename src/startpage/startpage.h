@@ -20,11 +20,11 @@ public:
 
 private:
     Ui::StartPage *ui;
-    QPushButton *pNewBtn;
-    QPushButton *pOpenBtn;
-    QPushButton *pOpenDirBtn;
-    QPushButton *pReferenceBtn;
-    QPushButton *pSettingsBtn;
+    QPushButton *mpNewBtn;
+    QPushButton *mpOpenBtn;
+    QPushButton *mpOpenDirBtn;
+    QPushButton *mpReferenceBtn;
+    QPushButton *mpSettingsBtn;
 
 private slots:
     void newBtnPressed();
@@ -46,7 +46,7 @@ private:
                      QPalette &palette);
     void setupButton(QPushButton *pButton,
                      QIcon icon,
-                     int maxWidth);
+                     int maxWidth, const QString& text);
 };
 
 #endif // STARTPAGE_H

@@ -6,7 +6,6 @@
 #include <QStyleFactory>
 #include <QMessageBox>
 #include <QFileDialog>
-#include <QException> // temporarily included
 #include <QSettings>
 #include <QStyle>
 #include <QDebug> // temporarily included
@@ -17,12 +16,14 @@
 #include "bottompaneldock.h"
 #include "chatwindowdock.h"
 #include "newfilewizard.h"
+#include "usermessages.h"
 #include "logindialog.h"
 #include "filemanager.h"
 #include "codeeditor.h"
 #include "storeconf.h"
 #include "startpage.h"
 #include "mdiarea.h"
+#include "utils.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -43,14 +44,8 @@ MainWindow::MainWindow(QWidget *parent) :
     // set icon
     setWindowIcon(QIcon(":/img/app_logo.jpg"));
 
-    QString styleName;
-
-    // set Fusion style globally - TEMP SOLUTION
-    if(QStyleFactory::keys().size() >= 3)
-    {
-        styleName = QStyleFactory::keys().at(2);
-    }
-    QApplication::setStyle(QStyleFactory::create(styleName));
+    // sets style globally
+    setAppStyle();
 
     setupMainMenu();
 
@@ -59,26 +54,7 @@ MainWindow::MainWindow(QWidget *parent) :
     setCentralWidget(mpDocsArea);
 
     // create instance of Project Viewer
-
-    mpProjectViewerDock = new ProjectViewerDock(this);
-    addDockWidget(Qt::LeftDockWidgetArea, mpProjectViewerDock);
-    mpProjectViewerDock->setObjectName("mpProjectViewerDock");  // added to avoid Warning in Unix system
-
-    // create instance of Chat Window
-    mpChatWindowDock = new ChatWindowDock(this);
-    mpChatWindowDock->setObjectName("mpChatWindowDock");        // added to avoid Warning in Unix system
-    addDockWidget(Qt::RightDockWidgetArea, mpChatWindowDock);
-
-    // create instance of MDIArea
-    mpDocsArea = new MDIArea(this);
-
-    // create instance of Bottom Panel
-    mpBottomPanelDock = new BottomPanelDock(this);
-    mpBottomPanelDock->setObjectName("mpBottomPanelDock");      // added to avoid Warning in Unix system
-
-    setCentralWidget(mpDocsArea);
-
-    createProjectViewer();    
+    createProjectViewer();
 
     // create instance of Chat Window
     createChatWindow();
@@ -91,7 +67,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
 QStringList MainWindow::getFileExtensions() const
 {
-    return QStringList() << ".c" << ".cpp" << ".h" << ".hpp" << ".txt" << ".json";
+    QSettings settings;
+    return QStringList {settings.value("cppExtentionsList").toStringList()};
 }
 
 void MainWindow::showStartPage()
@@ -241,17 +218,21 @@ void MainWindow::setupMainMenu()
     addToolBar(Qt::TopToolBarArea, pToolbar);
 }
 
-void MainWindow::saveDocument(CodeEditor *pDoc, QString fileName)
+void MainWindow::saveDocument(CodeEditor *pDoc, const QString &fileName)
 {    
     try
     {
         // writing to file
         FileManager().writeToFile(fileName, pDoc->toPlainText());
-        statusBar()->showMessage(tr("Changes to document have been saved"), 5000);
-    } catch (const QException&)
+        statusBar()->showMessage(userMessages[UserMessages::DocumentSavedMsg], 3000);
+    } catch (const FileOpeningFailure&)
     {
-        QMessageBox::warning(this, "Error", "Unable to open file for saving");
+        QMessageBox::warning
+                (this,
+                 userMessages[UserMessages::ErrorTitle],
+                userMessages[UserMessages::FileOpeningForSavingErrorMsg]);
     }
+    pDoc->document()->setModified(false);
 }
 
 void MainWindow::openDoc(QString fileName)
@@ -261,10 +242,17 @@ void MainWindow::openDoc(QString fileName)
     try
     {
         readResult = FileManager().readFromFile(fileName);
-    } catch (const QException&)
+    }
+    catch (const IncorrectUserInput&)
     {
-        QMessageBox::warning(this, tr("Error"),
-                             tr("Unable to open specified file."));
+        return;
+    }
+    catch (const FileOpeningFailure&)
+    {
+        QMessageBox::warning
+                (this,
+                 userMessages[UserMessages::ErrorTitle],
+                userMessages[UserMessages::FileOpeningErrorMsg]);
         return;
     }
 
@@ -277,34 +265,30 @@ void MainWindow::openDoc(QString fileName)
     newDoc->show();
 }
 
-bool MainWindow::checkIfOpened(const QString &fileName) const
+bool MainWindow::isOpened(const QString &fileName) const
 {
     // getting all docs
     auto docsList = mpDocsArea->subWindowList();
 
-    // if there are no docs
-    if(!docsList.empty())
+    for (const auto &doc : docsList)
     {
-        for (const auto& doc : docsList)
+        auto curDoc = qobject_cast<CodeEditor*>(doc->widget());
+        if (curDoc && curDoc->getFileName() == fileName)
         {
-            auto curDoc = qobject_cast<CodeEditor*>(doc->widget());
-            if(curDoc && curDoc->getFileName() == fileName)
-            {
-
-                return true;
-            }
+            return true;
         }
     }
+
     return false;
 }
 
-bool MainWindow::checkIfModified(QList<QMdiSubWindow*> &docsList)
+bool MainWindow::isModified(QList<QMdiSubWindow*> &docsList)
 {
     for (int i = 0; i < docsList.size(); ++i)
     {
         auto curDoc = qobject_cast<CodeEditor*>(docsList[i]->widget());
 
-        if(curDoc && curDoc->document()->isModified())
+        if (curDoc && curDoc->document()->isModified())
         {
             return true;
         }
@@ -314,7 +298,6 @@ bool MainWindow::checkIfModified(QList<QMdiSubWindow*> &docsList)
 
 void MainWindow::saveAllModifiedDocuments(QList<QMdiSubWindow*> &docsList)
 {
-    // if appreved then save changes
     for (int i = 0; i < docsList.size(); ++i)
     {
         auto curDoc = qobject_cast<CodeEditor*>(docsList[i]->widget());
@@ -360,7 +343,6 @@ void MainWindow::createChatWindow()
 
     mpChatWindowDock->setObjectName("mpChatWindowDock");
     addDockWidget(Qt::RightDockWidgetArea, mpChatWindowDock, Qt::Vertical);
-    mpChatWindowDock->setAllowedAreas(Qt::RightDockWidgetArea);
 }
 
 void MainWindow::createButtomPanel()
@@ -370,15 +352,36 @@ void MainWindow::createButtomPanel()
     mpBottomPanelDock->setObjectName("mpBottomPanelDock");
 }
 
-void MainWindow::onNewFileTriggered()
+CodeEditor *MainWindow::getCurrentDoc()
 {
+    // get current subWindow
+    // if there are no subWindows nullptr is returned
+    auto subWindow = mpDocsArea->currentSubWindow();
+
+    if (!subWindow)
+    {
+        return nullptr;
+    }
+    auto curDoc = qobject_cast<CodeEditor*>(subWindow->widget());
+
+    return curDoc ? curDoc : nullptr;
+}
+
+void MainWindow::onNewFileTriggered()
+{    
     QStringList fileExtensions = getFileExtensions();
-
     NewFileDialog newFileDialog(fileExtensions, this);
-
-    // new file dialog is called
-    // name of newly created file is received
-    QString newFileName = newFileDialog.start();    
+    QString newFileName;
+    try
+    {
+        // new file dialog is called
+        // name of newly created file is received
+        newFileName = newFileDialog.start();
+    }
+    catch (const QException&)
+    {
+        return;
+    }
 
     // new doc is created & shown
     CodeEditor *newDoc = createNewDoc();
@@ -391,17 +394,18 @@ void MainWindow::onNewFileTriggered()
 void MainWindow::onOpenFileTriggered()
 {
     QString fileName = QFileDialog::getOpenFileName
-            (
-                this,
-                "Open File",
-                QDir::currentPath(),
-                "C++/C files (*.h *.hpp *.cpp *.c) ;; Text Files (*.txt) ;; JSON Files (*.json)"
-                );
+            (this,
+             userMessages[UserMessages::OpenFileTitle],
+             QDir::currentPath(),
+             "C++/C files (*.h *.hpp *.cpp *.c) ;; Text Files (*.txt) ;; JSON Files (*.json)");
 
     // if document already opened then return
-    if(checkIfOpened(fileName))
+    if (isOpened(fileName))
     {
-        QMessageBox::warning(this, "Document already opened", "Selected document already opened.");
+        QMessageBox::warning
+                (this,
+                 userMessages[UserMessages::DocumentAlreadyOpenedTitle],
+                userMessages[UserMessages::DocumentAlreadyOpenedMsg]);
         return;
     }
 
@@ -410,7 +414,10 @@ void MainWindow::onOpenFileTriggered()
 
 void MainWindow::onOpenFolderTriggered()
 {
-    QString dirName = QFileDialog::getExistingDirectory(this, "Open Directory", QDir::currentPath());
+    QString dirName = QFileDialog::getExistingDirectory
+            (this,
+             userMessages[UserMessages::OpenDirectoryTitle],
+            QDir::currentPath());
     mpProjectViewerDock->setDir(dirName);
 }
 
@@ -422,23 +429,22 @@ void MainWindow::onOpenStartPage()
 void MainWindow::onSaveFileTriggered()
 {
     // if there are no opened docs
-    if(!mpDocsArea || !mpDocsArea->currentSubWindow())
+    if (!mpDocsArea->currentSubWindow())
     {
-        QMessageBox::information(this, "Save", "There are no opened documents to save.");
+        QMessageBox::information
+                (this,
+                 userMessages[UserMessages::SaveTitle],
+                userMessages[UserMessages::NoFilesToSaveMsg]);
         return;
     }
 
-    auto curDoc = qobject_cast<CodeEditor*>
-            (mpDocsArea->currentSubWindow()->widget());
-
-    // if ptr to current document is not valid
-    if(!curDoc)
-        return;
+    auto curDoc = getCurrentDoc();
 
     // if doc wasn't modified yet
-    if(!curDoc->document()->isModified())
+    if (!curDoc || !curDoc->document()->isModified())
+    {
         return;
-
+    }
     // saving doc
     saveDocument(curDoc, curDoc->getFileName());
 }
@@ -446,29 +452,36 @@ void MainWindow::onSaveFileTriggered()
 void MainWindow::onSaveFileAsTriggered()
 {
     // if there are no opened docs
-    if(!mpDocsArea || !mpDocsArea->currentSubWindow())
+    if (!mpDocsArea->currentSubWindow())
     {
-        QMessageBox::information(this, "Save", "There are no opened documents to save.");
+        QMessageBox::information
+                (this,
+                 userMessages[UserMessages::SaveTitle],
+                userMessages[UserMessages::NoFilesToSaveMsg]);
         return;
     }
 
-    auto curDoc = qobject_cast<CodeEditor*>
-            (mpDocsArea->currentSubWindow()->widget());
+    auto curDoc = getCurrentDoc();
 
-    // if ptr to current document is not valid
-    if(!curDoc)
+    // if there are no opened docs
+    if (!curDoc)
+    {
         return;
-
+    }
     QString extension;
 
     QString fileName = QFileDialog::getSaveFileName
-            (
-                this,
-                "Save As",
-                QDir::currentPath() + "/Unnamed",
-                "*.h ;; *.hpp ;; *.cpp ;; *.c ;; *.txt ;; *.json",
-                &extension
-                );
+            (this,
+             userMessages[UserMessages::SaveAsTitle],
+            QDir::currentPath() + "/Unnamed",
+            "*.h ;; *.hpp ;; *.cpp ;; *.c ;; *.txt ;; *.json",
+            &extension);
+
+    // if user closed dialog
+    if (fileName.isEmpty())
+    {
+        return;
+    }
 
     int position = fileName.indexOf(QChar{'.'});
     fileName += extension.mid(position + 1);
@@ -479,16 +492,16 @@ void MainWindow::onSaveFileAsTriggered()
 
 void MainWindow::onSaveAllFilesTriggered()
 {
-    if(!mpDocsArea)
-        return;
-
     // getting all docs
     auto docsList = mpDocsArea->subWindowList();
 
     // if there are no docs
     if(docsList.empty())
     {
-        QMessageBox::information(this, "Save", "There are no opened documents to save.");
+        QMessageBox::information
+                (this,
+                 userMessages[UserMessages::SaveTitle],
+                userMessages[UserMessages::NoFilesToSaveMsg]);
         return;
     }
 
@@ -496,27 +509,25 @@ void MainWindow::onSaveAllFilesTriggered()
     for (int i = 0; i < docsList.size(); ++i)
     {
         auto curDoc = qobject_cast<CodeEditor*>(docsList[i]->widget());
-        if(!curDoc)
-            qDebug() << "invalid ptr";
+
         if(curDoc && curDoc->document()->isModified())
         {
-            qDebug() << curDoc->getFileName();
             saveDocument(curDoc, curDoc->getFileName());
         }
     }
 }
 
 void MainWindow::onCloseFileTriggered()
-{
-    auto curDoc = qobject_cast<CodeEditor*>
-            (mpDocsArea->currentSubWindow()->widget());
+{    
+    auto curDoc = getCurrentDoc();
 
-    // if ptr to current document is not valid
-    if(!curDoc)
+    // if there are no opened documents
+    if (!curDoc)
+    {
         return;
-
+    }
     // if doc wasn't modified then just close doc
-    if(!curDoc->document()->isModified())
+    if (!curDoc->document()->isModified())
     {
         mpDocsArea->closeActiveSubWindow();
         return;
@@ -525,22 +536,22 @@ void MainWindow::onCloseFileTriggered()
     // ask user whether changes should be saved
     QMessageBox::StandardButton reply
             = QMessageBox::question
-            (
-                this,
-                "Save changes",
-                "Do you want to save changes to current document?",
-                QMessageBox::StandardButton::Yes |
-                QMessageBox::StandardButton::No |
-                QMessageBox::StandardButton::Cancel
-                );
+            (this,
+             userMessages[UserMessages::PromptSaveTitle],
+            userMessages[UserMessages::SaveQuestion],
+            QMessageBox::StandardButton::Yes |
+            QMessageBox::StandardButton::No |
+            QMessageBox::StandardButton::Cancel);
 
     // checking user's answer
-    if(reply == QMessageBox::Yes)
+    if (reply == QMessageBox::Yes)
     {
         saveDocument(curDoc, curDoc->getFileName());
     }
-    if(reply == QMessageBox::Cancel)
+    if (reply == QMessageBox::Cancel)
+    {
         return;
+    }
 
     // closing doc
     mpDocsArea->closeActiveSubWindow();
@@ -553,84 +564,72 @@ void MainWindow::onExitTriggered()
 
 void MainWindow::onUndoTriggered()
 {
-    auto curDoc = qobject_cast<CodeEditor*>
-            (mpDocsArea->currentSubWindow()->widget());
+    auto curDoc = getCurrentDoc();
 
-    // if ptr to current document is not valid
-    if(!curDoc)
-        return;
-
-    curDoc->undo();
+    if (curDoc)
+    {
+        curDoc->undo();
+    }
 }
 
 void MainWindow::onRedoTriggered()
 {
-    auto curDoc = qobject_cast<CodeEditor*>
-            (mpDocsArea->currentSubWindow()->widget());
+    auto curDoc = getCurrentDoc();
 
-    // if ptr to current document is not valid
-    if(!curDoc)
-        return;
-
-    curDoc->redo();
+    if (curDoc)
+    {
+        curDoc->redo();
+    }
 }
 
 void MainWindow::onCutTriggered()
 {
-    auto curDoc = qobject_cast<CodeEditor*>
-            (mpDocsArea->currentSubWindow()->widget());
+    auto curDoc = getCurrentDoc();
 
-    // if ptr to current document is not valid
-    if(!curDoc)
-        return;
-
-    curDoc->cut();
+    if (curDoc)
+    {
+        curDoc->cut();
+    }
 }
 
 void MainWindow::onCopyTriggered()
 {
-    auto curDoc = qobject_cast<CodeEditor*>
-            (mpDocsArea->currentSubWindow()->widget());
+    auto curDoc = getCurrentDoc();
 
-    // if ptr to current document is not valid
-    if(!curDoc)
-        return;
-
-    curDoc->copy();
+    if (curDoc)
+    {
+        curDoc->copy();
+    }
 }
 
 void MainWindow::onPasteTriggered()
 {
-    auto curDoc = qobject_cast<CodeEditor*>
-            (mpDocsArea->currentSubWindow()->widget());
+    auto curDoc = getCurrentDoc();
 
-    // if ptr to current document is not valid
-    if(!curDoc)
-        return;
-
-    curDoc->paste();
+    if (curDoc)
+    {
+        curDoc->paste();
+    }
 }
 
 void MainWindow::onSelectAllTriggered()
-{
-    auto curDoc = qobject_cast<CodeEditor*>
-            (mpDocsArea->currentSubWindow()->widget());
+{    
+    auto curDoc = getCurrentDoc();
 
-    // if ptr to current document is not valid
-    if(!curDoc)
-        return;
-
-    curDoc->selectAll();
+    if (curDoc)
+    {
+        curDoc->selectAll();
+    }
 }
 
 void MainWindow::onFindTriggered()
 {
-    qDebug() << "find";
+    //
 }
 
 void MainWindow::onFullScreenTriggered()
 {
-    qDebug() << "full screen";
+    //
 }
 
 void MainWindow::onShowProjectViewerTriggered()
@@ -650,7 +649,7 @@ void MainWindow::onShowBottomPanel()
 
 void MainWindow::onRefactorTriggered()
 {
-    qDebug() << "refactor";
+    //
 }
 
 void MainWindow::onConnectTriggered()
@@ -668,7 +667,7 @@ void MainWindow::onConnectTriggered()
 
 void MainWindow::onSettingsTriggered()
 {
-    qDebug() << "settings";
+    //
 }
 
 //==================================================================================================
@@ -687,34 +686,37 @@ void MainWindow::onTest()
 void MainWindow::onAboutTriggered()
 {
     QString info = "This application has been "
-            "developed by students of group LV-425.C++ of SoftServe IT Academy. "
-             "\n\nIt is designed to provide tools for "
-            "pair programming as well as facilities "
-            "of high-end development environment.";
+                   "developed by students of group LV-425.C++ of SoftServe IT Academy. "
+                   "\n\nIt is designed to provide tools for "
+                   "pair programming as well as facilities "
+                   "of high-end development environment.";
     QMessageBox::about(this, "About PairStorm", info);
 }
 
 void MainWindow::onReferenceTriggered()
 {
-    qDebug() << "reference";
+    //
 }
 
 void MainWindow::onUserGuideTriggered()
 {
-    qDebug() << "user guide";
+    //
 }
 
 void MainWindow::onCheckUpdatesTriggered()
 {
-    qDebug() << "check updates";
+    //
 }
 
 void MainWindow::onOpenFileFromProjectViewer(QString fileName)
 {
     // if document already opened then return
-    if(checkIfOpened(fileName))
+    if (isOpened(fileName))
     {
-        QMessageBox::warning(this, "Document already opened", "Selected document already opened.");
+        QMessageBox::warning
+                (this,
+                 userMessages[UserMessages::DocumentAlreadyOpenedTitle],
+                userMessages[UserMessages::DocumentAlreadyOpenedMsg]);
         return;
     }
 
@@ -723,43 +725,31 @@ void MainWindow::onOpenFileFromProjectViewer(QString fileName)
 
 void MainWindow::onCloseWindow(CodeEditor *curDoc)
 {
-    if(!curDoc)
-        return;
 
-    if(curDoc->document()->isModified())
-    {
-        QMessageBox::StandardButton reply = QMessageBox::question
-                (
-                    this,
-                    "Saving Changes",
-                    "Do you want to save changes to opened documents?",
-                    QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel
-                    );
+    saveDocument(curDoc, curDoc->getFileName());
+}
 
-        if((reply == QMessageBox::No) | (reply == QMessageBox::Cancel))
-            return;
-
-        saveDocument(curDoc, curDoc->getFileName());
-    }
+void MainWindow::onConnectionFailed()
+{
+    QMessageBox::warning
+            (this,
+            userMessages[UserMessages::ConnectionFailureTitle],
+            userMessages[UserMessages::ConnectionFailureMsg]);
 }
 
 CodeEditor* MainWindow::createNewDoc()
 {
     CodeEditor *newDoc = new CodeEditor;
 
-    // !!! will be used when CodeEditor will emit closeSignal on closeEvent
-    //connect(curDoc, &CodeEditor::closeSignal, this, &MainWindow::onCloseWindow);
     mpDocsArea->addSubWindow(newDoc);
+    connect(newDoc, &CodeEditor::closeDocEventOccured, this, &MainWindow::onCloseWindow);
     newDoc->setAttribute(Qt::WA_DeleteOnClose);
 
     return newDoc;
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
-{
-    if(!mpDocsArea)
-        return;
-
+{    
     // getting all docs
     auto docsList = mpDocsArea->subWindowList();
 
@@ -771,26 +761,24 @@ void MainWindow::closeEvent(QCloseEvent *event)
     }
 
     // if doc is modified then we should ask user if changes have to be saved
-    if(!checkIfModified(docsList))
+    if(!isModified(docsList))
     {
         event->accept();
         return;
     }
 
     QMessageBox::StandardButton reply = QMessageBox::question
-            (
-                this,
-                "Saving Changes",
-                "Do you want to save changes to opened documents?",
-                QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel
-                );
+            (this,
+             userMessages[UserMessages::PromptSaveTitle],
+             userMessages[UserMessages::SaveQuestion],
+             QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
 
-    if(reply == QMessageBox::No)
+    if (reply == QMessageBox::No)
     {
         event->accept();
         return;
     }
-    if(reply == QMessageBox::Yes)
+    if (reply == QMessageBox::Yes)
     {
         // if appreved then save changes
         saveAllModifiedDocuments(docsList);
@@ -821,4 +809,14 @@ void MainWindow::restoreMainWindowState()
     QSettings settings(QApplication::organizationName(), QApplication::applicationName());
     restoreGeometry(settings.value("mainWindowGeometry").toByteArray());
     restoreState(settings.value("mainWindowState").toByteArray());
+}
+
+void MainWindow::setAppStyle()
+{
+    QString styleName = "Fusion";
+    QStringList availableStyles = QStyleFactory::keys();
+    if (availableStyles.contains(styleName))
+    {
+        QApplication::setStyle(QStyleFactory::create(styleName));
+    }
 }
