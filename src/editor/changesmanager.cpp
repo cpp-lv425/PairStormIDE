@@ -97,13 +97,13 @@ std::string ChangeManager::undo()
 {
     if (mCurrentFileStateIter == mChangesHistory.begin())
         return mCurrentFileState;
-
+    auto pos = mCurrentFileStateIter->beginChangePos;
     std::string from = mCurrentFileStateIter->after;
     std::string to = mCurrentFileStateIter->before;
 
     mCurrentFileStateIter--;
 
-    mCurrentFileState.replace(mCurrentFileStateIter->beginChangePos, from.length(), to);
+    mCurrentFileState.replace(pos, from.length(), to);
 
     return mCurrentFileState;
 }
