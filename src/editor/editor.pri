@@ -2,9 +2,9 @@ DEPENDPATH += $$PWD
 INCLUDEPATH += $$PWD
 
 SOURCES += \
+        $$PWD/addcommentbutton.cpp \
         $$PWD/changesmanager.cpp \
         $$PWD/codeeditor.cpp \
-        $$PWD/highlightercpp.cpp \
         $$PWD/hotkeys.cpp \
         $$PWD/ilexer.cpp \
         $$PWD/lexercpp.cpp \
@@ -12,10 +12,10 @@ SOURCES += \
         $$PWD/widget.cpp
 
 HEADERS += \
+        $$PWD/addcommentbutton.h \
         $$PWD/changemanager.h \
         $$PWD/codeeditor.h \
         $$PWD/fmstates.h \
-        $$PWD/highlightercpp.h \
         $$PWD/ideconfiguration.h \
         $$PWD/ilexer.h \
         $$PWD/keywords.h \
@@ -30,3 +30,5 @@ HEADERS += \
 FORMS += \
         $$PWD/inputcommentwidget.ui \
         $$PWD/widget.ui
+
+DISTFILES +=

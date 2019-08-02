@@ -8,9 +8,11 @@ class MainWindow;
 }
 
 QT_BEGIN_NAMESPACE
+class LocalConnectorInterface;
 class ProjectViewerDock;
 class QFileSystemModel;
 class BottomPanelDock;
+class QListWidgetItem;
 class ChatWindowDock;
 class QMdiSubWindow;
 class QDockWidget;
@@ -29,26 +31,28 @@ public:
     ~MainWindow();
 
 private:
+    LocalConnectorInterface * mplocalConnector;
     Ui::MainWindow *ui;
     ProjectViewerDock *mpProjectViewerDock;
     ChatWindowDock *mpChatWindowDock;
     BottomPanelDock *mpBottomPanelDock;
     MDIArea *mpDocsArea;
     QString mCurrentUserName;
-
     void setupMainMenu();
-    void saveDocument(CodeEditor* pDoc, QString fileName);
+    void saveDocument(CodeEditor *pDoc, const QString &fileName);
     void openDoc(QString fileName);
-    bool checkIfOpened(const QString& fileName)const;
+    bool isOpened(const QString &fileName)const;
     // returns true if any of docs has been modified
-    bool checkIfModified(QList<QMdiSubWindow*> &docsList);
+    bool isModified(QList<QMdiSubWindow*> &docsList);
     void saveAllModifiedDocuments(QList<QMdiSubWindow*> &docsList);
     void createProjectViewer();
     void createChatWindow();
     void createButtomPanel();
+    CodeEditor* getCurrentDoc();
 
     void saveMainWindowState();
     void restoreMainWindowState();
+    void setAppStyle();
 
 private slots:
     // file menu actions
@@ -90,7 +94,8 @@ private slots:
 
 public slots:
     void onOpenFileFromProjectViewer(QString fileName);    
-    void onCloseWindow(CodeEditor* curDoc);
+    void onCloseWindow(CodeEditor *curDoc);   
+    void onConnectionStatusChanged(bool status);
 
 private:
     // creates new doc in MDIArea

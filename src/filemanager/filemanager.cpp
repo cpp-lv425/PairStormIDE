@@ -1,39 +1,44 @@
 #include "filemanager.h"
 
 #include <QTextStream>
-#include <QException> // temp
 #include <QFile>
 
-QString FileManager::readFromFile(const QString& fname)
+#include "utils.h"
+
+QString FileManager::readFromFile(const QString &fileName)
 {
-    QFile file(fname);
+    if (fileName.isEmpty())
+    {
+        throw IncorrectUserInput();
+    }
+    QFile file(fileName);
 
     if (file.open(QIODevice::ReadOnly))
     {
         QTextStream stream(&file);
-        QString readResult = stream.readAll();
+        QString rReadResult = stream.readAll();
         file.close();
-        return readResult;
+        return rReadResult;
     }
-    throw QException();
+    throw FileOpeningFailure();
 }
 
-void FileManager::createFile(const QString& fname)
+void FileManager::createFile(const QString &fileName)
 {
-    QFile file(fname);
+    QFile file(fileName);
 
     if (file.open(QIODevice::WriteOnly))
     {
         file.close();
         return;
     }
-    throw QException();
+    throw FileOpeningFailure();
 }
 
-void FileManager::writeToFile(const QString &fname,
+void FileManager::writeToFile(const QString &fileName,
                              const QString &content)
 {
-    QFile file(fname);
+    QFile file(fileName);
 
     if (file.open(QIODevice::WriteOnly))
     {
@@ -41,5 +46,5 @@ void FileManager::writeToFile(const QString &fname,
         file.close();
         return;
     }
-    throw QException();
+    throw FileOpeningFailure();
 }
