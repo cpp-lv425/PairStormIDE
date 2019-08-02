@@ -10,7 +10,7 @@ UdpService::UdpService(QObject *qObject) :
     // Save received datagrams on readyRead
     connect(
         mpUdpSocket.get(), &QUdpSocket::readyRead,
-        this,                 &UdpService::saveDatagramOnReceival,
+        this,              &UdpService::saveDatagramOnReceival,
         Qt::UniqueConnection);
 }
 // ==========================================================================================
@@ -83,8 +83,8 @@ void UdpService::saveDatagramOnReceival()
 
     // Save datagram
     mPendingDatagram.mContent = data;
-    mPendingDatagram.mIp   = ip;
-    mPendingDatagram.mPort = port;
+    mPendingDatagram.mIp      = ip;
+    mPendingDatagram.mPort    = port;
 
     emit newDatagramSaved();
 }
