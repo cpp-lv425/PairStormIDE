@@ -5,7 +5,6 @@
 #include<QTextCursor>
 #include<QPainter>
 #include<QTextCharFormat>
-#include "keymap.h"
 #include <QFontDatabase>
 #include<QScrollBar>
 #include<QMessageBox>
@@ -33,8 +32,7 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     //create objects connected to codeEditor
     lineNumberArea = new LineNumberArea(this);
 
-    KeyMap keysevents;
-    mKeysEventMap=keysevents.getkeys();
+
     this->setTabStopDistance(TAB_SPACE * fontMetrics().width(QLatin1Char('0')));//set tab distance
     mTimer = new QTimer;
     mLcpp = new LexerCPP();

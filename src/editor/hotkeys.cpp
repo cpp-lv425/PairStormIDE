@@ -83,7 +83,6 @@ void CodeEditor::eventBracketLeft(QKeyEvent *e)
     this->insertPlainText("]");
     this->moveCursor(QTextCursor::Left);
     this->verticalScrollBar();
-    return;
 }
 void CodeEditor::eventBraceLeft(QKeyEvent *e)
 {
@@ -91,7 +90,6 @@ void CodeEditor::eventBraceLeft(QKeyEvent *e)
     this->insertPlainText("}");
     this->moveCursor(QTextCursor::Left);
     this->verticalScrollBar();
-    return;
 }
 
 
@@ -99,8 +97,6 @@ void CodeEditor::eventSlash(QKeyEvent *e)
 {
     QPlainTextEdit::keyPressEvent(e);
     ispressSlesh=true;
-    qDebug()<<"sleeshhhh"<<ispressSlesh<<"\n";
-    return;
 }
 void CodeEditor::eventAsterisk(QKeyEvent *e)
 {
@@ -112,7 +108,6 @@ void CodeEditor::eventAsterisk(QKeyEvent *e)
         this->moveCursor(QTextCursor::Left);
         this->verticalScrollBar();
         //ispressSlesh=false;
-        return;
     }
 }
 
@@ -125,11 +120,6 @@ void CodeEditor::eventShiftEnter(QKeyEvent *e)
 
 void CodeEditor::keyPressEvent(QKeyEvent *e)
 {
-   if(mKeysEventMap[qMakePair(e->key(),e->modifiers())])
-   {
-           (this->*mKeysEventMap.value(qMakePair(e->key(),e->modifiers())))(e);
-   }
-   else
     QPlainTextEdit::keyPressEvent(e);
 }
 

@@ -80,11 +80,9 @@ private:
    AddCommentButton *mAddCommentButton;
    QLabel *mCurrentCommentLable;
    int mLinesCount;
-   QMap<QPair<int, QFlags<Qt::KeyboardModifier>>, void(CodeEditor::*)(QKeyEvent *)> mKeysEventMap;
 
 public:
   static bool ispressSlesh;
-  //void setkeyeventmap();
    //keyboard event's handlers
    void eventBracketLeft(QKeyEvent *e);
    void eventBraceLeft(QKeyEvent *e);

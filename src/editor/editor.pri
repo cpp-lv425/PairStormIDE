@@ -7,7 +7,6 @@ SOURCES += \
         $$PWD/codeeditor.cpp \
         $$PWD/hotkeys.cpp \
         $$PWD/ilexer.cpp \
-        $$PWD/keymap.cpp \
         $$PWD/lexercpp.cpp \
         $$PWD/linenumberarea.cpp \
         $$PWD/widget.cpp
@@ -19,7 +18,6 @@ HEADERS += \
         $$PWD/fmstates.h \
         $$PWD/ideconfiguration.h \
         $$PWD/ilexer.h \
-        $$PWD/keymap.h \
         $$PWD/keywords.h \
         $$PWD/lexercpp.h \
         $$PWD/linenumberarea.h \
