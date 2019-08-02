@@ -17,6 +17,8 @@ public:
                         const QString message);
 signals:
     void userToConnectSelected(const QString);
+    void userToDisconnectSelected(const QString);
+
     void sendMessage(const QString&);
 
 public slots:

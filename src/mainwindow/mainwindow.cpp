@@ -314,24 +314,24 @@ void MainWindow::createChatWindow()
     // create instance of Chat Window
     mpChatWindowDock = new ChatWindowDock(this);
 
-    // Add updating users list on discovering new users
+    // Add updating users list on discovering new users and connecting new users
     connect(mplocalConnector, &LocalConnectorInterface::onlineUsersUpdated,
             mpChatWindowDock, &ChatWindowDock::updateOnlineUsersOnChange,
             Qt::UniqueConnection);
-
-    // Add updating users list on connecting new users
     connect(mplocalConnector, &LocalConnectorInterface::connectedUsersUpdated,
             mpChatWindowDock, &ChatWindowDock::updateConnectedUsersOnChange,
             Qt::UniqueConnection);
-
+    // Allow start sharing and stop sharing on user input
     connect(mpChatWindowDock, &ChatWindowDock::userToConnectSelected,
             mplocalConnector, &LocalConnectorInterface::startSharing,
             Qt::UniqueConnection);
-
+    connect(mpChatWindowDock, &ChatWindowDock::userToDisconnectSelected,
+            mplocalConnector, &LocalConnectorInterface::stopSharing,
+            Qt::UniqueConnection);
+    // Allow sending and displaying messages
     connect(mpChatWindowDock, &ChatWindowDock::sendMessage,
             mplocalConnector, &LocalConnectorInterface::shareMessage,
             Qt::UniqueConnection);
-
     connect(mplocalConnector, &LocalConnectorInterface::messageReceived,
             mpChatWindowDock, &ChatWindowDock::displayMessage,
             Qt::UniqueConnection);

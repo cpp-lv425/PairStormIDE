@@ -311,7 +311,7 @@ void DefaultLocalConnector::shareChange(const QString changeContent)
 // ==========================================================================================
 // ==========================================================================================
 // ==========================================================================================
-//                                                             COORDINATE RECEIVED TCP SEGMENT
+//                                                            COORDINATE RECEIVED TCP SEGMENT
 void DefaultLocalConnector::parseTcpSegmentOnReceive()
 {
     Segment segment = mpTcpService->getReceivedSegment();

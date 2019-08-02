@@ -26,6 +26,9 @@ public:
     explicit ChatWidget(QWidget *pParent = nullptr);
     void setOnlineUsers(const QStringList & onlineUsers);
     void setConnectedUsers(const QStringList & connectedUsers);
+
+    bool isUserConnected(const QString & userName);
+
     void setCurrentUserName(const QString& userName);
     void displayMessage(const QString& userName,
                         const QString& message);

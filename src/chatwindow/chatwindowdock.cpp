@@ -32,7 +32,14 @@ void ChatWindowDock::displayMessage(const QString userName, const QString messag
 
 void ChatWindowDock::onUserToConnectSelected(QString userName)
 {
-    emit userToConnectSelected(userName);
+    if (!mpChatWidget->isUserConnected(userName))
+    {
+        emit userToConnectSelected(userName);
+    }
+    else
+    {
+        emit userToDisconnectSelected(userName);
+    }
 }
 
 void ChatWindowDock::onSendMessage(const QString &message)

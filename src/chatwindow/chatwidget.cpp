@@ -79,6 +79,11 @@ void ChatWidget::setConnectedUsers(const QStringList &connectedUsers)
     updateUsersList();
 }
 
+bool ChatWidget::isUserConnected(const QString &userName)
+{
+    return mConnectedUsers.contains(userName);
+}
+
 void ChatWidget::setCurrentUserName(const QString &userName)
 {
     mUserName = userName;
