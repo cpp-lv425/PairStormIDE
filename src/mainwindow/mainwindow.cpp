@@ -447,6 +447,8 @@ void MainWindow::onSaveFileTriggered()
     }
     // saving doc
     saveDocument(curDoc, curDoc->getFileName());
+
+
 }
 
 void MainWindow::onSaveFileAsTriggered()
@@ -470,6 +472,7 @@ void MainWindow::onSaveFileAsTriggered()
     }
     QString extension;
 
+    // prompt new filename from user
     QString fileName = QFileDialog::getSaveFileName
             (this,
              userMessages[UserMessages::SaveAsTitle],
@@ -488,6 +491,11 @@ void MainWindow::onSaveFileAsTriggered()
 
     // saving doc
     saveDocument(curDoc, fileName);
+
+    // binding opened doc to new file
+    curDoc->setFileName(fileName);
+    position = fileName.lastIndexOf(QChar{'/'});
+    curDoc->setWindowTitle(fileName.mid(position + 1));
 }
 
 void MainWindow::onSaveAllFilesTriggered()
