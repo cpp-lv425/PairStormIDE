@@ -29,7 +29,6 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     //create objects connected to codeEditor
     lineNumberArea = new LineNumberArea(this);
     mTimer = new QTimer;
-    mHcpp = new Highlightercpp(document());
     mLcpp = new LexerCPP();
     mTimer = new QTimer;
     mChangeManager = new ChangeManager(this->toPlainText().toUtf8().constData());
@@ -44,9 +43,10 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     //If the text is scrolled, rect will cover the entire viewport area.
     //If the text is scrolled vertically, dy carries the amount of pixels the viewport was scrolled.
     connect(this,  SIGNAL(updateRequest(QRect,int)), this, SLOT(updateLineNumberArea(QRect,int)));
-    connect(this,  SIGNAL(cursorPositionChanged()), this, SLOT(runLexerAndHighlight()));
+    connect(this,  SIGNAL(cursorPositionChanged()), this, SLOT(runLexer()));
     connect(mTimer, SIGNAL(timeout()), this, SLOT(saveStateInTheHistory()));
     connect(this,  SIGNAL(textChanged()), this, SLOT(changesAppeared()));
+    connect(this,  SIGNAL(cursorPositionChanged()), this, SLOT(highlighText()));;
 
     mTimer->start(CHANGE_SAVE_TIME);//save text by this time
 
@@ -60,21 +60,19 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     mFont.setBold(false);
     mFont.setItalic(false);
     this->setFont(mFont);
+
+    //set text highlighting color
+    fmtLiteral.setForeground(Qt::red);
+    fmtKeyword.setForeground(Qt::blue);
+    fmtComment.setForeground(Qt::green);
 }
 
-void CodeEditor::runLexerAndHighlight()
+void CodeEditor::runLexer()
 {
     //run lexer
     mLcpp->clear();
     mLcpp->lexicalAnalysis(document()->toPlainText());
     mTokens = mLcpp->getTokens();
-    //run highlight
-    mHcpp->setData(mTokens);
-    mHcpp->setText(this->document()->toPlainText());
-    for(int i = 0; i < mHcpp->mLines.size(); i++)
-    {
-        mHcpp->highlightBlock(mHcpp->mLines[i]);
-    }
 }
 
 int CodeEditor::getLineNumberAreaWidth()
@@ -268,4 +266,37 @@ void CodeEditor::closeEvent(QCloseEvent *event)
     }
     // saving document
     emit closeDocEventOccured(this);
+}
+
+void CodeEditor::highlighText()
+{
+    QTextCursor cursor = textCursor();
+    for(const auto &i: mTokens)
+    {
+        qDebug() << i.name << ' ' << i.type << ' ' << i.begin << ' ' << i.end << '\n';
+        switch(i.type)
+        {
+        case(KW):
+        {
+            cursor.setPosition(i.begin, QTextCursor::MoveAnchor);
+            cursor.setPosition(i.end, QTextCursor::KeepAnchor);
+            cursor.setCharFormat(fmtKeyword);
+            break;
+        }
+        case(LIT):
+        {
+            cursor.setPosition(i.begin, QTextCursor::MoveAnchor);
+            cursor.setPosition(i.end, QTextCursor::KeepAnchor);
+            cursor.setCharFormat(fmtLiteral);
+            break;
+        }
+        case(COM):
+        {
+            cursor.setPosition(i.begin, QTextCursor::MoveAnchor);
+            cursor.setPosition(i.end, QTextCursor::KeepAnchor);
+            cursor.setCharFormat(fmtComment);
+            break;
+        }
+        }
+    }
 }
