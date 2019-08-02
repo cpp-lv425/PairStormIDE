@@ -42,7 +42,7 @@ inline bool LexerCPP::isStringLiteral(const QString &lexem)
 
 inline bool LexerCPP::isOneLineComment(const QString &lexem)
 {
-    const QRegExp cRx("//.*");
+    const QRegExp cRx("\\/\\/.*");
     return cRx.exactMatch(lexem);
 }
 
@@ -226,7 +226,7 @@ void LexerCPP::handleOperatorState(const QChar &sym)
 
 void LexerCPP::handleCommentState(const QChar &sym)
 {
-    if((isOneLineComment(mCurrentLexem) && (sym == cNextLine) || isBlockComments(mCurrentLexem)))
+    if((isOneLineComment(mCurrentLexem) && sym == cNextLine) || isBlockComments(mCurrentLexem))
     {
         addLexem();
     }
@@ -254,6 +254,7 @@ void LexerCPP::handleLiteralState(const QChar &sym)
 
 void LexerCPP::lexicalAnalysis(QString code)
 {
+    mCodeSize = code.size();
     mIndex = 0;
     QChar sym = 0;
 
@@ -305,4 +306,6 @@ void LexerCPP::lexicalAnalysis(QString code)
             break;
         }
     }
+    ++mIndex;
+    addLexem();
 }

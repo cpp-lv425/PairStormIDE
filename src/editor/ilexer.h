@@ -7,6 +7,7 @@ class iLexer
 {
 protected:
     unsigned int mIndex;
+    unsigned int mCodeSize;
     QString mCurrentLexem;
 
 public:

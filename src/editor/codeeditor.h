@@ -75,7 +75,7 @@ private:
     QTextCharFormat fmtLiteral;
     QTextCharFormat fmtComment;
     QTextCharFormat fmtKeyword;
-
+    QTextCharFormat fmtRegular;
 };
 
 #endif // CODEEDITOR_H
