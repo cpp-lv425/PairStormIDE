@@ -1,15 +1,27 @@
 #ifndef SERVERDATA_H
 #define SERVERDATA_H
 
+//=================================================================== STL libraries
+#include <memory>
+#include <algorithm>
+
+//============================================================ General Qt libraries
 #include <QObject>
-#include <QString>
 #include <QSettings>
 #include <QDateTime>
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QJsonDocument>
-#include <QUdpSocket>
+
+//=================================================== Network interaction libraries
+#include <QtNetwork>
+#include <QHostInfo>
 #include <QTcpServer>
+#include <QTcpSocket>
+#include <QUdpSocket>
+#include <QNetworkSession>
+#include <QNetworkInterface>
+
 
 #define CUSTOM_DEBUG
 
@@ -18,7 +30,6 @@ typedef quint16 PortNumType;
 typedef qint64  SizeType;
 
 // Default values for common parameters
-
 const PortNumType gDefaultTcpPortNumber    = 36108;
 const PortNumType gDefaultUdpPortNumber    = 32807;
 
@@ -27,7 +38,8 @@ const SizeType    gDefaultBroadcastCycleMs = 500;
 const SizeType    gDefaultOutdatingCycleMs = 1200;
 
 
-struct ServerData {
+struct ServerData
+{
     SizeType              mDiscoveryMoment;
     QHostAddress          mActiveIp;
     QString               mName;
@@ -99,7 +111,8 @@ struct ServerData {
     }
 };
 
-struct Message {
+struct Message
+{
     QString mSourceName;
     QString mContent;
     enum Type : int

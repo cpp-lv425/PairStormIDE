@@ -340,7 +340,7 @@ void MainWindow::createChatWindow()
             Qt::UniqueConnection);
 
     // Add updating users list on connecting new users
-    connect(mplocalConnector, &LocalConnectorInterface::onlineUsersUpdated,
+    connect(mplocalConnector, &LocalConnectorInterface::connectedUsersUpdated,
             mpChatWindowDock, &ChatWindowDock::updateConnectedUsersOnChange,
             Qt::UniqueConnection);
 
@@ -736,7 +736,7 @@ void MainWindow::onCloseWindow(CodeEditor *curDoc)
                     QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel
                     );
 
-        if(reply == QMessageBox::No | reply == QMessageBox::Cancel)
+        if((reply == QMessageBox::No) | (reply == QMessageBox::Cancel))
             return;
 
         saveDocument(curDoc, curDoc->getFileName());
