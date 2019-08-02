@@ -7,13 +7,14 @@ void DefaultLocalConnector::configureOnLogin(const QString & userName)
     if (mpUdpService && mpTcpService)
     {
         // If services has previously been configured
+        emit serviceStatusChanged(mpTcpService->isServerActive()? true : false);
         return;
     }
     // Configure the UDP service & TCP service
     mpUdpService = std::unique_ptr<UdpService>(new UdpService());
     mpTcpService = std::unique_ptr<TcpService>(new TcpService(userName));
 
-    emit serviceStatus(mpTcpService->isServerActive()? true : false);
+    emit serviceStatusChanged(mpTcpService->isServerActive()? true : false);
     if (!mpTcpService->isServerActive())
     {
         return;
@@ -311,7 +312,7 @@ void DefaultLocalConnector::shareChange(const QString changeContent)
 // ==========================================================================================
 // ==========================================================================================
 // ==========================================================================================
-//                                                             COORDINATE RECEIVED TCP SEGMENT
+//                                                            COORDINATE RECEIVED TCP SEGMENT
 void DefaultLocalConnector::parseTcpSegmentOnReceive()
 {
     Segment segment = mpTcpService->getReceivedSegment();
