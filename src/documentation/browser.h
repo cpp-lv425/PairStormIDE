@@ -15,8 +15,6 @@ class Browser : public QMainWindow
 public:
     explicit Browser(QWidget *parent = nullptr);
     ~Browser();
-signals:
-
 public slots:
     void newTab(const QString &keyword);
     void emptyDocumentationTab();

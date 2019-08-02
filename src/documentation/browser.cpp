@@ -1,18 +1,16 @@
 #include "browser.h"
 
+#include <QDir>
+#include <QStandardPaths>
+#include <QWebEngineView>
+#include <QWebEnginePage>
+
 #include "mdiarea.h"
 #include "documentationsearch.h"
 #include "connectionmanager.h"
 #include "documentationengine.h"
 #include "documentationviewer.h"
 #include "htmlcontentgenerator.h"
-#include <QWebEngineView>
-#include <QWebEnginePage>
-#include <QDebug>
-#include <QWebEngineSettings>
-#include <QMessageBox>
-#include <QDir>
-#include <QStandardPaths>
 
 Browser::Browser(QWidget *parent) : QMainWindow (parent)
 {
@@ -27,12 +25,21 @@ Browser::~Browser()
     delete mConnectionManager;
     delete mDocumentationEngine;
     delete mBrowseArea;
+
     bool result;
     QDir dir = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
+
     result = dir.cd("PairStorm");
-    dir.mkdir("temp");
-    dir.setNameFilters(QStringList() << "*.*");
+    result = dir.cd("temp");
+
+    if(!result)
+    {
+        return;
+    }
+
+    dir.setNameFilters(QStringList() << "*.html");
     dir.setFilter(QDir::Files);
+
     foreach(QString dirFile, dir.entryList())
     {
         dir.remove(dirFile);
@@ -41,37 +48,56 @@ Browser::~Browser()
 
 void Browser::newTab(const QString &keyword)
 {
+    DocumentationViewer *newWindow = new DocumentationViewer(this);
 
-    bool result;
+    bool isPairStormExist;
     QDir dir = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
-    result = dir.cd("PairStorm");
-    qDebug()<<result;
-    //dir.mkdir("temp");
-    qDebug()<<dir.cd("temp");
-    //dir.setNameFilters(QStringList() << "*.*");
-    //dir.setFilter(QDir::Files);
-//    foreach(QString dirFile, dir.entryList())
-//    {
-//        dir.remove(dirFile);
-//    }
-    DocumentationViewer *newWingow = new DocumentationViewer(this);
-    newWingow->setWindowTitle(keyword);
-    mDocumentationEngine->searchByKeyword(keyword);
-    QString html = QString::fromStdString(HTMLContentGenerator::generate(mDocumentationEngine->documentationLinks()));
-   // qDebug()<<html;
-    if(mDocumentationEngine->documentationLinks().size() > 0)
-    {
-        qDebug()<<dir.path();
-        QFile temp(QString(dir.path()+"/"+keyword+".html"));
-        temp.open(QIODevice::WriteOnly);
-        temp.write(html.toUtf8());
-        temp.close();
-       // newWingow->setHtml(html);
-    }
 
-    newWingow->webView()->load(QUrl::fromLocalFile(QString(dir.path()+"/"+keyword+".html")));
-    mBrowseArea->addSubWindow(newWingow);
-    newWingow->setAttribute(Qt::WA_DeleteOnClose);
+    isPairStormExist = dir.cd("PairStorm");
+
+    if(!isPairStormExist)
+    {
+        if(mConnectionManager->hasConnection())
+        {
+            newWindow->webView()->load(QUrl("https://en.cppreference.com/w/"));
+        }
+    }
+    else
+    {
+        dir.mkdir("temp");
+        QDir tempDir{dir};
+        tempDir.cd("temp");
+        mDocumentationEngine->searchByKeyword(keyword);
+        QString html = QString::fromStdString(HTMLContentGenerator::generate(mDocumentationEngine->documentationLinks()));
+
+        if(mDocumentationEngine->documentationLinks().size() > 0)
+        {
+            QFile temp(QString(tempDir.path()+"/"+keyword+".html"));
+
+            temp.open(QIODevice::WriteOnly);
+            temp.write(html.toUtf8());
+
+            temp.close();
+            newWindow->webView()->load(QUrl::fromLocalFile(QString(tempDir.path()+"/"+keyword+".html")));
+        }
+        else
+        {
+            if(mConnectionManager->hasConnection())
+            {
+                newWindow->webView()->load(QUrl("https://en.cppreference.com/w/"));
+            }
+            else
+            {
+                dir.cd("reference");
+                dir.cd("en");
+                QString indexPath{dir.path() + "/" + "index.html"};
+                qDebug()<<indexPath;
+                newWindow->webView()->load(QUrl::fromLocalFile(indexPath));
+            }
+        }
+    }
+    mBrowseArea->addSubWindow(newWindow);
+    newWindow->setAttribute(Qt::WA_DeleteOnClose);
 
 }
 
