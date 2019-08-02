@@ -246,7 +246,7 @@ void CodeEditor::closeEvent(QCloseEvent *event)
 void CodeEditor::highlighText()
 {
     QTextCursor cursor = textCursor();
-    for(auto i: mTokens)
+    for(const auto &i: mTokens)
     {
         qDebug() << i.name << ' ' << i.type << ' ' << i.begin << ' ' << i.end << '\n';
         switch(i.type)
