@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include <QListWidgetItem>
 #include <QMdiSubWindow>
 #include <QStyleFactory>
 #include <QMessageBox>
@@ -11,6 +12,7 @@
 #include <QDebug> // temporarily included
 #include <QFile>
 
+#include "localconnectorgenerator.h"
 #include "projectviewerdock.h"
 #include "bottompaneldock.h"
 #include "chatwindowdock.h"
@@ -26,6 +28,10 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
+    // Generate default local network connector
+    mplocalConnector =
+            LocalConnectorGenerator::getDefaultConnector();
+
     ui->setupUi(this);
     {
         StoreConf conf(this);
@@ -103,7 +109,9 @@ void MainWindow::setupMainMenu()
 {
     // file menu
     QMenu *fileMenu = new QMenu("&File");
+    // main tool bar
     QToolBar *pToolbar = new QToolBar("Main Tool Bar");
+    pToolbar->setObjectName("pToolbar");
 
     // working with files
     QAction *pNewFileAction = fileMenu->addAction("&New file", this, &MainWindow::onNewFileTriggered, Qt::CTRL + Qt::Key_N);
@@ -200,6 +208,9 @@ void MainWindow::setupMainMenu()
     // opening settings window
     QAction *pSettingsAction = toolsMenu->addAction("&Settings...", this, &MainWindow::onSettingsTriggered);
     pSettingsAction->setDisabled(true);
+
+    // for Valik for testing purposes
+    toolsMenu->addAction("&Test", this, &MainWindow::onTest, Qt::CTRL + Qt::SHIFT + Qt::Key_T);
 
     // help menu
     QMenu *helpMenu = new QMenu("&Help");
@@ -322,6 +333,31 @@ void MainWindow::createChatWindow()
 {
     // create instance of Chat Window
     mpChatWindowDock = new ChatWindowDock(this);
+
+    // Add updating users list on discovering new users
+    connect(mplocalConnector, &LocalConnectorInterface::onlineUsersUpdated,
+            mpChatWindowDock, &ChatWindowDock::updateOnlineUsersOnChange,
+            Qt::UniqueConnection);
+
+    // Add updating users list on connecting new users
+    connect(mplocalConnector, &LocalConnectorInterface::onlineUsersUpdated,
+            mpChatWindowDock, &ChatWindowDock::updateConnectedUsersOnChange,
+            Qt::UniqueConnection);
+
+    connect(mpChatWindowDock, &ChatWindowDock::userToConnectSelected,
+            mplocalConnector, &LocalConnectorInterface::startSharing,
+            Qt::UniqueConnection);
+
+    connect(mpChatWindowDock, &ChatWindowDock::sendMessage,
+            mplocalConnector, &LocalConnectorInterface::shareMessage,
+            Qt::UniqueConnection);
+
+    connect(mplocalConnector, &LocalConnectorInterface::messageReceived,
+            mpChatWindowDock, &ChatWindowDock::displayMessage,
+            Qt::UniqueConnection);
+
+
+
     mpChatWindowDock->setObjectName("mpChatWindowDock");
     addDockWidget(Qt::RightDockWidgetArea, mpChatWindowDock, Qt::Vertical);
     mpChatWindowDock->setAllowedAreas(Qt::RightDockWidgetArea);
@@ -330,7 +366,8 @@ void MainWindow::createChatWindow()
 void MainWindow::createButtomPanel()
 {
     // create instance of Bottom Panel
-    mpBottomPanelDock = new BottomPanelDock(this);    
+    mpBottomPanelDock = new BottomPanelDock(this);
+    mpBottomPanelDock->setObjectName("mpBottomPanelDock");
 }
 
 void MainWindow::onNewFileTriggered()
@@ -619,7 +656,14 @@ void MainWindow::onRefactorTriggered()
 void MainWindow::onConnectTriggered()
 {
     LoginDialog loginDialog(this);
-    mCurrentUserName = loginDialog.start();
+    QString userInput = loginDialog.start();
+    if (userInput.isEmpty())
+    {
+        return;
+    }
+    mCurrentUserName = userInput;
+    mpChatWindowDock->setUserName(userInput);
+    mplocalConnector->configureOnLogin(mCurrentUserName);
 }
 
 void MainWindow::onSettingsTriggered()
@@ -627,9 +671,27 @@ void MainWindow::onSettingsTriggered()
     qDebug() << "settings";
 }
 
+//==================================================================================================
+//                                                                              FOR TESTING PURPOSES
+void MainWindow::onTest()
+{
+    qDebug() << "===========================================";
+    qDebug() << "==============               ==============";
+    qDebug() << "=============   VALIK TESTS   =============";
+    qDebug() << "==============               ==============";
+    qDebug() << "===========================================";
+    //mplocalConnector->testSendHelloToLastServer();
+}
+//==================================================================================================
+
 void MainWindow::onAboutTriggered()
 {
-    qDebug() << "about";
+    QString info = "This application has been "
+            "developed by students of group LV-425.C++ of SoftServe IT Academy. "
+             "\n\nIt is designed to provide tools for "
+            "pair programming as well as facilities "
+            "of high-end development environment.";
+    QMessageBox::about(this, "About PairStorm", info);
 }
 
 void MainWindow::onReferenceTriggered()

@@ -7,15 +7,15 @@ namespace Ui {
 class StartPage;
 }
 
+class QLabel;
+
 class StartPage : public QDialog
 {
     Q_OBJECT
 
 public:
     explicit StartPage(QWidget *parent = nullptr);
-    void showStartPage();
-    void setupButton(QPushButton *pButton,
-                     QIcon icon, int maxWidth);
+    void showStartPage();    
     ~StartPage();
 
 private:
@@ -39,6 +39,14 @@ signals:
     void onOpenDirPressed();
     void onReferenceBtnPressed();
     void onSettingsBtnPressed();
+
+private:
+    void setupLabels(QLabel *pLabel,
+                     QFont &lblFont,
+                     QPalette &palette);
+    void setupButton(QPushButton *pButton,
+                     QIcon icon,
+                     int maxWidth);
 };
 
 #endif // STARTPAGE_H
