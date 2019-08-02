@@ -35,6 +35,7 @@ public:
     void undo();
     void redo();
     void zoom(int val);
+    bool isChanged();
 
 protected:
     void resizeEvent(QResizeEvent *event)override;
@@ -58,7 +59,7 @@ signals:
     void closeDocEventOccured(CodeEditor*);
 
 private:
-    QWidget *lineNumberArea;
+    QWidget *mLineNumberArea;
     ConfigParams mConfigParam;
     int mCurrentZoom;
     QFont mFont;
@@ -71,6 +72,7 @@ private:
     AddCommentButton *mAddCommentButton;
     QLabel *mCurrentCommentLable;
     int mLinesCount;
+    QString mBeginTextState;
 
     QTextCharFormat fmtLiteral;
     QTextCharFormat fmtComment;
