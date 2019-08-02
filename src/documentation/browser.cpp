@@ -22,6 +22,23 @@ Browser::Browser(QWidget *parent) : QMainWindow (parent)
     setCentralWidget(mBrowseArea);
 }
 
+Browser::~Browser()
+{
+    delete mConnectionManager;
+    delete mDocumentationEngine;
+    delete mBrowseArea;
+    bool result;
+    QDir dir = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
+    result = dir.cd("PairStorm");
+    dir.mkdir("temp");
+    dir.setNameFilters(QStringList() << "*.*");
+    dir.setFilter(QDir::Files);
+    foreach(QString dirFile, dir.entryList())
+    {
+        dir.remove(dirFile);
+    }
+}
+
 void Browser::newTab(const QString &keyword)
 {
     bool result;
