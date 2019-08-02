@@ -39,13 +39,5 @@ int main(int argc, char *argv[])
     QWebEngineSettings::defaultSettings()->setAttribute(QWebEngineSettings::DnsPrefetchEnabled, true);
     QWebEngineSettings::defaultSettings()->setAttribute(QWebEngineSettings::LocalStorageEnabled, true);
 
-
-    Browser *b = new Browser;
-           b->newTab("array");
-          // b.newTab("vector");
-          // b.newTab("igorast");
-           b->emptyDocumentationTab();
-           //b.emptyDocumentationTab();
-           b->show();
     return a.exec();
 }

@@ -17,6 +17,7 @@ class ChatWindowDock;
 class QMdiSubWindow;
 class QDockWidget;
 class CodeEditor;
+class Browser;
 class MDIArea;
 QT_END_NAMESPACE
 
@@ -38,6 +39,7 @@ private:
     BottomPanelDock *mpBottomPanelDock;
     MDIArea *mpDocsArea;
     QString mCurrentUserName;
+    Browser *mDocumentationBrowser;
     void setupMainMenu();
     void saveDocument(CodeEditor *pDoc, const QString &fileName);
     void openDoc(QString fileName);
@@ -91,6 +93,8 @@ private slots:
     void onReferenceTriggered();
     void onUserGuideTriggered();
     void onCheckUpdatesTriggered();
+
+    void createNewBrowser();
 
 public slots:
     void onOpenFileFromProjectViewer(QString fileName);    

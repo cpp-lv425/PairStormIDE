@@ -2,6 +2,7 @@
 
 #include <QDir>
 #include <QSizePolicy>
+#include <QMdiSubWindow>
 #include <QStandardPaths>
 #include <QWebEngineView>
 #include <QWebEnginePage>
@@ -105,7 +106,7 @@ void Browser::newTab(const QString &keyword)
 
 void Browser::emptyDocumentationTab()
 {
-    DocumentationViewer *newWindow = new DocumentationViewer(this);
+    DocumentationViewer *newWindow = new DocumentationViewer(mBrowseArea);
     bool isPairStormExist;
     QDir dir = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
 
@@ -124,8 +125,9 @@ void Browser::emptyDocumentationTab()
         newWindow->webView()->load(QUrl::fromLocalFile(indexPath));
     }
 
-
-    mBrowseArea->addSubWindow(newWindow);
+    qDebug()<<"HERE";
+    auto temp = mBrowseArea->addSubWindow(newWindow);
+    temp->setWindowState(Qt::WindowState::WindowMaximized);
     newWindow->setAttribute(Qt::WA_DeleteOnClose);
 }
 

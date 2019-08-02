@@ -22,6 +22,7 @@
 #include "codeeditor.h"
 #include "storeconf.h"
 #include "startpage.h"
+#include "browser.h"
 #include "mdiarea.h"
 #include "utils.h"
 
@@ -53,6 +54,11 @@ MainWindow::MainWindow(QWidget *parent) :
     mpDocsArea = new MDIArea(this);
     setCentralWidget(mpDocsArea);
 
+    //create instance of documentation browser
+    mDocumentationBrowser = new Browser;
+    mDocumentationBrowser->hide();
+
+    connect(mDocumentationBrowser,&Browser::destroyed,this,&MainWindow::createNewBrowser);
     // create instance of Project Viewer
     createProjectViewer();
 
@@ -679,7 +685,8 @@ void MainWindow::onAboutTriggered()
 
 void MainWindow::onReferenceTriggered()
 {
-    //
+    mDocumentationBrowser->emptyDocumentationTab();
+    mDocumentationBrowser->show();
 }
 
 void MainWindow::onUserGuideTriggered()
@@ -690,6 +697,13 @@ void MainWindow::onUserGuideTriggered()
 void MainWindow::onCheckUpdatesTriggered()
 {
     //
+}
+
+void MainWindow::createNewBrowser()
+{
+    delete mDocumentationBrowser;
+    mDocumentationBrowser = new Browser;
+
 }
 
 void MainWindow::onOpenFileFromProjectViewer(QString fileName)
@@ -727,6 +741,7 @@ CodeEditor* MainWindow::createNewDoc()
 
     mpDocsArea->addSubWindow(newDoc);
     connect(newDoc, &CodeEditor::closeDocEventOccured, this, &MainWindow::onCloseWindow);
+   // connect(newDoc,&CodeEditor::)
     newDoc->setAttribute(Qt::WA_DeleteOnClose);
 
     return newDoc;
