@@ -367,7 +367,7 @@ void MainWindow::onOpenFileTriggered()
 {
     QString fileName = QFileDialog::getOpenFileName
             (this,
-             "Open File",
+             userMessages[UserMessages::OpenFileTitle],
              QDir::currentPath(),
              "C++/C files (*.h *.hpp *.cpp *.c) ;; Text Files (*.txt) ;; JSON Files (*.json)");
 

@@ -32,6 +32,7 @@ enum class UserMessages
     SaveQuestion,
     ConnectionFailureTitle,
     ConnectionFailureMsg,
+    OpenFileTitle,
 };
 
 extern QMap<UserMessages, QString> userMessages;
