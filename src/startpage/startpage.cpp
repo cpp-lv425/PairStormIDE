@@ -14,9 +14,9 @@ StartPage::StartPage(QWidget *parent) :
     setWindowTitle("Start Page");
 
     int maxButtonsWidth = 200;
-    QFont lblFont("Segoe UI", 12);
+    QFont lblFont("Segoe UI", 10);
+    lblFont.setBold(true);
 
-    //lblFont.setBold(true);
     QPalette palette;
     palette.setColor(QPalette::WindowText, Qt::blue);
 
@@ -44,21 +44,12 @@ StartPage::StartPage(QWidget *parent) :
                 "Open Folder");
     connect(mpOpenDirBtn, &QPushButton::pressed, this, &StartPage::openDirPressed);
 
-    // creating & configuring reference call button
-    mpReferenceBtn = new QPushButton;
-    setupButton(mpReferenceBtn,
-                style()->standardIcon(QStyle::SP_DialogHelpButton),
-                maxButtonsWidth,
-                "Reference Assistant");
-    connect(mpReferenceBtn, &QPushButton::pressed, this, &StartPage::referenceBtnPressed);
-
     // creating & configuring settings call button
     mpSettingsBtn = new QPushButton;
     setupButton(mpSettingsBtn,
                 style()->standardIcon(QStyle::SP_BrowserReload),
                 maxButtonsWidth,
-                "Settings");
-    mpSettingsBtn->setDisabled(true);
+                "Settings");    
     connect(mpSettingsBtn, &QPushButton::pressed, this, &StartPage::settingsBtnPressed);
 
     // bindong buttons
@@ -66,7 +57,6 @@ StartPage::StartPage(QWidget *parent) :
     pBtnLayout->addWidget(mpNewBtn);
     pBtnLayout->addWidget(mpOpenBtn);
     pBtnLayout->addWidget(mpOpenDirBtn);
-    pBtnLayout->addWidget(mpReferenceBtn);
     pBtnLayout->addWidget(mpSettingsBtn);
 
     // creating & laying out labels
@@ -77,10 +67,7 @@ StartPage::StartPage(QWidget *parent) :
     setupLabels(pOpenLbl, lblFont, palette);
 
     QLabel *pOpenDirLbl = new QLabel(tr("Open existing project directory"));
-    setupLabels(pOpenDirLbl, lblFont, palette);
-
-    QLabel *pReferenceLbl = new QLabel(tr("Open Reference Assistant"));
-    setupLabels(pReferenceLbl, lblFont, palette);
+    setupLabels(pOpenDirLbl, lblFont, palette);    
 
     QLabel *pSettingsLbl = new QLabel(tr("Configure IDE"));
     setupLabels(pSettingsLbl, lblFont, palette);
@@ -89,8 +76,7 @@ StartPage::StartPage(QWidget *parent) :
     QVBoxLayout *pLblLayout = new QVBoxLayout;
     pLblLayout->addWidget(pNewLbl);
     pLblLayout->addWidget(pOpenLbl);
-    pLblLayout->addWidget(pOpenDirLbl);
-    pLblLayout->addWidget(pReferenceLbl);
+    pLblLayout->addWidget(pOpenDirLbl);    
     pLblLayout->addWidget(pSettingsLbl);
 
     // window lay out
@@ -149,12 +135,6 @@ void StartPage::openBtnPressed()
 void StartPage::openDirPressed()
 {
     emit onOpenDirPressed();
-    accept();
-}
-
-void StartPage::referenceBtnPressed()
-{
-    emit onReferenceBtnPressed();
     accept();
 }
 
