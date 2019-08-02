@@ -1,14 +1,7 @@
 #ifndef UPDSERVICE_H
 #define UPDSERVICE_H
 
-// Base features and structures for the networking module
 #include "networkbase.h"
-
-#include <memory>
-#include <QObject>
-#include <QHostInfo>
-#include <QUdpSocket>
-#include <QNetworkInterface>
 
 // ==========================================================================================
 //                                                                       UDP SERVICE PROVIDER

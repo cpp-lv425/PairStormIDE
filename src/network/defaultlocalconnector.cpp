@@ -4,9 +4,9 @@
 //                                                             LAUNCH SERVICES ON USER LOG IN
 void DefaultLocalConnector::configureOnLogin(const QString & userName)
 {
-    // Return if services has previously been configured
     if (mpUdpService && mpTcpService)
     {
+        // If services has previously been configured
         return;
     }
     // Configure the UDP service & TCP service
@@ -27,7 +27,7 @@ void DefaultLocalConnector::configureOnLogin(const QString & userName)
     // Begin saving incoming messages using TCP service
     connect(
         mpTcpService.get(), &TcpService::newSegmentSaved,
-        this,               &DefaultLocalConnector::processTcpSegmentOnReceive,
+        this,               &DefaultLocalConnector::parseTcpSegmentOnReceive,
         Qt::UniqueConnection
     );
 
@@ -253,7 +253,6 @@ void DefaultLocalConnector::startSharing(const QString userName)
     ServerData serverAttributes = pushToConnectedAttributes(userName);
     if (!serverAttributes.empty())
     {
-        qDebug() << "try to send start sharing message";
         Message message;
         message.mType       = Message::Type::StartSharingMessage;
         message.mSourceName = mpTcpService->getServerAttributes().mName;
@@ -291,8 +290,7 @@ void DefaultLocalConnector::shareMessage(const QString messageContent)
     message.mContent    = messageContent;
     for(const auto & serverAttrib : mConnectedServersAttrib)
     {
-        mpTcpService->sendDataToTcpServer(message.toJsonQString(),
-                                          serverAttrib);
+        mpTcpService->sendDataToTcpServer(message.toJsonQString(), serverAttrib);
     }
 }
 // ==========================================================================================
@@ -307,24 +305,22 @@ void DefaultLocalConnector::shareChange(const QString changeContent)
     message.mContent    = changeContent;
     for(const auto & serverAttrib : mConnectedServersAttrib)
     {
-        mpTcpService->sendDataToTcpServer(message.toJsonQString(),
-                                          serverAttrib);
+        mpTcpService->sendDataToTcpServer(message.toJsonQString(), serverAttrib);
     }
 }
 // ==========================================================================================
 // ==========================================================================================
 // ==========================================================================================
 //                                                             COORDINATE RECEIVED TCP SEGMENT
-void DefaultLocalConnector::processTcpSegmentOnReceive()
+void DefaultLocalConnector::parseTcpSegmentOnReceive()
 {
     Segment segment = mpTcpService->getReceivedSegment();
     Message message;
     message.fromJsonQString(segment.mContent);
 
-    qDebug() << "message: " << segment.mContent;
-
     if (message.empty())
     {
+        // If message is corrupted
         return;
     }
 
@@ -358,39 +354,3 @@ void DefaultLocalConnector::processTcpSegmentOnReceive()
         break;
     }
 }
-
-
-
-#ifdef CUSTOM_DEBUG
-
-void DefaultLocalConnector::testSendHelloToLastServer()
-{
-    ServerData serverData;
-    if(!mDiscoveredServersAttrib.empty())
-    {
-        serverData = mDiscoveredServersAttrib.back();
-    }
-
-    qDebug() << "try to send hello to server " << serverData.mName;
-
-    QString data("hello from ");
-    data.append(mpTcpService->getServerAttributes().mName);
-    data.append(" to ");
-    data.append(serverData.mName);
-
-    Message message;
-    message.mContent = data;
-    message.mType = Message::Type::ChatMessage;
-    message.mSourceName = mpTcpService->getServerAttributes().mName;
-
-    if(mpTcpService->sendDataToTcpServer(message.toJsonQString(), serverData))
-    {
-        qDebug() << "message is sent";
-    }
-    else
-    {
-        qDebug() << "message is not sent";
-    }
-    //startSharing(serverData.m_name);
-}
-#endif //CUSTOM_DEBUG

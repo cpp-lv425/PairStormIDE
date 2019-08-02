@@ -1,14 +1,7 @@
 #ifndef TCPSERVICE_H
 #define TCPSERVICE_H
 
-// Base features and structures for the networking module
 #include "networkbase.h"
-
-#include <memory>
-#include <QObject>
-#include <QtNetwork>
-#include <QTcpServer>
-#include <QNetworkSession>
 
 // ==========================================================================================
 //                                                                       TCP SERVICE PROVIDER
@@ -49,13 +42,13 @@ signals:
 
 private slots:
 
-    void configureServer();
-
-    void saveSegmentOnReceival();
+    void configureServerOnReady();
 
     void attachSocketOnServerConnected();
     void attachSocketOnClientConnected();
     void closeSocketOnDisconnected();
+
+    void saveSegmentOnReceival();
 };
 
 #endif // TCPSERVICE_H

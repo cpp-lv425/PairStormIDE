@@ -33,7 +33,7 @@ TcpService::TcpService(const QString & serverName, QObject *qObject) :
         // Configure server when session opening succeeds
         connect(
             mpNetSession.get(), &QNetworkSession::opened,
-            this,               &TcpService::configureServer,
+            this,               &TcpService::configureServerOnReady,
             Qt::UniqueConnection);
 
         mpNetSession->open();
@@ -42,14 +42,14 @@ TcpService::TcpService(const QString & serverName, QObject *qObject) :
     {
         // Configure server immediately if additional
         // network configuration is not needed
-        configureServer();
+        configureServerOnReady();
     }
 }
 // ==========================================================================================
 // ==========================================================================================
 // ==========================================================================================
 //                                                                       CONFIGURE TCP SERVER
-void TcpService::configureServer()
+void TcpService::configureServerOnReady()
 {
     // Case, if additional configuration has been previously done
     if (mpNetSession)
@@ -77,7 +77,7 @@ void TcpService::configureServer()
     // Trigger processing of the requested connections
     connect(
         mpTcpServer.get(), &QTcpServer::newConnection,
-        this,                 &TcpService::attachSocketOnClientConnected,
+        this,              &TcpService::attachSocketOnClientConnected,
         Qt::UniqueConnection);
 }
 // ==========================================================================================
@@ -189,8 +189,8 @@ void TcpService::saveSegmentOnReceival()
 
     // Save attributes of the segment
     mPendingSegment.mContent = data;
-    mPendingSegment.mIp   = ip;
-    mPendingSegment.mPort = port;
+    mPendingSegment.mIp      = ip;
+    mPendingSegment.mPort    = port;
 
     pSenderSocket->disconnectFromHost();
 

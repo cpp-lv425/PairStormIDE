@@ -5,7 +5,6 @@ SOURCES += \
         $$PWD/addcommentbutton.cpp \
         $$PWD/changesmanager.cpp \
         $$PWD/codeeditor.cpp \
-        $$PWD/highlightercpp.cpp \
         $$PWD/hotkeys.cpp \
         $$PWD/lexercpp.cpp \
         $$PWD/linenumberarea.cpp \
@@ -16,7 +15,6 @@ HEADERS += \
         $$PWD/changemanager.h \
         $$PWD/codeeditor.h \
         $$PWD/fmstates.h \
-        $$PWD/highlightercpp.h \
         $$PWD/ideconfiguration.h \
         $$PWD/ilexer.h \
         $$PWD/keywords.h \

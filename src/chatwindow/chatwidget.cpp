@@ -5,8 +5,6 @@
 #include <QListWidget>
 #include <QBoxLayout>
 #include <QLineEdit>
-#include <QListView>
-#include <QDebug> // temp
 #include <QLabel>
 
 ChatWidget::ChatWidget(QWidget *pParent):
@@ -29,8 +27,7 @@ ChatWidget::ChatWidget(QWidget *pParent):
     // creating send button
     QPushButton *pSendButton = new QPushButton("Send");
     pSendButton->setMaximumWidth(30);
-    connect(pSendButton, &QPushButton::clicked,
-            this, &ChatWidget::onSendCommand);
+    connect(pSendButton, &QPushButton::clicked, this, &ChatWidget::onSendCommand);
 
     QHBoxLayout *pLineLayout = new QHBoxLayout;
     pLineLayout->addWidget(mpEnterLine);
@@ -42,6 +39,7 @@ ChatWidget::ChatWidget(QWidget *pParent):
 
     pWindowLayout->addWidget(mpFeed);
     pWindowLayout->addLayout(pLineLayout);
+
     setLayout(pWindowLayout);
 
     // Set empty users list
@@ -107,7 +105,6 @@ void ChatWidget::onSendCommand()
 {
     emit sendMessage(mpEnterLine->text());
     updateFeedOnSend();
-
 }
 
 void ChatWidget::updateFeedOnSend()
