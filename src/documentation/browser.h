@@ -23,6 +23,7 @@ private:
     MDIArea *mBrowseArea;
     ConnectionManager *mConnectionManager;
     DocumentationEngine *mDocumentationEngine;
+    QVector<QString> mTempHTMLFiles;
 };
 
 #endif // BROWSER_H

@@ -41,10 +41,10 @@ QUrl DocumentationSearch::getUrl(const QFileInfo &info)
 
 QDir DocumentationSearch::documentationDirectory(bool &result)
 {
-
     QString documents(QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation));
     QDir documentation(documents);
     result = documentation.cd("PairStorm");
+    result = documentation.cd("reference");
     if(result)
     {
         return documentation;
