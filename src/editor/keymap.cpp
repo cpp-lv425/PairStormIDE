@@ -17,6 +17,10 @@ static void (CodeEditor::*ptreventSlash)(QKeyEvent*)=&CodeEditor::eventSlash;
 static QPair<int, QFlags<Qt::KeyboardModifier>> pairAsterisk = qMakePair(static_cast<int>(Qt::Key_Asterisk),Qt::ShiftModifier);
 static void (CodeEditor::*ptreventAsterisk)(QKeyEvent*)=&CodeEditor::eventAsterisk;
 
+static QPair<int, QFlags<Qt::KeyboardModifier>> pairShiftEnter = qMakePair(static_cast<int>(Qt::Key_Enter),Qt::ShiftModifier);
+static QPair<int, QFlags<Qt::KeyboardModifier>> pairReturnEnter = qMakePair(static_cast<int>(Qt::Key_Return),Qt::ShiftModifier);
+static void (CodeEditor::*ptreventShiftEnter)(QKeyEvent*)=&CodeEditor::eventShiftEnter;
+
 
 
 void KeyMap::fillMap(){
@@ -24,5 +28,7 @@ void KeyMap::fillMap(){
     mKeysMap.insert(pairBraceLeft,ptreventBracetLeft);
     mKeysMap.insert(pairSlash,ptreventSlash);
     mKeysMap.insert(pairAsterisk,ptreventAsterisk);
+    mKeysMap.insert(pairShiftEnter,ptreventShiftEnter);
+    mKeysMap.insert(pairReturnEnter,ptreventShiftEnter);
 }
 

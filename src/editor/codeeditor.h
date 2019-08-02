@@ -76,7 +76,7 @@ public:
    void eventBraceLeft(QKeyEvent *e);
    void eventSlash(QKeyEvent *e);
    void eventAsterisk(QKeyEvent *e);
-   /*void event(QKeyEvent *e);
+   void eventShiftEnter(QKeyEvent *e);
    void event(QKeyEvent *e);
    void event(QKeyEvent *e);
    void event(QKeyEvent *e);
@@ -87,7 +87,7 @@ public:
    void event(QKeyEvent *e);
    void event(QKeyEvent *e);
    void event(QKeyEvent *e);
-   void event(QKeyEvent *e);*/
+   void event(QKeyEvent *e);
 };
 
 #endif // CODEEDITOR_H
