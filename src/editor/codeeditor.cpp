@@ -16,8 +16,7 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     setLineWrapMode(QPlainTextEdit::NoWrap);// don't move cursor to the next line where it's out of visible scope
     this->setVerticalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAlwaysOn);
     this->setTabStopDistance(TAB_SPACE * fontMetrics().width(QLatin1Char('0')));//set tab distance
-    mCurrentZoom = 100;//in persents
-    mBeginTextState = this->toPlainText();
+    mCurrentZoom = 100;//in persents    
 
     //read settings
     QSettings settings(QApplication::organizationName(), QApplication::applicationName());
@@ -136,7 +135,12 @@ void CodeEditor::zoom(int val)
 
 bool CodeEditor::isChanged()
 {
-    return mBeginTextState == this->toPlainText();
+    return mBeginTextState != this->toPlainText();
+}
+
+void CodeEditor::setBeginTextState()
+{
+    mBeginTextState = this->toPlainText();
 }
 
 void CodeEditor::updateLineNumberAreaWidth()
@@ -248,7 +252,7 @@ void CodeEditor::mouseMoveEvent(QMouseEvent *event)
 
 void CodeEditor::closeEvent(QCloseEvent *event)
 {
-    if (!document()->isModified())
+    if (!isChanged())
     {
         event->accept();
         return;

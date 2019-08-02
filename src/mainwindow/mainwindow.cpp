@@ -8,7 +8,6 @@
 #include <QFileDialog>
 #include <QSettings>
 #include <QStyle>
-#include <QDebug> // temporarily included
 #include <QFile>
 
 #include "localconnectorgenerator.h"
@@ -233,6 +232,7 @@ void MainWindow::saveDocument(CodeEditor *pDoc, const QString &fileName)
                 userMessages[UserMessages::FileOpeningForSavingErrorMsg]);
     }
     pDoc->document()->setModified(false);
+    pDoc->setBeginTextState();
 }
 
 void MainWindow::openDoc(QString fileName)
@@ -262,6 +262,7 @@ void MainWindow::openDoc(QString fileName)
     int position = fileName.lastIndexOf(QChar{'/'});
     newDoc->setWindowTitle(fileName.mid(position + 1));
     newDoc->setPlainText(readResult);
+    newDoc->setBeginTextState();
     newDoc->show();
 }
 
@@ -288,7 +289,7 @@ bool MainWindow::isModified(QList<QMdiSubWindow*> &docsList)
     {
         auto curDoc = qobject_cast<CodeEditor*>(docsList[i]->widget());
 
-        if (curDoc && curDoc->document()->isModified())
+        if (curDoc && curDoc->isChanged())
         {
             return true;
         }
@@ -302,6 +303,7 @@ void MainWindow::saveAllModifiedDocuments(QList<QMdiSubWindow*> &docsList)
     {
         auto curDoc = qobject_cast<CodeEditor*>(docsList[i]->widget());
         saveDocument(curDoc, curDoc->getFileName());
+        curDoc->setBeginTextState();
     }
 }
 
@@ -339,8 +341,6 @@ void MainWindow::createChatWindow()
             mpChatWindowDock, &ChatWindowDock::displayMessage,
             Qt::UniqueConnection);
 
-
-
     mpChatWindowDock->setObjectName("mpChatWindowDock");
     addDockWidget(Qt::RightDockWidgetArea, mpChatWindowDock, Qt::Vertical);
 }
@@ -352,7 +352,7 @@ void MainWindow::createButtomPanel()
     mpBottomPanelDock->setObjectName("mpBottomPanelDock");
 }
 
-CodeEditor *MainWindow::getCurrentDoc()
+CodeEditor* MainWindow::getCurrentDoc()
 {
     // get current subWindow
     // if there are no subWindows nullptr is returned
@@ -388,6 +388,7 @@ void MainWindow::onNewFileTriggered()
     int position = newFileName.lastIndexOf(QChar{'/'});
     newDoc->setFileName(newFileName);
     newDoc->setWindowTitle(newFileName.mid(position + 1));
+    newDoc->setBeginTextState();
     newDoc->show();
 }
 
@@ -516,7 +517,7 @@ void MainWindow::onSaveAllFilesTriggered()
     {
         auto curDoc = qobject_cast<CodeEditor*>(docsList[i]->widget());
 
-        if(curDoc && curDoc->document()->isModified())
+        if(curDoc && curDoc->isChanged())
         {
             saveDocument(curDoc, curDoc->getFileName());
         }
@@ -684,7 +685,6 @@ void MainWindow::onOpenFileFromProjectViewer(QString fileName)
 
 void MainWindow::onCloseWindow(CodeEditor *curDoc)
 {
-
     saveDocument(curDoc, curDoc->getFileName());
 }
 
@@ -704,9 +704,11 @@ CodeEditor* MainWindow::createNewDoc()
     CodeEditor *newDoc = new CodeEditor;
 
     mpDocsArea->addSubWindow(newDoc);
-    connect(newDoc, &CodeEditor::closeDocEventOccured, this, &MainWindow::onCloseWindow);
+    connect(newDoc, &CodeEditor::closeDocEventOccured,
+            this, &MainWindow::onCloseWindow);
     newDoc->setAttribute(Qt::WA_DeleteOnClose);
     newDoc->document()->setModified(false);
+
     return newDoc;
 }
 
@@ -747,7 +749,6 @@ void MainWindow::closeEvent(QCloseEvent *event)
         event->accept();
         return;
     }
-
     event->ignore();
 }
 

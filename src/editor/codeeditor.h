@@ -36,6 +36,7 @@ public:
     void redo();
     void zoom(int val);
     bool isChanged();
+    void setBeginTextState();
 
 protected:
     void resizeEvent(QResizeEvent *event)override;
