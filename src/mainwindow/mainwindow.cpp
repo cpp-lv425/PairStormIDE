@@ -251,7 +251,7 @@ void MainWindow::openDoc(QString fileName)
     newDoc->show();
 }
 
-bool MainWindow::checkIfOpened(const QString &fileName) const
+bool MainWindow::isOpened(const QString &fileName) const
 {
     // getting all docs
     auto docsList = mpDocsArea->subWindowList();
@@ -268,7 +268,7 @@ bool MainWindow::checkIfOpened(const QString &fileName) const
     return false;
 }
 
-bool MainWindow::checkIfModified(QList<QMdiSubWindow*> &docsList)
+bool MainWindow::isModified(QList<QMdiSubWindow*> &docsList)
 {
     for (int i = 0; i < docsList.size(); ++i)
     {
@@ -366,7 +366,7 @@ void MainWindow::onOpenFileTriggered()
              "C++/C files (*.h *.hpp *.cpp *.c) ;; Text Files (*.txt) ;; JSON Files (*.json)");
 
     // if document already opened then return
-    if (checkIfOpened(fileName))
+    if (isOpened(fileName))
     {
         QMessageBox::warning(this, "Document already opened", "Selected document already opened.");
         return;
@@ -648,7 +648,7 @@ void MainWindow::onCheckUpdatesTriggered()
 void MainWindow::onOpenFileFromProjectViewer(QString fileName)
 {
     // if document already opened then return
-    if (checkIfOpened(fileName))
+    if (isOpened(fileName))
     {
         QMessageBox::warning(this, "Document already opened", "Selected document already opened.");
         return;
@@ -706,7 +706,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
     }
 
     // if doc is modified then we should ask user if changes have to be saved
-    if(!checkIfModified(docsList))
+    if(!isModified(docsList))
     {
         event->accept();
         return;

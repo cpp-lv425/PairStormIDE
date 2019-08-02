@@ -20,7 +20,7 @@ QString FileManager::readFromFile(const QString &fileName)
         file.close();
         return rReadResult;
     }
-    throw QException();
+    throw FileOpeningFailure();
 }
 
 void FileManager::createFile(const QString &fileName)
@@ -32,7 +32,7 @@ void FileManager::createFile(const QString &fileName)
         file.close();
         return;
     }
-    throw QException();
+    throw FileOpeningFailure();
 }
 
 void FileManager::writeToFile(const QString &fileName,
@@ -46,5 +46,5 @@ void FileManager::writeToFile(const QString &fileName,
         file.close();
         return;
     }
-    throw QException();
+    throw FileOpeningFailure();
 }

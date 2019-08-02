@@ -39,9 +39,9 @@ private:
     void setupMainMenu();
     void saveDocument(CodeEditor *pDoc, const QString &fileName);
     void openDoc(QString fileName);
-    bool checkIfOpened(const QString& fileName)const;
+    bool isOpened(const QString &fileName)const;
     // returns true if any of docs has been modified
-    bool checkIfModified(QList<QMdiSubWindow*> &docsList);
+    bool isModified(QList<QMdiSubWindow*> &docsList);
     void saveAllModifiedDocuments(QList<QMdiSubWindow*> &docsList);
     void createProjectViewer();
     void createChatWindow();

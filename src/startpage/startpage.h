@@ -46,7 +46,7 @@ private:
                      QPalette &palette);
     void setupButton(QPushButton *pButton,
                      QIcon icon,
-                     int maxWidth);
+                     int maxWidth, const QString& text);
 };
 
 #endif // STARTPAGE_H
