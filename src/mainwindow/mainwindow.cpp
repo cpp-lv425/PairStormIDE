@@ -340,7 +340,7 @@ void MainWindow::createChatWindow()
             Qt::UniqueConnection);
 
     // Add updating users list on connecting new users
-    connect(mplocalConnector, &LocalConnectorInterface::onlineUsersUpdated,
+    connect(mplocalConnector, &LocalConnectorInterface::connectedUsersUpdated,
             mpChatWindowDock, &ChatWindowDock::updateConnectedUsersOnChange,
             Qt::UniqueConnection);
 
