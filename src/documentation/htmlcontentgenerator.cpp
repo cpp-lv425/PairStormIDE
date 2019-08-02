@@ -5,50 +5,70 @@
 #include <QUrl>
 
 static std::string mustasheTemplate{R"(<!DOCTYPE html>
-                             <html>
-                             <head>
-                             <title>SearchResults</title>
-                             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-                             </head>
-                             <body>
-                             <p>&nbsp;</p>
-                             <h1>Search Results</h1>
-                             <p>&nbsp;</p>
-                             <p>&nbsp;</p>
-                             <table style="width:100%">
-                             <tbody>
-                             <tr>
-                             {{#showIcons}}
-                             <td>&nbsp;</td>
-                             {{/showIcons}}
-                             <td><strong>Name</strong></td>
-                             {{#showSize}}
-                             <td><strong></strong></td>
-                             {{/showSize}}
-                             {{#showDetails}}
-                             <td><strong></strong></td>
-                             {{/showDetails}}
-                             </tr>
-                             {{#dirEntryList}}
-                             <tr>
-                             {{#showIcons}}
-                             <td>{{{fileIcon}}}</td>
-                             {{/showIcons}}
-                             <td><a href="{{fileIndex}}">{{fileName}}</a></td>
-                             {{#showSize}}
-                             <td>{{fileSize}}</td>
-                             {{/showSize}}
-                             {{#showDetails}}
-                             <td>{{fileDetails}}</td>
-                             {{/showDetails}}
-                             </tr>
-                             {{/dirEntryList}}
-                             </tbody>
-                             </table>
-                             <p>&nbsp;</p>
-                             </body>
-                             </html>
-                             )"};
+                                    <html>
+                                        <head>
+                                            <title>SearchResults</title>
+                                            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+                                            </head>
+                                            <body>
+                                                <p>&nbsp;</p>
+                                                <h1>Search Results</h1>
+                                                <p>&nbsp;</p>
+                                                <p>&nbsp;</p>
+                                                <table style="width:100%">
+                                                    <tbody>
+                                                        <tr>
+                                                                 {{#showIcons}}
+
+                                                            <td>&nbsp;</td>
+                                                                 {{/showIcons}}
+
+                                                            <td>
+                                                                <strong>Name</strong>
+                                                            </td>
+                                                                 {{#showSize}}
+
+                                                            <td>
+                                                                <strong></strong>
+                                                            </td>
+                                                                 {{/showSize}}
+                                                                 {{#showDetails}}
+
+                                                            <td>
+                                                                <strong></strong>
+                                                            </td>
+                                                                 {{/showDetails}}
+
+                                                        </tr>
+                                                                 {{#dirEntryList}}
+
+                                                        <tr>
+                                                                 {{#showIcons}}
+
+                                                            <td>{{{fileIcon}}}</td>
+                                                                 {{/showIcons}}
+
+                                                            <td>
+                                                                <a href="{{fileIndex}}">{{fileName}}</a>
+                                                            </td>
+                                                                 {{#showSize}}
+
+                                                            <td>{{fileSize}}</td>
+                                                                 {{/showSize}}
+                                                                 {{#showDetails}}
+
+                                                            <td>{{fileDetails}}</td>
+                                                                 {{/showDetails}}
+
+                                                        </tr>
+                                                                 {{/dirEntryList}}
+
+                                                    </tbody>
+                                                </table>
+                                                <p>&nbsp;</p>
+                                            </body>
+                                        </html>
+                                                                 )"};
 
 std::string HTMLContentGenerator::generate(const QVector<QFileInfo> &files)
 {    //return mustasheTemplate;
@@ -66,8 +86,6 @@ std::string HTMLContentGenerator::generate(const QVector<QFileInfo> &files)
 
     kainjow::mustache::data iconsListMustashe{kainjow::mustache::data::type::list};
     kainjow::mustache::data fileNamesListMustashe{kainjow::mustache::data::type::list};
-    kainjow::mustache::data sizesListMustashe{kainjow::mustache::data::type::list};
-    kainjow::mustache::data detailsListMustashe{kainjow::mustache::data::type::list};
 
     kainjow::mustache::data dirEntryListMustashe{kainjow::mustache::data::type::list};
     for (int fileIndex = 0; fileIndex < files.size();  fileIndex++)
@@ -101,8 +119,6 @@ std::string HTMLContentGenerator::generate(const QVector<QFileInfo> &files)
         dirEntryMustashe.set("fileName", files.at(fileIndex).fileName().toStdString());
         QUrl url{QUrl::fromLocalFile(files.at(fileIndex).filePath())};
         dirEntryMustashe.set("fileIndex", url.toString().toStdString());
-
-
 
         dirEntryListMustashe << dirEntryMustashe;
     }

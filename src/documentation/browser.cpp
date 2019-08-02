@@ -41,6 +41,7 @@ Browser::~Browser()
 
 void Browser::newTab(const QString &keyword)
 {
+
     bool result;
     QDir dir = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
     result = dir.cd("PairStorm");
@@ -54,6 +55,7 @@ void Browser::newTab(const QString &keyword)
 //        dir.remove(dirFile);
 //    }
     DocumentationViewer *newWingow = new DocumentationViewer(this);
+    newWingow->setWindowTitle(keyword);
     mDocumentationEngine->searchByKeyword(keyword);
     QString html = QString::fromStdString(HTMLContentGenerator::generate(mDocumentationEngine->documentationLinks()));
    // qDebug()<<html;

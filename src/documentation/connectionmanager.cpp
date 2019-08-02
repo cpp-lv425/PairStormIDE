@@ -1,11 +1,9 @@
 #include "connectionmanager.h"
 
-#include <QDebug>
 #include <QEventLoop>
 #include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QNetworkAccessManager>
-
 
 ConnectionManager::ConnectionManager(QObject *parent)
     : QObject (parent)

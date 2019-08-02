@@ -1,7 +1,8 @@
 #include "documentationengine.h"
-#include "documentationsearch.h"
 
 #include <QDir>
+
+#include "documentationsearch.h"
 
 DocumentationEngine::DocumentationEngine(QObject *parent)
     : QObject(parent)
@@ -16,11 +17,7 @@ void DocumentationEngine::searchByKeyword(const QString &keyword)
     QDir documentation{DocumentationSearch::documentationDirectory(result)};
     if(result)
     {
-        auto temp = DocumentationSearch::search(documentation,keyword);
-        foreach(const auto &a, temp)
-        {
-            mDocumentationLinks.push_back(a);
-        }
+        mDocumentationLinks = DocumentationSearch::search(documentation,keyword);
     }
 
 }
@@ -32,11 +29,7 @@ void DocumentationEngine::searchByLibraryAndFunction(const QString &include, con
     QDir documentation{DocumentationSearch::documentationDirectory(result)};
     if(result)
     {
-        auto temp = DocumentationSearch::search(documentation,include,function);
-        foreach(const auto &a, temp)
-        {
-            mDocumentationLinks.push_back(a);
-        }
+        mDocumentationLinks = DocumentationSearch::search(documentation,include,function);
     }
 }
 

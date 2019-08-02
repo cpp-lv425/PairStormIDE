@@ -117,7 +117,6 @@ void DocumentationViewer::loadStarted()
 
 void DocumentationViewer::loadFinished(bool ok)
 {
-    qDebug()<<"OK";
     mStackedWidget->setCurrentWidget(mUrlEdit);
     mStopLoadAction->setDisabled(true);
     mPrevPageAction->setDisabled(!mWebView->history()->canGoBack());
