@@ -203,7 +203,7 @@ ServerData DefaultLocalConnector::pushToConnectedAttributes(const QString & serv
     {
         // If server is not already connected
         serverAttributes = *pDiscoveredServerAttributes;
-        mConnectedServersAttrib.push_back(*pDiscoveredServerAttributes);
+        mConnectedServersAttrib.push_back(serverAttributes);
     }
     return serverAttributes;
 }
@@ -237,6 +237,7 @@ void DefaultLocalConnector::startSharing(const QString userName)
     ServerData serverAttributes = pushToConnectedAttributes(userName);
     if (!serverAttributes.empty())
     {
+        qDebug() << "try to send start sharing message";
         Message message;
         message.mType       = Message::Type::StartSharingMessage;
         message.mSourceName = mpTcpService->getServerAttributes().mName;
@@ -303,6 +304,8 @@ void DefaultLocalConnector::processTcpSegmentOnReceive()
     Segment segment = mpTcpService->getReceivedSegment();
     Message message;
     message.fromJsonQString(segment.mContent);
+
+    qDebug() << "message: " << segment.mContent;
 
     if (message.empty())
     {

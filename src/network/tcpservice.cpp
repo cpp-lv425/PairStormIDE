@@ -141,7 +141,7 @@ bool TcpService::sendDataToTcpServer(const QString & data, const ServerData & se
 
     // Try to connect to socket and then send data
     pServerSocket->connectToHost(serverIp, port);
-    if (pServerSocket->waitForConnected(700))
+    if (pServerSocket->waitForConnected(gDefaultConnTimeoutMs))
     {
         pServerSocket->write(data.toUtf8());
         pServerSocket->flush();

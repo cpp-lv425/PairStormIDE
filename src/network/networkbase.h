@@ -22,8 +22,9 @@ typedef qint64  SizeType;
 const PortNumType gDefaultTcpPortNumber    = 36108;
 const PortNumType gDefaultUdpPortNumber    = 32807;
 
+const SizeType    gDefaultConnTimeoutMs    = 900;
 const SizeType    gDefaultBroadcastCycleMs = 500;
-const SizeType    gDefaultOutdatingCycleMs = 800;
+const SizeType    gDefaultOutdatingCycleMs = 1200;
 
 
 struct ServerData {
