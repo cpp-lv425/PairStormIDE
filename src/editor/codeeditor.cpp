@@ -4,83 +4,78 @@
 #include<QDebug>
 #include<QTextCursor>
 #include<QPainter>
+#include <QFontDatabase>
+#include<QScrollBar>
+#include<QMessageBox>
+#include<iostream>
+#include<QLabel>
 
 #define TAB_SPACE 4
 
-#include<QMessageBox>
-#include<iostream>
-
-
 CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
 {
-    // just for test. in the future it'll read config parametrs from JSON file
-    configParam.setConfigParams("Consolas", "12", "WHITE");
     setLineWrapMode(QPlainTextEdit::NoWrap);// don't move cursor to the next line where it's out of visible scope
+    this->setVerticalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAlwaysOn);
+    this->setTabStopDistance(TAB_SPACE * fontMetrics().width(QLatin1Char('0')));//set tab distance
+    mCurrentZoom = 100;//in persents
 
+    //read settings
+    QSettings settings(QApplication::organizationName(), QApplication::applicationName());
+    QString analizerFontSize = settings.value("analizerFontSize").toString();
+    QString analizerFontName = settings.value("analizerFontName").toString();
+    QString analizerStyle = settings.value("analizerStyle").toString();
+    mConfigParam.setConfigParams(analizerFontName,analizerFontSize,analizerStyle);
+
+    //create objects connected to codeEditor
     lineNumberArea = new LineNumberArea(this);
-    timer = new QTimer;
-    this->cursorPositionChanged();
-    hcpp = new Highlightercpp(document());
-    lcpp = new LexerCPP();
-    timer = new QTimer;
-    changeManager = new ChangeManager(this->toPlainText().toUtf8().constData());
+    mTimer = new QTimer;
+    mLcpp = new LexerCPP();
+    mTimer = new QTimer;
+    mChangeManager = new ChangeManager(this->toPlainText().toUtf8().constData());
+    //comment button
+    mAddCommentButton = new AddCommentButton(this);
+    mAddCommentButton->setText("+");
+    mAddCommentButton->setVisible(false);
+    mCurrentCommentLable = new QLabel(this);
+    setMouseTracking(true);
 
     //This signal is emitted when the text document needs an update of the specified rect.
     //If the text is scrolled, rect will cover the entire viewport area.
     //If the text is scrolled vertically, dy carries the amount of pixels the viewport was scrolled.
-    connect(this, SIGNAL(updateRequest(QRect,int)), this, SLOT(updateLineNumberArea(QRect,int)));
-    //connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(runLexerAndHighlight()));
-    //connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(highlightCurrentLine()));
-    connect(timer, SIGNAL(timeout()), this, SLOT(saveStateInTheHistory()));
-    connect(this, SIGNAL(textChanged()), this, SLOT(changesAppeared()));
-    timer->start(CHANGE_SAVE_TIME);//save text by this time
-   // connect(this, SIGNAL(textChanged()), this, SLOT(runLexer()));
-    connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(highlightCurrentLine()));
     connect(this,  SIGNAL(updateRequest(QRect,int)), this, SLOT(updateLineNumberArea(QRect,int)));
-    connect(this,  SIGNAL(textChanged()),            this, SLOT(runLexerAndHighlight()));
-    //connect(this,  SIGNAL(cursorPositionChanged()),  this, SLOT(highlightCurrentLine()));
-    connect(timer, SIGNAL(timeout()),                this, SLOT(saveStateInTheHistory()));
+    connect(this,  SIGNAL(cursorPositionChanged()), this, SLOT(runLexer()));
+    connect(mTimer, SIGNAL(timeout()), this, SLOT(saveStateInTheHistory()));
+    connect(this,  SIGNAL(textChanged()), this, SLOT(changesAppeared()));
+    connect(this,  SIGNAL(cursorPositionChanged()), this, SLOT(highlighText()));;
 
-    timer->start(CHANGE_SAVE_TIME);//save text by this time
-
-    this->setTabStopDistance(TAB_SPACE * fontMetrics().width(QLatin1Char('0')));//set tab distance
-
+    mTimer->start(CHANGE_SAVE_TIME);//save text by this time
 
     // start typing from correct position (in the first line it doesn't consider weight of lineCounter)
     //that's why we need to set this position
     updateLineNumberAreaWidth();
-    highlightCurrentLine();
-    this->setTabStopDistance(TAB_SPACE * fontMetrics().width(QLatin1Char('0')));//set tab distance
-    //fonts and colors configurations
-    font.setPointSize(configParam.mFontSize);
-    font.setFamily(configParam.mTextStyle);
-    font.setBold(false);
-    font.setItalic(false);
-    this->setFont(font);
 
+    //fonts and colors configurations
+    mFont.setPointSize(mConfigParam.mFontSize);
+    mFont.setFamily(mConfigParam.mTextStyle);
+    mFont.setBold(false);
+    mFont.setItalic(false);
+    this->setFont(mFont);
+
+    //set text highlighting color
+    fmtLiteral.setForeground(Qt::red);
+    fmtKeyword.setForeground(Qt::blue);
+    fmtComment.setForeground(Qt::green);
 }
 
-void CodeEditor::runLexerAndHighlight()
+void CodeEditor::runLexer()
 {
     //run lexer
-    lcpp->clear();
-    lcpp->lexicalAnalysis(document()->toPlainText());
-    tokens = lcpp->getTokens();
-    //run highlight
-    hcpp->setData(tokens);
-    hcpp->setText(this->document()->toPlainText());
-    for(int i = 0; i < hcpp->mLines.size(); i++)
-    {
-        hcpp->highlightBlock(hcpp->mLines[i]);
-    }
-
-    for(auto it = tokens.begin(); it < tokens.end(); ++it)
-        qDebug() << it->name << " "  << it->begin << " " << it->end << " " << it->linesCount << '\n';
-    lexer.lexicalAnalysis(toPlainText());
-    tokens = lexer.getTokens();
+    mLcpp->clear();
+    mLcpp->lexicalAnalysis(document()->toPlainText());
+    mTokens = mLcpp->getTokens();
 }
 
-int CodeEditor::lineNumberAreaWidth()
+int CodeEditor::getLineNumberAreaWidth()
 {
     int digits = 1;
     int currLineNumber = qMax(1, blockCount());
@@ -89,39 +84,57 @@ int CodeEditor::lineNumberAreaWidth()
         currLineNumber /= 10;
         ++digits;
     }
-
-    return fontMetrics().maxWidth() * digits;// wight of one symbol(in our case number) * count of digits
+    return fontMetrics().averageCharWidth() * digits;// wight of one symbol(in our case number) * count of digits
 }
 
 QString &CodeEditor::getFileName()
 {
-    return fileName;
+    return mFileName;
 }
 
 void CodeEditor::setFileName(const QString &fileName)
 {
-    this->fileName = fileName;
+    this->mFileName = fileName;
 }
 
 std::pair<const QString &, const QString &> CodeEditor::getChangedFileInfo()
 {
-    return std::make_pair(this->toPlainText(), fileName);
+    return std::make_pair(this->toPlainText(), mFileName);
 }
 
 void CodeEditor::undo()
 {
-    changeManager->undo();
+    QString text = QString::fromStdString(this->mChangeManager->undo());
+    this->document()->setPlainText(text);
+
+    QTextCursor cursor(this->document());
+    cursor.setPosition(mChangeManager->getCursorPosPrev());
+
+    this->setTextCursor(cursor);
 }
 
 void CodeEditor::redo()
 {
-    changeManager->redo();
+    QString text = QString::fromStdString(this->mChangeManager->redo());
+    this->document()->setPlainText(text);
+
+    QTextCursor cursor(this->document());
+    cursor.setPosition(mChangeManager->getCursorPosNext());
+
+    this->setTextCursor(cursor);
+}
+
+void CodeEditor::zoom(int val)
+{
+    val > 0 ?this->zoomIn(val):this->zoomOut(-val);
+    mCurrentZoom+=val;
+    setViewportMargins(getLineNumberAreaWidth(), 0, 0, 0);// reset text margin in accordance to linecouter change
 }
 
 void CodeEditor::updateLineNumberAreaWidth()
 {
     // reset start position for typing (according new linecounter position)
-    setViewportMargins(lineNumberAreaWidth(), 0, 0, 0);
+    setViewportMargins(getLineNumberAreaWidth(), 0, 0, 0);
 }
 
 void CodeEditor::updateLineNumberArea(const QRect &rect, int dy)// rectangle of current block and Y-Axis changing
@@ -142,27 +155,13 @@ void CodeEditor::resizeEvent(QResizeEvent *e)
 {
     QPlainTextEdit::resizeEvent(e);
     QRect cr = contentsRect();//whole area inside widget's margins
-    lineNumberArea->setGeometry(QRect(0, 0, lineNumberAreaWidth(), cr.height()));//set the same height as codeEditor for lineCouter
-}
-
-void CodeEditor::highlightCurrentLine()
-{
-    QList<QTextEdit::ExtraSelection> extraSelections;
-    QTextEdit::ExtraSelection selection;
-
-    QColor lineColor = configParam.mCurrentLineColor;
-    selection.format.setBackground(lineColor);
-    selection.format.setProperty(QTextFormat::FullWidthSelection, true);
-    selection.cursor = textCursor();
-    extraSelections.append(selection);
-    setExtraSelections(extraSelections);
+    lineNumberArea->setGeometry(QRect(0, 0, getLineNumberAreaWidth(), cr.height()));//set the same height as codeEditor for lineCouter
 }
 
 void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event)
 {
     QPainter painter(lineNumberArea);
-    painter.fillRect(event->rect(), configParam.mLineCounterAreaColor);
-
+    painter.fillRect(event->rect(), mConfigParam.mLineCounterAreaColor);
 
     QTextBlock block = firstVisibleBlock();//area of first numeration block from linecounter
     int blockNumber = block.blockNumber();//get line number (start from 0)
@@ -172,7 +171,7 @@ void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event)
     while (block.isValid())//we have blocks (have lines numbers)
     {
         QString number = QString::number(blockNumber + 1);
-        painter.setPen(configParam.mCodeTextColor);
+        painter.setPen(mConfigParam.mCodeTextColor);
         painter.drawText(0, top, lineNumberArea->width(), fontMetrics().height(),//draw line count
                          Qt::AlignCenter, number);
         block = block.next();
@@ -181,10 +180,123 @@ void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event)
         bottom += bottom - temp;// bottom - temp = dy which is block height
         ++blockNumber;
     }
+    mLinesCount = blockNumber;
 }
 
 void CodeEditor::saveStateInTheHistory()
 {
     std::string newFileState = this->toPlainText().toUtf8().constData();
-    changeManager->writeChange(newFileState);
+    mChangeManager->writeChange(newFileState);
+}
+
+void CodeEditor::mouseMoveEvent(QMouseEvent *event)
+{
+    if (event->button() == Qt::NoButton)
+    {
+        QTextBlock block = this->firstVisibleBlock();
+
+        int top = static_cast<int>(blockBoundingGeometry(block).translated(contentOffset()).top());//top of currentblock 0
+        int bottom = top + static_cast<int>(blockBoundingRect(block).height());
+        int side = bottom - top;// size of each side of comment button
+
+       // side of rectancge where our bottom will be. X-0 && Y-0 start from the left top, so (top < bottom)
+        const QSize buttonSize = QSize(side, side);
+        mAddCommentButton->setFixedSize(buttonSize);
+
+        auto currSliderPos = this->verticalScrollBar()->sliderPosition();
+
+        int commentAreaRightMargin = this->width() - this->verticalScrollBar()->width() - getLineNumberAreaWidth();
+        int commentAreaLeftMargin = commentAreaRightMargin - side;
+
+       if((event->x() >= commentAreaLeftMargin) && (event->x() <= commentAreaRightMargin))//mouse inside comment block
+       {
+            int linesFromTheTop = event->y() / side;
+            int currLine = linesFromTheTop + currSliderPos + 1;//because first block = 0
+            mAddCommentButton->setCurrentLine(currLine);
+            int commentBottonYpos = linesFromTheTop * side;// get Y pos for bottom
+
+            if(currLine <= mLinesCount)// check if the line exists
+            {
+                int commentBottonXpos = commentAreaLeftMargin + getLineNumberAreaWidth();
+
+                mAddCommentButton->setGeometry(commentBottonXpos, currSliderPos ? commentBottonYpos :
+                                          commentBottonYpos + TOP_UNUSED_PIXELS_HEIGHT , side, side);
+                mAddCommentButton->setVisible(true);
+                //label for line showing
+                mCurrentCommentLable->setGeometry(mAddCommentButton->x() - getLineNumberAreaWidth(), mAddCommentButton->y(),
+                                                  getLineNumberAreaWidth(), mAddCommentButton->height());
+                mCurrentCommentLable->setText(QString::number(mAddCommentButton->getCurrentLine()));
+                mCurrentCommentLable->setVisible(true);
+            }
+       }
+       else
+       {
+           mAddCommentButton->setVisible(false);
+           mCurrentCommentLable->setVisible(false);
+       }
+    }
+    QPlainTextEdit::mouseMoveEvent(event);
+}
+
+void CodeEditor::closeEvent(QCloseEvent *event)
+{
+    if (!document()->isModified())
+    {
+        event->accept();
+        return;
+    }
+
+    QMessageBox::StandardButton reply = QMessageBox::question
+            (this,
+             "Saving Changes",
+             "Do you want to save changes to opened documents?",
+             QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+
+    // if user closes dialog event is ignored
+    if (reply == QMessageBox::Cancel)
+    {
+        event->ignore();
+        return;
+    }
+    // if document wasn't modified of user doesn't want to save changes
+    if (reply == QMessageBox::No)
+    {
+        event->accept();
+        return;
+    }
+    // saving document
+    emit closeDocEventOccured(this);
+}
+
+void CodeEditor::highlighText()
+{
+    QTextCursor cursor = textCursor();
+    for(const auto &i: mTokens)
+    {
+        qDebug() << i.name << ' ' << i.type << ' ' << i.begin << ' ' << i.end << '\n';
+        switch(i.type)
+        {
+        case(KW):
+        {
+            cursor.setPosition(i.begin, QTextCursor::MoveAnchor);
+            cursor.setPosition(i.end, QTextCursor::KeepAnchor);
+            cursor.setCharFormat(fmtKeyword);
+            break;
+        }
+        case(LIT):
+        {
+            cursor.setPosition(i.begin, QTextCursor::MoveAnchor);
+            cursor.setPosition(i.end, QTextCursor::KeepAnchor);
+            cursor.setCharFormat(fmtLiteral);
+            break;
+        }
+        case(COM):
+        {
+            cursor.setPosition(i.begin, QTextCursor::MoveAnchor);
+            cursor.setPosition(i.end, QTextCursor::KeepAnchor);
+            cursor.setCharFormat(fmtComment);
+            break;
+        }
+        }
+    }
 }

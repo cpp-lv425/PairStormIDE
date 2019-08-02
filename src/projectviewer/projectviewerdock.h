@@ -17,12 +17,9 @@ class ProjectViewerDock: public QDockWidget
     ProjectTreeView *mpTreeViewer;
     ProjectViewerModel *mpViewerModel;
 public:
-    ProjectViewerDock(QWidget *pParent = nullptr);
-
+    explicit ProjectViewerDock(QWidget *pParent = nullptr);
     void setFilters(QStringList filters);
     void setDir(QDir curDir);
-    ~ProjectViewerDock();
-
 };
 
 #endif // PROJECTVIEWERDOCK_H

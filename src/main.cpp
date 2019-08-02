@@ -13,17 +13,25 @@
 #include <thread>
 #include <QCommandLineParser>
 
-#include "mdiarea.h"
 #include "browser.h"
+#include "splashscreen.h"
 #include "mainwindow.h"
 #include "documentationsearch.h"
 #include "documentationviewer.h"
 #include "htmlcontentgenerator.h"
-#include <fstream>
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+
+    SplashScreen splashScreen;
+    splashScreen.start();
+
+    MainWindow w;
+    splashScreen.finish(&w);
+
+    w.show();
+    w.showStartPage();
 
     QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);

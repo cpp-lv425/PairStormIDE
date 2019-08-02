@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>img/app_logo.jpg</file>
+        <file>img/splash_screen.jpg</file>
+    </qresource>
+</RCC>

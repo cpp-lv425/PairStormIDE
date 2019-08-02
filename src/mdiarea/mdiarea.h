@@ -7,7 +7,7 @@ class MDIArea: public QMdiArea
 {
     Q_OBJECT
 public:
-    MDIArea(QWidget *pParent = nullptr);
+    explicit MDIArea(QWidget *pParent = nullptr);
 };
 
 #endif // MDIAREA_H

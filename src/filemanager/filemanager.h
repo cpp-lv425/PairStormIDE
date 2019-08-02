@@ -6,10 +6,10 @@ class QString;
 class FileManager
 {
 public:    
-    QString readFromFile(const QString& fname);
-    void createFile(const QString& fname);
-    void writeToFile(const QString& fname,
-                     const QString& content);
+    QString readFromFile(const QString &fileName);
+    void createFile(const QString &fileName);
+    void writeToFile(const QString &fileName,
+                     const QString &content);
 };
 
 #endif // FILEMANAGER_H
