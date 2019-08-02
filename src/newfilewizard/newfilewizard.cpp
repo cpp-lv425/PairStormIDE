@@ -105,9 +105,9 @@ QString NewFileDialog::start()
     return mFileName;
 }
 
-bool NewFileDialog::checkIfValid(const QString &fileName)
+bool NewFileDialog::isValidFilename(const QString &fileName)
 {
-    return !fileName.contains(QRegExp("[*./:;|=,]"));
+    return !fileName.contains(QRegExp(R"exp([*/:;|=,\\\[\]])exp"));
 }
 
 void NewFileDialog::onSelectDirectory()
@@ -136,7 +136,7 @@ void NewFileDialog::onCreateFile()
                              "Please enter file name.");
         return;
     }
-    if (!checkIfValid(mpLine->text()))
+    if (!isValidFilename(mpLine->text()))
     {
         QMessageBox::warning(this, "Incorrect name",
                              "Invalid file name.");
