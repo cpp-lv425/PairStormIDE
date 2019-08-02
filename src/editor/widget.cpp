@@ -1,6 +1,5 @@
 #include "widget.h"
 #include "ui_widget.h"
-#include "highlightercpp.h"
 
 Widget::Widget(QWidget *parent) :
     QWidget(parent),

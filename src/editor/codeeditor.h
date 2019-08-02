@@ -9,7 +9,6 @@ const int TOP_UNUSED_PIXELS_HEIGHT = 4;
 #include"changemanager.h"
 #include"addcommentbutton.h"
 #include"ideconfiguration.h"
-#include"highlightercpp.h"
 #include"lexercpp.h"
 #include<utility>
 #include<QAbstractScrollArea>
@@ -45,7 +44,8 @@ protected:
 private slots:
     void updateLineNumberAreaWidth();
     void updateLineNumberArea(const QRect &rect, int dy);
-    void runLexerAndHighlight();
+    void runLexer();
+    void highlighText();
 
 public slots:
     void keyPressEvent(QKeyEvent *e) override;
@@ -56,20 +56,24 @@ signals:
     void changesAppeared();
 
 private:
-   QWidget *lineNumberArea;
-   ConfigParams mConfigParam;
-   int mCurrentZoom;
-   QFont mFont;
-   QVector<Token> mTokens;
-   Highlightercpp *mHcpp;
-   LexerCPP *mLcpp;
-   QString mFileName;
-   ChangeManager *mChangeManager;
-   QTimer *mTimer;
-   LexerCPP mLexer;
-   AddCommentButton *mAddCommentButton;
-   QLabel *mCurrentCommentLable;
-   int mLinesCount;
+    QWidget *lineNumberArea;
+    ConfigParams mConfigParam;
+    int mCurrentZoom;
+    QFont mFont;
+    QVector<Token> mTokens;
+    LexerCPP *mLcpp;
+    QString mFileName;
+    ChangeManager *mChangeManager;
+    QTimer *mTimer;
+    LexerCPP mLexer;
+    AddCommentButton *mAddCommentButton;
+    QLabel *mCurrentCommentLable;
+    int mLinesCount;
+
+    QTextCharFormat fmtLiteral;
+    QTextCharFormat fmtComment;
+    QTextCharFormat fmtKeyword;
+
 };
 
 #endif // CODEEDITOR_H
