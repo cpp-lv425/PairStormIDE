@@ -691,7 +691,7 @@ void MainWindow::onAboutTriggered()
 void MainWindow::onReferenceTriggered()
 {
     BrowserDialog browser;
-    browser.emptyDocumentationTab();
+    browser.createEmptyTab();
     browser.show();
     browser.exec();
 }
@@ -704,13 +704,6 @@ void MainWindow::onUserGuideTriggered()
 void MainWindow::onCheckUpdatesTriggered()
 {
     //
-}
-
-void MainWindow::createNewBrowser()
-{
-    delete mDocumentationBrowser;
-    mDocumentationBrowser = new Browser;
-
 }
 
 void MainWindow::onOpenFileFromProjectViewer(QString fileName)

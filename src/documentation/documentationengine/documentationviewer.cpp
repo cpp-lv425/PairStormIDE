@@ -1,5 +1,6 @@
 #include "documentationviewer.h"
 
+#include <QDir>
 #include <QMenu>
 #include <QToolTip>
 #include <QToolBar>
@@ -10,11 +11,20 @@
 #include <QWebEngineView>
 #include <QWebEnginePage>
 #include <QStackedWidget>
+#include <QStandardPaths>
 #include <QWebEngineHistory>
+
+#include "connectionmanager.h"
+#include "documentationengine.h"
+#include "documentationsearch.h"
+#include "htmlcontentgenerator.h"
 
 DocumentationViewer::DocumentationViewer(QWidget *parent)
     : QMainWindow (parent)
 {
+    mDocumentationEngine = new DocumentationEngine(this);
+    mConnectionManager = new ConnectionManager(this);
+
     mUrlEdit = new QLineEdit(this);
     mProgressBar = new QProgressBar(this);
     mWebView = new QWebEngineView(this);
@@ -83,9 +93,73 @@ QWebEngineView *DocumentationViewer::webView() const
     return mWebView;
 }
 
-void DocumentationViewer::setHtml(const QString &html)
+void DocumentationViewer::loadReferenceDocumentation()
 {
-    mWebView->setHtml(html);
+    bool isPairStormExist;
+    QDir dir = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
+
+    isPairStormExist = dir.cd("PairStorm");
+
+    if(mConnectionManager->hasConnection())
+    {
+        mWebView->load(QUrl("https://en.cppreference.com/w/"));
+    }
+    else
+    {
+        dir.cd("reference");
+        dir.cd("en");
+        QString indexPath{dir.path() + "/" + "index.html"};
+        mWebView->load(QUrl::fromLocalFile(indexPath));
+    }
+}
+
+void DocumentationViewer::loadReferenceDocumentation(const QString &keyword)
+{
+    bool isPairStormExist;
+    QDir dir = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
+
+    isPairStormExist = dir.cd("PairStorm");
+
+    if(!isPairStormExist)
+    {
+        if(mConnectionManager->hasConnection())
+        {
+            mWebView->load(QUrl("https://en.cppreference.com/w/"));
+        }
+    }
+    else
+    {
+        dir.mkdir("temp");
+        QDir tempDir{dir};
+        tempDir.cd("temp");
+        mDocumentationEngine->searchByKeyword(keyword);
+        QString html = QString::fromStdString(HTMLContentGenerator::generate(mDocumentationEngine->documentationFiles()));
+
+        if(mDocumentationEngine->documentationFiles().size() > 0)
+        {
+            QFile temp(QString(tempDir.path()+"/"+keyword+".html"));
+
+            temp.open(QIODevice::WriteOnly);
+            temp.write(html.toUtf8());
+
+            temp.close();
+            webView()->load(QUrl::fromLocalFile(QString(tempDir.path()+"/"+keyword+".html")));
+        }
+        else
+        {
+            if(mConnectionManager->hasConnection())
+            {
+                webView()->load(QUrl("https://en.cppreference.com/w/"));
+            }
+            else
+            {
+                dir.cd("reference");
+                dir.cd("en");
+                QString indexPath{dir.path() + "/" + "index.html"};
+                webView()->load(QUrl::fromLocalFile(indexPath));
+            }
+        }
+    }
 }
 
 void DocumentationViewer::updateUrlBar(const QUrl &url)
@@ -95,9 +169,18 @@ void DocumentationViewer::updateUrlBar(const QUrl &url)
     mUrlEdit->setCursorPosition(0);
 }
 
-void DocumentationViewer::urlRequested() {
-    QString url = mUrlEdit->text();
-    mWebView->load(QUrl(url));
+void DocumentationViewer::urlRequested()
+{
+    QString stringUrl = mUrlEdit->text();
+    QUrl tempUrl{stringUrl};
+    if(tempUrl.isValid())
+    {
+        mWebView->load(QUrl(tempUrl));
+    }
+    else
+    {
+        mWebView->load(QUrl("http://www.google.com"));
+    }
 }
 
 void DocumentationViewer::titleChange(const QString &title) {

@@ -21,8 +21,8 @@ BrowserDialog::BrowserDialog(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    resize(800,600);
     mConnectionManager = new ConnectionManager(this);
-    mDocumentationEngine = new DocumentationEngine(this);
     ui->mMDIArea->setViewMode(QMdiArea::ViewMode::TabbedView);
 
 }
@@ -31,7 +31,6 @@ BrowserDialog::~BrowserDialog()
 {
     delete ui;
     delete mConnectionManager;
-    delete mDocumentationEngine;
     for(auto &a : ui->mMDIArea->subWindowList())
     {
         delete a;
@@ -58,83 +57,19 @@ BrowserDialog::~BrowserDialog()
     }
 }
 
-void BrowserDialog::newTab(const QString &keyword)
+void BrowserDialog::createNewTab(const QString &keyword)
 {
     DocumentationViewer *newWindow = new DocumentationViewer(this);
-
-    bool isPairStormExist;
-    QDir dir = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
-
-    isPairStormExist = dir.cd("PairStorm");
-
-    if(!isPairStormExist)
-    {
-        if(mConnectionManager->hasConnection())
-        {
-            newWindow->webView()->load(QUrl("https://en.cppreference.com/w/"));
-        }
-    }
-    else
-    {
-        dir.mkdir("temp");
-        QDir tempDir{dir};
-        tempDir.cd("temp");
-        mDocumentationEngine->searchByKeyword(keyword);
-        QString html = QString::fromStdString(HTMLContentGenerator::generate(mDocumentationEngine->documentationFiles()));
-
-        if(mDocumentationEngine->documentationFiles().size() > 0)
-        {
-            QFile temp(QString(tempDir.path()+"/"+keyword+".html"));
-
-            temp.open(QIODevice::WriteOnly);
-            temp.write(html.toUtf8());
-
-            temp.close();
-            newWindow->webView()->load(QUrl::fromLocalFile(QString(tempDir.path()+"/"+keyword+".html")));
-        }
-        else
-        {
-            if(mConnectionManager->hasConnection())
-            {
-                newWindow->webView()->load(QUrl("https://en.cppreference.com/w/"));
-            }
-            else
-            {
-                dir.cd("reference");
-                dir.cd("en");
-                QString indexPath{dir.path() + "/" + "index.html"};
-                qDebug()<<indexPath;
-                newWindow->webView()->load(QUrl::fromLocalFile(indexPath));
-            }
-        }
-    }
+    newWindow->loadReferenceDocumentation(keyword);
     ui->mMDIArea->addSubWindow(newWindow);
     newWindow->setAttribute(Qt::WA_DeleteOnClose);
 
 }
 
-void BrowserDialog::emptyDocumentationTab()
+void BrowserDialog::createEmptyTab()
 {
     DocumentationViewer *newWindow = new DocumentationViewer(this);
-    bool isPairStormExist;
-    QDir dir = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
-
-    isPairStormExist = dir.cd("PairStorm");
-
-    if(mConnectionManager->hasConnection())
-    {
-        newWindow->webView()->load(QUrl("https://en.cppreference.com/w/"));
-    }
-    else
-    {
-        dir.cd("reference");
-        dir.cd("en");
-        QString indexPath{dir.path() + "/" + "index.html"};
-        qDebug()<<indexPath;
-        newWindow->webView()->load(QUrl::fromLocalFile(indexPath));
-    }
-
-    qDebug()<<"HERE";
+    newWindow->loadReferenceDocumentation();
     auto temp = ui->mMDIArea->addSubWindow(newWindow);
     temp->setWindowState(Qt::WindowState::WindowMaximized);
     newWindow->setAttribute(Qt::WA_DeleteOnClose);

@@ -94,7 +94,7 @@ private slots:
     void onUserGuideTriggered();
     void onCheckUpdatesTriggered();
 
-    void createNewBrowser();
+    void onReferenceFromEditor(const QString &keyword);
 
 public slots:
     void onOpenFileFromProjectViewer(QString fileName);    

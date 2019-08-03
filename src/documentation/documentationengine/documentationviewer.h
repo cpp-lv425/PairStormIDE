@@ -6,6 +6,8 @@ class QProgressBar;
 class QWebEngineView;
 class QStackedWidget;
 class QWebEnginePage;
+class ConnectionManager;
+class DocumentationEngine;
 QT_END_NAMESPACE
 class DocumentationViewer : public QMainWindow
 {
@@ -16,7 +18,8 @@ public:
 
     QWebEngineView *webView() const;
 
-    void setHtml(const QString &html);
+    void loadReferenceDocumentation();
+    void loadReferenceDocumentation(const QString &keyword);
 
 private:
     QLineEdit *mUrlEdit;
@@ -34,7 +37,9 @@ private:
     QAction *mStopLoadAction;
     QAction *mRefreshPageAction;
 
-    void setupUI();
+    ConnectionManager *mConnectionManager;
+    DocumentationEngine *mDocumentationEngine;
+
 private slots:
     void onHistoryTriggered();
     void onHelpTrigerred();

@@ -7,7 +7,6 @@ namespace Ui {
 class BrowserDialog;
 }
 
-
 QT_BEGIN_NAMESPACE
 class MDIArea;
 class ConnectionManager;
@@ -21,11 +20,10 @@ public:
     explicit BrowserDialog(QWidget *parent = nullptr);
     ~BrowserDialog();
 public slots:
-    void newTab(const QString &keyword);
-    void emptyDocumentationTab();
+    void createNewTab(const QString &keyword);
+    void createEmptyTab();
 private:
     ConnectionManager *mConnectionManager;
-    DocumentationEngine *mDocumentationEngine;
     QVector<QString> mTempHTMLFiles;
     Ui::BrowserDialog *ui;
 };
