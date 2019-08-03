@@ -1,50 +1,11 @@
 #include "codeeditor.h"
-
+#include "codeeditoreventbuilder.h"
 #include <QDebug>
 #include <QRegularExpression>
 #include<QTextCursor>
-#include<QDebug>
 
 QString CodeEditor::tabs="";
 bool CodeEditor::ispressSlesh=false;
-bool CodeEditor::isinsidebracket()
-{
-    QTextCursor cursor = this->textCursor();
-    if(cursor.position()!=this->document()->toPlainText().size())
-    {
-        cursor.movePosition(QTextCursor::PreviousCharacter);
-        int currentpos = cursor.position();
-        QString prev =this->document()->toPlainText().at(currentpos);
-        cursor.movePosition(QTextCursor::NextCharacter);
-        currentpos = cursor.position();
-        QString next = this->document()->toPlainText().at(currentpos);
-        if(prev == "{" && next == "}")
-            return true;
-    }
-    return false;
-}
-
-void CodeEditor::autotab()
-{
-    QString text(this->document()->toRawText());
-    int lbrackets = 0;
-    int rbrackets = 0;
-    QTextCursor crs = this->textCursor();
-    for (int c = 0; c < crs.position(); c++)
-    {
-        if(text.at(c) == "{")
-            lbrackets++;
-        if(text.at(c) == "}")
-            rbrackets++;
-    }
-    tabs = "";
-    int difference = lbrackets - rbrackets;
-
-    for(int i = 0; i < difference; i++)
-    {
-      tabs.append("\t");
-    }
-}
 
 const QString SINGLE_LINE_COMMENT = "//";
 const QString COMMENT_BLOCK_START = "/*";
@@ -120,11 +81,10 @@ void CodeEditor::eventShiftEnter(QKeyEvent *e)
 
 void CodeEditor::keyPressEvent(QKeyEvent *e)
 {
-    QPlainTextEdit::keyPressEvent(e);
+    Event *pressEvent = EventBuilder::getEvent(e);
+    (*pressEvent)(this,e);
+
 }
-
-
-
 
 
 

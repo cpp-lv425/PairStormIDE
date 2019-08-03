@@ -90,6 +90,7 @@ public:
    void eventAsterisk(QKeyEvent *e);
    void eventShiftEnter(QKeyEvent *e);
 
+   friend class Event;
 
 
 };
