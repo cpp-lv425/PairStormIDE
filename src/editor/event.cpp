@@ -1,7 +1,7 @@
 #include "event.h"
 
-QString Event::tabs="";
-
+QString Event::sTabs="";
+bool Event::sIsSleshPressed=false;
 void Event::eventInsertSymbol(CodeEditor *codeEditor, QKeyEvent *e, QString s)
 {
         plainTextPressEvent(codeEditor,e);
@@ -32,12 +32,12 @@ void Event::plainTextPressEvent(CodeEditor *codeEditor, QKeyEvent *e)
     codeEditor->QPlainTextEdit::keyPressEvent(e);
 }
 
-/*void Event::autotab()
+void Event::autotab(CodeEditor *code)
 {
-    QString text(this->document()->toRawText());
+    QString text(code->document()->toRawText());
     int lbrackets = 0;
     int rbrackets = 0;
-    QTextCursor crs = this->textCursor();
+    QTextCursor crs = code->textCursor();
     for (int c = 0; c < crs.position(); c++)
     {
         if(text.at(c) == "{")
@@ -45,12 +45,16 @@ void Event::plainTextPressEvent(CodeEditor *codeEditor, QKeyEvent *e)
         if(text.at(c) == "}")
             rbrackets++;
     }
-    tabs = "";
+    sTabs = "";
     int difference = lbrackets - rbrackets;
-
     for(int i = 0; i < difference; i++)
     {
-      tabs.append("\t");
+      sTabs.append("\t");
     }
 }
-*/
+
+
+int Event::editorCurrentZoom(CodeEditor *codeEditor)
+{
+    return codeEditor->mCurrentZoom;
+}

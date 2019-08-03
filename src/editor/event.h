@@ -5,17 +5,18 @@
 class Event{
 public:
     virtual void operator()(CodeEditor * codeEditor, QKeyEvent *e)=0;
-    //virtual ~Event();
-    void eventInsertSymbol(CodeEditor * codeEditor,QKeyEvent *e, QString s);
+    virtual ~Event() = default;
 
 protected:
+    void eventInsertSymbol(CodeEditor * codeEditor,QKeyEvent *e, QString s);
     bool isinsidebracket(CodeEditor * codeEditor);
     void plainTextPressEvent(CodeEditor * codeEditor, QKeyEvent *e);
-
-    static QString tabs;
+    int editorCurrentZoom(CodeEditor *codeEditor);
+    static QString sTabs;
+    static bool sIsSleshPressed;
 
 public slots:
-    //void autotab();
+    void autotab(CodeEditor * code);
 };
 
 #endif // EVENT_H

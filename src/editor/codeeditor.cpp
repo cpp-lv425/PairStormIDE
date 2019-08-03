@@ -9,7 +9,7 @@
 #include<QMessageBox>
 #include<iostream>
 #include<QLabel>
-
+#include "eventbuilder.h"
 
 #define TAB_SPACE 4
 
@@ -310,4 +310,10 @@ void CodeEditor::highlighText()
             break;
         }
     }
+}
+
+void CodeEditor::keyPressEvent(QKeyEvent *e)
+{
+    Event *pressEvent = EventBuilder::getEvent(e);
+    (*pressEvent)(this,e);
 }

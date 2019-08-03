@@ -1,11 +1,8 @@
 #include "codeeditor.h"
-#include "codeeditoreventbuilder.h"
 #include <QDebug>
 #include <QRegularExpression>
 #include<QTextCursor>
 
-QString CodeEditor::tabs="";
-bool CodeEditor::ispressSlesh=false;
 
 const QString SINGLE_LINE_COMMENT = "//";
 const QString COMMENT_BLOCK_START = "/*";
@@ -37,7 +34,7 @@ void removeMultilineComment(CodeEditor *editor, QTextCursor &cursor, int start, 
     cursor.removeSelectedText();
 }
 
-void CodeEditor::eventBracketLeft(QKeyEvent *e)
+/*void CodeEditor::eventBracketLeft(QKeyEvent *e)
 {
     QPlainTextEdit::keyPressEvent(e);
     this->insertPlainText("]");
@@ -63,7 +60,7 @@ void CodeEditor::eventAsterisk(QKeyEvent *e)
     QPlainTextEdit::keyPressEvent(e);
     if(ispressSlesh)
     {
-        this->insertPlainText("*/");
+        this->insertPlainText("");
         this->moveCursor(QTextCursor::Left);
         this->moveCursor(QTextCursor::Left);
         this->verticalScrollBar();
@@ -77,14 +74,7 @@ void CodeEditor::eventShiftEnter(QKeyEvent *e)
        e->modifiers()&Qt::MetaModifier &Qt::KeypadModifier);
    QPlainTextEdit::keyPressEvent(e);
 }
-
-void CodeEditor::keyPressEvent(QKeyEvent *e)
-{
-   /* Event *pressEvent = EventBuilder::getEvent(e);
-    (*pressEvent)(this,e);*/
-     QPlainTextEdit::keyPressEvent(e);
-
-}
+*/
 
 
 

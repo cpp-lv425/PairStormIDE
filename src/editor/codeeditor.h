@@ -40,7 +40,6 @@ public:
     void lineNumberAreaPaintEvent(QPaintEvent *event);
     int getLineNumberAreaWidth();
     bool isinsidebracket();
-    static QString tabs;
     QString& getFileName();
     void setFileName(const QString &flename);
     std::pair<const QString &, const QString &> getChangedFileInfo();
@@ -73,7 +72,6 @@ signals:
 private:
     QWidget *mLineNumberArea;
     ConfigParams mConfigParam;
-    int mCurrentZoom;
     QFont mFont;
     QVector<Token> mTokens;
     LexerCPP *mLcpp;
@@ -91,14 +89,8 @@ private:
     QTextCharFormat fmtKeyword;
     QTextCharFormat fmtRegular;
 
-public:
-  static bool ispressSlesh;
-   //keyboard event's handlers
-   void eventBracketLeft(QKeyEvent *e);
-   void eventBraceLeft(QKeyEvent *e);
-   void eventSlash(QKeyEvent *e);
-   void eventAsterisk(QKeyEvent *e);
-   void eventShiftEnter(QKeyEvent *e);
+protected:
+    int mCurrentZoom;
 
    friend class Event;
 
