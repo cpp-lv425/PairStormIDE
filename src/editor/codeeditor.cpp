@@ -279,7 +279,7 @@ void CodeEditor::closeEvent(QCloseEvent *event)
     emit closeDocEventOccured(this);
 }
 
-void formating(QTextCharFormat fmt, QTextCursor cursor, Token token)
+void formating(const QTextCharFormat &fmt, QTextCursor &cursor, const Token &token)
 {
     cursor.setPosition(token.mBegin, QTextCursor::MoveAnchor);
     cursor.setPosition(token.mEnd, QTextCursor::KeepAnchor);
