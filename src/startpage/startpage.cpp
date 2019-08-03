@@ -3,6 +3,7 @@
 
 #include <QVBoxLayout>
 #include <QPushButton>
+#include <QScreen>
 #include <QLabel>
 #include <QStyle>
 
@@ -13,7 +14,7 @@ StartPage::StartPage(QWidget *parent) :
     ui->setupUi(this);
     setWindowTitle("Start Page");
 
-    int maxButtonsWidth = 200;
+    const int maxButtonsWidth = 200;
     QFont lblFont("Segoe UI", 10);
     lblFont.setBold(true);
 
@@ -49,7 +50,7 @@ StartPage::StartPage(QWidget *parent) :
     setupButton(mpSettingsBtn,
                 style()->standardIcon(QStyle::SP_BrowserReload),
                 maxButtonsWidth,
-                "Settings");    
+                "Settings");
     connect(mpSettingsBtn, &QPushButton::pressed, this, &StartPage::settingsBtnPressed);
 
     // bindong buttons
@@ -67,7 +68,7 @@ StartPage::StartPage(QWidget *parent) :
     setupLabels(pOpenLbl, lblFont, palette);
 
     QLabel *pOpenDirLbl = new QLabel(tr("Open existing project directory"));
-    setupLabels(pOpenDirLbl, lblFont, palette);    
+    setupLabels(pOpenDirLbl, lblFont, palette);
 
     QLabel *pSettingsLbl = new QLabel(tr("Configure IDE"));
     setupLabels(pSettingsLbl, lblFont, palette);
@@ -76,7 +77,7 @@ StartPage::StartPage(QWidget *parent) :
     QVBoxLayout *pLblLayout = new QVBoxLayout;
     pLblLayout->addWidget(pNewLbl);
     pLblLayout->addWidget(pOpenLbl);
-    pLblLayout->addWidget(pOpenDirLbl);    
+    pLblLayout->addWidget(pOpenDirLbl);
     pLblLayout->addWidget(pSettingsLbl);
 
     // window lay out
@@ -86,11 +87,15 @@ StartPage::StartPage(QWidget *parent) :
 
     setLayout(pWdwLayout);
 
+    // receive current screen geometry
+    QScreen *screen = qApp->screens().at(0);
+    QRect screenGeometry = screen->geometry();
+
     // resizing & centring dialog
-    setGeometry(geometry().x(), geometry().y(), 500, 250);
-    QPoint cntr = parent->geometry().center();
-    int x = cntr.x() - width() / 2;
-    int y = cntr.y() - height() / 2;
+    resize(screenGeometry.width() / 3,
+           screenGeometry.height() / 3);
+    int x = screenGeometry.center().x() - width() / 2;
+    int y = screenGeometry.center().y() - height() / 2;
     move(x, y);
 }
 
