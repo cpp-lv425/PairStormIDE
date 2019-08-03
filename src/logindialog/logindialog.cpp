@@ -1,10 +1,12 @@
 #include "logindialog.h"
 
+#include <QApplication>
 #include <QMessageBox>
 #include <QPushButton>
 #include <QBoxLayout>
 #include <QGroupBox>
 #include <QLineEdit>
+#include <QScreen>
 #include <QLabel>
 
 LoginDialog::LoginDialog(QWidget *pParent): QDialog (pParent)
@@ -54,13 +56,15 @@ LoginDialog::LoginDialog(QWidget *pParent): QDialog (pParent)
     pWdwLayout->addLayout(pButtonsLayout);
     setLayout(pWdwLayout);
 
-    // specifying initial dialog size
-    setGeometry(geometry().x(), geometry().y(), 400, 200);
+    // receive current screen geometry
+    QScreen *screen = qApp->screens().at(0);
+    QRect screenGeometry = screen->geometry();
 
-    // centring dialog
-    QPoint cntr = pParent->geometry().center();
-    int x = cntr.x() - width() / 2;
-    int y = cntr.y() - height() / 2;
+    // resizing & centring dialog
+    resize(screenGeometry.width() / 3,
+           screenGeometry.height() / 3);
+    int x = screenGeometry.center().x() - width() / 2;
+    int y = screenGeometry.center().y() - height() / 2;
     move(x, y);
 }
 
