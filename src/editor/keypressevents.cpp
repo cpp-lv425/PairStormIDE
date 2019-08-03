@@ -73,6 +73,7 @@ EventEnter::~EventEnter() = default;
 //EventCtrlPlus
 void EventCtrlPlus::operator()(CodeEditor *codeEditor, QKeyEvent *e)
 {
+    codeEditor->saveStateInTheHistory();
     if (editorCurrentZoom(codeEditor) <= 150)
     {
             codeEditor->zoom(1);

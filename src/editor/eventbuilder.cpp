@@ -2,85 +2,62 @@
 
 Event *EventBuilder::getEventNoModifier(QKeyEvent *e)
 {
-    if (e->key() == Qt::Key_BracketLeft)
+    switch(e->key())
     {
+    case Qt::Key_BracketLeft:
         return new EventBracketLeft();
-    }
-    if (e->key() == Qt::Key_Enter || e->key() == Qt::Key_Return)
-    {
+    case (Qt::Key_Enter | Qt::Key_Return):
         return new EventEnter();
-    }
-    if (e->key() == Qt::Key_Apostrophe)
-    {
+    case Qt::Key_Apostrophe:
         return new EventApostrophe();
-    }
-    if (e->key() == Qt::Key_Slash)
-    {
+    case Qt::Key_Slash:
         return new EventSlash();
+    default:
+        return new EventDefault();
     }
-    return new EventDefault();
 }
 
 Event *EventBuilder::getEventShiftModifier(QKeyEvent *e)
 {
-    if (e->key()==Qt::Key_BraceLeft)
+    switch(e->key())
     {
+    case Qt::Key_BraceLeft:
         return new EventBraceLeft();
-    }
-    if (e->key() == Qt::Key_ParenLeft)
-    {
+    case Qt::Key_ParenLeft:
         return new EventParenLeft();
-    }
-    if (e->key() == Qt::Key_QuoteDbl)
-    {
+    case Qt::Key_QuoteDbl:
         return new EventQouteDbl();
-    }
-    if (e->key() == Qt::Key_Enter || e->key() == Qt::Key_Return)
-    {
-        return new EventShiftEnter();
-    }
-    if (e->key() == Qt::Key_Asterisk)
-    {
+    case Qt::Key_Asterisk:
         return new EventAsterisk();
-    }
-    if (e->key() == Qt::Key_Space || e->key() == Qt::Key_Enter || e->key() == Qt::Key_Return)
-    {
+    case (Qt::Key_Enter | Qt::Key_Return):
+        return new EventShiftEnter();
+    case (Qt::Key_Space | Qt::Key_Return):
         return new EventSaveChangeInHistory();
+    default:
+        return new EventDefault();
     }
-    return new EventDefault();
 }
 
-Event *EventBuilder::getEventControlModifier(QKeyEvent *e)
+Event* EventBuilder::getEventControlModifier(QKeyEvent *e)
 {
-    if (e->key() == Qt::Key_Plus)
+    switch(e->key())
     {
+    case Qt::Key_Plus:
         return new EventCtrlPlus();
-    }
-    if (e->key() == Qt::Key_Minus)
-    {
+    case Qt::Key_Minus:
         return new EventCtrlMinus();
-    }
-    if (e->key() == Qt::Key_Z)
-    {
+    case Qt::Key_Z:
         return new EventCtrlZ();
-    }
-    if (e->key() == Qt::Key_Y)
-    {
+    case Qt::Key_Y:
         return new EventCtrlY();
-    }
-    if (e->key() == Qt::Key_Slash)
-    {
+    case Qt::Key_Slash:
         return new EventCtrlSlash();
-    }
-    if (e->key() == Qt::Key_D)
-    {
+    case Qt::Key_D:
         return new EventSendLexem();
-    }
-    if (e->key() == Qt::Key_V)
-    {
+    case Qt::Key_V:
         return new EventSaveChangeInHistory();
-    }
-    return new EventDefault();
+    default:
+        return new EventDefault();
 }
 
 Event *EventBuilder::getEventKeyboardModifier(QKeyEvent *e)
@@ -96,7 +73,8 @@ Event *EventBuilder::getEventKeyboardModifier(QKeyEvent *e)
     return new EventDefault();
 }
 
-Event *EventBuilder::getEvent(QKeyEvent *e){
+Event *EventBuilder::getEvent(QKeyEvent *e)
+{
     if(e->modifiers() & Qt::ShiftModifier)
     {
         return getEventShiftModifier(e);
