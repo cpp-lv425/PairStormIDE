@@ -48,6 +48,8 @@ MainWindow::MainWindow(QWidget *parent) :
     // set icon
     setWindowIcon(QIcon(":/img/app_logo.jpg"));
 
+    setWindowTitle("PairStorm");
+
     // sets style globally
     setAppStyle();
 

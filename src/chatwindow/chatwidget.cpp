@@ -65,6 +65,7 @@ void ChatWidget::updateUsersList()
         mpUsersList->addItem(pItem);
     }
     mpUsersList->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+
 }
 
 void ChatWidget::setOnlineUsers(const QStringList &onlineUsers)
