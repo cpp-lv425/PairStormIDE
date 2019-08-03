@@ -720,19 +720,13 @@ void MainWindow::closeEvent(QCloseEvent *event)
     auto docsList = mpDocsArea->subWindowList();
 
     // if there are no docs
-    if(docsList.empty())
+    if(docsList.empty() || !isModified(docsList))
     {
         event->accept();
         return;
-    }
+    }    
 
-    // if doc is modified then we should ask user if changes have to be saved
-    if(!isModified(docsList))
-    {
-        event->accept();
-        return;
-    }
-
+    // ask user whether changes should be changed
     QMessageBox::StandardButton reply = QMessageBox::question
             (this,
              userMessages[UserMessages::PromptSaveTitle],
