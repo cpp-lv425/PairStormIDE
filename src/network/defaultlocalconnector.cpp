@@ -251,6 +251,11 @@ ServerData DefaultLocalConnector::popFromConnectedAttributes(const QString & ser
 //                                                                              START SHARING
 void DefaultLocalConnector::startSharing(const QString userName)
 {
+    if (!mpUdpService || !mpTcpService)
+    {
+        // If services has not been configured
+        return;
+    }
     ServerData serverAttributes = pushToConnectedAttributes(userName);
     if (!serverAttributes.empty())
     {
@@ -268,6 +273,11 @@ void DefaultLocalConnector::startSharing(const QString userName)
 //                                                                               STOP SHARING
 void DefaultLocalConnector::stopSharing(const QString userName)
 {
+    if (!mpUdpService || !mpTcpService)
+    {
+        // If services has not been configured
+        return;
+    }
     ServerData serverAttributes = popFromConnectedAttributes(userName);
     if (!serverAttributes.empty())
     {
@@ -285,6 +295,11 @@ void DefaultLocalConnector::stopSharing(const QString userName)
 //                                                      SHARE MESSAGE BETWEEN CONNECTED USERS
 void DefaultLocalConnector::shareMessage(const QString messageContent)
 {
+    if (!mpUdpService || !mpTcpService)
+    {
+        // If services has not been configured
+        return;
+    }
     Message message;
     message.mType       = Message::Type::ChatMessage;
     message.mSourceName = mpTcpService->getServerAttributes().mName;
@@ -300,6 +315,11 @@ void DefaultLocalConnector::shareMessage(const QString messageContent)
 //                                                       SHARE CHANGE BETWEEN CONNECTED USERS
 void DefaultLocalConnector::shareChange(const QString changeContent)
 {
+    if (!mpUdpService || !mpTcpService)
+    {
+        // If services has not been configured
+        return;
+    }
     Message message;
     message.mType       = Message::Type::ChangesMessage;
     message.mSourceName = mpTcpService->getServerAttributes().mName;
