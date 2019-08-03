@@ -125,6 +125,7 @@ void EventAsterisk::operator()(CodeEditor * codeEditor, QKeyEvent *e)
     {
          plainTextPressEvent(codeEditor, e);
     }
+    sIsSleshPressed=false;
 }
 EventAsterisk::~EventAsterisk() = default;
 
