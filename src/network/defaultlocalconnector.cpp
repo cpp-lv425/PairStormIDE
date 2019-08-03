@@ -153,7 +153,7 @@ void DefaultLocalConnector::addServerAttributesOnReceive()
                              return inServerData.mName ==
                                     curretnAttributes.mName;
                          });
-    if (pExistentAttributes != mDiscoveredServersAttrib.cend())
+    if (pExistentAttributes != mDiscoveredServersAttrib.end())
     {
         // Server with a given name has already been discovered so update discovery moment
         pExistentAttributes->mDiscoveryMoment = curretnAttributes.mDiscoveryMoment;
