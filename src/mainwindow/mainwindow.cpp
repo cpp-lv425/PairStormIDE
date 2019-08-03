@@ -444,7 +444,7 @@ void MainWindow::onSaveFileTriggered()
     auto curDoc = getCurrentDoc();
 
     // if doc wasn't modified yet
-    if (!curDoc || !curDoc->document()->isModified())
+    if (!curDoc || !curDoc->isChanged())
     {
         return;
     }
