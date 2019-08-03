@@ -6,7 +6,7 @@ SOURCES += \
         $$PWD/changesmanager.cpp \
         $$PWD/codeeditor.cpp \
         $$PWD/event.cpp \
-        $$PWD/hotkeys.cpp \
+        $$PWD/eventbuilder.cpp \
         $$PWD/keypressevents.cpp \
         $$PWD/lexercpp.cpp \
         $$PWD/linenumberarea.cpp \

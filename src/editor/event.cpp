@@ -2,15 +2,17 @@
 
 QString Event::sTabs="";
 bool Event::sIsSleshPressed=false;
-void Event::eventInsertSymbol(CodeEditor *codeEditor, QKeyEvent *e, QString s)
+void Event::eventInsertSymbol(CodeEditor* codeEditor, QKeyEvent* e, QString s)
 {
-        plainTextPressEvent(codeEditor,e);
+        plainTextPressEvent(codeEditor, e);
         codeEditor->insertPlainText(s);
-        codeEditor->moveCursor(QTextCursor::Left);
-        codeEditor->verticalScrollBar();
+        for (int i = 0; i < s.size(); i++)
+        {
+            codeEditor->moveCursor(QTextCursor::Left);
+        }
 }
 
-bool Event::isinsidebracket(CodeEditor * codeEditor)
+bool Event::isinsidebracket(CodeEditor* codeEditor)
 {
     QTextCursor cursor = codeEditor->textCursor();
     if(cursor.position()!=codeEditor->document()->toPlainText().size())
@@ -22,17 +24,19 @@ bool Event::isinsidebracket(CodeEditor * codeEditor)
         currentpos = cursor.position();
         QString next = codeEditor->document()->toPlainText().at(currentpos);
         if(prev == "{" && next == "}")
+        {
             return true;
+        }
     }
     return false;
 }
 
-void Event::plainTextPressEvent(CodeEditor *codeEditor, QKeyEvent *e)
+void Event::plainTextPressEvent(CodeEditor* codeEditor, QKeyEvent* e)
 {
     codeEditor->QPlainTextEdit::keyPressEvent(e);
 }
 
-void Event::autotab(CodeEditor *code)
+void Event::autotab(CodeEditor* code)
 {
     QString text(code->document()->toRawText());
     int lbrackets = 0;
@@ -41,9 +45,13 @@ void Event::autotab(CodeEditor *code)
     for (int c = 0; c < crs.position(); c++)
     {
         if(text.at(c) == "{")
+        {
             lbrackets++;
+        }
         if(text.at(c) == "}")
+        {
             rbrackets++;
+        }
     }
     sTabs = "";
     int difference = lbrackets - rbrackets;
@@ -57,4 +65,9 @@ void Event::autotab(CodeEditor *code)
 int Event::editorCurrentZoom(CodeEditor *codeEditor)
 {
     return codeEditor->mCurrentZoom;
+}
+
+QVector<Token> Event::editorTokens(CodeEditor *codeEditor)
+{
+    return codeEditor->mTokens;
 }

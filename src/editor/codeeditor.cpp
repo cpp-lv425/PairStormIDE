@@ -11,9 +11,6 @@
 #include<QLabel>
 #include "eventbuilder.h"
 
-#define TAB_SPACE 4
-
-
 CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
 {
     setLineWrapMode(QPlainTextEdit::NoWrap);// don't move cursor to the next line where it's out of visible scope
@@ -282,7 +279,7 @@ void CodeEditor::closeEvent(QCloseEvent *event)
     emit closeDocEventOccured(this);
 }
 
-void formating(QTextCharFormat fmt,QTextCursor cursor,Token  token)
+void formating(QTextCharFormat fmt, QTextCursor cursor, Token token)
 {
     cursor.setPosition(token.mBegin, QTextCursor::MoveAnchor);
     cursor.setPosition(token.mEnd, QTextCursor::KeepAnchor);
@@ -315,5 +312,5 @@ void CodeEditor::highlighText()
 void CodeEditor::keyPressEvent(QKeyEvent *e)
 {
     Event *pressEvent = EventBuilder::getEvent(e);
-    (*pressEvent)(this,e);
+    (*pressEvent)(this, e);
 }

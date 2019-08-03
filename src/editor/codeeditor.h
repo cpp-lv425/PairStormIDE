@@ -24,12 +24,7 @@ class QPaintEvent;
 class QResizeEvent;
 class QSize;
 class QWidget;
-
 class LineNumberArea;
-
-
-
-
 
 class CodeEditor : public QPlainTextEdit
 {
@@ -73,7 +68,6 @@ private:
     QWidget *mLineNumberArea;
     ConfigParams mConfigParam;
     QFont mFont;
-    QVector<Token> mTokens;
     LexerCPP *mLcpp;
     QString mFileName;
     ChangeManager *mChangeManager;
@@ -91,13 +85,8 @@ private:
 
 protected:
     int mCurrentZoom;
-
-   friend class Event;
-
-
-
-
-
+    QVector<Token> mTokens;
+ friend class Event;
 };
 
 #endif // CODEEDITOR_H
