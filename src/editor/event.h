@@ -5,7 +5,7 @@
 class Event{
 public:
     virtual void operator()(CodeEditor * codeEditor, QKeyEvent *e)=0;
-    virtual ~Event();
+    //virtual ~Event();
     void eventInsertSymbol(CodeEditor * codeEditor,QKeyEvent *e, QString s);
 
 protected:
@@ -15,7 +15,7 @@ protected:
     static QString tabs;
 
 public slots:
-    void autotab();
+    //void autotab();
 };
 
 #endif // EVENT_H

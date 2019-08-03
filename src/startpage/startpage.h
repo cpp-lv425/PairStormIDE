@@ -20,24 +20,21 @@ public:
 
 private:
     Ui::StartPage *ui;
-    QPushButton *pNewBtn;
-    QPushButton *pOpenBtn;
-    QPushButton *pOpenDirBtn;
-    QPushButton *pReferenceBtn;
-    QPushButton *pSettingsBtn;
+    QPushButton *mpNewBtn;
+    QPushButton *mpOpenBtn;
+    QPushButton *mpOpenDirBtn;
+    QPushButton *mpSettingsBtn;
 
 private slots:
     void newBtnPressed();
     void openBtnPressed();
     void openDirPressed();
-    void referenceBtnPressed();
     void settingsBtnPressed();
 
 signals:
     void onNewBtnPressed();
     void onOpenBtnPressed();
     void onOpenDirPressed();
-    void onReferenceBtnPressed();
     void onSettingsBtnPressed();
 
 private:
@@ -46,7 +43,7 @@ private:
                      QPalette &palette);
     void setupButton(QPushButton *pButton,
                      QIcon icon,
-                     int maxWidth);
+                     int maxWidth, const QString& text);
 };
 
 #endif // STARTPAGE_H

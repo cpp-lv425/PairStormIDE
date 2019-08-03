@@ -1,8 +1,9 @@
 #ifndef KEYWORDS_H
 #define KEYWORDS_H
+
 #include <QSet>
 
-const QSet<QString> KEYWORDS = {"auto", "break", "case", "char", "const", "continue",
+const QSet<QString> cKeywords = {"auto", "break", "case", "char", "const", "continue",
                                 "default", "do", "double", "else", "enum", "extern",
                                 "float", "for", "goto", "if", "int", "long",
                                 "register", "return", "short", "signed", "sizeof", "static",

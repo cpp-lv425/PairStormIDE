@@ -39,7 +39,6 @@ void removeMultilineComment(CodeEditor *editor, QTextCursor &cursor, int start, 
 
 void CodeEditor::eventBracketLeft(QKeyEvent *e)
 {
-
     QPlainTextEdit::keyPressEvent(e);
     this->insertPlainText("]");
     this->moveCursor(QTextCursor::Left);
@@ -81,8 +80,9 @@ void CodeEditor::eventShiftEnter(QKeyEvent *e)
 
 void CodeEditor::keyPressEvent(QKeyEvent *e)
 {
-    Event *pressEvent = EventBuilder::getEvent(e);
-    (*pressEvent)(this,e);
+   /* Event *pressEvent = EventBuilder::getEvent(e);
+    (*pressEvent)(this,e);*/
+     QPlainTextEdit::keyPressEvent(e);
 
 }
 

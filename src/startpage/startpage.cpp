@@ -3,6 +3,7 @@
 
 #include <QVBoxLayout>
 #include <QPushButton>
+#include <QScreen>
 #include <QLabel>
 #include <QStyle>
 
@@ -13,45 +14,51 @@ StartPage::StartPage(QWidget *parent) :
     ui->setupUi(this);
     setWindowTitle("Start Page");
 
-    int maxButtonsWidth = 200;
-    QFont lblFont("Segoe UI", 12);
-    //lblFont.setBold(true);
+    const int maxButtonsWidth = 200;
+    QFont lblFont("Segoe UI", 10);
+    lblFont.setBold(true);
+
     QPalette palette;
     palette.setColor(QPalette::WindowText, Qt::blue);
 
     // creating & configuring new file button
-    pNewBtn = new QPushButton(tr("   New File"));
-    setupButton(pNewBtn, style()->standardIcon(QStyle::SP_FileIcon), maxButtonsWidth);
-    connect(pNewBtn, &QPushButton::pressed, this, &StartPage::newBtnPressed);
+    mpNewBtn = new QPushButton;
+    setupButton(mpNewBtn,
+                style()->standardIcon(QStyle::SP_FileIcon),
+                maxButtonsWidth,
+                "New File");
+    connect(mpNewBtn, &QPushButton::pressed, this, &StartPage::newBtnPressed);
 
     // creating & configuring open file button
-    pOpenBtn = new QPushButton(tr("   Open File"));
-    setupButton(pOpenBtn, style()->standardIcon(QStyle::SP_DialogOpenButton), maxButtonsWidth);
-    connect(pOpenBtn, &QPushButton::pressed, this, &StartPage::openBtnPressed);
+    mpOpenBtn = new QPushButton;
+    setupButton(mpOpenBtn, style()->standardIcon
+                (QStyle::SP_DialogOpenButton),
+                maxButtonsWidth,
+                "Open File");
+    connect(mpOpenBtn, &QPushButton::pressed, this, &StartPage::openBtnPressed);
 
     // creating & configuring open folder button
-    pOpenDirBtn = new QPushButton(tr("   Open Folder"));
-    setupButton(pOpenDirBtn, style()->standardIcon(QStyle::SP_DriveHDIcon), maxButtonsWidth);
-    connect(pOpenDirBtn, &QPushButton::pressed, this, &StartPage::openDirPressed);
-
-    // creating & configuring reference call button
-    pReferenceBtn = new QPushButton(tr("   Reference Assistant"));
-    setupButton(pReferenceBtn, style()->standardIcon(QStyle::SP_DialogHelpButton), maxButtonsWidth);
-    connect(pReferenceBtn, &QPushButton::pressed, this, &StartPage::referenceBtnPressed);
+    mpOpenDirBtn = new QPushButton;
+    setupButton(mpOpenDirBtn,
+                style()->standardIcon(QStyle::SP_DriveHDIcon),
+                maxButtonsWidth,
+                "Open Folder");
+    connect(mpOpenDirBtn, &QPushButton::pressed, this, &StartPage::openDirPressed);
 
     // creating & configuring settings call button
-    pSettingsBtn = new QPushButton(tr("   Settings"));
-    setupButton(pSettingsBtn, style()->standardIcon(QStyle::SP_BrowserReload), maxButtonsWidth);
-    pSettingsBtn->setDisabled(true);
-    connect(pSettingsBtn, &QPushButton::pressed, this, &StartPage::settingsBtnPressed);
+    mpSettingsBtn = new QPushButton;
+    setupButton(mpSettingsBtn,
+                style()->standardIcon(QStyle::SP_BrowserReload),
+                maxButtonsWidth,
+                "Settings");
+    connect(mpSettingsBtn, &QPushButton::pressed, this, &StartPage::settingsBtnPressed);
 
     // bindong buttons
     QVBoxLayout *pBtnLayout = new QVBoxLayout;
-    pBtnLayout->addWidget(pNewBtn);
-    pBtnLayout->addWidget(pOpenBtn);
-    pBtnLayout->addWidget(pOpenDirBtn);
-    pBtnLayout->addWidget(pReferenceBtn);
-    pBtnLayout->addWidget(pSettingsBtn);
+    pBtnLayout->addWidget(mpNewBtn);
+    pBtnLayout->addWidget(mpOpenBtn);
+    pBtnLayout->addWidget(mpOpenDirBtn);
+    pBtnLayout->addWidget(mpSettingsBtn);
 
     // creating & laying out labels
     QLabel *pNewLbl = new QLabel(tr("Create new file"));
@@ -63,9 +70,6 @@ StartPage::StartPage(QWidget *parent) :
     QLabel *pOpenDirLbl = new QLabel(tr("Open existing project directory"));
     setupLabels(pOpenDirLbl, lblFont, palette);
 
-    QLabel *pReferenceLbl = new QLabel(tr("Open Reference Assistant"));
-    setupLabels(pReferenceLbl, lblFont, palette);
-
     QLabel *pSettingsLbl = new QLabel(tr("Configure IDE"));
     setupLabels(pSettingsLbl, lblFont, palette);
     pSettingsLbl->setDisabled(true);
@@ -74,7 +78,6 @@ StartPage::StartPage(QWidget *parent) :
     pLblLayout->addWidget(pNewLbl);
     pLblLayout->addWidget(pOpenLbl);
     pLblLayout->addWidget(pOpenDirLbl);
-    pLblLayout->addWidget(pReferenceLbl);
     pLblLayout->addWidget(pSettingsLbl);
 
     // window lay out
@@ -84,11 +87,15 @@ StartPage::StartPage(QWidget *parent) :
 
     setLayout(pWdwLayout);
 
+    // receive current screen geometry
+    QScreen *screen = qApp->screens().at(0);
+    QRect screenGeometry = screen->geometry();
+
     // resizing & centring dialog
-    setGeometry(geometry().x(), geometry().y(), 500, 300);
-    QPoint cntr = parent->geometry().center();
-    int x = cntr.x() - width() / 2;
-    int y = cntr.y() - height() / 2;
+    resize(screenGeometry.width() / 3,
+           screenGeometry.height() / 3);
+    int x = screenGeometry.center().x() - width() / 2;
+    int y = screenGeometry.center().y() - height() / 2;
     move(x, y);
 }
 
@@ -99,13 +106,18 @@ void StartPage::showStartPage()
 
 void StartPage::setupButton(QPushButton *pButton,
                             QIcon icon,
-                            int maxWidth)
+                            int maxWidth, const QString &text)
 {
     pButton->setIcon(icon);
     pButton->setMaximumWidth(maxWidth);
     pButton->setSizePolicy(QSizePolicy::Expanding,
                            QSizePolicy::Expanding);
-
+    pButton->setStyleSheet("text-align:left;");
+    pButton->setLayout(new QGridLayout);
+    QLabel *textLabel = new QLabel(text);
+    textLabel->setAlignment(Qt::AlignCenter);
+    textLabel->setAttribute(Qt::WA_TransparentForMouseEvents, true);
+    pButton->layout()->addWidget(textLabel);
 }
 
 StartPage::~StartPage()
@@ -128,12 +140,6 @@ void StartPage::openBtnPressed()
 void StartPage::openDirPressed()
 {
     emit onOpenDirPressed();
-    accept();
-}
-
-void StartPage::referenceBtnPressed()
-{
-    emit onReferenceBtnPressed();
     accept();
 }
 

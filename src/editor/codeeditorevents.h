@@ -36,7 +36,7 @@ class EventEnter : public Event
 public:
     virtual void operator()(CodeEditor * codeEditor, QKeyEvent *e) override
     {
-        if(isinsidebracket())
+        /*if(isinsidebracket())
         {
             codeEditor->insertPlainText("\n\n");
             emit autotab();
@@ -46,9 +46,9 @@ public:
             emit autotab();
             codeEditor->insertPlainText(tabs);
             return;
-        }
+        }*/
         plainTextPressEvent(codeEditor,e);
-        emit autotab();
+        //emit autotab();
         codeEditor->insertPlainText(tabs);
     }
 };

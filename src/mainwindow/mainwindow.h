@@ -15,7 +15,6 @@ class BottomPanelDock;
 class QListWidgetItem;
 class ChatWindowDock;
 class QMdiSubWindow;
-class QDockWidget;
 class CodeEditor;
 class MDIArea;
 QT_END_NAMESPACE
@@ -38,20 +37,20 @@ private:
     BottomPanelDock *mpBottomPanelDock;
     MDIArea *mpDocsArea;
     QString mCurrentUserName;
-
     void setupMainMenu();
-    void saveDocument(CodeEditor* pDoc, QString fileName);
+    void saveDocument(CodeEditor *pDoc, const QString &fileName);
     void openDoc(QString fileName);
-    bool checkIfOpened(const QString& fileName)const;
-    // returns true if any of docs has been modified
-    bool checkIfModified(QList<QMdiSubWindow*> &docsList);
+    bool isOpened(const QString &fileName)const;
+    bool isModified(QList<QMdiSubWindow*> &docsList);
     void saveAllModifiedDocuments(QList<QMdiSubWindow*> &docsList);
     void createProjectViewer();
     void createChatWindow();
     void createButtomPanel();
+    CodeEditor* getCurrentDoc();
 
     void saveMainWindowState();
     void restoreMainWindowState();
+    void setAppStyle();
 
 private slots:
     // file menu actions
@@ -84,7 +83,6 @@ private slots:
     void onRefactorTriggered();
     void onConnectTriggered();
     void onSettingsTriggered();
-    void onTest();
 
     // help menu
     void onAboutTriggered();
@@ -94,7 +92,8 @@ private slots:
 
 public slots:
     void onOpenFileFromProjectViewer(QString fileName);    
-    void onCloseWindow(CodeEditor* curDoc);
+    void onCloseWindow(CodeEditor *curDoc);   
+    void onConnectionStatusChanged(bool status);
 
 private:
     // creates new doc in MDIArea

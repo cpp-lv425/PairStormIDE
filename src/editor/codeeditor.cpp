@@ -1,7 +1,6 @@
 #include "codeeditor.h"
 #include "linenumberarea.h"
 #include<QtGui>
-#include<QDebug>
 #include<QTextCursor>
 #include<QPainter>
 #include<QTextCharFormat>
@@ -20,7 +19,7 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     setLineWrapMode(QPlainTextEdit::NoWrap);// don't move cursor to the next line where it's out of visible scope
     this->setVerticalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAlwaysOn);
     this->setTabStopDistance(TAB_SPACE * fontMetrics().width(QLatin1Char('0')));//set tab distance
-    mCurrentZoom = 100;//in persents
+    mCurrentZoom = 100;//in persents    
 
     //read settings
     QSettings settings(QApplication::organizationName(), QApplication::applicationName());
@@ -30,10 +29,7 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     mConfigParam.setConfigParams(analizerFontName,analizerFontSize,analizerStyle);
 
     //create objects connected to codeEditor
-    lineNumberArea = new LineNumberArea(this);
-
-
-    this->setTabStopDistance(TAB_SPACE * fontMetrics().width(QLatin1Char('0')));//set tab distance
+    mLineNumberArea = new LineNumberArea(this);
     mTimer = new QTimer;
     mLcpp = new LexerCPP();
     mTimer = new QTimer;
@@ -48,10 +44,14 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     //This signal is emitted when the text document needs an update of the specified rect.
     //If the text is scrolled, rect will cover the entire viewport area.
     //If the text is scrolled vertically, dy carries the amount of pixels the viewport was scrolled.
+
     connect(this,  SIGNAL(updateRequest(QRect,int)), this, SLOT(updateLineNumberArea(QRect,int)));
-    connect(this,  SIGNAL(cursorPositionChanged()), this, SLOT(runLexerAndHighlight()));
+    connect(this,  SIGNAL(cursorPositionChanged()), this, SLOT(runLexer()));
     connect(mTimer, SIGNAL(timeout()), this, SLOT(saveStateInTheHistory()));
     connect(this,  SIGNAL(textChanged()), this, SLOT(changesAppeared()));
+    connect(this,  SIGNAL(cursorPositionChanged()), this, SLOT(highlighText()));
+
+    //connect(this,  SIGNAL(sendLexem(QString)), this, SLOT(/*SLOT Igorya*/));;
 
     mTimer->start(CHANGE_SAVE_TIME);//save text by this time
 
@@ -65,15 +65,19 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     mFont.setBold(false);
     mFont.setItalic(false);
     this->setFont(mFont);
+
+    //set text highlighting color
+    fmtLiteral.setForeground(mConfigParam.mStringsColor);
+    fmtKeyword.setForeground(mConfigParam.mBasicLiteralsColor);
+    fmtComment.setForeground(mConfigParam.mCommentColor);
+    fmtRegular.setForeground(mConfigParam.mCodeTextColor);
 }
 
-void CodeEditor::runLexerAndHighlight()
+void CodeEditor::runLexer()
 {
-    //run lexer
     mLcpp->clear();
     mLcpp->lexicalAnalysis(document()->toPlainText());
     mTokens = mLcpp->getTokens();
-
 }
 
 int CodeEditor::getLineNumberAreaWidth()
@@ -132,6 +136,16 @@ void CodeEditor::zoom(int val)
     setViewportMargins(getLineNumberAreaWidth(), 0, 0, 0);// reset text margin in accordance to linecouter change
 }
 
+bool CodeEditor::isChanged()
+{
+    return mBeginTextState != this->toPlainText();
+}
+
+void CodeEditor::setBeginTextState()
+{
+    mBeginTextState = this->toPlainText();
+}
+
 void CodeEditor::updateLineNumberAreaWidth()
 {
     // reset start position for typing (according new linecounter position)
@@ -142,11 +156,11 @@ void CodeEditor::updateLineNumberArea(const QRect &rect, int dy)// rectangle of 
 {
     if(dy)// when not all of the text is in the visible area (we scrolled it)
     {
-        lineNumberArea->scroll(0, dy);// we should scroll lines numbers in following direction
+        mLineNumberArea->scroll(0, dy);// we should scroll lines numbers in following direction
     }
     else
     {
-        lineNumberArea->update(0, 0, lineNumberArea->width(), rect.height());//set position to the new block (area for line number)
+        mLineNumberArea->update(0, 0, mLineNumberArea->width(), rect.height());//set position to the new block (area for line number)
     }
     if(rect.contains(viewport()->rect()))//when one covers other (text is under line counter)
         updateLineNumberAreaWidth();
@@ -156,12 +170,12 @@ void CodeEditor::resizeEvent(QResizeEvent *e)
 {
     QPlainTextEdit::resizeEvent(e);
     QRect cr = contentsRect();//whole area inside widget's margins
-    lineNumberArea->setGeometry(QRect(0, 0, getLineNumberAreaWidth(), cr.height()));//set the same height as codeEditor for lineCouter
+    mLineNumberArea->setGeometry(QRect(0, 0, getLineNumberAreaWidth(), cr.height()));//set the same height as codeEditor for lineCouter
 }
 
 void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event)
 {
-    QPainter painter(lineNumberArea);
+    QPainter painter(mLineNumberArea);
     painter.fillRect(event->rect(), mConfigParam.mLineCounterAreaColor);
 
     QTextBlock block = firstVisibleBlock();//area of first numeration block from linecounter
@@ -173,7 +187,7 @@ void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event)
     {
         QString number = QString::number(blockNumber + 1);
         painter.setPen(mConfigParam.mCodeTextColor);
-        painter.drawText(0, top, lineNumberArea->width(), fontMetrics().height(),//draw line count
+        painter.drawText(0, top, mLineNumberArea->width(), fontMetrics().height(),//draw line count
                          Qt::AlignCenter, number);
         block = block.next();
         int temp = top;//save current top position
@@ -241,5 +255,59 @@ void CodeEditor::mouseMoveEvent(QMouseEvent *event)
 
 void CodeEditor::closeEvent(QCloseEvent *event)
 {
-    //to do
+    if (!isChanged())
+    {
+        event->accept();
+        return;
+    }
+    QMessageBox::StandardButton reply = QMessageBox::question
+            (this,
+             "Saving Changes",
+             "Do you want to save changes to opened documents?",
+             QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+
+    // if user closes dialog event is ignored
+    if (reply == QMessageBox::Cancel)
+    {
+        event->ignore();
+        return;
+    }
+    // if document wasn't modified of user doesn't want to save changes
+    if (reply == QMessageBox::No)
+    {
+        event->accept();
+        return;
+    }
+    // saving document
+    emit closeDocEventOccured(this);
+}
+
+void formating(QTextCharFormat fmt,QTextCursor cursor,Token  token)
+{
+    cursor.setPosition(token.mBegin, QTextCursor::MoveAnchor);
+    cursor.setPosition(token.mEnd, QTextCursor::KeepAnchor);
+    cursor.setCharFormat(fmt);
+}
+
+void CodeEditor::highlighText()
+{
+    QTextCursor cursor = textCursor();
+    for(const auto &i: mTokens)
+    {
+        switch(i.mType)
+        {
+        case(State::KW):
+            formating(fmtKeyword, cursor, i);
+            break;
+        case(State::LIT):
+            formating(fmtLiteral, cursor, i);
+            break;
+        case(State::COM):
+            formating(fmtComment, cursor, i);
+            break;
+        default:
+            formating(fmtRegular, cursor, i);
+            break;
+        }
+    }
 }

@@ -1,10 +1,12 @@
 #include "logindialog.h"
 
+#include <QApplication>
 #include <QMessageBox>
 #include <QPushButton>
 #include <QBoxLayout>
 #include <QGroupBox>
 #include <QLineEdit>
+#include <QScreen>
 #include <QLabel>
 
 LoginDialog::LoginDialog(QWidget *pParent): QDialog (pParent)
@@ -25,11 +27,11 @@ LoginDialog::LoginDialog(QWidget *pParent): QDialog (pParent)
     // create user name label
     QLabel *pUserNameLbl = new QLabel("User Name");
     // create user name line edit
-    pUserNameLineEdit = new QLineEdit;
-    pUserNameLineEdit->setText("Unnamed");
+    mpUserNameLineEdit = new QLineEdit;
+    mpUserNameLineEdit->setText("Unnamed");
     QHBoxLayout *pEditLayout = new QHBoxLayout;
     pEditLayout->addWidget(pUserNameLbl);
-    pEditLayout->addWidget(pUserNameLineEdit);
+    pEditLayout->addWidget(mpUserNameLineEdit);
 
     // create group box to hold user name label & line edit
     QGroupBox *pLoginBox = new QGroupBox("Login");
@@ -54,13 +56,15 @@ LoginDialog::LoginDialog(QWidget *pParent): QDialog (pParent)
     pWdwLayout->addLayout(pButtonsLayout);
     setLayout(pWdwLayout);
 
-    // specifying initial dialog size
-    setGeometry(geometry().x(), geometry().y(), 400, 200);
+    // receive current screen geometry
+    QScreen *screen = qApp->screens().at(0);
+    QRect screenGeometry = screen->geometry();
 
-    // centring dialog
-    QPoint cntr = pParent->geometry().center();
-    int x = cntr.x() - width() / 2;
-    int y = cntr.y() - height() / 2;
+    // resizing & centring dialog
+    resize(screenGeometry.width() / 3,
+           screenGeometry.height() / 3);
+    int x = screenGeometry.center().x() - width() / 2;
+    int y = screenGeometry.center().y() - height() / 2;
     move(x, y);
 }
 
@@ -68,17 +72,17 @@ QString LoginDialog::start()
 {
     exec();
     // return user name
-    return userName;
+    return mUserName;
 }
 
 void LoginDialog::onOkButtonClicked()
 {
     // check if user left empty edit line
-    if(pUserNameLineEdit->text().isEmpty())
+    if (mpUserNameLineEdit->text().isEmpty())
     {
         QMessageBox::warning(this, "User Name Input", "Please enter user name to proceed");
         return;
     }
-    userName = pUserNameLineEdit->text();
+    mUserName = mpUserNameLineEdit->text();
     accept();
 }

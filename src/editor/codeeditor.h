@@ -47,6 +47,8 @@ public:
     void undo();
     void redo();
     void zoom(int val);
+    bool isChanged();
+    void setBeginTextState();
 
 protected:
     void resizeEvent(QResizeEvent *event)override;
@@ -56,30 +58,38 @@ protected:
 private slots:
     void updateLineNumberAreaWidth();
     void updateLineNumberArea(const QRect &rect, int dy);
-    void runLexerAndHighlight();
+    void runLexer();
+    void highlighText();
 
 public slots:
     void keyPressEvent(QKeyEvent *e) override;
-    void autotab();
     void saveStateInTheHistory();
 
 signals:
     void changesAppeared();
+    void sendLexem(QString);
+    void closeDocEventOccured(CodeEditor*);
 
 private:
-   QWidget *lineNumberArea;
-   ConfigParams mConfigParam;
-   int mCurrentZoom;
-   QFont mFont;
-   QVector<Token> mTokens;
-   LexerCPP *mLcpp;
-   QString mFileName;
-   ChangeManager *mChangeManager;
-   QTimer *mTimer;
-   LexerCPP mLexer;
-   AddCommentButton *mAddCommentButton;
-   QLabel *mCurrentCommentLable;
-   int mLinesCount;
+    QWidget *mLineNumberArea;
+    ConfigParams mConfigParam;
+    int mCurrentZoom;
+    QFont mFont;
+    QVector<Token> mTokens;
+    LexerCPP *mLcpp;
+    QString mFileName;
+    ChangeManager *mChangeManager;
+    QTimer *mTimer;
+    LexerCPP mLexer;
+    AddCommentButton *mAddCommentButton;
+    QLabel *mCurrentCommentLable;
+    int mLinesCount;
+    QString mBeginTextState;
+
+    QTextCharFormat fmtLiteral;
+    QTextCharFormat fmtComment;
+    QTextCharFormat fmtKeyword;
+    QTextCharFormat fmtRegular;
 
 public:
   static bool ispressSlesh;
@@ -91,6 +101,9 @@ public:
    void eventShiftEnter(QKeyEvent *e);
 
    friend class Event;
+
+
+
 
 
 };

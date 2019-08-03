@@ -32,7 +32,7 @@ void Event::plainTextPressEvent(CodeEditor *codeEditor, QKeyEvent *e)
     codeEditor->QPlainTextEdit::keyPressEvent(e);
 }
 
-void Event::autotab()
+/*void Event::autotab()
 {
     QString text(this->document()->toRawText());
     int lbrackets = 0;
@@ -53,3 +53,4 @@ void Event::autotab()
       tabs.append("\t");
     }
 }
+*/
