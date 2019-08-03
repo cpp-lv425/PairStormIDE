@@ -58,19 +58,19 @@ Event* EventBuilder::getEventControlModifier(QKeyEvent *e)
         return new EventSaveChangeInHistory();
     default:
         return new EventDefault();
+    }
 }
-
 Event *EventBuilder::getEventKeyboardModifier(QKeyEvent *e)
 {
-    if(e->key() == Qt::Key_Slash)
+    switch(e->key())
     {
+    case Qt::Key_Slash:
         return new EventSlash();
-    }
-    if(e->key() == Qt::Key_Asterisk)
-    {
+    case Qt::Key_Asterisk:
         return new EventAsterisk();
+    default:
+        return new EventDefault();
     }
-    return new EventDefault();
 }
 
 Event *EventBuilder::getEvent(QKeyEvent *e)
