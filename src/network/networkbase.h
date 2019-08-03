@@ -33,8 +33,8 @@ typedef qint64  SizeType;
 const PortNumType gDefaultTcpPortNumber    = 36108;
 const PortNumType gDefaultUdpPortNumber    = 32807;
 
-const SizeType    gDefaultConnTimeoutMs    = 900;
-const SizeType    gDefaultBroadcastCycleMs = 500;
+const SizeType    gDefaultConnTimeoutMs    = 1100;
+const SizeType    gDefaultBroadcastCycleMs = 100;
 const SizeType    gDefaultOutdatingCycleMs = 2000;
 
 
