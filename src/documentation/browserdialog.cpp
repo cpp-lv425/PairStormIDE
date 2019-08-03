@@ -30,31 +30,30 @@ BrowserDialog::BrowserDialog(QWidget *parent) :
 BrowserDialog::~BrowserDialog()
 {
     delete ui;
-    delete mConnectionManager;
-    for(auto &a : ui->mMDIArea->subWindowList())
-    {
-        delete a;
-    }
-    qDebug()<<"Delete browser";
+//    for(auto &a : ui->mMDIArea->subWindowList())
+//    {
+//        delete a;
+//    }
+//    qDebug()<<"Delete browser";
 
-    bool result;
-    QDir dir = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
+//    bool result;
+//    QDir dir = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
 
-    result = dir.cd("PairStorm");
-    result = dir.cd("temp");
+//    result = dir.cd("PairStorm");
+//    result = dir.cd("temp");
 
-    if(!result)
-    {
-        return;
-    }
+//    if(!result)
+//    {
+//        return;
+//    }
 
-    dir.setNameFilters(QStringList() << "*.html");
-    dir.setFilter(QDir::Files);
+//    dir.setNameFilters(QStringList() << "*.html");
+//    dir.setFilter(QDir::Files);
 
-    foreach(QString dirFile, dir.entryList())
-    {
-        dir.remove(dirFile);
-    }
+//    foreach(QString dirFile, dir.entryList())
+//    {
+//        dir.remove(dirFile);
+//    }
 }
 
 void BrowserDialog::createNewTab(const QString &keyword)
