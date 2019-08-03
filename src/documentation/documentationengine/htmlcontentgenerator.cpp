@@ -5,6 +5,8 @@
 #include <QUrl>
 #include <QDir>
 
+#include "documentationsearch.h"
+
 static std::string mustasheTemplate{R"(<!DOCTYPE html>
                                     <html>
                                         <head>
@@ -115,7 +117,7 @@ std::string HTMLContentGenerator::generate(const QVector<QFileInfo> &files)
         // File Name
         QString filename = files.at(fileIndex).dir().dirName()+ "/" + files.at(fileIndex).fileName();
         dirEntryMustashe.set("fileName", filename.toStdString());
-        QUrl url{QUrl::fromLocalFile(files.at(fileIndex).filePath())};
+        QUrl url{DocumentationSearch::getUrl(files.at(fileIndex))};
         dirEntryMustashe.set("fileIndex", url.toString().toStdString());
         dirEntryMustashe.set("search", files.at(fileIndex).baseName().toStdString());
 

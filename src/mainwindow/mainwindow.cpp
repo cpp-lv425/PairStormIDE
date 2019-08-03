@@ -16,6 +16,7 @@
 #include "bottompaneldock.h"
 #include "chatwindowdock.h"
 #include "newfilewizard.h"
+#include "browserdialog.h"
 #include "usermessages.h"
 #include "logindialog.h"
 #include "filemanager.h"
@@ -60,10 +61,9 @@ MainWindow::MainWindow(QWidget *parent) :
     setCentralWidget(mpDocsArea);
 
     //create instance of documentation browser
-    mDocumentationBrowser = new Browser;
-    mDocumentationBrowser->hide();
+    //mDocumentationBrowser->hide();
 
-    connect(mDocumentationBrowser,&Browser::destroyed,this,&MainWindow::createNewBrowser);
+// connect(mDocumentationBrowser,&Browser::close,this,&MainWindow::createNewBrowser);
     // create instance of Project Viewer
     createProjectViewer();
 
@@ -690,8 +690,10 @@ void MainWindow::onAboutTriggered()
 
 void MainWindow::onReferenceTriggered()
 {
-    mDocumentationBrowser->emptyDocumentationTab();
-    mDocumentationBrowser->show();
+    BrowserDialog browser;
+    browser.emptyDocumentationTab();
+    browser.show();
+    browser.exec();
 }
 
 void MainWindow::onUserGuideTriggered()

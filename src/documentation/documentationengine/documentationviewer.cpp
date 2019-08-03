@@ -130,15 +130,15 @@ void DocumentationViewer::linkHovered(const QString &url)
 
 void DocumentationViewer::onHistoryTriggered()
 {
-    qDebug()<<"Ok";
+    qDebug()<<"History";
 }
 
 void DocumentationViewer::onHelpTrigerred()
 {
-    qDebug()<<"Ok";
+    qDebug()<<"Help";
 }
 
 void DocumentationViewer::onExitTrigerred()
 {
-    qDebug()<<"Ok";
+    qDebug()<<"Exit";
 }

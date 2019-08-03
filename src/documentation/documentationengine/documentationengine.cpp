@@ -12,28 +12,27 @@ DocumentationEngine::DocumentationEngine(QObject *parent)
 
 void DocumentationEngine::searchByKeyword(const QString &keyword)
 {
-    mDocumentationLinks.clear();
+    mDocumentationFiles.clear();
     bool result{false};
     QDir documentation{DocumentationSearch::documentationDirectory(result)};
     if(result)
     {
-        mDocumentationLinks = DocumentationSearch::search(documentation,keyword);
+        mDocumentationFiles = DocumentationSearch::search(documentation,keyword);
     }
-
 }
 
 void DocumentationEngine::searchByLibraryAndFunction(const QString &include, const QString &function)
 {
-    mDocumentationLinks.clear();
+    mDocumentationFiles.clear();
     bool result{false};
     QDir documentation{DocumentationSearch::documentationDirectory(result)};
     if(result)
     {
-        mDocumentationLinks = DocumentationSearch::search(documentation,include,function);
+        mDocumentationFiles = DocumentationSearch::search(documentation,include,function);
     }
 }
 
-QVector<QFileInfo> DocumentationEngine::documentationLinks() const
+QVector<QFileInfo> DocumentationEngine::documentationFiles() const
 {
-    return mDocumentationLinks;
+    return mDocumentationFiles;
 }

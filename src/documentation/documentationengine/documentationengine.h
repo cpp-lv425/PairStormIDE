@@ -12,10 +12,10 @@ public:
     void searchByKeyword(const QString &keyword);
     void searchByLibraryAndFunction(const QString &include, const QString &function);
 
-    QVector<QFileInfo> documentationLinks() const;
+    QVector<QFileInfo> documentationFiles() const;
 
 private:
-    QVector<QFileInfo> mDocumentationLinks;
+    QVector<QFileInfo> mDocumentationFiles;
 };
 
 #endif // DOCUMENTATIONENGINE_H

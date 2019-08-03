@@ -1,4 +1,5 @@
-#include "browser.h"
+#include "browserdialog.h"
+#include "ui_browserdialog.h"
 
 #include <QDir>
 #include <QSizePolicy>
@@ -14,21 +15,24 @@
 #include "documentationviewer.h"
 #include "htmlcontentgenerator.h"
 
-Browser::Browser(QWidget *parent) : QMainWindow (parent)
+BrowserDialog::BrowserDialog(QWidget *parent) :
+    QDialog(parent),
+    ui(new Ui::BrowserDialog)
 {
+    ui->setupUi(this);
+
     mConnectionManager = new ConnectionManager(this);
     mDocumentationEngine = new DocumentationEngine(this);
-    mBrowseArea = new MDIArea;
-    mBrowseArea->setViewMode(QMdiArea::ViewMode::TabbedView);
-    setCentralWidget(mBrowseArea);
+    ui->mMDIArea->setViewMode(QMdiArea::ViewMode::TabbedView);
+
 }
 
-Browser::~Browser()
+BrowserDialog::~BrowserDialog()
 {
+    delete ui;
     delete mConnectionManager;
     delete mDocumentationEngine;
-    delete mBrowseArea;
-    for(auto &a : mBrowseArea->subWindowList())
+    for(auto &a : ui->mMDIArea->subWindowList())
     {
         delete a;
     }
@@ -54,7 +58,7 @@ Browser::~Browser()
     }
 }
 
-void Browser::newTab(const QString &keyword)
+void BrowserDialog::newTab(const QString &keyword)
 {
     DocumentationViewer *newWindow = new DocumentationViewer(this);
 
@@ -104,14 +108,14 @@ void Browser::newTab(const QString &keyword)
             }
         }
     }
-    mBrowseArea->addSubWindow(newWindow);
+    ui->mMDIArea->addSubWindow(newWindow);
     newWindow->setAttribute(Qt::WA_DeleteOnClose);
 
 }
 
-void Browser::emptyDocumentationTab()
+void BrowserDialog::emptyDocumentationTab()
 {
-    DocumentationViewer *newWindow = new DocumentationViewer(mBrowseArea);
+    DocumentationViewer *newWindow = new DocumentationViewer(this);
     bool isPairStormExist;
     QDir dir = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
 
@@ -131,7 +135,7 @@ void Browser::emptyDocumentationTab()
     }
 
     qDebug()<<"HERE";
-    auto temp = mBrowseArea->addSubWindow(newWindow);
+    auto temp = ui->mMDIArea->addSubWindow(newWindow);
     temp->setWindowState(Qt::WindowState::WindowMaximized);
     newWindow->setAttribute(Qt::WA_DeleteOnClose);
 }
