@@ -35,7 +35,7 @@ const PortNumType gDefaultUdpPortNumber    = 32807;
 
 const SizeType    gDefaultConnTimeoutMs    = 900;
 const SizeType    gDefaultBroadcastCycleMs = 500;
-const SizeType    gDefaultOutdatingCycleMs = 1200;
+const SizeType    gDefaultOutdatingCycleMs = 2000;
 
 
 struct ServerData
