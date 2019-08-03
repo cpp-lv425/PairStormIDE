@@ -61,7 +61,8 @@ void BrowserDialog::createNewTab(const QString &keyword)
 {
     DocumentationViewer *newWindow = new DocumentationViewer(this);
     newWindow->loadReferenceDocumentation(keyword);
-    ui->mMDIArea->addSubWindow(newWindow);
+    auto temp = ui->mMDIArea->addSubWindow(newWindow);
+    temp->setWindowState(Qt::WindowState::WindowMaximized);
     newWindow->setAttribute(Qt::WA_DeleteOnClose);
 
 }

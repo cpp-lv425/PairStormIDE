@@ -15,7 +15,6 @@ class BottomPanelDock;
 class QListWidgetItem;
 class ChatWindowDock;
 class QMdiSubWindow;
-class QDockWidget;
 class CodeEditor;
 class Browser;
 class MDIArea;
@@ -44,7 +43,6 @@ private:
     void saveDocument(CodeEditor *pDoc, const QString &fileName);
     void openDoc(QString fileName);
     bool isOpened(const QString &fileName)const;
-    // returns true if any of docs has been modified
     bool isModified(QList<QMdiSubWindow*> &docsList);
     void saveAllModifiedDocuments(QList<QMdiSubWindow*> &docsList);
     void createProjectViewer();
