@@ -2,7 +2,7 @@
 
 QString Event::sTabs="";
 bool Event::sIsSleshPressed=false;
-void Event::eventInsertSymbol(CodeEditor* codeEditor, QKeyEvent* e, QString s)
+void Event::eventInsertSymbol(CodeEditor *codeEditor, QKeyEvent *e, QString s)
 {
         plainTextPressEvent(codeEditor, e);
         codeEditor->insertPlainText(s);
@@ -12,14 +12,14 @@ void Event::eventInsertSymbol(CodeEditor* codeEditor, QKeyEvent* e, QString s)
         }
 }
 
-bool Event::isinsidebracket(CodeEditor* codeEditor)
+bool Event::isinsidebracket(CodeEditor *codeEditor)
 {
     QTextCursor cursor = codeEditor->textCursor();
-    if(cursor.position()!=codeEditor->document()->toPlainText().size())
+    if(cursor.position() != codeEditor->document()->toPlainText().size())
     {
         cursor.movePosition(QTextCursor::PreviousCharacter);
         int currentpos = cursor.position();
-        QString prev =codeEditor->document()->toPlainText().at(currentpos);
+        QString prev = codeEditor->document()->toPlainText().at(currentpos);
         cursor.movePosition(QTextCursor::NextCharacter);
         currentpos = cursor.position();
         QString next = codeEditor->document()->toPlainText().at(currentpos);
@@ -31,12 +31,12 @@ bool Event::isinsidebracket(CodeEditor* codeEditor)
     return false;
 }
 
-void Event::plainTextPressEvent(CodeEditor* codeEditor, QKeyEvent* e)
+void Event::plainTextPressEvent(CodeEditor *codeEditor, QKeyEvent *e)
 {
     codeEditor->QPlainTextEdit::keyPressEvent(e);
 }
 
-void Event::autotab(CodeEditor* code)
+void Event::autotab(CodeEditor *code)
 {
     QString text(code->document()->toRawText());
     int lbrackets = 0;
