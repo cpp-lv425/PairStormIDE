@@ -14,6 +14,7 @@
 #include <QStandardPaths>
 #include <QWebEngineHistory>
 
+#include "urlglobal.h"
 #include "connectionmanager.h"
 #include "documentationengine.h"
 #include "documentationsearch.h"
@@ -102,7 +103,7 @@ void DocumentationViewer::loadReferenceDocumentation()
 
     if(mConnectionManager->hasConnection())
     {
-        mWebView->load(QUrl("https://en.cppreference.com/w/"));
+        mWebView->load(ReferenceUrl::reference));
     }
     else
     {
@@ -124,7 +125,7 @@ void DocumentationViewer::loadReferenceDocumentation(const QString &keyword)
     {
         if(mConnectionManager->hasConnection())
         {
-            mWebView->load(QUrl("https://en.cppreference.com/w/"));
+            mWebView->load(ReferenceUrl::reference);
         }
     }
     else
@@ -149,7 +150,7 @@ void DocumentationViewer::loadReferenceDocumentation(const QString &keyword)
         {
             if(mConnectionManager->hasConnection())
             {
-                webView()->load(QUrl("https://en.cppreference.com/w/"));
+                webView()->load(ReferenceUrl::reference);
             }
             else
             {
@@ -179,7 +180,7 @@ void DocumentationViewer::urlRequested()
     }
     else
     {
-        mWebView->load(QUrl("http://www.google.com"));
+        mWebView->load(ReferenceUrl::google);
     }
 }
 

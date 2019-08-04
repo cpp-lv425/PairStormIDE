@@ -8,7 +8,8 @@ HEADERS += \
     $$PWD/documentationviewer.h \
     $$PWD/htmlcontentgenerator.h \
     $$PWD/mustache.hpp \
-    $$PWD/catch.hpp
+    $$PWD/catch.hpp \
+    $$PWD/urlglobal.h
 
 SOURCES += \
     $$PWD/connectionmanager.cpp \
