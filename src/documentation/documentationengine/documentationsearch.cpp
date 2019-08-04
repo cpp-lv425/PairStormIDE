@@ -19,13 +19,13 @@ QVector<QFileInfo> DocumentationSearch::search(const QDir &directory, const QStr
     return rResult;
 }
 
-QVector<QFileInfo> DocumentationSearch::search(const QDir &directory, const QString &include, const QString &keyword)
+QVector<QFileInfo> DocumentationSearch::search(const QDir &directory, const QString &keyword, const QString &library)
 {
     QVector<QFileInfo> rResult;
     QDirIterator it(directory, QDirIterator::Subdirectories);
     while (it.hasNext())
     {
-        if(it.fileInfo().suffix() == "html" && it.fileInfo().baseName()== keyword && it.fileInfo().dir().dirName() == include)
+        if(it.fileInfo().suffix() == "html" && it.fileInfo().baseName()== keyword && it.fileInfo().dir().dirName() == library)
         {
              rResult.push_back(it.fileInfo());
         }
@@ -45,12 +45,5 @@ QDir DocumentationSearch::documentationDirectory(bool &result)
     QDir documentation(documents);
     result = documentation.cd("PairStorm");
     result = documentation.cd("reference");
-    if(result)
-    {
-        return documentation;
-    }
-    else
-    {
-        return QDir::home();
-    }
+    return result ? documentation : QDir::home();
 }
