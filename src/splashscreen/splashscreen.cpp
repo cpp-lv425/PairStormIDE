@@ -6,7 +6,7 @@
 
 SplashScreen::SplashScreen()
 {
-    QPixmap pic(":/img/splash_screen.jpg");
+    QPixmap pic(":/img/SPLASHSCREEN.png");
 
     // get screen size
     QSize size = qApp->screens().at(0)->size();
@@ -17,7 +17,7 @@ SplashScreen::SplashScreen()
 
     showMessage("Group LV-425.C++",
                 Qt::AlignHCenter | Qt::AlignBottom,
-                Qt::white);
+                Qt::red);
 }
 
 void SplashScreen::start()

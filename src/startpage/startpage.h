@@ -43,6 +43,7 @@ private:
                      QPalette &palette);
     void setupButton(QPushButton *pButton,
                      QIcon icon,
+                     int iconDimension,
                      int maxWidth, const QString& text);
 };
 

@@ -2,5 +2,17 @@
     <qresource prefix="/">
         <file>img/app_logo.jpg</file>
         <file>img/splash_screen.jpg</file>
+        <file>img/SPLASHSCREEN.png</file>
+        <file>img/SETTINGS.png</file>
+        <file>img/SAVE.png</file>
+        <file>img/REFERENCEASSISTANT.png</file>
+        <file>img/OPENDIR.png</file>
+        <file>img/EXPDIR.png</file>
+        <file>img/CONNECTED.png</file>
+        <file>img/DIR.png</file>
+        <file>img/LOGO.png</file>
+        <file>img/NEWFILE.png</file>
+        <file>img/OPENFILE.png</file>
+        <file>img/DISCONNECTED.png</file>
     </qresource>
 </RCC>
