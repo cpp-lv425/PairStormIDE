@@ -127,6 +127,10 @@ void LexerCPP::handleStartState(const QChar &sym)
     {
         changeState(State::LIT, sym);
     }
+    else
+    {
+        changeState(State::UNDEF, sym);
+    }
 }
 
 void LexerCPP::handleIdentifierState(const QChar &sym)
@@ -145,7 +149,7 @@ void LexerCPP::handleIdentifierState(const QChar &sym)
     }
     else
     {
-        mState = State::UNDEF;
+        changeState(State::UNDEF, sym);
     }
 }
 
@@ -201,7 +205,7 @@ void LexerCPP::handleFloatNumberState(const QChar &sym)
     }
     else
     {
-        mState = State::UNDEF;
+        changeState(State::UNDEF, sym);
     }
 }
 
@@ -221,13 +225,25 @@ void LexerCPP::handleOperatorState(const QChar &sym)
     }
     else
     {
-        mState = State::UNDEF;
+        changeState(State::UNDEF, sym);
     }
 }
 
 void LexerCPP::handleCommentState(const QChar &sym)
 {
     if((isOneLineComment(mCurrentLexem) && sym == cNextLine) || isBlockComments(mCurrentLexem))
+    {
+        addLexem();
+    }
+    else
+    {
+        mCurrentLexem += sym;
+    }
+}
+
+void LexerCPP::handleUndefinedState(const QChar &sym)
+{
+    if(isLexemEnd(sym))
     {
         addLexem();
     }
@@ -303,7 +319,7 @@ void LexerCPP::lexicalAnalysis(QString code)
             break;
 
         case State::UNDEF:
-            addLexem();
+            handleUndefinedState(sym);
             break;
         }
     }

@@ -67,6 +67,7 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     fmtLiteral.setForeground(Qt::red);
     fmtKeyword.setForeground(Qt::blue);
     fmtComment.setForeground(Qt::green);
+    fmtUndef.setForeground(Qt::darkRed);
     fmtRegular.setForeground(Qt::black);
 }
 
