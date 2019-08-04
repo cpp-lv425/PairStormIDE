@@ -663,7 +663,7 @@ void MainWindow::onAboutTriggered()
 
 void MainWindow::onReferenceTriggered()
 {
-    BrowserDialog browser;
+    BrowserDialog browser(this);
     browser.createEmptyTab();
     browser.show();
     browser.exec();
@@ -681,7 +681,7 @@ void MainWindow::onCheckUpdatesTriggered()
 
 void MainWindow::onReferenceFromEditor(const QString &keyword)
 {
-    BrowserDialog browser;
+    BrowserDialog browser(this);
     browser.createNewTab(keyword);
     browser.show();
     browser.exec();

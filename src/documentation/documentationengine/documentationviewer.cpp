@@ -103,7 +103,7 @@ void DocumentationViewer::loadReferenceDocumentation()
 
     if(mConnectionManager->hasConnection())
     {
-        mWebView->load(ReferenceUrl::reference));
+        mWebView->load(ReferenceUrl::reference);
     }
     else
     {
