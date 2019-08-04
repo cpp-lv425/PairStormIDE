@@ -12,11 +12,11 @@ SplashScreen::SplashScreen()
     QSize size = qApp->screens().at(0)->size();
 
     setPixmap(pic.scaled(size.width() / 2,
-                         size.height() / 2,
+                         static_cast<int>(size.height() * 0.26),
                          Qt::KeepAspectRatio));
 
     showMessage("Group LV-425.C++",
-                Qt::AlignHCenter | Qt::AlignBottom,
+                Qt::AlignRight | Qt::AlignBottom,
                 Qt::red);
 }
 
