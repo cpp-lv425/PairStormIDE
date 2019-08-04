@@ -1,7 +1,5 @@
 <RCC>
     <qresource prefix="/">
-        <file>img/app_logo.jpg</file>
-        <file>img/splash_screen.jpg</file>
         <file>img/SPLASHSCREEN.png</file>
         <file>img/SETTINGS.png</file>
         <file>img/SAVE.png</file>
