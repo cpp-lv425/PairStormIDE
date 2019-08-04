@@ -3,13 +3,13 @@
 #include<QtGui>
 #include<QTextCursor>
 #include<QPainter>
-#include<QFontDatabase>
+#include<QTextCharFormat>
+#include <QFontDatabase>
 #include<QScrollBar>
 #include<QMessageBox>
 #include<iostream>
 #include<QLabel>
-
-#define TAB_SPACE 4
+#include "eventbuilder.h"
 
 CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
 {
@@ -61,10 +61,10 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     this->setFont(mFont);
 
     //set text highlighting color
-    fmtLiteral.setForeground(Qt::red);
-    fmtKeyword.setForeground(Qt::blue);
-    fmtComment.setForeground(Qt::green);
-    fmtRegular.setForeground(Qt::black);
+    fmtLiteral.setForeground(mConfigParam.mStringsColor);
+    fmtKeyword.setForeground(mConfigParam.mBasicLiteralsColor);
+    fmtComment.setForeground(mConfigParam.mCommentColor);
+    fmtRegular.setForeground(mConfigParam.mCodeTextColor);
 }
 
 void CodeEditor::runLexer()
@@ -280,6 +280,13 @@ void CodeEditor::closeEvent(QCloseEvent *event)
     emit closeDocEventOccured(this);
 }
 
+void formating(QTextCharFormat fmt, QTextCursor cursor,  Token token)
+{
+    cursor.setPosition(token.mBegin, QTextCursor::MoveAnchor);
+    cursor.setPosition(token.mEnd, QTextCursor::KeepAnchor);
+    cursor.setCharFormat(fmt);
+}
+
 void CodeEditor::highlighText()
 {
     QTextCursor cursor = textCursor();
@@ -288,31 +295,23 @@ void CodeEditor::highlighText()
         switch(i.mType)
         {
         case(State::KW):
-        {
-            cursor.setPosition(i.mBegin, QTextCursor::MoveAnchor);
-            cursor.setPosition(i.mEnd, QTextCursor::KeepAnchor);
-            cursor.setCharFormat(fmtKeyword);
+            formating(fmtKeyword, cursor, i);
             break;
-        }
         case(State::LIT):
-        {
-            cursor.setPosition(i.mBegin, QTextCursor::MoveAnchor);
-            cursor.setPosition(i.mEnd, QTextCursor::KeepAnchor);
-            cursor.setCharFormat(fmtLiteral);
+            formating(fmtLiteral, cursor, i);
             break;
-        }
         case(State::COM):
-        {
-            cursor.setPosition(i.mBegin, QTextCursor::MoveAnchor);
-            cursor.setPosition(i.mEnd, QTextCursor::KeepAnchor);
-            cursor.setCharFormat(fmtComment);
+            formating(fmtComment, cursor, i);
             break;
-        }
         default:
-            cursor.setPosition(i.mBegin, QTextCursor::MoveAnchor);
-            cursor.setPosition(i.mEnd, QTextCursor::KeepAnchor);
-            cursor.setCharFormat(fmtRegular);
+            formating(fmtRegular, cursor, i);
             break;
         }
     }
+}
+
+void CodeEditor::keyPressEvent(QKeyEvent *e)
+{
+    Event *pressEvent = EventBuilder::getEvent(e);
+    (*pressEvent)(this, e);
 }
