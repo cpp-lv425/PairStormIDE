@@ -13,11 +13,7 @@ SplashScreen::SplashScreen()
 
     setPixmap(pic.scaled(size.width() / 2,
                          static_cast<int>(size.height() * 0.26),
-                         Qt::KeepAspectRatio));
-
-    showMessage("Group LV-425.C++",
-                Qt::AlignRight | Qt::AlignBottom,
-                Qt::red);
+                         Qt::KeepAspectRatio));    
 }
 
 void SplashScreen::start()
