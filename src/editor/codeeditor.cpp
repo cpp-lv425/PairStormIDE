@@ -42,13 +42,10 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     //If the text is scrolled, rect will cover the entire viewport area.
     //If the text is scrolled vertically, dy carries the amount of pixels the viewport was scrolled.
 
-    connect(this,  SIGNAL(updateRequest(QRect,int)), this, SLOT(updateLineNumberArea(QRect,int)));
-    connect(this,  SIGNAL(cursorPositionChanged()), this, SLOT(runLexer()));
-    connect(mTimer, SIGNAL(timeout()), this, SLOT(saveStateInTheHistory()));
-    connect(this,  SIGNAL(textChanged()), this, SLOT(changesAppeared()));
-    connect(this,  SIGNAL(cursorPositionChanged()), this, SLOT(highlighText()));
-
-    //connect(this,  SIGNAL(sendLexem(QString)), this, SLOT(/*SLOT Igorya*/));;
+    connect(this,   SIGNAL(updateRequest(QRect,int)), this, SLOT(updateLineNumberArea(QRect,int)));
+    connect(this,   SIGNAL(cursorPositionChanged()),  this, SLOT(runLexer()));
+    connect(mTimer, SIGNAL(timeout()),                this, SLOT(saveStateInTheHistory()));
+    connect(this,   SIGNAL(cursorPositionChanged()),  this, SLOT(highlighText()));
 
     mTimer->start(CHANGE_SAVE_TIME);//save text by this time
 
@@ -126,13 +123,6 @@ void CodeEditor::redo()
     this->setTextCursor(cursor);
 }
 
-void CodeEditor::zoom(int val)
-{
-    val > 0 ?this->zoomIn(val):this->zoomOut(-val);
-    mCurrentZoom+=val;
-    setViewportMargins(getLineNumberAreaWidth(), 0, 0, 0);// reset text margin in accordance to linecouter change
-}
-
 bool CodeEditor::isChanged()
 {
     return mBeginTextState != this->toPlainText();
@@ -151,7 +141,7 @@ void CodeEditor::updateLineNumberAreaWidth()
 
 void CodeEditor::updateLineNumberArea(const QRect &rect, int dy)// rectangle of current block and Y-Axis changing
 {
-    if(dy)// when not all of the text is in the visible area (we scrolled it)
+    if (dy)// when not all of the text is in the visible area (we scrolled it)
     {
         mLineNumberArea->scroll(0, dy);// we should scroll lines numbers in following direction
     }
@@ -159,7 +149,7 @@ void CodeEditor::updateLineNumberArea(const QRect &rect, int dy)// rectangle of 
     {
         mLineNumberArea->update(0, 0, mLineNumberArea->width(), rect.height());//set position to the new block (area for line number)
     }
-    if(rect.contains(viewport()->rect()))//when one covers other (text is under line counter)
+    if (rect.contains(viewport()->rect()))//when one covers other (text is under line counter)
         updateLineNumberAreaWidth();
 }
 
@@ -201,6 +191,17 @@ void CodeEditor::saveStateInTheHistory()
     mChangeManager->writeChange(newFileState);
 }
 
+void CodeEditor::zoom(int val)
+{
+    val > 0 ?this->zoomIn(val):this->zoomOut(-val);
+    mCurrentZoom+=val;
+}
+
+void CodeEditor::setZoom(int zoomVal)
+{
+    zoom(zoomVal - mCurrentZoom);
+}
+
 void CodeEditor::mouseMoveEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::NoButton)
@@ -220,16 +221,16 @@ void CodeEditor::mouseMoveEvent(QMouseEvent *event)
         int commentAreaRightMargin = this->width() - this->verticalScrollBar()->width() - getLineNumberAreaWidth();
         int commentAreaLeftMargin = commentAreaRightMargin - side;
 
-       if((event->x() >= commentAreaLeftMargin) && (event->x() <= commentAreaRightMargin))//mouse inside comment block
+       if ((event->x() >= commentAreaLeftMargin) && (event->x() <= commentAreaRightMargin))//mouse inside comment block
        {
             int linesFromTheTop = event->y() / side;
             int currLine = linesFromTheTop + currSliderPos + 1;//because first block = 0
             mAddCommentButton->setCurrentLine(currLine);
-            int commentBottonYpos = linesFromTheTop * side;// get Y pos for bottom
 
-            if(currLine <= mLinesCount)// check if the line exists
+            if (currLine <= mLinesCount)// check if the line exists
             {
                 int commentBottonXpos = commentAreaLeftMargin + getLineNumberAreaWidth();
+                int commentBottonYpos = linesFromTheTop * side;
 
                 mAddCommentButton->setGeometry(commentBottonXpos, currSliderPos ? commentBottonYpos :
                                           commentBottonYpos + TOP_UNUSED_PIXELS_HEIGHT , side, side);

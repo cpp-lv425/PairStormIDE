@@ -38,6 +38,7 @@ public:
     bool isChanged();
     void setBeginTextState();
 
+
 protected:
     void resizeEvent(QResizeEvent *event)override;
     virtual void mouseMoveEvent(QMouseEvent *event) override;
@@ -53,11 +54,13 @@ public slots:
     void keyPressEvent(QKeyEvent *e) override;
     void autotab();
     void saveStateInTheHistory();
+    void setZoom(int zoomVal);
 
 signals:
     void changesAppeared();
     void sendLexem(QString);
     void closeDocEventOccured(CodeEditor*);
+
 
 private:
     QWidget *mLineNumberArea;
