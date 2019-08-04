@@ -35,6 +35,8 @@ public:
     void undo();
     void redo();
     void zoom(int val);
+    bool isChanged();
+    void setBeginTextState();
 
 
 protected:
@@ -61,7 +63,7 @@ signals:
 
 
 private:
-    QWidget *lineNumberArea;
+    QWidget *mLineNumberArea;
     ConfigParams mConfigParam;
     int mCurrentZoom;
     QFont mFont;
@@ -74,6 +76,7 @@ private:
     AddCommentButton *mAddCommentButton;
     QLabel *mCurrentCommentLable;
     int mLinesCount;
+    QString mBeginTextState;
 
     QTextCharFormat fmtLiteral;
     QTextCharFormat fmtComment;

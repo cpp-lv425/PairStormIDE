@@ -1,11 +1,20 @@
 #include "splashscreen.h"
 
+#include <QApplication>
+#include <QScreen>
 #include <QThread>
 
 SplashScreen::SplashScreen()
 {
     QPixmap pic(":/img/splash_screen.jpg");
-    setPixmap(pic.scaled(600, 300, Qt::KeepAspectRatio));
+
+    // get screen size
+    QSize size = qApp->screens().at(0)->size();
+
+    setPixmap(pic.scaled(size.width() / 2,
+                         size.height() / 2,
+                         Qt::KeepAspectRatio));
+
     showMessage("Group LV-425.C++",
                 Qt::AlignHCenter | Qt::AlignBottom,
                 Qt::white);

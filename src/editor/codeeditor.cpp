@@ -3,7 +3,7 @@
 #include<QtGui>
 #include<QTextCursor>
 #include<QPainter>
-#include <QFontDatabase>
+#include<QFontDatabase>
 #include<QScrollBar>
 #include<QMessageBox>
 #include<iostream>
@@ -16,7 +16,7 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     setLineWrapMode(QPlainTextEdit::NoWrap);// don't move cursor to the next line where it's out of visible scope
     this->setVerticalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAlwaysOn);
     this->setTabStopDistance(TAB_SPACE * fontMetrics().width(QLatin1Char('0')));//set tab distance
-    mCurrentZoom = 100;//in persents
+    mCurrentZoom = 100;//in persents    
 
     //read settings
     QSettings settings(QApplication::organizationName(), QApplication::applicationName());
@@ -26,7 +26,7 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     mConfigParam.setConfigParams(analizerFontName,analizerFontSize,analizerStyle);
 
     //create objects connected to codeEditor
-    lineNumberArea = new LineNumberArea(this);
+    mLineNumberArea = new LineNumberArea(this);
     mTimer = new QTimer;
     mLcpp = new LexerCPP();
     mTimer = new QTimer;
@@ -69,7 +69,6 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
 
 void CodeEditor::runLexer()
 {
-    //run lexer
     mLcpp->clear();
     mLcpp->lexicalAnalysis(document()->toPlainText());
     mTokens = mLcpp->getTokens();
@@ -124,6 +123,16 @@ void CodeEditor::redo()
     this->setTextCursor(cursor);
 }
 
+bool CodeEditor::isChanged()
+{
+    return mBeginTextState != this->toPlainText();
+}
+
+void CodeEditor::setBeginTextState()
+{
+    mBeginTextState = this->toPlainText();
+}
+
 void CodeEditor::updateLineNumberAreaWidth()
 {
     // reset start position for typing (according new linecounter position)
@@ -134,11 +143,11 @@ void CodeEditor::updateLineNumberArea(const QRect &rect, int dy)// rectangle of 
 {
     if (dy)// when not all of the text is in the visible area (we scrolled it)
     {
-        lineNumberArea->scroll(0, dy);// we should scroll lines numbers in following direction
+        mLineNumberArea->scroll(0, dy);// we should scroll lines numbers in following direction
     }
     else
     {
-        lineNumberArea->update(0, 0, lineNumberArea->width(), rect.height());//set position to the new block (area for line number)
+        mLineNumberArea->update(0, 0, mLineNumberArea->width(), rect.height());//set position to the new block (area for line number)
     }
     if (rect.contains(viewport()->rect()))//when one covers other (text is under line counter)
         updateLineNumberAreaWidth();
@@ -148,12 +157,12 @@ void CodeEditor::resizeEvent(QResizeEvent *e)
 {
     QPlainTextEdit::resizeEvent(e);
     QRect cr = contentsRect();//whole area inside widget's margins
-    lineNumberArea->setGeometry(QRect(0, 0, getLineNumberAreaWidth(), cr.height()));//set the same height as codeEditor for lineCouter
+    mLineNumberArea->setGeometry(QRect(0, 0, getLineNumberAreaWidth(), cr.height()));//set the same height as codeEditor for lineCouter
 }
 
 void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event)
 {
-    QPainter painter(lineNumberArea);
+    QPainter painter(mLineNumberArea);
     painter.fillRect(event->rect(), mConfigParam.mLineCounterAreaColor);
 
     QTextBlock block = firstVisibleBlock();//area of first numeration block from linecounter
@@ -165,7 +174,7 @@ void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event)
     {
         QString number = QString::number(blockNumber + 1);
         painter.setPen(mConfigParam.mCodeTextColor);
-        painter.drawText(0, top, lineNumberArea->width(), fontMetrics().height(),//draw line count
+        painter.drawText(0, top, mLineNumberArea->width(), fontMetrics().height(),//draw line count
                          Qt::AlignCenter, number);
         block = block.next();
         int temp = top;//save current top position
@@ -244,12 +253,11 @@ void CodeEditor::mouseMoveEvent(QMouseEvent *event)
 
 void CodeEditor::closeEvent(QCloseEvent *event)
 {
-    if (!document()->isModified())
+    if (!isChanged())
     {
         event->accept();
         return;
     }
-
     QMessageBox::StandardButton reply = QMessageBox::question
             (this,
              "Saving Changes",
