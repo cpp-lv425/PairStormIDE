@@ -6,7 +6,9 @@ Event *EventBuilder::getEventNoModifier(QKeyEvent *e)
     {
     case Qt::Key_BracketLeft:
         return new EventBracketLeft();
-    case (Qt::Key_Enter | Qt::Key_Return):
+    case Qt::Key_Enter:
+        return new EventEnter();
+    case Qt::Key_Return:
         return new EventEnter();
     case Qt::Key_Apostrophe:
         return new EventApostrophe();
@@ -29,9 +31,11 @@ Event *EventBuilder::getEventShiftModifier(QKeyEvent *e)
         return new EventQouteDbl();
     case Qt::Key_Asterisk:
         return new EventAsterisk();
-    case (Qt::Key_Enter | Qt::Key_Return):
+    case Qt::Key_Enter:
         return new EventShiftEnter();
-    case (Qt::Key_Space | Qt::Key_Return):
+    case Qt::Key_Return:
+        return new EventShiftEnter();
+    case Qt::Key_Space:
         return new EventSaveChangeInHistory();
     default:
         return new EventDefault();

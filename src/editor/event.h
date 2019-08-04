@@ -9,7 +9,7 @@ public:
 
 protected:
     void eventInsertSymbol(CodeEditor *codeEditor, QKeyEvent *e, QString s);
-    bool isinsidebracket(CodeEditor *codeEditor);
+    bool IsInsideBracket(CodeEditor *codeEditor);
     void plainTextPressEvent(CodeEditor *codeEditor, QKeyEvent *e);
     int editorCurrentZoom(CodeEditor *codeEditor);
     QVector<Token> editorTokens(CodeEditor *codeEditor);

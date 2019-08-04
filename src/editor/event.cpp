@@ -12,7 +12,7 @@ void Event::eventInsertSymbol(CodeEditor *codeEditor, QKeyEvent *e, QString s)
         }
 }
 
-bool Event::isinsidebracket(CodeEditor *codeEditor)
+bool Event::IsInsideBracket(CodeEditor *codeEditor)
 {
     QTextCursor cursor = codeEditor->textCursor();
     if(cursor.position() != codeEditor->document()->toPlainText().size())

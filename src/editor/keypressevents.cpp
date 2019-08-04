@@ -53,19 +53,20 @@ EventShiftEnter::~EventShiftEnter() = default;
 //EventEnter
 void EventEnter::operator()(CodeEditor *codeEditor, QKeyEvent *e)
 {
-    if (isinsidebracket(codeEditor))
+    codeEditor->saveStateInTheHistory();
+    if (IsInsideBracket(codeEditor))
     {
         codeEditor->insertPlainText("\n\n");
-        emit autotab(codeEditor);
+        autotab(codeEditor);
         sTabs.resize(sTabs.size()-1);
         codeEditor->insertPlainText(sTabs);
         codeEditor->moveCursor(QTextCursor::Up);
-        emit autotab(codeEditor);
+        autotab(codeEditor);
         codeEditor->insertPlainText(sTabs);
         return;
     }
     plainTextPressEvent(codeEditor,e);
-    emit autotab(codeEditor);
+    autotab(codeEditor);
     codeEditor->insertPlainText(sTabs);
 }
 EventEnter::~EventEnter() = default;
@@ -73,7 +74,6 @@ EventEnter::~EventEnter() = default;
 //EventCtrlPlus
 void EventCtrlPlus::operator()(CodeEditor *codeEditor, QKeyEvent *e)
 {
-    codeEditor->saveStateInTheHistory();
     if (editorCurrentZoom(codeEditor) <= 150)
     {
             codeEditor->zoom(1);
@@ -134,7 +134,7 @@ void EventSendLexem::operator()(CodeEditor * codeEditor, QKeyEvent *e)
 {
     QTextCursor cursor = codeEditor->textCursor();
     int position = cursor.position();
-    for (auto &it: editorTokens(codeEditor))
+    for (const auto &it: editorTokens(codeEditor))
     {
         if (it.mType == State::KW && it.mBegin <= position && it.mEnd >= position)
         {
