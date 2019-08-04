@@ -67,7 +67,8 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     fmtLiteral.setForeground(Qt::red);
     fmtKeyword.setForeground(Qt::blue);
     fmtComment.setForeground(Qt::green);
-    fmtUndef.setForeground(Qt::darkRed);
+    fmtUndefined.setUnderlineStyle(QTextCharFormat::WaveUnderline);
+    fmtUndefined.setUnderlineColor(Qt::red);
     fmtRegular.setForeground(Qt::black);
 }
 
@@ -306,6 +307,13 @@ void CodeEditor::highlighText()
             cursor.setPosition(i.mBegin, QTextCursor::MoveAnchor);
             cursor.setPosition(i.mEnd, QTextCursor::KeepAnchor);
             cursor.setCharFormat(fmtComment);
+            break;
+        }
+        case(State::UNDEF):
+        {
+            cursor.setPosition(1, QTextCursor::MoveAnchor);
+            cursor.setPosition(1, QTextCursor::KeepAnchor);
+            cursor.setCharFormat(fmtUndefined);
             break;
         }
         default:
