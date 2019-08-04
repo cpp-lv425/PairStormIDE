@@ -15,6 +15,8 @@ StartPage::StartPage(QWidget *parent) :
     setWindowTitle("Start Page");
 
     const int maxButtonsWidth = 200;
+    const int iconDimension = 32;
+
     QFont lblFont("Segoe UI", 10);
     lblFont.setBold(true);
 
@@ -24,15 +26,17 @@ StartPage::StartPage(QWidget *parent) :
     // creating & configuring new file button
     mpNewBtn = new QPushButton;
     setupButton(mpNewBtn,
-                style()->standardIcon(QStyle::SP_FileIcon),
+                QIcon(":/img/NEWFILE.png"),
+                iconDimension,
                 maxButtonsWidth,
                 "New File");
     connect(mpNewBtn, &QPushButton::pressed, this, &StartPage::newBtnPressed);
 
     // creating & configuring open file button
     mpOpenBtn = new QPushButton;
-    setupButton(mpOpenBtn, style()->standardIcon
-                (QStyle::SP_DialogOpenButton),
+    setupButton(mpOpenBtn,
+                QIcon(":/img/OPENFILE.png"),
+                iconDimension,
                 maxButtonsWidth,
                 "Open File");
     connect(mpOpenBtn, &QPushButton::pressed, this, &StartPage::openBtnPressed);
@@ -40,7 +44,8 @@ StartPage::StartPage(QWidget *parent) :
     // creating & configuring open folder button
     mpOpenDirBtn = new QPushButton;
     setupButton(mpOpenDirBtn,
-                style()->standardIcon(QStyle::SP_DriveHDIcon),
+                QIcon(":/img/OPENDIR.png"),
+                iconDimension,
                 maxButtonsWidth,
                 "Open Folder");
     connect(mpOpenDirBtn, &QPushButton::pressed, this, &StartPage::openDirPressed);
@@ -48,7 +53,8 @@ StartPage::StartPage(QWidget *parent) :
     // creating & configuring settings call button
     mpSettingsBtn = new QPushButton;
     setupButton(mpSettingsBtn,
-                style()->standardIcon(QStyle::SP_BrowserReload),
+                QIcon(":/img/SETTINGS.png"),
+                iconDimension,
                 maxButtonsWidth,
                 "Settings");
     connect(mpSettingsBtn, &QPushButton::pressed, this, &StartPage::settingsBtnPressed);
@@ -105,10 +111,11 @@ void StartPage::showStartPage()
 }
 
 void StartPage::setupButton(QPushButton *pButton,
-                            QIcon icon,
+                            QIcon icon, int iconDimension,
                             int maxWidth, const QString &text)
 {
     pButton->setIcon(icon);
+    pButton->setIconSize(QSize(iconDimension,iconDimension));
     pButton->setMaximumWidth(maxWidth);
     pButton->setSizePolicy(QSizePolicy::Expanding,
                            QSizePolicy::Expanding);

@@ -46,7 +46,7 @@ MainWindow::MainWindow(QWidget *parent) :
     setWindowState(Qt::WindowMaximized);
 
     // set icon
-    setWindowIcon(QIcon(":/img/app_logo.jpg"));
+    setWindowIcon(QIcon(":/img/LOGO.png"));
 
     setWindowTitle("PairStorm");
 
@@ -97,14 +97,14 @@ void MainWindow::setupMainMenu()
 
     // working with files
     QAction *pNewFileAction = fileMenu->addAction("&New file", this, &MainWindow::onNewFileTriggered, Qt::CTRL + Qt::Key_N);
-    pNewFileAction->setIcon(style()->standardIcon(QStyle::SP_FileIcon));
+    pNewFileAction->setIcon(QIcon(":/img/NEWFILE.png"));
     pToolbar->addAction(pNewFileAction);
 
     QAction *pOpenFileAction = fileMenu->addAction("&Open file...", this, &MainWindow::onOpenFileTriggered, Qt::CTRL + Qt::Key_O);
-    pOpenFileAction->setIcon(style()->standardIcon(QStyle::SP_DialogOpenButton));
+    pOpenFileAction->setIcon(QIcon(":/img/OPENFILE.png"));
     pToolbar->addAction(pOpenFileAction);
     QAction *pOpenFolderAction = fileMenu->addAction("Open &folder...", this, &MainWindow::onOpenFolderTriggered);
-    pOpenFolderAction->setIcon(style()->standardIcon(QStyle::SP_DirHomeIcon));
+    pOpenFolderAction->setIcon(QIcon(":/img/OPENDIR.png"));
     pToolbar->addAction(pOpenFolderAction);
     fileMenu->addSeparator();
 
@@ -114,7 +114,7 @@ void MainWindow::setupMainMenu()
 
     // saving files
     QAction *pSaveAction = fileMenu->addAction("&Save...", this, &MainWindow::onSaveFileTriggered, Qt::CTRL + Qt::Key_S);
-    pSaveAction->setIcon(style()->standardIcon(QStyle::SP_DialogSaveButton));
+    pSaveAction->setIcon(QIcon(":/img/SAVE.png"));
     pToolbar->addAction(pSaveAction);
     fileMenu->addAction("Save &As...", this, &MainWindow::onSaveFileAsTriggered);
     fileMenu->addAction("Save A&ll...", this, &MainWindow::onSaveAllFilesTriggered, Qt::CTRL + Qt::SHIFT + Qt::Key_S);
@@ -167,8 +167,8 @@ void MainWindow::setupMainMenu()
 
     // opening chat window
     QAction *pConnectAction = toolsMenu->addAction("&Connect...", this, &MainWindow::onConnectTriggered);
-    pConnectAction->setIcon(style()->standardIcon(QStyle::SP_DialogYesButton));
-    pToolbar->addAction(pConnectAction);
+    pConnectAction->setIcon(QIcon(":/img/DISCONNECTED.png"));
+
     toolsMenu->addSeparator();
 
     // buidling solution
@@ -188,7 +188,12 @@ void MainWindow::setupMainMenu()
     toolsMenu->addSeparator();
 
     // opening settings window
-    toolsMenu->addAction("&Settings...", this, &MainWindow::onSettingsTriggered);
+    QAction *pSettingsAction = toolsMenu->addAction("&Settings...", this, &MainWindow::onSettingsTriggered);
+    pSettingsAction->setIcon(QIcon(":/img/SETTINGS.png"));
+    pToolbar->addAction(pSettingsAction);
+
+    // add action connect to the toolbar after settings
+    pToolbar->addAction(pConnectAction);
 
     // help menu
     QMenu *helpMenu = new QMenu("&Help");
@@ -198,7 +203,9 @@ void MainWindow::setupMainMenu()
     helpMenu->addSeparator();
 
     // opening reference window
-    helpMenu->addAction("&Reference Assistant...", this, &MainWindow::onReferenceTriggered, Qt::CTRL + Qt::Key_F1);
+    QAction *pReferenceAction = helpMenu->addAction("&Reference Assistant...", this, &MainWindow::onReferenceTriggered, Qt::CTRL + Qt::Key_F1);
+    pReferenceAction->setIcon(QIcon(":/img/REFERENCEASSISTANT.png"));
+    pToolbar->addAction(pReferenceAction);
 
     // user guide
     QAction *pUserGuideActoin = helpMenu->addAction("User &Guide...", this, &MainWindow::onUserGuideTriggered, Qt::Key_F1);
