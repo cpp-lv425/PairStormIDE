@@ -28,7 +28,7 @@ void DocumentationEngine::searchByLibraryAndFunction(const QString &include, con
     QDir documentation{DocumentationSearch::documentationDirectory(result)};
     if(result)
     {
-        mDocumentationFiles = DocumentationSearch::search(documentation,include,function);
+        mDocumentationFiles = DocumentationSearch::search(documentation,function,include);
     }
 }
 

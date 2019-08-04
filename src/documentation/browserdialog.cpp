@@ -2,6 +2,7 @@
 #include "ui_browserdialog.h"
 
 #include <QDir>
+#include <QScreen>
 #include <QSizePolicy>
 #include <QMdiSubWindow>
 #include <QStandardPaths>
@@ -21,7 +22,14 @@ BrowserDialog::BrowserDialog(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    resize(800,600);
+    // receive current screen geometry
+    QScreen *screen = qApp->screens().at(0);
+    QRect screenGeometry = screen->geometry();
+
+    // resizing & centring dialog
+    resize(screenGeometry.width() / 2,
+           screenGeometry.height() / 2);
+
     mConnectionManager = new ConnectionManager(this);
     ui->mMDIArea->setViewMode(QMdiArea::ViewMode::TabbedView);
 
