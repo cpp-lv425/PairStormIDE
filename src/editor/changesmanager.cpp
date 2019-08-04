@@ -1,5 +1,5 @@
 #include "changemanager.h"
-#include<QDebug>
+
 ChangeManager::ChangeManager() = default;
 
 ChangeManager::ChangeManager(const std::string &fileState)
