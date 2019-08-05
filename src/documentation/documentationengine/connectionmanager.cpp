@@ -5,7 +5,7 @@
 #include <QNetworkRequest>
 #include <QNetworkAccessManager>
 
-#include "urlglobal.h"
+#include "constantsdocumentationl.h"
 
 ConnectionManager::ConnectionManager(QObject *parent)
     : QObject (parent)

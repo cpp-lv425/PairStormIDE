@@ -14,7 +14,7 @@
 #include <QStandardPaths>
 #include <QWebEngineHistory>
 
-#include "urlglobal.h"
+#include "constantsdocumentationl.h"
 #include "connectionmanager.h"
 #include "documentationengine.h"
 #include "documentationsearch.h"
