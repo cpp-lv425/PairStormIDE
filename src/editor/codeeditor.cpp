@@ -311,8 +311,8 @@ void CodeEditor::highlighText()
         }
         case(State::UNDEF):
         {
-            cursor.setPosition(1, QTextCursor::MoveAnchor);
-            cursor.setPosition(1, QTextCursor::KeepAnchor);
+            cursor.setPosition(i.mBegin, QTextCursor::MoveAnchor);
+            cursor.setPosition(i.mEnd, QTextCursor::KeepAnchor);
             cursor.setCharFormat(fmtUndefined);
             break;
         }

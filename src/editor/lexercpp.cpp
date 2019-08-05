@@ -14,7 +14,7 @@ inline bool LexerCPP::isIdentifier(const QString &lexem)
 
 inline bool LexerCPP::isNumber(const QString &lexem)
 {
-    const QRegExp cRx("[0-9]+");
+    const QRegExp cRx("[0-9]+|[0-9]+[UuLl]?");
     return cRx.exactMatch(lexem);
 }
 
@@ -323,8 +323,13 @@ void LexerCPP::lexicalAnalysis(QString code)
             break;
         }
     }
-    ++mIndex;
-    addLexem();
+
+    if(mState != State::ST)
+    {
+        ++mIndex;
+        addLexem();
+    }
+
     for(auto it: mTokens)
         qDebug() << it.mName << ' ' << it.mBegin << ' ' << it.mEnd << ' ' << (int)it.mType << '\n';
     qDebug() << "***************************\n";
