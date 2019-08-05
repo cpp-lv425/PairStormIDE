@@ -32,36 +32,11 @@ BrowserDialog::BrowserDialog(QWidget *parent) :
 
     mConnectionManager = new ConnectionManager(this);
     ui->mMDIArea->setViewMode(QMdiArea::ViewMode::TabbedView);
-
 }
 
 BrowserDialog::~BrowserDialog()
 {
     delete ui;
-//    for(auto &a : ui->mMDIArea->subWindowList())
-//    {
-//        delete a;
-//    }
-//    qDebug()<<"Delete browser";
-
-//    bool result;
-//    QDir dir = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
-
-//    result = dir.cd("PairStorm");
-//    result = dir.cd("temp");
-
-//    if(!result)
-//    {
-//        return;
-//    }
-
-//    dir.setNameFilters(QStringList() << "*.html");
-//    dir.setFilter(QDir::Files);
-
-//    foreach(QString dirFile, dir.entryList())
-//    {
-//        dir.remove(dirFile);
-//    }
 }
 
 void BrowserDialog::createNewTab(const QString &keyword)
@@ -71,7 +46,6 @@ void BrowserDialog::createNewTab(const QString &keyword)
     auto temp = ui->mMDIArea->addSubWindow(newWindow);
     temp->setWindowState(Qt::WindowState::WindowMaximized);
     newWindow->setAttribute(Qt::WA_DeleteOnClose);
-
 }
 
 void BrowserDialog::createEmptyTab()

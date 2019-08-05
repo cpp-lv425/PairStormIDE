@@ -108,7 +108,7 @@ void DocumentationViewer::loadReferenceDocumentation()
     {
         dir.cd("reference");
         dir.cd("en");
-        QString indexPath{dir.path() + "/" + "index.html"};
+        QString indexPath = dir.absoluteFilePath("index.html");
         mWebView->load(QUrl::fromLocalFile(indexPath));
     }
 }
@@ -173,14 +173,8 @@ void DocumentationViewer::urlRequested()
 {
     QString stringUrl = mUrlEdit->text();
     QUrl tempUrl{stringUrl};
-    if(tempUrl.isValid())
-    {
-        mWebView->load(QUrl(tempUrl));
-    }
-    else
-    {
-        mWebView->load(ReferenceUrl::google);
-    }
+
+    mWebView->load(tempUrl.isValid() ? QUrl(tempUrl) : ReferenceUrl::google );
 }
 
 void DocumentationViewer::titleChange(const QString &title) {

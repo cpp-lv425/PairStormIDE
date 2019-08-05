@@ -9,6 +9,7 @@ class QWebEnginePage;
 class ConnectionManager;
 class DocumentationEngine;
 QT_END_NAMESPACE
+
 class DocumentationViewer : public QMainWindow
 {
     Q_OBJECT
