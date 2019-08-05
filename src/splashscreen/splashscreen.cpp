@@ -6,18 +6,14 @@
 
 SplashScreen::SplashScreen()
 {
-    QPixmap pic(":/img/splash_screen.jpg");
+    QPixmap pic(":/img/SPLASHSCREEN.png");
 
     // get screen size
     QSize size = qApp->screens().at(0)->size();
 
     setPixmap(pic.scaled(size.width() / 2,
-                         size.height() / 2,
-                         Qt::KeepAspectRatio));
-
-    showMessage("Group LV-425.C++",
-                Qt::AlignHCenter | Qt::AlignBottom,
-                Qt::white);
+                         static_cast<int>(size.height() * 0.26),
+                         Qt::KeepAspectRatio));    
 }
 
 void SplashScreen::start()

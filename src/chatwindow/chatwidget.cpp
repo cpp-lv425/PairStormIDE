@@ -58,11 +58,11 @@ void ChatWidget::updateUsersList()
         pItem->setText("Connect to: " + userName);
         if (mConnectedUsers.contains(userName))
         {
-            pItem->setIcon(style()->standardIcon(QStyle::SP_DialogYesButton));
+            pItem->setIcon(QIcon(":/img/CONNECTED.png"));
         }
         else
         {
-            pItem->setIcon(style()->standardIcon(QStyle::SP_DialogNoButton));
+            pItem->setIcon(QIcon(":/img/DISCONNECTED.png"));
         }
         mpUsersList->addItem(pItem);
     }
