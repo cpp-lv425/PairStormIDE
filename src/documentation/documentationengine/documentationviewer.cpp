@@ -137,13 +137,13 @@ void DocumentationViewer::loadReferenceDocumentation(const QString &keyword)
 
         if(mDocumentationEngine->documentationFiles().size() > 0)
         {
-            QFile temp(QString(tempDir.path()+"/"+keyword+".html"));
+            QFile temp(QString(tempDir.absoluteFilePath(QString(keyword+".html"))));
 
             temp.open(QIODevice::WriteOnly);
             temp.write(html.toUtf8());
 
             temp.close();
-            webView()->load(QUrl::fromLocalFile(QString(tempDir.path()+"/"+keyword+".html")));
+            webView()->load(QUrl::fromLocalFile(QString(tempDir.absoluteFilePath(QString(keyword+".html")))));
         }
         else
         {
@@ -155,7 +155,7 @@ void DocumentationViewer::loadReferenceDocumentation(const QString &keyword)
             {
                 dir.cd("reference");
                 dir.cd("en");
-                QString indexPath{dir.path() + "/" + "index.html"};
+                QString indexPath(dir.absoluteFilePath("index.html"));
                 webView()->load(QUrl::fromLocalFile(indexPath));
             }
         }
