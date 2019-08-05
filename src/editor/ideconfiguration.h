@@ -24,7 +24,7 @@ struct ConfigParams
         mBasicLiteralsColor =   QColor("#5377DB");// blue
         mUserTypesColor =       QColor("#46C976");//light green
         mDefineTypesColor =     QColor("#CA55E8");//purpule
-        mCommentColor =         QColor("#116390");//green
+        mCommentColor =         QColor("#a0bf55");//green
         mLineCounterAreaColor = QColor("#B5A8A8");//gray
         mStringsColor =         QColor("#CD9D2C");//orange
 
