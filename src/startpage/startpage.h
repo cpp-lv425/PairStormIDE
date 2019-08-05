@@ -23,21 +23,18 @@ private:
     QPushButton *mpNewBtn;
     QPushButton *mpOpenBtn;
     QPushButton *mpOpenDirBtn;
-    QPushButton *mpReferenceBtn;
     QPushButton *mpSettingsBtn;
 
 private slots:
     void newBtnPressed();
     void openBtnPressed();
     void openDirPressed();
-    void referenceBtnPressed();
     void settingsBtnPressed();
 
 signals:
     void onNewBtnPressed();
     void onOpenBtnPressed();
     void onOpenDirPressed();
-    void onReferenceBtnPressed();
     void onSettingsBtnPressed();
 
 private:
@@ -46,6 +43,7 @@ private:
                      QPalette &palette);
     void setupButton(QPushButton *pButton,
                      QIcon icon,
+                     int iconDimension,
                      int maxWidth, const QString& text);
 };
 

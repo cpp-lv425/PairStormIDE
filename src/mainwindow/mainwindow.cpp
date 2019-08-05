@@ -8,7 +8,6 @@
 #include <QFileDialog>
 #include <QSettings>
 #include <QStyle>
-#include <QDebug> // temporarily included
 #include <QFile>
 
 #include "localconnectorgenerator.h"
@@ -48,7 +47,9 @@ MainWindow::MainWindow(QWidget *parent) :
     setWindowState(Qt::WindowMaximized);
 
     // set icon
-    setWindowIcon(QIcon(":/img/app_logo.jpg"));
+    setWindowIcon(QIcon(":/img/LOGO.png"));
+
+    setWindowTitle("PairStorm");
 
     // sets style globally
     setAppStyle();
@@ -83,7 +84,6 @@ void MainWindow::showStartPage()
     connect(&startPage, &StartPage::onNewBtnPressed, this, &MainWindow::onNewFileTriggered);
     connect(&startPage, &StartPage::onOpenBtnPressed, this, &MainWindow::onOpenFileTriggered);
     connect(&startPage, &StartPage::onOpenDirPressed, this, &MainWindow::onOpenFolderTriggered);
-    connect(&startPage, &StartPage::onReferenceBtnPressed, this, &MainWindow::onReferenceTriggered);
     connect(&startPage, &StartPage::onSettingsBtnPressed, this, &MainWindow::onSettingsTriggered);
     startPage.showStartPage();
 }
@@ -98,14 +98,14 @@ void MainWindow::setupMainMenu()
 
     // working with files
     QAction *pNewFileAction = fileMenu->addAction("&New file", this, &MainWindow::onNewFileTriggered, Qt::CTRL + Qt::Key_N);
-    pNewFileAction->setIcon(style()->standardIcon(QStyle::SP_FileIcon));
+    pNewFileAction->setIcon(QIcon(":/img/NEWFILE.png"));
     pToolbar->addAction(pNewFileAction);
 
     QAction *pOpenFileAction = fileMenu->addAction("&Open file...", this, &MainWindow::onOpenFileTriggered, Qt::CTRL + Qt::Key_O);
-    pOpenFileAction->setIcon(style()->standardIcon(QStyle::SP_DialogOpenButton));
+    pOpenFileAction->setIcon(QIcon(":/img/OPENFILE.png"));
     pToolbar->addAction(pOpenFileAction);
     QAction *pOpenFolderAction = fileMenu->addAction("Open &folder...", this, &MainWindow::onOpenFolderTriggered);
-    pOpenFolderAction->setIcon(style()->standardIcon(QStyle::SP_DirHomeIcon));
+    pOpenFolderAction->setIcon(QIcon(":/img/OPENDIR.png"));
     pToolbar->addAction(pOpenFolderAction);
     fileMenu->addSeparator();
 
@@ -115,7 +115,7 @@ void MainWindow::setupMainMenu()
 
     // saving files
     QAction *pSaveAction = fileMenu->addAction("&Save...", this, &MainWindow::onSaveFileTriggered, Qt::CTRL + Qt::Key_S);
-    pSaveAction->setIcon(style()->standardIcon(QStyle::SP_DialogSaveButton));
+    pSaveAction->setIcon(QIcon(":/img/SAVE.png"));
     pToolbar->addAction(pSaveAction);
     fileMenu->addAction("Save &As...", this, &MainWindow::onSaveFileAsTriggered);
     fileMenu->addAction("Save A&ll...", this, &MainWindow::onSaveAllFilesTriggered, Qt::CTRL + Qt::SHIFT + Qt::Key_S);
@@ -168,8 +168,8 @@ void MainWindow::setupMainMenu()
 
     // opening chat window
     QAction *pConnectAction = toolsMenu->addAction("&Connect...", this, &MainWindow::onConnectTriggered);
-    pConnectAction->setIcon(style()->standardIcon(QStyle::SP_DialogYesButton));
-    pToolbar->addAction(pConnectAction);
+    pConnectAction->setIcon(QIcon(":/img/DISCONNECTED.png"));
+
     toolsMenu->addSeparator();
 
     // buidling solution
@@ -192,6 +192,12 @@ void MainWindow::setupMainMenu()
     QAction *pSettingsAction = toolsMenu->addAction("&Settings...", this, &MainWindow::onSettingsTriggered);
     //pSettingsAction->setDisabled(true);
 
+    pSettingsAction->setIcon(QIcon(":/img/SETTINGS.png"));
+    pToolbar->addAction(pSettingsAction);
+
+    // add action connect to the toolbar after settings
+    pToolbar->addAction(pConnectAction);
+
     // help menu
     QMenu *helpMenu = new QMenu("&Help");
 
@@ -200,7 +206,9 @@ void MainWindow::setupMainMenu()
     helpMenu->addSeparator();
 
     // opening reference window
-    helpMenu->addAction("&Reference Assistant...", this, &MainWindow::onReferenceTriggered, Qt::CTRL + Qt::Key_F1);
+    QAction *pReferenceAction = helpMenu->addAction("&Reference Assistant...", this, &MainWindow::onReferenceTriggered, Qt::CTRL + Qt::Key_F1);
+    pReferenceAction->setIcon(QIcon(":/img/REFERENCEASSISTANT.png"));
+    pToolbar->addAction(pReferenceAction);
 
     // user guide
     QAction *pUserGuideActoin = helpMenu->addAction("User &Guide...", this, &MainWindow::onUserGuideTriggered, Qt::Key_F1);
@@ -236,6 +244,7 @@ void MainWindow::saveDocument(CodeEditor *pDoc, const QString &fileName)
                 userMessages[UserMessages::FileOpeningForSavingErrorMsg]);
     }
     pDoc->document()->setModified(false);
+    pDoc->setBeginTextState();
 }
 
 void MainWindow::openDoc(QString fileName)
@@ -265,6 +274,7 @@ void MainWindow::openDoc(QString fileName)
     int position = fileName.lastIndexOf(QChar{'/'});
     newDoc->setWindowTitle(fileName.mid(position + 1));
     newDoc->setPlainText(readResult);
+    newDoc->setBeginTextState();
     newDoc->show();
 }
 
@@ -291,7 +301,7 @@ bool MainWindow::isModified(QList<QMdiSubWindow*> &docsList)
     {
         auto curDoc = qobject_cast<CodeEditor*>(docsList[i]->widget());
 
-        if (curDoc && curDoc->document()->isModified())
+        if (curDoc && curDoc->isChanged())
         {
             return true;
         }
@@ -305,6 +315,7 @@ void MainWindow::saveAllModifiedDocuments(QList<QMdiSubWindow*> &docsList)
     {
         auto curDoc = qobject_cast<CodeEditor*>(docsList[i]->widget());
         saveDocument(curDoc, curDoc->getFileName());
+        curDoc->setBeginTextState();
     }
 }
 
@@ -342,8 +353,6 @@ void MainWindow::createChatWindow()
             mpChatWindowDock, &ChatWindowDock::displayMessage,
             Qt::UniqueConnection);
 
-
-
     mpChatWindowDock->setObjectName("mpChatWindowDock");
     addDockWidget(Qt::RightDockWidgetArea, mpChatWindowDock, Qt::Vertical);
 }
@@ -355,7 +364,7 @@ void MainWindow::createButtomPanel()
     mpBottomPanelDock->setObjectName("mpBottomPanelDock");
 }
 
-CodeEditor *MainWindow::getCurrentDoc()
+CodeEditor* MainWindow::getCurrentDoc()
 {
     // get current subWindow
     // if there are no subWindows nullptr is returned
@@ -391,6 +400,7 @@ void MainWindow::onNewFileTriggered()
     int position = newFileName.lastIndexOf(QChar{'/'});
     newDoc->setFileName(newFileName);
     newDoc->setWindowTitle(newFileName.mid(position + 1));
+    newDoc->setBeginTextState();
     newDoc->show();
 }
 
@@ -444,7 +454,7 @@ void MainWindow::onSaveFileTriggered()
     auto curDoc = getCurrentDoc();
 
     // if doc wasn't modified yet
-    if (!curDoc || !curDoc->document()->isModified())
+    if (!curDoc || !curDoc->isChanged())
     {
         return;
     }
@@ -473,6 +483,7 @@ void MainWindow::onSaveFileAsTriggered()
     }
     QString extension;
 
+    // prompt new filename from user
     QString fileName = QFileDialog::getSaveFileName
             (this,
              userMessages[UserMessages::SaveAsTitle],
@@ -491,6 +502,11 @@ void MainWindow::onSaveFileAsTriggered()
 
     // saving doc
     saveDocument(curDoc, fileName);
+
+    // binding opened doc to new file
+    curDoc->setFileName(fileName);
+    position = fileName.lastIndexOf(QChar{'/'});
+    curDoc->setWindowTitle(fileName.mid(position + 1));
 }
 
 void MainWindow::onSaveAllFilesTriggered()
@@ -513,7 +529,7 @@ void MainWindow::onSaveAllFilesTriggered()
     {
         auto curDoc = qobject_cast<CodeEditor*>(docsList[i]->widget());
 
-        if(curDoc && curDoc->document()->isModified())
+        if(curDoc && curDoc->isChanged())
         {
             saveDocument(curDoc, curDoc->getFileName());
         }
@@ -522,40 +538,6 @@ void MainWindow::onSaveAllFilesTriggered()
 
 void MainWindow::onCloseFileTriggered()
 {    
-    auto curDoc = getCurrentDoc();
-
-    // if there are no opened documents
-    if (!curDoc)
-    {
-        return;
-    }
-    // if doc wasn't modified then just close doc
-    if (!curDoc->document()->isModified())
-    {
-        mpDocsArea->closeActiveSubWindow();
-        return;
-    }
-
-    // ask user whether changes should be saved
-    QMessageBox::StandardButton reply
-            = QMessageBox::question
-            (this,
-             userMessages[UserMessages::PromptSaveTitle],
-            userMessages[UserMessages::SaveQuestion],
-            QMessageBox::StandardButton::Yes |
-            QMessageBox::StandardButton::No |
-            QMessageBox::StandardButton::Cancel);
-
-    // checking user's answer
-    if (reply == QMessageBox::Yes)
-    {
-        saveDocument(curDoc, curDoc->getFileName());
-    }
-    if (reply == QMessageBox::Cancel)
-    {
-        return;
-    }
-
     // closing doc
     mpDocsArea->closeActiveSubWindow();
 }
@@ -715,7 +697,6 @@ void MainWindow::onOpenFileFromProjectViewer(QString fileName)
 
 void MainWindow::onCloseWindow(CodeEditor *curDoc)
 {
-
     saveDocument(curDoc, curDoc->getFileName());
 }
 
@@ -735,8 +716,10 @@ CodeEditor* MainWindow::createNewDoc()
     CodeEditor *newDoc = new CodeEditor;
 
     mpDocsArea->addSubWindow(newDoc);
-    connect(newDoc, &CodeEditor::closeDocEventOccured, this, &MainWindow::onCloseWindow);
+    connect(newDoc, &CodeEditor::closeDocEventOccured,
+            this, &MainWindow::onCloseWindow);
     newDoc->setAttribute(Qt::WA_DeleteOnClose);
+    newDoc->document()->setModified(false);
 
     return newDoc;
 }
@@ -747,19 +730,13 @@ void MainWindow::closeEvent(QCloseEvent *event)
     auto docsList = mpDocsArea->subWindowList();
 
     // if there are no docs
-    if(docsList.empty())
+    if(docsList.empty() || !isModified(docsList))
     {
         event->accept();
         return;
-    }
+    }    
 
-    // if doc is modified then we should ask user if changes have to be saved
-    if(!isModified(docsList))
-    {
-        event->accept();
-        return;
-    }
-
+    // ask user whether changes should be changed
     QMessageBox::StandardButton reply = QMessageBox::question
             (this,
              userMessages[UserMessages::PromptSaveTitle],
@@ -778,7 +755,6 @@ void MainWindow::closeEvent(QCloseEvent *event)
         event->accept();
         return;
     }
-
     event->ignore();
 }
 

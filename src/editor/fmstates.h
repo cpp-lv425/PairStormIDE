@@ -1,7 +1,7 @@
 #ifndef FMSTATES_H
 #define FMSTATES_H
 
-enum States {
+enum class State {
     ST,
     OPER,
     KW,

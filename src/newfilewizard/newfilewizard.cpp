@@ -1,5 +1,6 @@
 #include "newfilewizard.h"
 
+#include <QApplication>
 #include <QVBoxLayout>
 #include <QStringList>
 #include <QListWidget>
@@ -7,6 +8,7 @@
 #include <QPushButton>
 #include <QMessageBox>
 #include <QLineEdit>
+#include <QScreen>
 #include <QLabel>
 #include <QDir>
 
@@ -84,13 +86,15 @@ NewFileDialog::NewFileDialog(QStringList &fileExtensions,
 
     setLayout(pLayout);
 
-    // specifying initial dialog size
-    setGeometry(geometry().x(), geometry().y(), 700, 500);
+    // receive current screen geometry
+    QScreen *screen = qApp->screens().at(0);
+    QRect screenGeometry = screen->geometry();
 
-    // centring dialog
-    QPoint cntr = pParent->geometry().center();
-    int x = cntr.x() - width() / 2;
-    int y = cntr.y() - height() / 2;
+    // resizing & centring dialog
+    resize(screenGeometry.width() / 2,
+           static_cast<int>(screenGeometry.height() * 0.6));
+    int x = screenGeometry.center().x() - width() / 2;
+    int y = screenGeometry.center().y() - height() / 2;
     move(x, y);
 }
 

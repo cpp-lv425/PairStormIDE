@@ -3,6 +3,7 @@
 
 #include <QVBoxLayout>
 #include <QPushButton>
+#include <QScreen>
 #include <QLabel>
 #include <QStyle>
 
@@ -13,25 +14,29 @@ StartPage::StartPage(QWidget *parent) :
     ui->setupUi(this);
     setWindowTitle("Start Page");
 
-    int maxButtonsWidth = 200;
-    QFont lblFont("Segoe UI", 12);
+    const int maxButtonsWidth = 200;
+    const int iconDimension = 32;
 
-    //lblFont.setBold(true);
+    QFont lblFont("Segoe UI", 10);
+    lblFont.setBold(true);
+
     QPalette palette;
     palette.setColor(QPalette::WindowText, Qt::blue);
 
     // creating & configuring new file button
     mpNewBtn = new QPushButton;
     setupButton(mpNewBtn,
-                style()->standardIcon(QStyle::SP_FileIcon),
+                QIcon(":/img/NEWFILE.png"),
+                iconDimension,
                 maxButtonsWidth,
                 "New File");
     connect(mpNewBtn, &QPushButton::pressed, this, &StartPage::newBtnPressed);
 
     // creating & configuring open file button
     mpOpenBtn = new QPushButton;
-    setupButton(mpOpenBtn, style()->standardIcon
-                (QStyle::SP_DialogOpenButton),
+    setupButton(mpOpenBtn,
+                QIcon(":/img/OPENFILE.png"),
+                iconDimension,
                 maxButtonsWidth,
                 "Open File");
     connect(mpOpenBtn, &QPushButton::pressed, this, &StartPage::openBtnPressed);
@@ -39,26 +44,22 @@ StartPage::StartPage(QWidget *parent) :
     // creating & configuring open folder button
     mpOpenDirBtn = new QPushButton;
     setupButton(mpOpenDirBtn,
-                style()->standardIcon(QStyle::SP_DriveHDIcon),
+                QIcon(":/img/OPENDIR.png"),
+                iconDimension,
                 maxButtonsWidth,
                 "Open Folder");
     connect(mpOpenDirBtn, &QPushButton::pressed, this, &StartPage::openDirPressed);
 
-    // creating & configuring reference call button
-    mpReferenceBtn = new QPushButton;
-    setupButton(mpReferenceBtn,
-                style()->standardIcon(QStyle::SP_DialogHelpButton),
-                maxButtonsWidth,
-                "Reference Assistant");
-    connect(mpReferenceBtn, &QPushButton::pressed, this, &StartPage::referenceBtnPressed);
-
     // creating & configuring settings call button
     mpSettingsBtn = new QPushButton;
     setupButton(mpSettingsBtn,
-                style()->standardIcon(QStyle::SP_BrowserReload),
+                QIcon(":/img/SETTINGS.png"),
+                iconDimension,
                 maxButtonsWidth,
                 "Settings");
+
     //mpSettingsBtn->setDisabled(true);
+
     connect(mpSettingsBtn, &QPushButton::pressed, this, &StartPage::settingsBtnPressed);
 
     // bindong buttons
@@ -66,7 +67,6 @@ StartPage::StartPage(QWidget *parent) :
     pBtnLayout->addWidget(mpNewBtn);
     pBtnLayout->addWidget(mpOpenBtn);
     pBtnLayout->addWidget(mpOpenDirBtn);
-    pBtnLayout->addWidget(mpReferenceBtn);
     pBtnLayout->addWidget(mpSettingsBtn);
 
     // creating & laying out labels
@@ -79,9 +79,6 @@ StartPage::StartPage(QWidget *parent) :
     QLabel *pOpenDirLbl = new QLabel(tr("Open existing project directory"));
     setupLabels(pOpenDirLbl, lblFont, palette);
 
-    QLabel *pReferenceLbl = new QLabel(tr("Open Reference Assistant"));
-    setupLabels(pReferenceLbl, lblFont, palette);
-
     QLabel *pSettingsLbl = new QLabel(tr("Configure IDE"));
     setupLabels(pSettingsLbl, lblFont, palette);
     pSettingsLbl->setDisabled(true);
@@ -90,7 +87,6 @@ StartPage::StartPage(QWidget *parent) :
     pLblLayout->addWidget(pNewLbl);
     pLblLayout->addWidget(pOpenLbl);
     pLblLayout->addWidget(pOpenDirLbl);
-    pLblLayout->addWidget(pReferenceLbl);
     pLblLayout->addWidget(pSettingsLbl);
 
     // window lay out
@@ -100,11 +96,15 @@ StartPage::StartPage(QWidget *parent) :
 
     setLayout(pWdwLayout);
 
+    // receive current screen geometry
+    QScreen *screen = qApp->screens().at(0);
+    QRect screenGeometry = screen->geometry();
+
     // resizing & centring dialog
-    setGeometry(geometry().x(), geometry().y(), 500, 300);
-    QPoint cntr = parent->geometry().center();
-    int x = cntr.x() - width() / 2;
-    int y = cntr.y() - height() / 2;
+    resize(screenGeometry.width() / 3,
+           screenGeometry.height() / 3);
+    int x = screenGeometry.center().x() - width() / 2;
+    int y = screenGeometry.center().y() - height() / 2;
     move(x, y);
 }
 
@@ -114,10 +114,11 @@ void StartPage::showStartPage()
 }
 
 void StartPage::setupButton(QPushButton *pButton,
-                            QIcon icon,
+                            QIcon icon, int iconDimension,
                             int maxWidth, const QString &text)
 {
     pButton->setIcon(icon);
+    pButton->setIconSize(QSize(iconDimension,iconDimension));
     pButton->setMaximumWidth(maxWidth);
     pButton->setSizePolicy(QSizePolicy::Expanding,
                            QSizePolicy::Expanding);
@@ -149,12 +150,6 @@ void StartPage::openBtnPressed()
 void StartPage::openDirPressed()
 {
     emit onOpenDirPressed();
-    accept();
-}
-
-void StartPage::referenceBtnPressed()
-{
-    emit onReferenceBtnPressed();
     accept();
 }
 

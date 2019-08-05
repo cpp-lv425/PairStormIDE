@@ -19,6 +19,13 @@ const int TOP_UNUSED_PIXELS_HEIGHT = 4;
 #include<QMouseEvent>
 #include<QLabel>
 
+
+class QPaintEvent;
+class QResizeEvent;
+class QSize;
+class QWidget;
+class LineNumberArea;
+
 class CodeEditor : public QPlainTextEdit
 {
     Q_OBJECT
@@ -28,13 +35,15 @@ public:
     void lineNumberAreaPaintEvent(QPaintEvent *event);
     int getLineNumberAreaWidth();
     bool isinsidebracket();
-    static QString tabs;
     QString& getFileName();
     void setFileName(const QString &flename);
     std::pair<const QString &, const QString &> getChangedFileInfo();
     void undo();
     void redo();
     void zoom(int val);
+    bool isChanged();
+    void setBeginTextState();
+
 
 protected:
     void resizeEvent(QResizeEvent *event)override;
@@ -49,19 +58,19 @@ private slots:
 
 public slots:
     void keyPressEvent(QKeyEvent *e) override;
-    void autotab();
     void saveStateInTheHistory();
+    void setZoom(int zoomVal);
 
 signals:
     void changesAppeared();
+    void sendLexem(QString);
     void closeDocEventOccured(CodeEditor*);
 
+
 private:
-    QWidget *lineNumberArea;
+    QWidget *mLineNumberArea;
     ConfigParams mConfigParam;
-    int mCurrentZoom;
     QFont mFont;
-    QVector<Token> mTokens;
     LexerCPP *mLcpp;
     QString mFileName;
     ChangeManager *mChangeManager;
@@ -70,11 +79,17 @@ private:
     AddCommentButton *mAddCommentButton;
     QLabel *mCurrentCommentLable;
     int mLinesCount;
+    QString mBeginTextState;
 
     QTextCharFormat fmtLiteral;
     QTextCharFormat fmtComment;
     QTextCharFormat fmtKeyword;
+    QTextCharFormat fmtRegular;
 
+protected:
+    int mCurrentZoom;
+    QVector<Token> mTokens;
+ friend class Event;
 };
 
 #endif // CODEEDITOR_H

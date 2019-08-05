@@ -26,8 +26,10 @@ ChatWidget::ChatWidget(QWidget *pParent):
 
     // creating send button
     QPushButton *pSendButton = new QPushButton("Send");
+
     pSendButton->setMaximumWidth(30);
-    connect(pSendButton, &QPushButton::clicked, this, &ChatWidget::onSendCommand);
+    connect(pSendButton, &QPushButton::clicked,
+            this, &ChatWidget::onSendCommand);
 
     QHBoxLayout *pLineLayout = new QHBoxLayout;
     pLineLayout->addWidget(mpEnterLine);
@@ -56,15 +58,16 @@ void ChatWidget::updateUsersList()
         pItem->setText("Connect to: " + userName);
         if (mConnectedUsers.contains(userName))
         {
-            pItem->setIcon(style()->standardIcon(QStyle::SP_DialogYesButton));
+            pItem->setIcon(QIcon(":/img/CONNECTED.png"));
         }
         else
         {
-            pItem->setIcon(style()->standardIcon(QStyle::SP_DialogNoButton));
+            pItem->setIcon(QIcon(":/img/DISCONNECTED.png"));
         }
         mpUsersList->addItem(pItem);
     }
     mpUsersList->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+
 }
 
 void ChatWidget::setOnlineUsers(const QStringList &onlineUsers)
