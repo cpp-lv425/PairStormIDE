@@ -8,7 +8,7 @@ ProjectTreeView::ProjectTreeView(QWidget *parent)
     : QTreeView(parent)
 {
     setSelectionMode(QAbstractItemView::SingleSelection);
-    setIconSize(QSize(20,28));
+    setIconSize(QSize(20,20));
     setVisible(true);
     hideColumn(1);
     hideColumn(2);
@@ -21,7 +21,7 @@ ProjectTreeView::ProjectTreeView(ProjectViewerModel *model,QWidget *parent)
     setSelectionMode(QAbstractItemView::SingleSelection);
     setModel(model);
     mProjectModel = model;
-    setIconSize(QSize(20,28));
+    setIconSize(QSize(20,20));
     setRootIndex(model->index(model->rootPath()));
     setVisible(true);
     hideColumn(1);

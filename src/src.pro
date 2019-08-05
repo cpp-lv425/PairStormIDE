@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui network
+QT       += core gui webenginewidgets network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -42,11 +42,10 @@ include($$PWD/settings/settings.pri)
 include($$PWD/startpage/startpage.pri)
 include($$PWD/projectviewer/projectviewer.pri)
 include($$PWD/newfilewizard/newfilewizard.pri)
-
+include($$PWD/documentation/documentation.pri)
 include($$PWD/logindialog/logindialog.pri)
 include($$PWD/splashscreen/splashscreen.pri)
 include($$PWD/utils/utils.pri)
 
 RESOURCES += \
     globalresources.qrc
-

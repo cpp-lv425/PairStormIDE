@@ -15,6 +15,7 @@
 #include "bottompaneldock.h"
 #include "chatwindowdock.h"
 #include "newfilewizard.h"
+#include "browserdialog.h"
 #include "usermessages.h"
 #include "logindialog.h"
 #include "filemanager.h"
@@ -59,6 +60,10 @@ MainWindow::MainWindow(QWidget *parent) :
     mpDocsArea = new MDIArea(this);
     setCentralWidget(mpDocsArea);
 
+    //create instance of documentation browser
+    //mDocumentationBrowser->hide();
+
+// connect(mDocumentationBrowser,&Browser::close,this,&MainWindow::createNewBrowser);
     // create instance of Project Viewer
     createProjectViewer();
 
@@ -664,7 +669,10 @@ void MainWindow::onAboutTriggered()
 
 void MainWindow::onReferenceTriggered()
 {
-    //
+    BrowserDialog browser(this);
+    browser.createEmptyTab();
+    browser.show();
+    browser.exec();
 }
 
 void MainWindow::onUserGuideTriggered()
@@ -675,6 +683,14 @@ void MainWindow::onUserGuideTriggered()
 void MainWindow::onCheckUpdatesTriggered()
 {
     //
+}
+
+void MainWindow::onReferenceFromEditor(const QString &keyword)
+{
+    BrowserDialog browser(this);
+    browser.createNewTab(keyword);
+    browser.show();
+    browser.exec();
 }
 
 void MainWindow::onOpenFileFromProjectViewer(QString fileName)
@@ -713,6 +729,7 @@ CodeEditor* MainWindow::createNewDoc()
     CodeEditor *newDoc = new CodeEditor;
 
     mpDocsArea->addSubWindow(newDoc);
+    connect(newDoc, &CodeEditor::sendLexem,this,&MainWindow::onReferenceFromEditor);
     connect(newDoc, &CodeEditor::closeDocEventOccured,
             this, &MainWindow::onCloseWindow);
     newDoc->setAttribute(Qt::WA_DeleteOnClose);
