@@ -58,7 +58,7 @@ StartPage::StartPage(QWidget *parent) :
                 style()->standardIcon(QStyle::SP_BrowserReload),
                 maxButtonsWidth,
                 "Settings");
-    mpSettingsBtn->setDisabled(true);
+    //mpSettingsBtn->setDisabled(true);
     connect(mpSettingsBtn, &QPushButton::pressed, this, &StartPage::settingsBtnPressed);
 
     // bindong buttons
