@@ -1,5 +1,4 @@
 #include "lexercpp.h"
-#include <QDebug>
 
 inline bool LexerCPP::isKeyword(const QString &lexem)
 {
@@ -329,8 +328,4 @@ void LexerCPP::lexicalAnalysis(QString code)
         ++mIndex;
         addLexem();
     }
-
-    for(auto it: mTokens)
-        qDebug() << it.mName << ' ' << it.mBegin << ' ' << it.mEnd << ' ' << (int)it.mType << '\n';
-    qDebug() << "***************************\n";
 }
