@@ -29,7 +29,7 @@ DocumentationViewer::DocumentationViewer(QWidget *parent)
     mUrlEdit = new QLineEdit(this);
     mProgressBar = new QProgressBar(this);
     mWebView = new QWebEngineView(this);
-    mWebView->load(QUrl("http://www.google.com"));
+    mWebView->load(ReferenceUrl::google);
     setCentralWidget(mWebView);
 
     mBottomToolBar = new QToolBar(this);
@@ -38,7 +38,6 @@ DocumentationViewer::DocumentationViewer(QWidget *parent)
     mStackedWidget = new QStackedWidget(this);
 
     setWindowTitle("C++ Documentation");
-    resize(800, 600);
 
     QMenu *pViewMenu = new QMenu("&View",this);
     pViewMenu->addAction("&History", this, &DocumentationViewer::onHistoryTriggered, Qt::CTRL + Qt::Key_H);

@@ -22,7 +22,6 @@
 #include "codeeditor.h"
 #include "storeconf.h"
 #include "startpage.h"
-#include "browser.h"
 #include "mdiarea.h"
 #include "utils.h"
 
