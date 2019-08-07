@@ -157,6 +157,15 @@ QScrollBar::add-page, QScrollBar::sub-page
     background: none;
 }
 
+
+QAbstractButton
+{
+    border: 1px solid #191919;
+    /*border-style: outset;
+    border-radius: 10px;
+    padding: 3px;*/
+}
+
 QAbstractButton:hover
 {
     background: #353535;
