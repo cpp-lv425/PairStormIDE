@@ -34,9 +34,9 @@ MainWindow::MainWindow(QWidget *parent) :
             LocalConnectorGenerator::getDefaultConnector();
     // And output its state in case of changes
     connect(
-        mplocalConnector, &LocalConnectorInterface::serviceStatusChanged,
-        this,             &MainWindow::onConnectionStatusChanged,
-        Qt::UniqueConnection);
+                mplocalConnector, &LocalConnectorInterface::serviceStatusChanged,
+                this,             &MainWindow::onConnectionStatusChanged,
+                Qt::UniqueConnection);
 
     ui->setupUi(this);
     {
@@ -63,7 +63,7 @@ MainWindow::MainWindow(QWidget *parent) :
     //create instance of documentation browser
     //mDocumentationBrowser->hide();
 
-// connect(mDocumentationBrowser,&Browser::close,this,&MainWindow::createNewBrowser);
+    // connect(mDocumentationBrowser,&Browser::close,this,&MainWindow::createNewBrowser);
     // create instance of Project Viewer
     createProjectViewer();
 
@@ -411,8 +411,8 @@ void MainWindow::onOpenFileTriggered()
     QString fileName = QFileDialog::getOpenFileName
             (this,
              userMessages[UserMessages::OpenFileTitle],
-             QDir::currentPath(),
-             "C++/C files (*.h *.hpp *.cpp *.c) ;; Text Files (*.txt) ;; JSON Files (*.json)");
+            QDir::currentPath(),
+            "C++/C files (*.h *.hpp *.cpp *.c) ;; Text Files (*.txt) ;; JSON Files (*.json)");
 
     // if document already opened then return
     if (isOpened(fileName))
@@ -719,7 +719,7 @@ void MainWindow::onConnectionStatusChanged(bool status)
     {
         QMessageBox::warning
                 (this,
-                userMessages[UserMessages::ConnectionFailureTitle],
+                 userMessages[UserMessages::ConnectionFailureTitle],
                 userMessages[UserMessages::ConnectionFailureMsg]);
     }
 }
@@ -748,14 +748,14 @@ void MainWindow::closeEvent(QCloseEvent *event)
     {
         event->accept();
         return;
-    }    
+    }
 
     // ask user whether changes should be changed
     QMessageBox::StandardButton reply = QMessageBox::question
             (this,
              userMessages[UserMessages::PromptSaveTitle],
-             userMessages[UserMessages::SaveQuestion],
-             QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+            userMessages[UserMessages::SaveQuestion],
+            QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
 
     if (reply == QMessageBox::No)
     {
@@ -796,10 +796,13 @@ void MainWindow::restoreMainWindowState()
 
 void MainWindow::setAppStyle()
 {
-    QString styleName = "Fusion";
-    QStringList availableStyles = QStyleFactory::keys();
-    if (availableStyles.contains(styleName))
+    QString strCSS;
+    try
     {
-        QApplication::setStyle(QStyleFactory::create(styleName));
+        strCSS = FileManager().readFromFile(":/cssstyles/darkstylecss.css");
+    } catch (const QException&)
+    {
+        qDebug() << "Unable to read CSS from file";
     }
+    qApp->setStyleSheet(strCSS);
 }

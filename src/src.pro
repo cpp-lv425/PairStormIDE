@@ -48,4 +48,5 @@ include($$PWD/splashscreen/splashscreen.pri)
 include($$PWD/utils/utils.pri)
 
 RESOURCES += \
+    cssstyles.qrc \
     globalresources.qrc
