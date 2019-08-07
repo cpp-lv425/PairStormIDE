@@ -796,13 +796,39 @@ void MainWindow::restoreMainWindowState()
 
 void MainWindow::setAppStyle()
 {
-    QString strCSS;
-    try
-    {
-        strCSS = FileManager().readFromFile(":/cssstyles/darkstylecss.css");
-    } catch (const QException&)
-    {
-        qDebug() << "Unable to read CSS from file";
-    }
-    qApp->setStyleSheet(strCSS);
+//    QString strCSS;
+//    try
+//    {
+//        strCSS = FileManager().readFromFile(":/cssstyles/darkstylecss.css");
+//    } catch (const QException&)
+//    {
+//        qDebug() << "Unable to read CSS from file";
+//    }
+//    qApp->setStyleSheet(strCSS);
+    qApp->setStyle(QStyleFactory::create("Fusion"));
+
+    QPalette palette;
+    palette.setColor(QPalette::Window, QColor(53,53,53));
+    palette.setColor(QPalette::WindowText, Qt::white);
+    palette.setColor(QPalette::Base, QColor("#191919"));
+    palette.setColor(QPalette::AlternateBase, QColor(53,53,53));
+    palette.setColor(QPalette::ToolTipBase, Qt::white);
+    palette.setColor(QPalette::ToolTipText, Qt::white);
+    palette.setColor(QPalette::Text, Qt::white);
+    palette.setColor(QPalette::Button, QColor(53,53,53));
+    palette.setColor(QPalette::ButtonText, Qt::white);
+    palette.setColor(QPalette::BrightText, Qt::red);
+
+    // disabled text
+
+
+    palette.setColor(QPalette::Disabled, QPalette::Text, QColor("#353535"));
+
+    palette.setColor(QPalette::Disabled, QPalette::Light, QColor("#191919"));
+
+
+
+    palette.setColor(QPalette::Highlight, QColor("#3D7848").lighter());
+    palette.setColor(QPalette::HighlightedText, QColor("#191919"));
+    qApp->setPalette(palette);
 }
