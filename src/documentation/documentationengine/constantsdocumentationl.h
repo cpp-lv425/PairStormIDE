@@ -22,50 +22,18 @@ const std::string mustasheTemplate{R"(<!DOCTYPE html>
                                                 <table style="width:100%">
                                                     <tbody>
                                                         <tr>
-                                                                 {{#showIcons}}
-
-                                                            <td>&nbsp;</td>
-                                                                 {{/showIcons}}
-
                                                             <td>
                                                                 <strong>Name</strong>
                                                             </td>
-                                                                 {{#showSize}}
-
-                                                            <td>
-                                                                <strong></strong>
-                                                            </td>
-                                                                 {{/showSize}}
-                                                                 {{#showDetails}}
-
-                                                            <td>
-                                                                <strong></strong>
-                                                            </td>
-                                                                 {{/showDetails}}
 
                                                         </tr>
-                                                                 {{#dirEntryList}}
-
+                                                        {{#dirEntryList}}
                                                         <tr>
-                                                                 {{#showIcons}}
-
-                                                            <td>{{{fileIcon}}}</td>
-                                                                 {{/showIcons}}
-
                                                             <td>
                                                                 <a href="{{fileIndex}}">{{fileName}}</a>
                                                             </td>
-                                                                 {{#showSize}}
-
-                                                            <td>{{fileSize}}</td>
-                                                                 {{/showSize}}
-                                                                 {{#showDetails}}
-
-                                                            <td>{{fileDetails}}</td>
-                                                                 {{/showDetails}}
-
                                                         </tr>
-                                                                 {{/dirEntryList}}
+                                                        {{/dirEntryList}}
 
                                                     </tbody>
                                                 </table>
