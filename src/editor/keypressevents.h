@@ -3,6 +3,7 @@
 #include<QPlainTextEdit>
 #include "codeeditor.h"
 #include "event.h"
+#include<QDebug>
 
 //Event for non-specific key press
 class EventDefault: public Event
@@ -132,6 +133,14 @@ class  EventSaveChangeInHistory : public Event
 public:
     void operator()(CodeEditor *codeEditor, QKeyEvent *e) override;
     ~EventSaveChangeInHistory() override;
-
 };
+
+//EventCtrlV
+class  EventCtrlV : public Event
+{
+public:
+    void operator()(CodeEditor *codeEditor, QKeyEvent *e) override;
+    ~EventCtrlV() override;
+};
+
 #endif // CODEEDITOREVENTS_H

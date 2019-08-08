@@ -60,11 +60,14 @@ public slots:
     void keyPressEvent(QKeyEvent *e) override;
     void saveStateInTheHistory();
     void setZoom(int zoomVal);
+    void textChangedInTheOneLine();
 
 signals:
     void changesAppeared();
     void sendLexem(QString);
     void closeDocEventOccured(CodeEditor*);
+    void textChangedInLine(int);
+    void textChangedInLines(int, int);
 
 
 private:

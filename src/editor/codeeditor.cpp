@@ -46,6 +46,7 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     connect(this,   SIGNAL(cursorPositionChanged()),  this, SLOT(runLexer()));
     connect(mTimer, SIGNAL(timeout()),                this, SLOT(saveStateInTheHistory()));
     connect(this,   SIGNAL(cursorPositionChanged()),  this, SLOT(highlighText()));
+    connect(this,   SIGNAL(cursorPositionChanged()),            this, SLOT(textChangedInTheOneLine()));
 
     mTimer->start(CHANGE_SAVE_TIME);//save text by this time
 
@@ -200,6 +201,11 @@ void CodeEditor::zoom(int val)
 void CodeEditor::setZoom(int zoomVal)
 {
     zoom(zoomVal - mCurrentZoom);
+}
+
+void CodeEditor::textChangedInTheOneLine()
+{
+    emit(textChangedInLine(this->textCursor().blockNumber() + 1));
 }
 
 void CodeEditor::mouseMoveEvent(QMouseEvent *event)
