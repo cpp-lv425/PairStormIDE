@@ -28,6 +28,7 @@ StoreConf::StoreConf(QString userName)
 
 void StoreConf::restoreConFile()
 {
+    checkConfDir();
     getPathToConFile();
     QFile file(mPathToConFile);
     if (!file.exists()) // userName.json file not exist. keep all fields with default values,
@@ -43,7 +44,7 @@ void StoreConf::restoreConFile()
             parseJson();
         }
         else
-        {                       //  file corrupted
+        {                        //  file corrupted
             writeJson();        //      rewrite with default values
         }
         saveData();
@@ -65,6 +66,17 @@ void StoreConf::getPathToConFile()
     mPathToConFile = QDir::currentPath();
     mPathToConFile += "/conf/";
     mPathToConFile += mConFile;
+}
+
+void StoreConf::checkConfDir(QString str)
+{
+    if (str == "exe")
+    {
+        QString pathToConDir = QDir::currentPath();
+        pathToConDir += "/conf";
+        if (!QDir(pathToConDir).exists())
+            QDir().mkdir(pathToConDir);
+    }
 }
 
 void StoreConf::writeJson(QString mode)
@@ -102,10 +114,13 @@ void StoreConf::writeJson(QString mode)
 
 void StoreConf::readJson()
 {
-    QFile loadFile(mConFile);                       // closing in it destructor
+    QFile loadFile(mPathToConFile);                       // closing in it destructor
     if (loadFile.open(QIODevice::ReadOnly))
+    {
         mReadStatus = true;
-    else {
+    }
+    else
+    {
         mReadStatus = false;
         return;
     }

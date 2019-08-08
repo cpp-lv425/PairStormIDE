@@ -3,8 +3,8 @@
  * and save it in persistent platform-independent application settings.
  * Reach out these data are posible from any point in application using statements:
  * QSettings settings;
- * int i = settings.value("fieldName").toString();
- * where <fieldName> same as in configuration file.
+ * int i = settings.value("fieldName").toInt();
+ * where <fieldName> field in configuration file.
  *
  * Also writes application version, application name, organization name
  * to QApplication settings. They are available through static fields:
@@ -25,26 +25,28 @@ class StoreConf
 public:
     explicit StoreConf(QString userName = "unnamed");
 
-    void restoreConFile();
-    void saveConFile();
+    void restoreConFile();          //  restoring settings from last session
+    void saveConFile();             //  saving settings at the end of current session
 private:
-    void getPathToConFile();        // search configuration file. if not exist - create it with default parameters
+    void getPathToConFile();        //  search configuration file. if not exist - create it with default parameters
 
-    QString mConFile;
-    QString mPathToConFile;
-    QMap<QString, QString> mFields;  //  first -> valueName, second -> valueItself
+    QString mConFile;               //  name of configuration file
+    QString mPathToConFile;         //  path to configuration file
+    QMap<QString, QString> mFields; //  first -> valueName, second -> valueItself
 
-    QStringList mCppExtentionsList;
+    QStringList mCppExtentionsList; //  all extentions available in C++ mode
 
+    void checkConfDir(QString str = "exe");    //  check existance directory <conf>, create if not exist
+                                               //  str = "exe" - directory in same dir as execution file
     void writeJson(QString str = "start");     //  on application start: if conf.json not exist - creates it in conf directory
-                                               //  on application quit:  rewrite json from QSettings
-    void readJson();                //  read [confile] to [loadDoc]. status write to [readStatus]
+                                               //  on application quit:  rewrite json with values from QSettings
+    void readJson();                //  read configuration file to [loadDoc]. status write to [readStatus]
     void parseJson();
     void saveData();                // save data to QSettings file and QApplication fields
 
     QJsonDocument mJsonDoc;
-    bool mReadStatus = false;        //  status to read conf.json
-    bool mWriteStatus = false;       //  status to write default conf.json
+    bool mReadStatus = false;        //  status after read conf.json
+    bool mWriteStatus = false;       //  status after write configuration file
 };
 
 #endif // STORECONF_H
