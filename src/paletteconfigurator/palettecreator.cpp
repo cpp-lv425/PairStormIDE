@@ -7,20 +7,30 @@ AbstractPaletteCreator::~AbstractPaletteCreator()
 DarkPaletteCreator::DarkPaletteCreator(const QPalette &defaultPalette):
     mPalette(defaultPalette)
 {
-    mPalette.setColor(QPalette::Window, QColor("#353535"));
-    mPalette.setColor(QPalette::WindowText, QColor("#DDDDDD"));
-    mPalette.setColor(QPalette::Base, QColor("#191919"));
-    mPalette.setColor(QPalette::AlternateBase, QColor("#353535"));
-    mPalette.setColor(QPalette::ToolTipBase, QColor("#DDDDDD"));
-    mPalette.setColor(QPalette::ToolTipText, QColor("#DDDDDD"));
-    mPalette.setColor(QPalette::Text, QColor("#DDDDDD"));
-    mPalette.setColor(QPalette::Button, QColor("#353535"));
-    mPalette.setColor(QPalette::ButtonText, QColor("#DDDDDD"));
-    mPalette.setColor(QPalette::BrightText, QColor("#ff0000"));
-    mPalette.setColor(QPalette::Disabled, QPalette::Text, QColor("#353535"));
-    mPalette.setColor(QPalette::Disabled, QPalette::Light, QColor("#191919"));
-    mPalette.setColor(QPalette::Highlight, QColor("#3D7848").lighter());
-    mPalette.setColor(QPalette::HighlightedText, QColor("#191919"));
+    //  create colors prototypes
+    mColors.insert(Colors::DARK, "#191919");
+    mColors.insert(Colors::MEDIUM, "#353535");
+    mColors.insert(Colors::MEDLIGHT, "#5A5A5A");
+    mColors.insert(Colors::LIGHT, "#DDDDDD");
+    mColors.insert(Colors::ACCENT, "#3D7848");
+
+    // configuring colors of active group
+    mPalette.setColor(QPalette::Window, mColors[Colors::MEDIUM]);
+    mPalette.setColor(QPalette::WindowText, mColors[Colors::LIGHT]);
+    mPalette.setColor(QPalette::Base, mColors[Colors::DARK]);
+    mPalette.setColor(QPalette::AlternateBase, mColors[Colors::MEDIUM]);
+    mPalette.setColor(QPalette::ToolTipBase, mColors[Colors::LIGHT]);
+    mPalette.setColor(QPalette::ToolTipText, mColors[Colors::LIGHT]);
+    mPalette.setColor(QPalette::Text, mColors[Colors::LIGHT]);
+    mPalette.setColor(QPalette::Button, mColors[Colors::MEDIUM]);
+    mPalette.setColor(QPalette::ButtonText, mColors[Colors::LIGHT]);
+    mPalette.setColor(QPalette::Highlight, mColors[Colors::ACCENT].lighter());
+    mPalette.setColor(QPalette::HighlightedText, mColors[Colors::DARK]);
+
+    // configuring colors of disabled group
+    mPalette.setColor(QPalette::Disabled, QPalette::Text, mColors[Colors::MEDLIGHT]);
+    mPalette.setColor(QPalette::Disabled, QPalette::Light, mColors[Colors::DARK]);
+    mPalette.setColor(QPalette::Disabled, QPalette::WindowText, mColors[Colors::MEDLIGHT]);
 }
 
 QPalette DarkPaletteCreator::getPalette() const
