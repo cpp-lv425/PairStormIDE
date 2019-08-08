@@ -37,6 +37,23 @@ BrowserDialog::BrowserDialog(QWidget *parent) :
 BrowserDialog::~BrowserDialog()
 {
     delete ui;
+    delete mConnectionManager;
+
+    QDir dir = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
+
+    bool result;
+    result = dir.cd("PairStorm");
+    result = dir.cd("temp");
+
+    if(result)
+    {
+        dir.setNameFilters(QStringList() << "*.html");
+        dir.setFilter(QDir::Files);
+        foreach(QString dirFile, dir.entryList())
+        {
+           dir.remove(dirFile);
+        }
+    }
 }
 
 void BrowserDialog::createNewTab(const QString &keyword)
