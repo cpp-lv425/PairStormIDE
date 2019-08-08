@@ -800,7 +800,10 @@ void MainWindow::restoreMainWindowState()
 
 void MainWindow::setAppStyle()
 {    
+    // fusion style is applied globally
+    // if platform does not support fusion, default style is applied
     qApp->setStyle(QStyleFactory::create("Fusion"));
+    // dark style palette is created & set globally
     QPalette palette = mpPaletteConfigurator->getPalette("DARK");
     qApp->setPalette(palette);
 }

@@ -41,7 +41,7 @@ private:
     MDIArea *mpDocsArea;
     QString mCurrentUserName;
     Browser *mDocumentationBrowser;
-    PaletteConfigurator *mpPaletteConfigurator;
+    QScopedPointer<PaletteConfigurator> mpPaletteConfigurator;
 
     void setupMainMenu();
     void saveDocument(CodeEditor *pDoc, const QString &fileName);
