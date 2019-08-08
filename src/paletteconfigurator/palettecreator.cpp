@@ -7,16 +7,16 @@ AbstractPaletteCreator::~AbstractPaletteCreator()
 DarkPaletteCreator::DarkPaletteCreator(const QPalette &defaultPalette):
     mPalette(defaultPalette)
 {
-    mPalette.setColor(QPalette::Window, QColor(53,53,53));
-    mPalette.setColor(QPalette::WindowText, Qt::white);
+    mPalette.setColor(QPalette::Window, QColor("#353535"));
+    mPalette.setColor(QPalette::WindowText, QColor("#DDDDDD"));
     mPalette.setColor(QPalette::Base, QColor("#191919"));
-    mPalette.setColor(QPalette::AlternateBase, QColor(53,53,53));
-    mPalette.setColor(QPalette::ToolTipBase, Qt::white);
-    mPalette.setColor(QPalette::ToolTipText, Qt::white);
-    mPalette.setColor(QPalette::Text, Qt::white);
-    mPalette.setColor(QPalette::Button, QColor(53,53,53));
-    mPalette.setColor(QPalette::ButtonText, Qt::white);
-    mPalette.setColor(QPalette::BrightText, Qt::red);
+    mPalette.setColor(QPalette::AlternateBase, QColor("#353535"));
+    mPalette.setColor(QPalette::ToolTipBase, QColor("#DDDDDD"));
+    mPalette.setColor(QPalette::ToolTipText, QColor("#DDDDDD"));
+    mPalette.setColor(QPalette::Text, QColor("#DDDDDD"));
+    mPalette.setColor(QPalette::Button, QColor("#353535"));
+    mPalette.setColor(QPalette::ButtonText, QColor("#DDDDDD"));
+    mPalette.setColor(QPalette::BrightText, QColor("#ff0000"));
     mPalette.setColor(QPalette::Disabled, QPalette::Text, QColor("#353535"));
     mPalette.setColor(QPalette::Disabled, QPalette::Light, QColor("#191919"));
     mPalette.setColor(QPalette::Highlight, QColor("#3D7848").lighter());

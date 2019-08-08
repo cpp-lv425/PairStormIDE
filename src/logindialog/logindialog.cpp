@@ -19,10 +19,7 @@ LoginDialog::LoginDialog(QWidget *pParent): QDialog (pParent)
     pInfo->setWordWrap(true);
     QFont infoFont("Segoe UI", 10);
     infoFont.setBold(true);
-    pInfo->setFont(infoFont);
-    QPalette palette;
-    palette.setColor(QPalette::WindowText, Qt::blue);
-    pInfo->setPalette(palette);
+    pInfo->setFont(infoFont);    
 
     // create user name label
     QLabel *pUserNameLbl = new QLabel("User Name");

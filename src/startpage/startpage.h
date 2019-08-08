@@ -39,8 +39,7 @@ signals:
 
 private:
     void setupLabels(QLabel *pLabel,
-                     QFont &lblFont,
-                     QPalette &palette);
+                     QFont &lblFont);
     void setupButton(QPushButton *pButton,
                      QIcon icon,
                      int iconDimension,
