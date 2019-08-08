@@ -20,9 +20,9 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
 
     //read settings
     QSettings settings(QApplication::organizationName(), QApplication::applicationName());
-    QString analizerFontSize = settings.value("analizerFontSize").toString();
-    QString analizerFontName = settings.value("analizerFontName").toString();
-    QString analizerStyle = settings.value("analizerStyle").toString();
+    QString analizerFontSize = settings.value("editorFontSize").toString();
+    QString analizerFontName = settings.value("editorFontName").toString();
+    QString analizerStyle = settings.value("style").toString();
     mConfigParam.setConfigParams(analizerFontName,analizerFontSize,analizerStyle);
 
     //create objects connected to codeEditor

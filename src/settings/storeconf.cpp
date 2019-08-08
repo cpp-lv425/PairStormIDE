@@ -9,126 +9,150 @@
 #include <QFileDialog>
 #include <QApplication>
 
-StoreConf::StoreConf(QWidget * parent)
-    : QWidget (parent)
+StoreConf::StoreConf(QString userName)
+    : mConFile {userName += ".json"}
 {
-    conFile = getPathToConFile();
-    if (!conFile.size()) // conf.json file not exist. keep all fields with default values,
-    {                   // create conf.json with these values
+    mFields["applicationName"] = "Pair Storm";       //  default values used when json file
+    mFields["applicationVersion"] = "0.1";           //      not exist or corrupted
+    mFields["organizationName"] = "Lv-425.C++";
+    mFields["style"] = "WHITE";
+    mFields["editorFontName"] = "Consolas";
+    mFields["editorFontSize"] = "12";
+    mFields["defaultUdpPortNumber"] = "36108";
+    mFields["defaultTcpPortNumber"] = "32807";
+    mFields["userName"] = "unnamed user";
+    mFields["cppExtentions"] = ".c;.cpp;.h;.hpp;.json;.txt";
+    mCppExtentionsList << ".c" << ".cpp" << ".h" << ".hpp" << ".json" << ".txt";
+
+}
+
+void StoreConf::restoreConFile()
+{
+    getPathToConFile();
+    QFile file(mPathToConFile);
+    if (!file.exists()) // userName.json file not exist. keep all fields with default values,
+    {                   // create userName.json with these values
         writeJson();
         saveData();
-    } else {
+    }
+    else
+    {
         readJson();
-        parseJson();
+        if (mReadStatus)
+        {
+            parseJson();
+        }
+        else
+        {                       //  file corrupted
+            writeJson();        //      rewrite with default values
+        }
         saveData();
     }
 }
 
-QString StoreConf::getPathToConFile()
+void StoreConf::saveConFile()
 {
-    QString currentPath = QDir::currentPath();
-    currentPath += "/conf.json";
-    QFile file(currentPath);
-    if(file.exists())
-        return "conf.json";
-    else
-        return "";
+    getPathToConFile();
+    QFile file(mPathToConFile);
+    if (file.exists())
+    {
+        writeJson("finish");
+    }
 }
 
-void StoreConf::writeJson()
+void StoreConf::getPathToConFile()
+{
+    mPathToConFile = QDir::currentPath();
+    mPathToConFile += "/conf/";
+    mPathToConFile += mConFile;
+}
+
+void StoreConf::writeJson(QString mode)
 {
     QJsonObject root_obj;
-    root_obj.insert("organizationName", organizationName);
-    root_obj.insert("applicationVersion", applicationVersion);
-    root_obj.insert("applicationName", applicationName);
-    root_obj.insert("analizerStyle", analizerStyle);
-    root_obj.insert("analizerFontSize", analizerFontSize);
-    root_obj.insert("analizerFontName", analizerFontName);
-    root_obj.insert("cppExtentions", cppExtentions);
+
+    QSettings s;
+    QMap<QString, QString>::const_iterator it = mFields.constBegin();
+    while (it != mFields.constEnd())
+    {
+        if (mode == "start")
+        {                           // copy value from QMap to json
+            root_obj.insert(it.key(), it.value());
+        }
+        else
+        {                           // copy value from QSettings to json
+            if (s.contains(it.key()))
+                root_obj.insert(it.key(), s.value(it.key()).toString());
+        }
+        ++it;
+    }
 
     QJsonDocument json_doc(root_obj);
     QString json_string = json_doc.toJson();
 
-    conFile = conFileDefault;
-
-    QFile save_file(conFile);
+    QFile save_file(mPathToConFile);
     if(!save_file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
-        writeStatus = false;
+        mWriteStatus = false;
         return;
     } else
-        writeStatus = true;
+        mWriteStatus = true;
 
     save_file.write(json_string.toLocal8Bit());
 }
 
 void StoreConf::readJson()
 {
-    QFile loadFile(conFile);        // close in destructor
+    QFile loadFile(mConFile);                       // closing in it destructor
     if (loadFile.open(QIODevice::ReadOnly))
-        readStatus = true;
+        mReadStatus = true;
     else {
-        readStatus = false;
+        mReadStatus = false;
         return;
     }
 
     QByteArray saveData = loadFile.readAll();
-    loadDoc = QJsonDocument::fromJson(saveData);
-    if(loadDoc.isNull() || !loadDoc.isObject() || loadDoc.isEmpty())
-        readStatus = false;
+    mJsonDoc = QJsonDocument::fromJson(saveData);
+    if(mJsonDoc.isNull() || !mJsonDoc.isObject() || mJsonDoc.isEmpty())
+        mReadStatus = false;
     else
-        readStatus = true;
+        mReadStatus = true;
 }
 
 void StoreConf::parseJson()
 {
-    QJsonObject json = loadDoc.object();
+    QJsonObject json = mJsonDoc.object();
+    QMap<QString, QString>::const_iterator it = mFields.constBegin();
+    while (it != mFields.constEnd())
+    {
+        if (json.contains(it.key()) && json[it.key()].isString())   // overwrite default value
+            mFields[it.key()] = json[it.key()].toString();           // from json to QMap
+        ++it;
+    }
 
-    if (json.contains("organizationName") && json["organizationName"].isString())
-        organizationName = json["organizationName"].toString();
+    mCppExtentionsList.clear();                                      // overwrite default value
 
-    if (json.contains("applicationVersion") && json["applicationVersion"].isString())
-        applicationVersion = json["applicationVersion"].toString();
-
-    if (json.contains("applicationName") && json["applicationName"].isString())
-        applicationName = json["applicationName"].toString();
-
-    if (json.contains("analizerStyle") && json["analizerStyle"].isString())
-        analizerStyle = json["analizerStyle"].toString();
-
-    if (json.contains("analizerFontSize") && json["analizerFontSize"].isString())
-        analizerFontSize = json["analizerFontSize"].toString();
-
-    if (json.contains("analizerFontName") && json["analizerFontName"].isString())
-        analizerFontName = json["analizerFontName"].toString();
-
-    if (json.contains("cppExtentions") && json["cppExtentions"].isString())
-        cppExtentions = json["cppExtentions"].toString();
-
-    cppExtentionsList.clear();
-
-    std::string cppExtentionsS = cppExtentions.toStdString();
+    std::string cppExtentionsS = mFields["cppExtentions"].toStdString();
     std::vector<std::string> tokens;
     std::regex re("\\;+");
     std::sregex_token_iterator begin(cppExtentionsS.begin(), cppExtentionsS.end(), re, -1);
     std::sregex_token_iterator end;
     std::copy(begin, end, std::back_inserter(tokens));
     for (unsigned i = 0; i < tokens.size() ; i++)
-        cppExtentionsList << tokens[i].c_str();
+        mCppExtentionsList << tokens[i].c_str();
 }
 
 void StoreConf::saveData()
 {
-    QSettings settings(organizationName, applicationName);
-    settings.setValue("organizationName", organizationName);
-    settings.setValue("applicationVersion", applicationVersion);
-    settings.setValue("applicationName", applicationName);
-    settings.setValue("analizerStyle", analizerStyle);
-    settings.setValue("analizerFontSize", analizerFontSize);
-    settings.setValue("analizerFontName", analizerFontName);
-    settings.setValue("cppExtentions", cppExtentions);
-    settings.setValue("cppExtentionsList", QVariant::fromValue(cppExtentionsList));
+    QApplication::setOrganizationName(mFields["organizationName"]);
+    QApplication::setApplicationVersion(mFields["applicationVersion"]);
+    QApplication::setApplicationName(mFields["applicationName"]);
 
-    QApplication::setOrganizationName(organizationName);
-    QApplication::setApplicationVersion(applicationVersion);
-    QApplication::setApplicationName(applicationName);
+    QSettings settings;
+    QMap<QString, QString>::const_iterator it = mFields.constBegin();
+    while (it != mFields.constEnd())
+    {
+        settings.setValue(it.key(), mFields[it.key()]);        // copy values from QMap to QSettings
+        ++it;
+    }
+    settings.setValue("cppExtentionsList", QVariant::fromValue(mCppExtentionsList));
 }

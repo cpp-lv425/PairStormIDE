@@ -40,7 +40,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->setupUi(this);
     {
-        StoreConf conf(this);
+        StoreConf conf;
+        conf.restoreConFile();
     }
 
     // when first started main window is maximized
@@ -73,7 +74,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // create instance of Bottom Panel
     createButtomPanel();
 
-    restoreMainWindowState();
+    //restoreMainWindowState();
 }
 
 QStringList MainWindow::getFileExtensions() const
@@ -775,6 +776,9 @@ void MainWindow::closeEvent(QCloseEvent *event)
 MainWindow::~MainWindow()
 {
     saveMainWindowState();
+    StoreConf conf;
+    conf.saveConFile();
+
     delete ui;
 }
 
@@ -790,8 +794,10 @@ void MainWindow::saveMainWindowState()
 void MainWindow::restoreMainWindowState()
 {
     QSettings settings(QApplication::organizationName(), QApplication::applicationName());
-    restoreGeometry(settings.value("mainWindowGeometry").toByteArray());
-    restoreState(settings.value("mainWindowState").toByteArray());
+    if (settings.contains("mainWindowGeometry"))
+        restoreGeometry(settings.value("mainWindowGeometry").toByteArray());
+    if (settings.contains("mainWindowState"))
+        restoreState(settings.value("mainWindowState").toByteArray());
 }
 
 void MainWindow::setAppStyle()
