@@ -75,7 +75,7 @@ const std::string mustasheTemplate{R"(<!DOCTYPE html>
                                                     <tbody>
                                                         <tr>
                                                             <td>
-                                                                <strong>Name</strong>
+                                                                <strong>Links</strong>
                                                             </td>
 
                                                         </tr>
