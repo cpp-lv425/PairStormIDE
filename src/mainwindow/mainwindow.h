@@ -10,6 +10,7 @@ class MainWindow;
 
 QT_BEGIN_NAMESPACE
 class LocalConnectorInterface;
+class PaletteConfigurator;
 class ProjectViewerDock;
 class QFileSystemModel;
 class BottomPanelDock;
@@ -40,6 +41,8 @@ private:
     MDIArea *mpDocsArea;
     QString mCurrentUserName;
     Browser *mDocumentationBrowser;
+    PaletteConfigurator *mpPaletteConfigurator;
+
     void setupMainMenu();
     void saveDocument(CodeEditor *pDoc, const QString &fileName);
     void openDoc(QString fileName);

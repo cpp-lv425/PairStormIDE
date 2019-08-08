@@ -11,6 +11,7 @@
 #include <QFile>
 
 #include "localconnectorgenerator.h"
+#include "paletteconfigurator.h"
 #include "projectviewerdock.h"
 #include "bottompaneldock.h"
 #include "chatwindowdock.h"
@@ -27,16 +28,19 @@
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    ui(new Ui::MainWindow),
+    // initializing palette configurator with current palette
+    mpPaletteConfigurator(new PaletteConfigurator(palette()))
 {
     // Generate default local network connector
     mplocalConnector =
             LocalConnectorGenerator::getDefaultConnector();
     // And output its state in case of changes
-    connect(
-                mplocalConnector, &LocalConnectorInterface::serviceStatusChanged,
-                this,             &MainWindow::onConnectionStatusChanged,
-                Qt::UniqueConnection);
+    connect(mplocalConnector,
+            &LocalConnectorInterface::serviceStatusChanged,
+            this,
+            &MainWindow::onConnectionStatusChanged,
+            Qt::UniqueConnection);
 
     ui->setupUi(this);
     {
@@ -796,39 +800,16 @@ void MainWindow::restoreMainWindowState()
 
 void MainWindow::setAppStyle()
 {
-//    QString strCSS;
-//    try
-//    {
-//        strCSS = FileManager().readFromFile(":/cssstyles/darkstylecss.css");
-//    } catch (const QException&)
-//    {
-//        qDebug() << "Unable to read CSS from file";
-//    }
-//    qApp->setStyleSheet(strCSS);
+    //    QString strCSS;
+    //    try
+    //    {
+    //        strCSS = FileManager().readFromFile(":/cssstyles/darkstylecss.css");
+    //    } catch (const QException&)
+    //    {
+    //        qDebug() << "Unable to read CSS from file";
+    //    }
+    //    qApp->setStyleSheet(strCSS);
     qApp->setStyle(QStyleFactory::create("Fusion"));
-
-    QPalette palette;
-    palette.setColor(QPalette::Window, QColor(53,53,53));
-    palette.setColor(QPalette::WindowText, Qt::white);
-    palette.setColor(QPalette::Base, QColor("#191919"));
-    palette.setColor(QPalette::AlternateBase, QColor(53,53,53));
-    palette.setColor(QPalette::ToolTipBase, Qt::white);
-    palette.setColor(QPalette::ToolTipText, Qt::white);
-    palette.setColor(QPalette::Text, Qt::white);
-    palette.setColor(QPalette::Button, QColor(53,53,53));
-    palette.setColor(QPalette::ButtonText, Qt::white);
-    palette.setColor(QPalette::BrightText, Qt::red);
-
-    // disabled text
-
-
-    palette.setColor(QPalette::Disabled, QPalette::Text, QColor("#353535"));
-
-    palette.setColor(QPalette::Disabled, QPalette::Light, QColor("#191919"));
-
-
-
-    palette.setColor(QPalette::Highlight, QColor("#3D7848").lighter());
-    palette.setColor(QPalette::HighlightedText, QColor("#191919"));
+    QPalette palette = mpPaletteConfigurator->getPalette("DARK");
     qApp->setPalette(palette);
 }
