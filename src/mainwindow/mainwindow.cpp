@@ -799,16 +799,7 @@ void MainWindow::restoreMainWindowState()
 }
 
 void MainWindow::setAppStyle()
-{
-    //    QString strCSS;
-    //    try
-    //    {
-    //        strCSS = FileManager().readFromFile(":/cssstyles/darkstylecss.css");
-    //    } catch (const QException&)
-    //    {
-    //        qDebug() << "Unable to read CSS from file";
-    //    }
-    //    qApp->setStyleSheet(strCSS);
+{    
     qApp->setStyle(QStyleFactory::create("Fusion"));
     QPalette palette = mpPaletteConfigurator->getPalette("DARK");
     qApp->setPalette(palette);

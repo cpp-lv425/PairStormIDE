@@ -49,5 +49,4 @@ include($$PWD/utils/utils.pri)
 include($$PWD/paletteconfigurator/paletteconfigurator.pri)
 
 RESOURCES += \
-    cssstyles.qrc \
     globalresources.qrc
