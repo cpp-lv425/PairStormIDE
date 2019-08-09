@@ -96,6 +96,10 @@ NewFileDialog::NewFileDialog(QStringList &fileExtensions,
     int x = screenGeometry.center().x() - width() / 2;
     int y = screenGeometry.center().y() - height() / 2;
     move(x, y);
+
+    // specify tab order
+    setTabOrder(pOkBtn, pCancelBtn);
+    setTabOrder(pCancelBtn, pBrowseBtn);
 }
 
 QString NewFileDialog::start()
