@@ -34,7 +34,7 @@ void StoreConf::restoreConFile()
     if (!file.exists()) // userName.json file not exist. keep all fields with default values,
     {                   // create userName.json with these values
         writeJson();
-        saveData();
+        //saveData();
     }
     else
     {
@@ -47,8 +47,9 @@ void StoreConf::restoreConFile()
         {                        //  file corrupted
             writeJson();        //      rewrite with default values
         }
-        saveData();
+        //saveData();
     }
+    saveData();
 }
 
 void StoreConf::saveConFile()
@@ -103,11 +104,10 @@ void StoreConf::writeJson(QString mode)
     QString json_string = json_doc.toJson();
 
     QFile save_file(mPathToConFile);
-    if(!save_file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
-        mWriteStatus = false;
+    if(!save_file.open(QIODevice::WriteOnly | QIODevice::Truncate))
+    {
         return;
-    } else
-        mWriteStatus = true;
+    }
 
     save_file.write(json_string.toLocal8Bit());
 }

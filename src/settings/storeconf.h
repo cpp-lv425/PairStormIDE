@@ -46,7 +46,6 @@ private:
 
     QJsonDocument mJsonDoc;
     bool mReadStatus = false;        //  status after read conf.json
-    bool mWriteStatus = false;       //  status after write configuration file
 };
 
 #endif // STORECONF_H
