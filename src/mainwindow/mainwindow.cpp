@@ -58,12 +58,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // create instance of MDIArea
     mpDocsArea = new MDIArea(this);
-    setCentralWidget(mpDocsArea);
+    setCentralWidget(mpDocsArea);    
 
-    //create instance of documentation browser
-    //mDocumentationBrowser->hide();
-
-// connect(mDocumentationBrowser,&Browser::close,this,&MainWindow::createNewBrowser);
     // create instance of Project Viewer
     createProjectViewer();
 
@@ -323,8 +319,11 @@ void MainWindow::saveAllModifiedDocuments(QList<QMdiSubWindow*> &docsList)
 
 void MainWindow::createProjectViewer()
 {
-    mpProjectViewerDock = new ProjectViewerDock(this);
+    mpProjectViewerDock = new ProjectViewerDock(getFileExtensions(), this);
     addDockWidget(Qt::LeftDockWidgetArea, mpProjectViewerDock);
+    connect(mpProjectViewerDock, &ProjectViewerDock::openFileFromProjectViewer,
+            this, &MainWindow::onOpenFileFromProjectViewer);
+
     mpProjectViewerDock->setObjectName("mpProjectViewerDock");
 }
 
@@ -364,6 +363,7 @@ void MainWindow::createButtomPanel()
     // create instance of Bottom Panel
     mpBottomPanelDock = new BottomPanelDock(this);
     mpBottomPanelDock->setObjectName("mpBottomPanelDock");
+    addDockWidget(Qt::BottomDockWidgetArea, mpBottomPanelDock);
 }
 
 CodeEditor* MainWindow::getCurrentDoc()
