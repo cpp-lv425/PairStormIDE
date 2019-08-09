@@ -3,6 +3,7 @@ INCLUDEPATH += $$PWD
 
 SOURCES += \
         $$PWD/addcommentbutton.cpp \
+        $$PWD/addcommenttextedit.cpp \
         $$PWD/changesmanager.cpp \
         $$PWD/codeeditor.cpp \
         $$PWD/event.cpp \
@@ -14,6 +15,7 @@ SOURCES += \
 
 HEADERS += \
         $$PWD/addcommentbutton.h \
+        $$PWD/addcommenttextedit.h \
         $$PWD/changemanager.h \
         $$PWD/codeeditor.h \
         $$PWD/event.h \
@@ -31,7 +33,7 @@ HEADERS += \
         $$PWD/widget.h
 
 FORMS += \
-        $$PWD/inputcommentwidget.ui \
+        $$PWD/addcommenttextedit.ui \
         $$PWD/widget.ui
 
 DISTFILES +=

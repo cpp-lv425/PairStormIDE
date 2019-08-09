@@ -8,6 +8,7 @@ const int TOP_UNUSED_PIXELS_HEIGHT = 4;
 #include"ideconfiguration.h"
 #include"changemanager.h"
 #include"addcommentbutton.h"
+#include"addcommenttextedit.h"
 #include"ideconfiguration.h"
 #include"lexercpp.h"
 #include<utility>
@@ -18,6 +19,7 @@ const int TOP_UNUSED_PIXELS_HEIGHT = 4;
 #include<QObject>
 #include<QMouseEvent>
 #include<QLabel>
+
 
 
 class QPaintEvent;
@@ -61,6 +63,7 @@ public slots:
     void saveStateInTheHistory();
     void setZoom(int zoomVal);
     void textChangedInTheOneLine();
+    void showCommentTextEdit(int);
 
 signals:
     void changesAppeared();
@@ -80,6 +83,7 @@ private:
     QTimer *mTimer;
     LexerCPP mLexer;
     AddCommentButton *mAddCommentButton;
+    AddCommentTextEdit *mAddCommentTextEdit;
     QLabel *mCurrentCommentLable;
     int mLinesCount;
     QString mBeginTextState;

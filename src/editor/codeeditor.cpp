@@ -38,15 +38,19 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     mCurrentCommentLable = new QLabel(this);
     setMouseTracking(true);
 
+     //comment text edit
+    mAddCommentTextEdit = new AddCommentTextEdit;
+    mAddCommentTextEdit->setVisible(false);
     //This signal is emitted when the text document needs an update of the specified rect.
     //If the text is scrolled, rect will cover the entire viewport area.
     //If the text is scrolled vertically, dy carries the amount of pixels the viewport was scrolled.
 
-    connect(this,   SIGNAL(updateRequest(QRect,int)), this, SLOT(updateLineNumberArea(QRect,int)));
-    connect(this,   SIGNAL(cursorPositionChanged()),  this, SLOT(runLexer()));
-    connect(mTimer, SIGNAL(timeout()),                this, SLOT(saveStateInTheHistory()));
-    connect(this,   SIGNAL(cursorPositionChanged()),  this, SLOT(highlighText()));
-    connect(this,   SIGNAL(cursorPositionChanged()),            this, SLOT(textChangedInTheOneLine()));
+    connect(this,              SIGNAL(updateRequest(QRect,int)),    this, SLOT(updateLineNumberArea(QRect,int)));
+    connect(this,              SIGNAL(cursorPositionChanged()),     this, SLOT(runLexer()));
+    connect(mTimer,            SIGNAL(timeout()),                   this, SLOT(saveStateInTheHistory()));
+    connect(this,              SIGNAL(cursorPositionChanged()),     this, SLOT(highlighText()));
+    connect(this,              SIGNAL(cursorPositionChanged()),     this, SLOT(textChangedInTheOneLine()));
+    connect(mAddCommentButton, SIGNAL(addCommentButtonPressed(int)),this, SLOT(showCommentTextEdit(int)));
 
     mTimer->start(CHANGE_SAVE_TIME);//save text by this time
 
@@ -206,6 +210,14 @@ void CodeEditor::setZoom(int zoomVal)
 void CodeEditor::textChangedInTheOneLine()
 {
     emit(textChangedInLine(this->textCursor().blockNumber() + 1));
+}
+
+void CodeEditor::showCommentTextEdit(int line)
+{
+    auto globalCodeEditorPos = mapToGlobal(QRect(0,0));
+    mAddCommentTextEdit->setObjectName("Comment to" + QString::number(line) + "line");
+    mAddCommentTextEdit->setGeometry(global)
+    mAddCommentTextEdit->setVisible(true);
 }
 
 void CodeEditor::mouseMoveEvent(QMouseEvent *event)
