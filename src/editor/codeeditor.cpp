@@ -214,9 +214,12 @@ void CodeEditor::textChangedInTheOneLine()
 
 void CodeEditor::showCommentTextEdit(int line)
 {
-    auto globalCodeEditorPos = mapToGlobal(QRect(0,0));
+    auto globalCodeEditorPos = QWidget::mapToGlobal(QPoint(0,0));
     mAddCommentTextEdit->setObjectName("Comment to" + QString::number(line) + "line");
-    mAddCommentTextEdit->setGeometry(global)
+    mAddCommentTextEdit->setGeometry(globalCodeEditorPos.x() + mAddCommentButton->x() - this->width()/2,
+                                     globalCodeEditorPos.y() + mAddCommentButton->y(),
+                                     this->width() / 2,
+                                     this->height() / 3);
     mAddCommentTextEdit->setVisible(true);
 }
 
