@@ -11,7 +11,8 @@
 #include<QRegularExpressionMatchIterator>
 #include<QVector>
 
-enum SpecificTextType{BOLD, ITALIC, BOTH};
+enum SpecificTextType{BOLD,
+                      ITALIC};
 
 struct SpecificText
 {
@@ -38,12 +39,10 @@ public:
 
     QString getCommentString() const;
     void setCommentString(const QString &value);
-    void setCommentToTextEdit();
+    void setSpecialText(const QRegularExpression &re, int oneSideSymbolsCount);
     void setConfiguration(QPlainTextEdit *editor, AddCommentButton *commentButton);
 private slots:
-
-
-    void on_sendMessageButton_clicked();
+    void setWholeText();
 
 private:
     Ui::AddCommentTextEdit *ui;

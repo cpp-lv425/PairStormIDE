@@ -1,6 +1,6 @@
 #include "addcommenttextedit.h"
 #include "ui_addcommenttextedit.h"
-#include<QDebug>
+#include <QDebug>
 
 AddCommentTextEdit::AddCommentTextEdit(QWidget *parent) :
     QWidget(parent),
@@ -9,6 +9,7 @@ AddCommentTextEdit::AddCommentTextEdit(QWidget *parent) :
     ui->setupUi(this);
     ui->setBoldButton->setStyleSheet("font-weight: bold");
     ui->setItalicButton->setStyleSheet("font: italic");
+    connect(ui->sendMessageButton, SIGNAL(pressed()), this, SLOT(setWholeText()));
 }
 
 AddCommentTextEdit::~AddCommentTextEdit()
@@ -36,37 +37,65 @@ void AddCommentTextEdit::setCommentString(const QString &value)
     commentString = value;
 }
 
-void AddCommentTextEdit::setCommentToTextEdit()
+void AddCommentTextEdit::setSpecialText(const QRegularExpression &re, int oneSideSymbolsCount)
 {
     SpecificText specText;
-    qDebug()<<"here";
-    QRegularExpression rx("\\*\\*(.*?)\\*\\*");
-    QString findString = "**text** **test**donttouchit**00000000000000**";
-    QRegularExpressionMatchIterator matchIter =  rx.globalMatch(findString);
+    QString findString = ui->commentTextEdit->toPlainText();
+    QRegularExpressionMatchIterator matchIter =  re.globalMatch(findString);
     int shift = 0;
     while(matchIter.hasNext())
     {
         QRegularExpressionMatch match = matchIter.next();
-        int startOffset = match.capturedStart();
-        int endOffset = match.capturedEnd();
-        if(match.hasMatch())
+        if (match.hasMatch())
         {
-            //QString withoutStars = match.captured(0).mid(2,match.captured(0).length() - 4);
-           // match.captured(0) = match.captured(0).mid(2,match.captured(0).length() - 4);
-           findString.replace(startOffset - shift,endOffset - startOffset, match.captured(0).mid(2,match.captured(0).length() - 4));
-            // qDebug()<<"without stars = "<<withoutStars;
-            specText.startIndex = startOffset - shift > 0?startOffset - shift:0;
-            qDebug()<<"findStr = "<<findString;
-            qDebug()<<"start pos = "<<(startOffset - shift > 0?startOffset - shift:0);
+            int startOffset = match.capturedStart();
+                        int endOffset = match.capturedEnd();
 
-            shift+=4;
+            findString.replace(startOffset - shift,
+                               endOffset - startOffset,
+                               match.captured().mid(oneSideSymbolsCount,
+                                                    match.captured().length() - oneSideSymbolsCount * 2));
+
+            specText.startIndex = startOffset - shift > 0? startOffset - shift : 0;
+
+            shift += oneSideSymbolsCount * 2;
             specText.endIndex = endOffset - shift;
-            specText.textType = SpecificTextType::BOLD;
+
+            specText.textType = oneSideSymbolsCount == 2 ? SpecificTextType::BOLD : SpecificTextType::ITALIC;
             specificTextVector.push_back(specText);
-            qDebug()<<"end pos = "<<endOffset - shift;
+            for(auto &i: specificTextVector)
+            {
+                if(i.textType == 0)
+                {
+                    if(i.startIndex > specText.startIndex)
+                    {
+                        i.startIndex -= oneSideSymbolsCount * 2;
+                        i.endIndex   -= oneSideSymbolsCount * 2;
+                        if(i.endIndex < specText.endIndex)
+                        {
+                          i.startIndex = specText.startIndex;
+                          i.endIndex = specText.endIndex;
+                        }
+                    }
+                }
+                else
+                {
+                    break;
+                }
+            }
         }
+        qDebug()<<"str = "<<findString;
+        qDebug()<<"vector size = "<<specificTextVector.size();
     }
+    for(auto &i: specificTextVector)
+    {
+        qDebug()<<"start = "<<i.startIndex;
+        qDebug()<<"end = "<<i.endIndex;
+        qDebug()<<"type = "<<i.textType;
+    }
+    commentString = findString;
 }
+
 void AddCommentTextEdit::setConfiguration(QPlainTextEdit *editor, AddCommentButton *commentButton)
 {
     auto globalParentPos = QWidget::mapToGlobal(QPoint(0,0));
@@ -76,7 +105,9 @@ void AddCommentTextEdit::setConfiguration(QPlainTextEdit *editor, AddCommentButt
                       editor->height() / 3);
 }
 
-void AddCommentTextEdit::on_sendMessageButton_clicked()
+void AddCommentTextEdit::setWholeText()
 {
-    setCommentToTextEdit();
+    specificTextVector.clear();
+    setSpecialText(QRegularExpression("\\*\\*(.*?)\\*\\*"), 2);
+    setSpecialText(QRegularExpression("_(.*?)_"), 1);
 }
