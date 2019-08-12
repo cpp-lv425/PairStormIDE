@@ -10,6 +10,8 @@
 #include<QRegularExpressionMatch>
 #include<QRegularExpressionMatchIterator>
 #include<QVector>
+#include<QTextCursor>
+#include<QTextCharFormat>
 
 enum SpecificTextType{BOLD,
                       ITALIC};
@@ -39,12 +41,16 @@ public:
 
     QString getCommentString() const;
     void setCommentString(const QString &value);
-    void setSpecialText(const QRegularExpression &re, int oneSideSymbolsCount);
-    void setConfiguration(QPlainTextEdit *editor, AddCommentButton *commentButton);
+    void setSpecialText(const QRegularExpression &re, const SpecificTextType &fontType);
+    void setPosition(QPlainTextEdit *editor, AddCommentButton *commentButton);
+    void setSpecificTextView();
+
 private slots:
     void setWholeText();
 
 private:
+    void shiftAllBold(const SpecificText &specText,const int &oneSideSymbolsCount);
+
     Ui::AddCommentTextEdit *ui;
     int commentLine;
     QString commentString;

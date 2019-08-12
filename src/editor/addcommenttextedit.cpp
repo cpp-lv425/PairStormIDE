@@ -37,8 +37,9 @@ void AddCommentTextEdit::setCommentString(const QString &value)
     commentString = value;
 }
 
-void AddCommentTextEdit::setSpecialText(const QRegularExpression &re, int oneSideSymbolsCount)
+void AddCommentTextEdit::setSpecialText(const QRegularExpression &re, const SpecificTextType &textType)
 {
+    int oneSideSymbolsCount = textType == SpecificTextType::BOLD ? 2: 1;
     SpecificText specText;
     QString findString = ui->commentTextEdit->toPlainText();
     QRegularExpressionMatchIterator matchIter =  re.globalMatch(findString);
@@ -61,42 +62,18 @@ void AddCommentTextEdit::setSpecialText(const QRegularExpression &re, int oneSid
             shift += oneSideSymbolsCount * 2;
             specText.endIndex = endOffset - shift;
 
-            specText.textType = oneSideSymbolsCount == 2 ? SpecificTextType::BOLD : SpecificTextType::ITALIC;
+            specText.textType = textType;
             specificTextVector.push_back(specText);
-            for(auto &i: specificTextVector)
-            {
-                if(i.textType == 0)
-                {
-                    if(i.startIndex > specText.startIndex)
-                    {
-                        i.startIndex -= oneSideSymbolsCount * 2;
-                        i.endIndex   -= oneSideSymbolsCount * 2;
-                        if(i.endIndex < specText.endIndex)
-                        {
-                          i.startIndex = specText.startIndex;
-                          i.endIndex = specText.endIndex;
-                        }
-                    }
-                }
-                else
-                {
-                    break;
-                }
-            }
+
+            shiftAllBold(specText, oneSideSymbolsCount);
         }
-        qDebug()<<"str = "<<findString;
-        qDebug()<<"vector size = "<<specificTextVector.size();
-    }
-    for(auto &i: specificTextVector)
-    {
-        qDebug()<<"start = "<<i.startIndex;
-        qDebug()<<"end = "<<i.endIndex;
-        qDebug()<<"type = "<<i.textType;
     }
     commentString = findString;
+    ui->commentTextEdit->setText(findString);
+    setSpecificTextView();
 }
 
-void AddCommentTextEdit::setConfiguration(QPlainTextEdit *editor, AddCommentButton *commentButton)
+void AddCommentTextEdit::setPosition(QPlainTextEdit *editor, AddCommentButton *commentButton)
 {
     auto globalParentPos = QWidget::mapToGlobal(QPoint(0,0));
     this->setGeometry(globalParentPos.x() + commentButton->x() - editor->width()/2,
@@ -108,6 +85,47 @@ void AddCommentTextEdit::setConfiguration(QPlainTextEdit *editor, AddCommentButt
 void AddCommentTextEdit::setWholeText()
 {
     specificTextVector.clear();
-    setSpecialText(QRegularExpression("\\*\\*(.*?)\\*\\*"), 2);
-    setSpecialText(QRegularExpression("_(.*?)_"), 1);
+    setSpecialText(QRegularExpression("\\*\\*(.*?)\\*\\*"), SpecificTextType::BOLD);
+    setSpecialText(QRegularExpression("_(.*?)_"), SpecificTextType::ITALIC);
+}
+
+void AddCommentTextEdit::shiftAllBold(const SpecificText &specText,const int &oneSideSymbolsCount)
+{
+    for(auto &i: specificTextVector)
+    {
+        if(i.textType != SpecificTextType::BOLD)
+            break;
+        if(i.startIndex > specText.startIndex)
+        {
+            i.startIndex -= oneSideSymbolsCount * 2;
+            i.endIndex   -= oneSideSymbolsCount * 2;
+            if(i.endIndex < specText.endIndex)
+            {
+              i.startIndex = specText.startIndex;
+              i.endIndex = specText.endIndex;
+            }
+        }
+    }
+}
+
+void AddCommentTextEdit::setSpecificTextView()
+{
+    QTextCursor cursor(ui->commentTextEdit->document());
+
+    for(auto &i : specificTextVector)
+    {
+        cursor.setPosition(i.startIndex);
+        cursor.movePosition(QTextCursor::Right,
+                            QTextCursor::KeepAnchor,
+                            i.endIndex - i.startIndex);
+        QTextCharFormat format;
+        format.setFontWeight(QFont::Bold);
+        cursor.mergeCharFormat(format);
+        cursor.clearSelection();
+//        int times = i.endIndex - i.startIndex;
+//        while(times--)
+//        {
+
+//        }
+    }
 }
