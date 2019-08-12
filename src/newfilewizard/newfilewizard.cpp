@@ -26,10 +26,7 @@ NewFileDialog::NewFileDialog(QStringList &fileExtensions,
     pLabel->setWordWrap(true);
     QFont lblFont("Segoe UI", 12);
     lblFont.setBold(true);
-    pLabel->setFont(lblFont);
-    QPalette palette;
-    palette.setColor(QPalette::WindowText, Qt::blue);
-    pLabel->setPalette(palette);
+    pLabel->setFont(lblFont);    
 
     // filename label
     QLabel *pFileNameLbl = new QLabel(tr("File Name"));

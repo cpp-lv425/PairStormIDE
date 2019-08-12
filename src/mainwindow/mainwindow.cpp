@@ -12,6 +12,7 @@
 #include <QFile>
 
 #include "localconnectorgenerator.h"
+#include "paletteconfigurator.h"
 #include "projectviewerdock.h"
 #include "bottompaneldock.h"
 #include "chatwindowdock.h"
@@ -30,16 +31,19 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     // create instance of Document Manager
-    mpDocumentManager(new DocumentManager)
+    mpDocumentManager(new DocumentManager),
+    // initializing palette configurator with current palette
+    mpPaletteConfigurator(new PaletteConfigurator(palette()))
 {
     // Generate default local network connector
     mplocalConnector =
             LocalConnectorGenerator::getDefaultConnector();
     // And output its state in case of changes
-    connect(
-        mplocalConnector, &LocalConnectorInterface::serviceStatusChanged,
-        this,             &MainWindow::onConnectionStatusChanged,
-        Qt::UniqueConnection);
+    connect(mplocalConnector,
+            &LocalConnectorInterface::serviceStatusChanged,
+            this,
+            &MainWindow::onConnectionStatusChanged,
+            Qt::UniqueConnection);
 
     ui->setupUi(this);
     {
@@ -401,8 +405,8 @@ void MainWindow::onOpenFileTriggered()
     QString fileName = QFileDialog::getOpenFileName
             (this,
              userMessages[UserMessages::OpenFileTitle],
-             QDir::currentPath(),
-             "C++/C files (*.h *.hpp *.cpp *.c) ;; Text Files (*.txt) ;; JSON Files (*.json)");
+            QDir::currentPath(),
+            "C++/C files (*.h *.hpp *.cpp *.c) ;; Text Files (*.txt) ;; JSON Files (*.json)");
 
     // if document already opened then return
     if (isOpened(fileName))
@@ -709,7 +713,7 @@ void MainWindow::onConnectionStatusChanged(bool status)
     {
         QMessageBox::warning
                 (this,
-                userMessages[UserMessages::ConnectionFailureTitle],
+                 userMessages[UserMessages::ConnectionFailureTitle],
                 userMessages[UserMessages::ConnectionFailureMsg]);
     }
 }
@@ -745,7 +749,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 //        event->accept();
 //        return;
 //    }
-//    event->ignore();
+//    event->ignore();   
 }
 
 MainWindow::~MainWindow()
@@ -771,11 +775,11 @@ void MainWindow::restoreMainWindowState()
 }
 
 void MainWindow::setAppStyle()
-{
-    QString styleName = "Fusion";
-    QStringList availableStyles = QStyleFactory::keys();
-    if (availableStyles.contains(styleName))
-    {
-        QApplication::setStyle(QStyleFactory::create(styleName));
-    }
+{    
+    // fusion style is applied globally
+    // if platform does not support fusion, default style is applied
+    qApp->setStyle(QStyleFactory::create("Fusion"));
+    // dark style palette is created & set globally
+    QPalette palette = mpPaletteConfigurator->getPalette("DARK");
+    qApp->setPalette(palette);
 }

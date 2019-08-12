@@ -10,6 +10,7 @@ class MainWindow;
 
 QT_BEGIN_NAMESPACE
 class LocalConnectorInterface;
+class PaletteConfigurator;
 class ProjectViewerDock;
 class QFileSystemModel;
 class BottomPanelDock;
@@ -40,6 +41,8 @@ private:
     QScopedPointer<DocumentManager> mpDocumentManager;
     QString mCurrentUserName;
     Browser *mDocumentationBrowser;
+    QScopedPointer<PaletteConfigurator> mpPaletteConfigurator;
+
     void setupMainMenu();
     void saveDocument(CodeEditor *pDoc, const QString &fileName);
     void openDoc(QString fileName);
