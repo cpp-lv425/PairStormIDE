@@ -28,10 +28,18 @@ public:
 
     QString getText();
     QPushButton* getSendButton();
-    void setBoldSelect();
+
+public
+
+slots:
+    void setBoldPressed();
+    void setItalicPressed();
+    void setSpecialSelect(QString sighns);
+
+signals:
+    void setBySpecialSigns(QString sights);
 
 private:
-
     Ui::AddCommentTextEdit *ui;
 };
 

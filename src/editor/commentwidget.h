@@ -8,6 +8,7 @@
 #include<QPlainTextEdit>
 #include "addcommentbutton.h"
 #include<viewtextedit.h>
+#include<QPalette>
 
 enum SpecificTextType{BOLD,
                       ITALIC};

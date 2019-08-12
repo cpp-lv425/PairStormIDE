@@ -24,12 +24,17 @@ CommentWidget::CommentWidget(QWidget *parent) :
     commentTabWIdget->addTab(editTab, "Edit");
     commentTabWIdget->addTab(viewTab, "View");
 
+    this->setWindowIcon(QIcon(":/img/comment.ico"));
+
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(commentTabWIdget);
     this->setLayout(mainLayout);
     connect(commentTabWIdget, SIGNAL(currentChanged(int)), this, SLOT(setWholeText(int)));
     //connect(editTab->getSendButton(), SIGNAL(pressed()), this, SLOT(setWholeText()));
     commentString = editTab->getText();
+
+    this->setEnabled(true);
+
 }
 
 CommentWidget::~CommentWidget()
@@ -90,7 +95,7 @@ void CommentWidget::setWholeText(int index)
         return;
     }
     specificTextVector.clear();
-    writeSpecialTextPositions(QRegularExpression("\\*\\*(.*?)\\*\\*"), SpecificTextType::BOLD);
+    writeSpecialTextPositions(QRegularExpression("\\*\\*(?:(?:[^*])|(?:\\*[^*])|(?:[^*]\\*))*(?:\\*| |\n)*\\*\\*"), SpecificTextType::BOLD);
     writeSpecialTextPositions(QRegularExpression("_(.*?)_"), SpecificTextType::ITALIC);
 
     setSpecificTextView();

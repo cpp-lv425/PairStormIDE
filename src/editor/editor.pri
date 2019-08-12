@@ -43,3 +43,6 @@ FORMS += \
         $$PWD/widget.ui
 
 DISTFILES +=
+
+RESOURCES += \
+    $$PWD/editoricons.qrc
