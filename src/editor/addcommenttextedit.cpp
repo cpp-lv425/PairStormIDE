@@ -73,15 +73,6 @@ void AddCommentTextEdit::setSpecialText(const QRegularExpression &re, const Spec
     setSpecificTextView();
 }
 
-void AddCommentTextEdit::setPosition(QPlainTextEdit *editor, AddCommentButton *commentButton)
-{
-    auto globalParentPos = QWidget::mapToGlobal(QPoint(0,0));
-    this->setGeometry(globalParentPos.x() + commentButton->x() - editor->width()/2,
-                      globalParentPos.y() + commentButton->y(),
-                      editor->width() /  2,
-                      editor->height() / 3);
-}
-
 void AddCommentTextEdit::setWholeText()
 {
     specificTextVector.clear();

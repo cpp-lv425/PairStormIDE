@@ -42,7 +42,6 @@ public:
     QString getCommentString() const;
     void setCommentString(const QString &value);
     void setSpecialText(const QRegularExpression &re, const SpecificTextType &fontType);
-    void setPosition(QPlainTextEdit *editor, AddCommentButton *commentButton);
     void setSpecificTextView();
 
 private slots:

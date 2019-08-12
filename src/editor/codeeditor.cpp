@@ -39,8 +39,11 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     setMouseTracking(true);
 
      //comment text edit
-    mAddCommentTextEdit = new AddCommentTextEdit;
-    mAddCommentTextEdit->setVisible(false);
+  //  mAddCommentTextEdit = new AddCommentTextEdit;
+   // mAddCommentTextEdit->setVisible(false);
+
+    mCommentWidget = new CommentWidget;
+    mCommentWidget->setVisible(false);
     //This signal is emitted when the text document needs an update of the specified rect.
     //If the text is scrolled, rect will cover the entire viewport area.
     //If the text is scrolled vertically, dy carries the amount of pixels the viewport was scrolled.
@@ -214,13 +217,9 @@ void CodeEditor::textChangedInTheOneLine()
 
 void CodeEditor::showCommentTextEdit(int line)
 {
-    auto globalCodeEditorPos = QWidget::mapToGlobal(QPoint(0,0));
-    mAddCommentTextEdit->setObjectName("Comment to" + QString::number(line) + "line");
-    mAddCommentTextEdit->setGeometry(globalCodeEditorPos.x() + mAddCommentButton->x() - this->width()/2,
-                                     globalCodeEditorPos.y() + mAddCommentButton->y(),
-                                     this->width() / 2,
-                                     this->height() / 3);
-    mAddCommentTextEdit->setVisible(true);
+    mCommentWidget->setWindowTitle("Comment to " + QString::number(line) + " line");
+    mCommentWidget->setPosition(this, mAddCommentButton);
+    mCommentWidget->setVisible(true);
 }
 
 void CodeEditor::mouseMoveEvent(QMouseEvent *event)

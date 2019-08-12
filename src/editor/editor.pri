@@ -6,6 +6,7 @@ SOURCES += \
         $$PWD/addcommenttextedit.cpp \
         $$PWD/changesmanager.cpp \
         $$PWD/codeeditor.cpp \
+        $$PWD/commentwidget.cpp \
         $$PWD/event.cpp \
         $$PWD/eventbuilder.cpp \
         $$PWD/keypressevents.cpp \
@@ -18,6 +19,7 @@ HEADERS += \
         $$PWD/addcommenttextedit.h \
         $$PWD/changemanager.h \
         $$PWD/codeeditor.h \
+        $$PWD/commentwidget.h \
         $$PWD/event.h \
         $$PWD/eventbuilder.h \
         $$PWD/fmstates.h \
@@ -34,6 +36,7 @@ HEADERS += \
 
 FORMS += \
         $$PWD/addcommenttextedit.ui \
+        $$PWD/commentwidget.ui \
         $$PWD/widget.ui
 
 DISTFILES +=

@@ -19,6 +19,7 @@ const int TOP_UNUSED_PIXELS_HEIGHT = 4;
 #include<QObject>
 #include<QMouseEvent>
 #include<QLabel>
+#include<commentwidget.h>
 
 
 
@@ -84,6 +85,7 @@ private:
     LexerCPP mLexer;
     AddCommentButton *mAddCommentButton;
     AddCommentTextEdit *mAddCommentTextEdit;
+    CommentWidget *mCommentWidget;
     QLabel *mCurrentCommentLable;
     int mLinesCount;
     QString mBeginTextState;

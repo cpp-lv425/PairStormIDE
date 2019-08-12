@@ -2,8 +2,14 @@
 #define COMMENTWIDGET_H
 
 #include <QWidget>
+#include <QTabWidget>
+#include<addcommenttextedit.h>
+#include<QVBoxLayout>
+#include<QPlainTextEdit>
+#include "addcommentbutton.h"
 
-namespace Ui {
+namespace Ui
+{
 class CommentWidget;
 }
 
@@ -14,6 +20,7 @@ class CommentWidget : public QWidget
 public:
     explicit CommentWidget(QWidget *parent = nullptr);
     ~CommentWidget();
+    void setPosition(QPlainTextEdit *editor, AddCommentButton *commentButton);
 
 private:
     Ui::CommentWidget *ui;
