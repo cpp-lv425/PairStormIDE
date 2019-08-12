@@ -14,6 +14,7 @@
 #include "localconnectorgenerator.h"
 #include "paletteconfigurator.h"
 #include "projectviewerdock.h"
+#include "documentmanager.h"
 #include "bottompaneldock.h"
 #include "chatwindowdock.h"
 #include "newfilewizard.h"
@@ -24,7 +25,6 @@
 #include "codeeditor.h"
 #include "storeconf.h"
 #include "startpage.h"
-#include "documentmanager.h"
 #include "utils.h"
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -158,6 +158,9 @@ void MainWindow::setupMainMenu()
     QAction *pScaleSubMenu = viewMenu->addMenu(scaleSubMenu);
     pScaleSubMenu->setDisabled(true);
 
+    viewMenu->addAction("Split &Horizontally", this, &MainWindow::onSplitHorizontallyTriggered);
+    viewMenu->addAction("Split &Vectically", this, &MainWindow::onSplitVerticallyTriggered);
+
     viewMenu->addSeparator();
     viewMenu->addAction("Show &Project Viewer", this, &MainWindow::onShowProjectViewerTriggered);
     viewMenu->addAction("Show &Chat Window", this, &MainWindow::onShowChatWindowDockTriggered);
@@ -275,37 +278,6 @@ void MainWindow::openDoc(QString fileName)
     mpDocumentManager->openDocument(fileName, true);
 }
 
-bool MainWindow::isOpened(const QString &fileName) const
-{
-    // getting all docs
-//    auto docsList = mpDocsArea->subWindowList();
-
-//    for (const auto &doc : docsList)
-//    {
-//        auto curDoc = qobject_cast<CodeEditor*>(doc->widget());
-//        if (curDoc && curDoc->getFileName() == fileName)
-//        {
-//            return true;
-//        }
-//    }
-
-    return false;
-}
-
-bool MainWindow::isModified(QList<QMdiSubWindow*> &docsList)
-{
-    for (int i = 0; i < docsList.size(); ++i)
-    {
-        auto curDoc = qobject_cast<CodeEditor*>(docsList[i]->widget());
-
-        if (curDoc && curDoc->isChanged())
-        {
-            return true;
-        }
-    }
-    return false;
-}
-
 void MainWindow::saveAllModifiedDocuments(QList<QMdiSubWindow*> &docsList)
 {
     for (int i = 0; i < docsList.size(); ++i)
@@ -367,17 +339,7 @@ void MainWindow::createButtomPanel()
 
 CodeEditor* MainWindow::getCurrentDoc()
 {
-    // get current subWindow
-    // if there are no subWindows nullptr is returned
-//    auto subWindow = mpDocsArea->currentSubWindow();
-
-//    if (!subWindow)
-//    {
-//        return nullptr;
-//    }
-//    auto curDoc = qobject_cast<CodeEditor*>(subWindow->widget());
-
-//    return curDoc ? curDoc : nullptr;
+    // consider removing current method
     return nullptr;
 }
 
@@ -408,16 +370,6 @@ void MainWindow::onOpenFileTriggered()
             QDir::currentPath(),
             "C++/C files (*.h *.hpp *.cpp *.c) ;; Text Files (*.txt) ;; JSON Files (*.json)");
 
-    // if document already opened then return
-    if (isOpened(fileName))
-    {
-        QMessageBox::warning
-                (this,
-                 userMessages[UserMessages::DocumentAlreadyOpenedTitle],
-                userMessages[UserMessages::DocumentAlreadyOpenedMsg]);
-        return;
-    }
-
     openDoc(fileName);
 }
 
@@ -427,6 +379,7 @@ void MainWindow::onOpenFolderTriggered()
             (this,
              userMessages[UserMessages::OpenDirectoryTitle],
             QDir::currentPath());
+
     mpProjectViewerDock->setDir(dirName);
 }
 
@@ -613,6 +566,16 @@ void MainWindow::onFullScreenTriggered()
     //
 }
 
+void MainWindow::onSplitHorizontallyTriggered()
+{
+    mpDocumentManager->onSplit(Qt::Horizontal);
+}
+
+void MainWindow::onSplitVerticallyTriggered()
+{
+    mpDocumentManager->onSplit(Qt::Vertical);
+}
+
 void MainWindow::onShowProjectViewerTriggered()
 {
     mpProjectViewerDock->show();
@@ -689,16 +652,6 @@ void MainWindow::onReferenceFromEditor(const QString &keyword)
 
 void MainWindow::onOpenFileFromProjectViewer(QString fileName)
 {
-    // if document already opened then return
-    if (isOpened(fileName))
-    {
-        QMessageBox::warning
-                (this,
-                 userMessages[UserMessages::DocumentAlreadyOpenedTitle],
-                userMessages[UserMessages::DocumentAlreadyOpenedMsg]);
-        return;
-    }
-
     openDoc(fileName);
 }
 

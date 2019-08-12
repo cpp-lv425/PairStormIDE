@@ -7,7 +7,7 @@ TextDocumentHolder::TextDocumentHolder(const QString &fileName, QWidget *pParent
 {
 }
 
-const QString& TextDocumentHolder::fileName() const
+const QString& TextDocumentHolder::getFileName() const
 {
     return mFileName;
 }

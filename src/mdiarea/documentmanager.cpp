@@ -2,8 +2,10 @@
 
 #include <QMessageBox>
 #include <QSplitter>
+#include <algorithm>
 #include <QMdiArea>
 #include <QVector>
+#include <QDebug>
 
 #include "textdocumentholder.h"
 #include "usermessages.h"
@@ -14,6 +16,7 @@
 DocumentManager::DocumentManager()
 {
     mpSplitter = new QSplitter;
+    split->setChildrenCollapsible(false);
     splitWindow();
 }
 
@@ -80,6 +83,12 @@ void DocumentManager::loadFile(CodeEditor *newView, const QString &fileName)
     newView->setPlainText(readResult);
 }
 
+void DocumentManager::onSplit(Qt::Orientation orientation)
+{
+    splitWindow();
+    mpSplitter->setOrientation(orientation);
+}
+
 QMdiArea* DocumentManager::createMdiArea()
 {
     QMdiArea *pMdiArea = new QMdiArea;
@@ -96,6 +105,11 @@ QMdiArea* DocumentManager::selectAreaForPlacement()
 
 TextDocumentHolder* DocumentManager::openedDoc(const QString &fileName)
 {
-    // temp
-    return nullptr;
+    auto openedDocum = std::find_if(mDocuments.begin(), mDocuments.end(), [&fileName](const auto& doc)
+    {
+        return doc->getFileName() == fileName;
+    });
+    // if document is opened - ptr to it is returned
+    // otherwise null is returned
+    return (openedDocum != mDocuments.end()) ? openedDocum->get() : nullptr;
 }

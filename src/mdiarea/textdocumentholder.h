@@ -8,9 +8,9 @@ class TextDocumentHolder: public QPlainTextEdit
     QString mFileName;
     size_t mViewCount;
 public:
-    TextDocumentHolder(const QString &fileName, QWidget *pParent = nullptr);
-    const QString& fileName() const;
-    void setFileName(const QString &fileName);
+    TextDocumentHolder(const QString &getFileName, QWidget *pParent = nullptr);
+    const QString& getFileName() const;
+    void setFileName(const QString &getFileName);
     void incrementViewCount();
 };
 

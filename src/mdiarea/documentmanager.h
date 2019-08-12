@@ -23,6 +23,9 @@ public:
     void openDocument(const QString &fileName, bool load = false);
     void loadFile(CodeEditor *newView, const QString &fileName);
 
+public slots:
+    void onSplit(Qt::Orientation orientation);
+
 private:
     QMdiArea* createMdiArea();
     QMdiArea* selectAreaForPlacement();

@@ -14,12 +14,12 @@ class PaletteConfigurator;
 class ProjectViewerDock;
 class QFileSystemModel;
 class BottomPanelDock;
+class DocumentManager;
 class QListWidgetItem;
 class ChatWindowDock;
 class QMdiSubWindow;
 class CodeEditor;
 class Browser;
-class DocumentManager;
 QT_END_NAMESPACE
 
 class MainWindow : public QMainWindow
@@ -46,8 +46,6 @@ private:
     void setupMainMenu();
     void saveDocument(CodeEditor *pDoc, const QString &fileName);
     void openDoc(QString fileName);
-    bool isOpened(const QString &fileName)const;
-    bool isModified(QList<QMdiSubWindow*> &docsList);
     void saveAllModifiedDocuments(QList<QMdiSubWindow*> &docsList);
     void createProjectViewer();
     void createChatWindow();
@@ -81,6 +79,8 @@ private slots:
 
     // view menu
     void onFullScreenTriggered();
+    void onSplitHorizontallyTriggered();
+    void onSplitVerticallyTriggered();
     void onShowProjectViewerTriggered();
     void onShowChatWindowDockTriggered();
     void onShowBottomPanel();
