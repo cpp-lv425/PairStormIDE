@@ -2,7 +2,9 @@ DEPENDPATH += $$PWD
 INCLUDEPATH += $$PWD
 
 HEADERS += \
-    $$PWD/mdiarea.h
+    $$PWD/documentmanager.h \
+    $$PWD/textdocumentholder.h
 
 SOURCES += \
-    $$PWD/mdiarea.cpp
+    $$PWD/documentmanager.cpp \
+    $$PWD/textdocumentholder.cpp

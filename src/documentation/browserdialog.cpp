@@ -9,7 +9,7 @@
 #include <QWebEngineView>
 #include <QWebEnginePage>
 
-#include "mdiarea.h"
+#include "documentmanager.h"
 #include "documentationsearch.h"
 #include "connectionmanager.h"
 #include "documentationengine.h"

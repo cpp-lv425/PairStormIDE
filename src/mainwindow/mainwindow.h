@@ -18,7 +18,7 @@ class ChatWindowDock;
 class QMdiSubWindow;
 class CodeEditor;
 class Browser;
-class MDIArea;
+class DocumentManager;
 QT_END_NAMESPACE
 
 class MainWindow : public QMainWindow
@@ -37,7 +37,7 @@ private:
     ProjectViewerDock *mpProjectViewerDock;
     ChatWindowDock *mpChatWindowDock;
     BottomPanelDock *mpBottomPanelDock;
-    MDIArea *mpDocsArea;
+    QScopedPointer<DocumentManager> mpDocumentManager;
     QString mCurrentUserName;
     Browser *mDocumentationBrowser;
     void setupMainMenu();
