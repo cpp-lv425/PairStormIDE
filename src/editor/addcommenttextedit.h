@@ -13,16 +13,6 @@
 #include<QTextCursor>
 #include<QTextCharFormat>
 
-enum SpecificTextType{BOLD,
-                      ITALIC};
-
-struct SpecificText
-{
-    int startIndex;
-    int endIndex;
-    SpecificTextType textType;
-};
-
 namespace Ui
 {
 class AddCommentTextEdit;
@@ -36,24 +26,13 @@ public:
     explicit AddCommentTextEdit(QWidget *parent = nullptr);
     ~AddCommentTextEdit();
 
-    int getCommentLine() const;
-    void setCommentLine(int value);
-
-    QString getCommentString() const;
-    void setCommentString(const QString &value);
-    void setSpecialText(const QRegularExpression &re, const SpecificTextType &fontType);
-    void setSpecificTextView();
-
-private slots:
-    void setWholeText();
+    QString getText();
+    QPushButton* getSendButton();
+    void setBoldSelect();
 
 private:
-    void shiftAllBold(const SpecificText &specText,const int &oneSideSymbolsCount);
 
     Ui::AddCommentTextEdit *ui;
-    int commentLine;
-    QString commentString;
-    QVector<SpecificText>specificTextVector;
 };
 
 #endif // ADDCOMMENTTEXTEDIT_H

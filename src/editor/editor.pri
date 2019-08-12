@@ -12,6 +12,7 @@ SOURCES += \
         $$PWD/keypressevents.cpp \
         $$PWD/lexercpp.cpp \
         $$PWD/linenumberarea.cpp \
+        $$PWD/viewtextedit.cpp \
         $$PWD/widget.cpp
 
 HEADERS += \
@@ -32,11 +33,13 @@ HEADERS += \
         $$PWD/operators.h \
         $$PWD/spaces.h \
         $$PWD/token.h \
+        $$PWD/viewtextedit.h \
         $$PWD/widget.h
 
 FORMS += \
         $$PWD/addcommenttextedit.ui \
         $$PWD/commentwidget.ui \
+        $$PWD/viewtextedit.ui \
         $$PWD/widget.ui
 
 DISTFILES +=
