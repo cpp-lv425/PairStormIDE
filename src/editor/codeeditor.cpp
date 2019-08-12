@@ -48,12 +48,14 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     //If the text is scrolled, rect will cover the entire viewport area.
     //If the text is scrolled vertically, dy carries the amount of pixels the viewport was scrolled.
 
-    connect(this,              SIGNAL(updateRequest(QRect,int)),    this, SLOT(updateLineNumberArea(QRect,int)));
-    connect(this,              SIGNAL(cursorPositionChanged()),     this, SLOT(runLexer()));
-    connect(mTimer,            SIGNAL(timeout()),                   this, SLOT(saveStateInTheHistory()));
-    connect(this,              SIGNAL(cursorPositionChanged()),     this, SLOT(highlighText()));
-    connect(this,              SIGNAL(cursorPositionChanged()),     this, SLOT(textChangedInTheOneLine()));
-    connect(mAddCommentButton, SIGNAL(addCommentButtonPressed(int)),this, SLOT(showCommentTextEdit(int)));
+    connect(this,              SIGNAL(updateRequest(QRect,int)),     this, SLOT(updateLineNumberArea(QRect,int)));
+    connect(this,              SIGNAL(cursorPositionChanged()),      this, SLOT(runLexer()));
+    connect(mTimer,            SIGNAL(timeout()),                    this, SLOT(saveStateInTheHistory()));
+    connect(this,              SIGNAL(cursorPositionChanged()),      this, SLOT(highlighText()));
+    connect(this,              SIGNAL(cursorPositionChanged()),      this, SLOT(textChangedInTheOneLine()));
+    connect(mAddCommentButton, SIGNAL(addCommentButtonPressed(int)) ,this, SLOT(showCommentTextEdit(int)));
+    connect(mCommentWidget->getEditTab(), SIGNAL(emptyComment()),    this, SLOT(emptyCommentWasAdded()));
+    connect(mCommentWidget->getEditTab(), SIGNAL(notEmptyComment()), this, SLOT(notEmptyCommentWasAdded()));
 
     mTimer->start(CHANGE_SAVE_TIME);//save text by this time
 
@@ -220,6 +222,17 @@ void CodeEditor::showCommentTextEdit(int line)
     mCommentWidget->setWindowTitle("Comment to " + QString::number(line) + " line");
     mCommentWidget->setPosition(this, mAddCommentButton);
     mCommentWidget->setVisible(true);
+}
+
+void CodeEditor::emptyCommentWasAdded()
+{
+    //delete from database if record exists(for the future)
+    mCommentWidget->setVisible(false);
+}
+
+void CodeEditor::notEmptyCommentWasAdded()
+{
+    qDebug()<<" not empty";
 }
 
 void CodeEditor::mouseMoveEvent(QMouseEvent *event)

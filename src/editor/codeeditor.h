@@ -65,6 +65,8 @@ public slots:
     void setZoom(int zoomVal);
     void textChangedInTheOneLine();
     void showCommentTextEdit(int);
+    void emptyCommentWasAdded();
+    void notEmptyCommentWasAdded();
 
 signals:
     void changesAppeared();

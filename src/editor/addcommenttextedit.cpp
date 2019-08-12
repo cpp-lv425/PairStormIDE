@@ -10,9 +10,10 @@ AddCommentTextEdit::AddCommentTextEdit(QWidget *parent) :
     ui->setBoldButton->setStyleSheet("font-weight: bold");
     ui->setItalicButton->setStyleSheet("font: italic");
 
-    connect(ui->setBoldButton,   SIGNAL(clicked()),                  this, SLOT(setBoldPressed()));
-    connect(ui->setItalicButton, SIGNAL(clicked()),                  this, SLOT(setItalicPressed()));
-    connect(this,                SIGNAL(setBySpecialSigns(QString)), this, SLOT(setSpecialSelect(QString)));
+    connect(ui->sendMessageButton, SIGNAL(clicked()),                  this, SLOT(sendComment()));
+    connect(ui->setBoldButton,     SIGNAL(clicked()),                  this, SLOT(setBoldPressed()));
+    connect(ui->setItalicButton,   SIGNAL(clicked()),                  this, SLOT(setItalicPressed()));
+    connect(this,                  SIGNAL(setBySpecialSigns(QString)), this, SLOT(setSpecialSelect(QString)));
 }
 
 AddCommentTextEdit::~AddCommentTextEdit()
@@ -44,10 +45,14 @@ void AddCommentTextEdit::setSpecialSelect(QString sighns)
 {
     int selectionStart = ui->commentTextEdit->textCursor().selectionStart();
     int selectionEnd = ui->commentTextEdit->textCursor().selectionEnd();
-    auto selectedText = ui->commentTextEdit->textCursor().selectedText();
 
-    QString after = selectedText.prepend(sighns);
+    QTextCursor curs = ui->commentTextEdit->textCursor();
+    QString after = ui->commentTextEdit->textCursor().selectedText();
+
+    after.prepend(sighns);
     after.append(sighns);
+
+    ui->commentTextEdit->textCursor().keepPositionOnInsert();
     QString currString = ui->commentTextEdit->toPlainText();
     currString.replace(
                 selectionStart,
@@ -55,9 +60,19 @@ void AddCommentTextEdit::setSpecialSelect(QString sighns)
                 after);
 
     ui->commentTextEdit->setText(currString);
-    QTextCursor curs = ui->commentTextEdit->textCursor();
-    qDebug()<<"curs pos = "<<curs.position();
-    curs.setPosition(selectionStart);
-   // ui->commentTextEdit->setCur
-    ui->commentTextEdit->textCursor().setPosition(selectionStart);
+    curs.setPosition(selectionStart + sighns.length());
+    ui->commentTextEdit->setTextCursor(curs);
+    ui->commentTextEdit->setFocus();
+}
+
+void AddCommentTextEdit::sendComment()
+{
+    if(ui->commentTextEdit->toPlainText().isEmpty())
+    {
+        emit emptyComment();
+    }
+    else
+    {
+        emit notEmptyComment();
+    }
 }

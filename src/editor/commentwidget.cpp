@@ -30,7 +30,6 @@ CommentWidget::CommentWidget(QWidget *parent) :
     mainLayout->addWidget(commentTabWIdget);
     this->setLayout(mainLayout);
     connect(commentTabWIdget, SIGNAL(currentChanged(int)), this, SLOT(setWholeText(int)));
-    //connect(editTab->getSendButton(), SIGNAL(pressed()), this, SLOT(setWholeText()));
     commentString = editTab->getText();
 
     this->setEnabled(true);
@@ -55,8 +54,7 @@ void CommentWidget::writeSpecialTextPositions(const QRegularExpression &re, cons
 {
     int oneSideSymbolsCount = textType == SpecificTextType::BOLD ? 2: 1;
     SpecificText specText;
-    QString findString = textType == SpecificTextType::BOLD? editTab->getText() : commentString;
-    qDebug()<<"find string ="<<findString;
+    QString findString = textType == SpecificTextType::BOLD ? editTab->getText() : commentString;
 
     QRegularExpressionMatchIterator matchIter =  re.globalMatch(findString);
     int shift = 0;
@@ -95,29 +93,50 @@ void CommentWidget::setWholeText(int index)
         return;
     }
     specificTextVector.clear();
-    writeSpecialTextPositions(QRegularExpression("\\*\\*(?:(?:[^*])|(?:\\*[^*])|(?:[^*]\\*))*(?:\\*| |\n)*\\*\\*"), SpecificTextType::BOLD);
+    writeSpecialTextPositions(QRegularExpression("\\*\\*(?:(?:[^*])|(?:\\*[^*])|(?:[^*]\\*))*(?:\\*| |\n)*\\*\\*"),
+                              SpecificTextType::BOLD);
     writeSpecialTextPositions(QRegularExpression("_(.*?)_"), SpecificTextType::ITALIC);
 
     setSpecificTextView();
 }
 
+ViewTextEdit *CommentWidget::getViewTab() const
+{
+    return viewTab;
+}
+
+void CommentWidget::setViewTab(ViewTextEdit *value)
+{
+    viewTab = value;
+}
+
+AddCommentTextEdit *CommentWidget::getEditTab() const
+{
+    return editTab;
+}
+
+void CommentWidget::setEditTab(AddCommentTextEdit *value)
+{
+    editTab = value;
+}
+
 void CommentWidget::shiftAllBold(const SpecificText &specText,const int &oneSideSymbolsCount)
 {
     for(auto &i: specificTextVector)
+    {
+        if(i.textType != SpecificTextType::BOLD)
+            break;
+        if(i.startIndex > specText.startIndex)
         {
-            if(i.textType != SpecificTextType::BOLD)
-                break;
-            if(i.startIndex > specText.startIndex)
+            i.startIndex -= oneSideSymbolsCount * 2;
+            i.endIndex   -= oneSideSymbolsCount * 2;
+            if(i.endIndex < specText.endIndex)
             {
-                i.startIndex -= oneSideSymbolsCount * 2;
-                i.endIndex   -= oneSideSymbolsCount * 2;
-                if(i.endIndex < specText.endIndex)
-                {
-                  i.startIndex = specText.startIndex;
-                  i.endIndex = specText.endIndex;
-                }
+              i.startIndex = specText.startIndex;
+              i.endIndex = specText.endIndex;
             }
         }
+    }
 }
 
 void CommentWidget::setSpecificTextView()

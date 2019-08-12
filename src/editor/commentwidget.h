@@ -36,8 +36,14 @@ public:
     void writeSpecialTextPositions(const QRegularExpression &re, const SpecificTextType &textType);
     void shiftAllBold(const SpecificText &specText,const int &oneSideSymbolsCount);
     void setSpecificTextView();
+    AddCommentTextEdit *getEditTab() const;
+    void setEditTab(AddCommentTextEdit *value);
+
+    ViewTextEdit *getViewTab() const;
+    void setViewTab(ViewTextEdit *value);
+
 public slots:
-        void setWholeText(int);
+    void setWholeText(int);
 private:
     Ui::CommentWidget *ui;
     AddCommentTextEdit *editTab;
