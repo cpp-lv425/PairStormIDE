@@ -267,14 +267,8 @@ void MainWindow::openDoc(QString fileName)
         return;
     }
 
-    // creating new doc & passing file content to it
-    CodeEditor *newDoc = createNewDoc();
-    newDoc->setFileName(fileName);
-    int position = fileName.lastIndexOf(QChar{'/'});
-    newDoc->setWindowTitle(fileName.mid(position + 1));
-    newDoc->setPlainText(readResult);
-    newDoc->setBeginTextState();
-    newDoc->show();
+    //
+    mpDocumentManager->openDocument(fileName, true);
 }
 
 bool MainWindow::isOpened(const QString &fileName) const
@@ -398,14 +392,8 @@ void MainWindow::onNewFileTriggered()
     {
         return;
     }
-
-    // new doc is created & shown
-    CodeEditor *newDoc = createNewDoc();
-    int position = newFileName.lastIndexOf(QChar{'/'});
-    newDoc->setFileName(newFileName);
-    newDoc->setWindowTitle(newFileName.mid(position + 1));
-    newDoc->setBeginTextState();
-    newDoc->show();
+    // opening doc with selected name
+    mpDocumentManager->openDocument(newFileName);
 }
 
 void MainWindow::onOpenFileTriggered()
@@ -724,21 +712,6 @@ void MainWindow::onConnectionStatusChanged(bool status)
                 userMessages[UserMessages::ConnectionFailureTitle],
                 userMessages[UserMessages::ConnectionFailureMsg]);
     }
-}
-
-CodeEditor* MainWindow::createNewDoc()
-{
-//    CodeEditor *newDoc = new CodeEditor;
-
-//    mpDocsArea->addSubWindow(newDoc);
-//    connect(newDoc, &CodeEditor::sendLexem,this,&MainWindow::onReferenceFromEditor);
-//    connect(newDoc, &CodeEditor::closeDocEventOccured,
-//            this, &MainWindow::onCloseWindow);
-//    newDoc->setAttribute(Qt::WA_DeleteOnClose);
-//    newDoc->document()->setModified(false);
-
-//    return newDoc;
-    return  nullptr;
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)

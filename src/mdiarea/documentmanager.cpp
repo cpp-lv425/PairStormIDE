@@ -48,7 +48,7 @@ void DocumentManager::openDocument(const QString &fileName, bool load)
     }
     else
     {
-        QScopedPointer<TextDocumentHolder> newDoc(new TextDocumentHolder(fileName));
+        QSharedPointer<TextDocumentHolder> newDoc(new TextDocumentHolder(fileName));
         mDocuments.push_back(newDoc);
         newDoc->incrementViewCount();
         newView->setDocument(newDoc->document());
@@ -58,6 +58,10 @@ void DocumentManager::openDocument(const QString &fileName, bool load)
     {
         loadFile(newView, fileName);
     }
+
+    int position = fileName.lastIndexOf(QChar{'/'});
+    newView->setWindowTitle(fileName.mid(position + 1));
+    newView->setBeginTextState();
 }
 
 void DocumentManager::loadFile(CodeEditor *newView, const QString &fileName)

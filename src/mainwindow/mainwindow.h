@@ -100,10 +100,6 @@ public slots:
     void onCloseWindow(CodeEditor *curDoc);   
     void onConnectionStatusChanged(bool status);
 
-private:
-    // creates new doc in MDIArea
-    CodeEditor* createNewDoc();
-
 protected:
     void closeEvent(QCloseEvent *event);
 };

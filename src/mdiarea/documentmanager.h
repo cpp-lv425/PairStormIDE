@@ -14,13 +14,13 @@ class DocumentManager: public QObject
 
     QSplitter* mpSplitter;
     QVector<QMdiArea*> mDocAreas;
-    QVector<QScopedPointer<TextDocumentHolder>> mDocuments;
+    QVector<QSharedPointer<TextDocumentHolder>> mDocuments;
 
 public:
     explicit DocumentManager();
     void splitWindow();
     QSplitter* getSplitter();
-    void openDocument(const QString &fileName, bool load);
+    void openDocument(const QString &fileName, bool load = false);
     void loadFile(CodeEditor *newView, const QString &fileName);
 
 private:
