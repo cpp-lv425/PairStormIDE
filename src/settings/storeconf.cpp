@@ -10,8 +10,9 @@
 #include <QApplication>
 
 StoreConf::StoreConf(QString userName)
-    : mConFile {userName += ".json"}
 {
+    mConFile = userName;
+    mConFile += ".json";
     mFields["applicationName"] = "Pair Storm";       //  default values used when json file
     mFields["applicationVersion"] = "0.1";           //      not exist or corrupted
     mFields["organizationName"] = "Lv-425.C++";
@@ -20,10 +21,12 @@ StoreConf::StoreConf(QString userName)
     mFields["editorFontSize"] = "12";
     mFields["defaultUdpPortNumber"] = "36108";
     mFields["defaultTcpPortNumber"] = "32807";
-    mFields["userName"] = "unnamed user";
+    mFields["userName"] = userName;
     mFields["cppExtentions"] = ".c;.cpp;.h;.hpp;.json;.txt";
-    mCppExtentionsList << ".c" << ".cpp" << ".h" << ".hpp" << ".json" << ".txt";
-
+    mFields["cppCompilers"] = "";
+    mFields["cppLibraryHeaders"] = "";
+    mFields["cppLibraryBinarys"] = "";
+    separateList(mFields["cppExtentions"], mCppExtentionsList);
 }
 
 void StoreConf::restoreConFile()
@@ -58,7 +61,7 @@ void StoreConf::saveConFile()
     QFile file(mPathToConFile);
     if (file.exists())
     {
-        writeJson("finish");
+        writeJson(sessionMode::Finish);
     }
 }
 
@@ -80,22 +83,81 @@ void StoreConf::checkConfDir(QString str)
     }
 }
 
-void StoreConf::writeJson(QString mode)
+void StoreConf::writeJson(sessionMode mode)
 {
     QJsonObject root_obj;
 
     QSettings s;
+    if(mode == sessionMode::Finish)
+    {
+        if (s.contains("cppExtentionsList"))
+        {
+            QString strExtentions;
+            QStringList extentionList = s.value("cppExtentionsList").toStringList();
+            for (int i = 0; i < extentionList.size(); ++i)
+            {
+                if(i != 0)
+                    strExtentions += ";";
+                strExtentions += extentionList.at(i);
+            }
+            s.setValue("cppExtentions", strExtentions);
+        }
+
+        if (s.contains("cppCompilersList"))
+        {
+            QString strCompilers;
+            QStringList compilersList = s.value("cppCompilersList").toStringList();
+            for (int i = 0; i < compilersList.size(); ++i)
+            {
+                if(i != 0)
+                    strCompilers += ";";
+                strCompilers += compilersList.at(i);
+            }
+            s.setValue("cppCompilers", strCompilers);
+        }
+
+        if (s.contains("cppLibraryHeadersList"))
+        {
+            QString strHeaders;
+            QStringList headersList = s.value("cppLibraryHeadersList").toStringList();
+            for (int i = 0; i < headersList.size(); ++i)
+            {
+                if(i != 0)
+                    strHeaders += ";";
+                strHeaders += headersList.at(i);
+            }
+            s.setValue("cppLibraryHeaders", strHeaders);
+        }
+
+        if (s.contains("cppLibraryBinarysList"))
+        {
+            QString strBinarys;
+            QStringList binarysList = s.value("cppLibraryBinarysList").toStringList();
+            for (int i = 0; i < binarysList.size(); ++i)
+            {
+                if(i != 0)
+                    strBinarys += ";";
+                strBinarys += binarysList.at(i);
+            }
+            s.setValue("cppLibraryBinarys", strBinarys);
+        }
+    }
     QMap<QString, QString>::const_iterator it = mFields.constBegin();
     while (it != mFields.constEnd())
     {
-        if (mode == "start")
-        {                           // copy value from QMap to json
+        switch (mode)
+        {
+        case sessionMode::Start:
+        {                               // copy value from QMap to json
             root_obj.insert(it.key(), it.value());
+            break;
         }
-        else
-        {                           // copy value from QSettings to json
+        case sessionMode::Finish:
+        {                               // copy value from QSettings to json
             if (s.contains(it.key()))
                 root_obj.insert(it.key(), s.value(it.key()).toString());
+            break;
+        }
         }
         ++it;
     }
@@ -145,15 +207,33 @@ void StoreConf::parseJson()
     }
 
     mCppExtentionsList.clear();                                      // overwrite default value
+    QString cppExtentions = mFields["cppExtentions"];
+    separateList(cppExtentions, mCppExtentionsList);
 
-    std::string cppExtentionsS = mFields["cppExtentions"].toStdString();
+    mCppCompilersList.clear();                                      // overwrite default value
+    QString mCppCompilers = mFields["cppCompilers"];
+    separateList( mCppCompilers, mCppCompilersList);
+
+    mCppLibraryHeadersList.clear();                                      // overwrite default value
+    QString mCppLibraryHeaders = mFields["cppLibraryHeaders"];
+    separateList(mCppLibraryHeaders, mCppLibraryHeadersList);
+
+    mCppLibraryBinarysList.clear();                                      // overwrite default value
+    QString mCppLibraryBinarys = mFields["cppLibraryBinarys"];
+    separateList(mCppLibraryBinarys, mCppLibraryBinarysList);
+
+}
+
+void StoreConf::separateList(QString &str, QStringList &lst)
+{
+    std::string cppExtentionsS = str.toStdString();
     std::vector<std::string> tokens;
     std::regex re("\\;+");
     std::sregex_token_iterator begin(cppExtentionsS.begin(), cppExtentionsS.end(), re, -1);
     std::sregex_token_iterator end;
     std::copy(begin, end, std::back_inserter(tokens));
     for (unsigned i = 0; i < tokens.size() ; i++)
-        mCppExtentionsList << tokens[i].c_str();
+        lst << tokens[i].c_str();
 }
 
 void StoreConf::saveData()
@@ -170,4 +250,7 @@ void StoreConf::saveData()
         ++it;
     }
     settings.setValue("cppExtentionsList", QVariant::fromValue(mCppExtentionsList));
+    settings.setValue("cppCompilersList", QVariant::fromValue(mCppCompilersList));
+    settings.setValue("cppLibraryHeadersList", QVariant::fromValue(mCppLibraryHeadersList));
+    settings.setValue("cppLibraryBinarysList", QVariant::fromValue(mCppLibraryBinarysList));
 }

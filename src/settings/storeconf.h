@@ -33,19 +33,25 @@ private:
     QString mConFile;               //  name of configuration file
     QString mPathToConFile;         //  path to configuration file
     QMap<QString, QString> mFields; //  first -> valueName, second -> valueItself
+    enum class sessionMode {Start, Finish, Size};   //  Start - start session, Finish - finish session, Size - size of enumeration
 
-    QStringList mCppExtentionsList; //  all extentions available in C++ mode
+    QStringList mCppExtentionsList;     //  all extentions available in C++ mode
+    QStringList mCppCompilersList;      //  all compilers available in C++ mode
+    QStringList mCppLibraryHeadersList; //  all included library headers in C++ mode
+    QStringList mCppLibraryBinarysList; //  all included library binarys in C++ mode
 
     void checkConfDir(QString str = "exe");    //  check existance directory <conf>, create if not exist
                                                //  str = "exe" - directory in same dir as execution file
-    void writeJson(QString str = "start");     //  on application start: if conf.json not exist - creates it in conf directory
+    void writeJson2(QString str = "start");     //  on application start: if conf.json not exist - creates it in conf directory
+    void writeJson(sessionMode mode = sessionMode::Start);     //  on application start: if conf.json not exist - creates it in conf directory
                                                //  on application quit:  rewrite json with values from QSettings
     void readJson();                //  read configuration file to [loadDoc]. status write to [readStatus]
     void parseJson();
     void saveData();                // save data to QSettings file and QApplication fields
+    void separateList(QString &str, QStringList &lst);// separate <str> into tokens to <lst>
 
     QJsonDocument mJsonDoc;
-    bool mReadStatus = false;        //  status after read conf.json
+    bool mReadStatus = false;        //  status after read conf.json 
 };
 
 #endif // STORECONF_H
