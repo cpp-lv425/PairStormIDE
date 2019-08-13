@@ -4,7 +4,7 @@
 #include <QWidget>
 #include <QFont>
 #include <QString>
-#include<addcommentbutton.h>
+#include<QPushButton>
 #include<QPlainTextEdit>
 #include<QRegularExpression>
 #include<QRegularExpressionMatch>
