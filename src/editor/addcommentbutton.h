@@ -7,7 +7,9 @@
 #include<QMouseEvent>
 #include<QTextBlock>
 #include<QPlainTextEdit>
-#include <QtCore/QObject>
+#include<QtCore/QObject>
+#include<addcommenttextedit.h>
+
 
 class AddCommentButton: public QPushButton
 {

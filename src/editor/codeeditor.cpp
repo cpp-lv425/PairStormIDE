@@ -38,14 +38,26 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     mCurrentCommentLable = new QLabel(this);
     setMouseTracking(true);
 
+     //comment text edit
+  //  mAddCommentTextEdit = new AddCommentTextEdit;
+   // mAddCommentTextEdit->setVisible(false);
+
+    mCommentWidget = new CommentWidget;
+    mCommentWidget->setVisible(false);
     //This signal is emitted when the text document needs an update of the specified rect.
     //If the text is scrolled, rect will cover the entire viewport area.
     //If the text is scrolled vertically, dy carries the amount of pixels the viewport was scrolled.
 
-    connect(this,   SIGNAL(updateRequest(QRect,int)), this, SLOT(updateLineNumberArea(QRect,int)));
-    connect(this,   SIGNAL(cursorPositionChanged()),  this, SLOT(runLexer()));
-    connect(mTimer, SIGNAL(timeout()),                this, SLOT(saveStateInTheHistory()));
-    connect(this,   SIGNAL(cursorPositionChanged()),  this, SLOT(highlighText()));
+    connect(this,              &QPlainTextEdit::updateRequest,                  this, &CodeEditor::updateLineNumberArea);
+    connect(this,              &QPlainTextEdit::cursorPositionChanged,          this, &CodeEditor::runLexer);
+    connect(mTimer,            &QTimer::timeout,                                this, &CodeEditor::saveStateInTheHistory);
+    connect(this,              &QPlainTextEdit::cursorPositionChanged,          this, &CodeEditor::highlighText);
+    connect(this,              &QPlainTextEdit::cursorPositionChanged,          this, &CodeEditor::textChangedInTheOneLine);
+    connect(mAddCommentButton, &AddCommentButton::addCommentButtonPressed ,     this, &CodeEditor::showCommentTextEdit);
+    connect(mCommentWidget->getEditTab(), &AddCommentTextEdit::emptyComment,    this, &CodeEditor::emptyCommentWasAdded);
+    connect(mCommentWidget->getEditTab(), &AddCommentTextEdit::notEmptyComment, this, &CodeEditor::notEmptyCommentWasAdded  );
+
+    //connect(mCommentsVector[int], SIGNAL(AddCommentButtonPressed(int)), this, SLOT(showCommentTextEdit(int)));
 
     mTimer->start(CHANGE_SAVE_TIME);//save text by this time
 
@@ -170,6 +182,7 @@ void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event)
     int top = static_cast<int>(blockBoundingGeometry(block).translated(contentOffset()).top());//top of currentblock 0
     int bottom = top + static_cast<int>(blockBoundingRect(block).height());//bottom of current block                 -
 
+
     while (block.isValid())//we have blocks (have lines numbers)
     {
         QString number = QString::number(blockNumber + 1);
@@ -181,6 +194,16 @@ void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event)
         top = bottom;//refresh the top bottom (next block top == this block bottom)
         bottom += bottom - temp;// bottom - temp = dy which is block height
         ++blockNumber;
+    }
+
+    int addedHight = this->verticalScrollBar()->sliderPosition()? 0 : TOP_UNUSED_PIXELS_HEIGHT;
+    int height = bottom - top;
+    for(auto &i :mCommentsVector)
+    {
+        i->setGeometry(this->width() - this->verticalScrollBar()->width() - height,
+                       (i->getCurrentLine() - this->verticalScrollBar()->sliderPosition() - 1) * height + addedHight,
+                       bottom - top,
+                       bottom - top);
     }
     mLinesCount = blockNumber;
 }
@@ -200,6 +223,57 @@ void CodeEditor::zoom(int val)
 void CodeEditor::setZoom(int zoomVal)
 {
     zoom(zoomVal - mCurrentZoom);
+}
+
+void CodeEditor::textChangedInTheOneLine()
+{
+    emit(textChangedInLine(this->textCursor().blockNumber() + 1));
+}
+
+void CodeEditor::showCommentTextEdit(int line)
+{
+    mCommentWidget->setWindowTitle("Comment to " + QString::number(line) + " line");
+    mCommentWidget->setPosition(this, mAddCommentButton);
+    mCommentWidget->setVisible(true);
+}
+
+void CodeEditor::emptyCommentWasAdded()
+{
+    //delete from the database if record exists(for the future)
+    mCommentWidget->setVisible(false);
+    for (int i = 0; i < mCommentsVector.size(); i++)
+    {
+        if (mCommentsVector[i]->getCurrentLine() == mAddCommentButton->getCurrentLine())
+        {
+            mCommentsVector[i]->setVisible(false);
+            mCommentsVector.erase(mCommentsVector.begin() + i);
+        }
+    }
+}
+
+void CodeEditor::notEmptyCommentWasAdded()
+{
+    //write to the database (for the future)
+    AddCommentButton *commentButton = new AddCommentButton(this);
+    commentButton->setGeometry(mAddCommentButton->geometry());
+    commentButton->setCurrentLine(mAddCommentButton->getCurrentLine());
+    commentButton->setStyleSheet("background-color: #18CD3C");
+    commentButton->setText("✔");
+    commentButton->setVisible(true);
+
+    mCommentsVector.push_back(commentButton);
+    for(int i = 0; i<mCommentsVector.size() - 1; i++)
+    {
+        if(mCommentsVector[i]->getCurrentLine() == mAddCommentButton->getCurrentLine())
+        {
+            mCommentsVector[i]->setVisible(false);
+            mCommentsVector.erase(mCommentsVector.begin() + i);
+        }
+    }
+    mCommentsSet.insert(commentButton);
+
+    connect(mCommentsVector.back(), &AddCommentButton::addCommentButtonPressed, this, &CodeEditor::showCommentTextEdit);
+    mAddCommentButton->setVisible(false);
 }
 
 void CodeEditor::mouseMoveEvent(QMouseEvent *event)

@@ -8,6 +8,7 @@ const int TOP_UNUSED_PIXELS_HEIGHT = 4;
 #include"ideconfiguration.h"
 #include"changemanager.h"
 #include"addcommentbutton.h"
+#include"addcommenttextedit.h"
 #include"ideconfiguration.h"
 #include"lexercpp.h"
 #include<utility>
@@ -18,6 +19,11 @@ const int TOP_UNUSED_PIXELS_HEIGHT = 4;
 #include<QObject>
 #include<QMouseEvent>
 #include<QLabel>
+#include<commentwidget.h>
+#include<QVector>
+#include<QSet>
+#include<QFont>
+
 
 
 class QPaintEvent;
@@ -60,11 +66,17 @@ public slots:
     void keyPressEvent(QKeyEvent *e) override;
     void saveStateInTheHistory();
     void setZoom(int zoomVal);
+    void textChangedInTheOneLine();
+    void showCommentTextEdit(int);
+    void emptyCommentWasAdded();
+    void notEmptyCommentWasAdded();
 
 signals:
     void changesAppeared();
     void sendLexem(QString);
     void closeDocEventOccured(CodeEditor*);
+    void textChangedInLine(int);
+    void textChangedInLines(int, int);
 
 
 private:
@@ -77,9 +89,13 @@ private:
     QTimer *mTimer;
     LexerCPP mLexer;
     AddCommentButton *mAddCommentButton;
+    AddCommentTextEdit *mAddCommentTextEdit;
+    CommentWidget *mCommentWidget;
     QLabel *mCurrentCommentLable;
     int mLinesCount;
     QString mBeginTextState;
+    QVector<AddCommentButton*> mCommentsVector;
+    QSet<AddCommentButton*> mCommentsSet;
 
     QTextCharFormat fmtLiteral;
     QTextCharFormat fmtComment;

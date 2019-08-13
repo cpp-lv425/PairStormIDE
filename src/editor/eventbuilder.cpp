@@ -59,7 +59,7 @@ Event* EventBuilder::getEventControlModifier(QKeyEvent *e)
     case Qt::Key_D:
         return new EventSendLexem();
     case Qt::Key_V:
-        return new EventSaveChangeInHistory();
+        return new EventCtrlV();
     default:
         return new EventDefault();
     }
