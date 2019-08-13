@@ -22,6 +22,7 @@ StoreConf::StoreConf(QString userName)
     mFields["defaultUdpPortNumber"] = "36108";
     mFields["defaultTcpPortNumber"] = "32807";
     mFields["userName"] = userName;
+    mFields["cppStandart"] = "C++11";
     mFields["cppExtentions"] = ".c;.cpp;.h;.hpp;.json;.txt";
     mFields["cppCompilers"] = "";
     mFields["cppLibraryHeaders"] = "";
