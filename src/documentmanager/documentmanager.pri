@@ -2,9 +2,7 @@ DEPENDPATH += $$PWD
 INCLUDEPATH += $$PWD
 
 HEADERS += \
-    $$PWD/documentmanager.h \
-    $$PWD/textdocumentholder.h
+    $$PWD/documentmanager.h
 
 SOURCES += \
-    $$PWD/documentmanager.cpp \
-    $$PWD/textdocumentholder.cpp
+    $$PWD/documentmanager.cpp

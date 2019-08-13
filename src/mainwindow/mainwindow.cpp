@@ -158,8 +158,10 @@ void MainWindow::setupMainMenu()
     QAction *pScaleSubMenu = viewMenu->addMenu(scaleSubMenu);
     pScaleSubMenu->setDisabled(true);
 
-    viewMenu->addAction("Split &Horizontally", this, &MainWindow::onSplitHorizontallyTriggered);
-    viewMenu->addAction("Split &Vectically", this, &MainWindow::onSplitVerticallyTriggered);
+    viewMenu->addAction("Split &Horizontally", this, &MainWindow::onSplitHorizontallyTriggered,
+                        Qt::CTRL + Qt::Key_E);
+    viewMenu->addAction("Split &Vectically", this, &MainWindow::onSplitVerticallyTriggered,
+                        Qt::CTRL + Qt::SHIFT + Qt::Key_E);
 
     viewMenu->addSeparator();
     viewMenu->addAction("Show &Project Viewer", this, &MainWindow::onShowProjectViewerTriggered);

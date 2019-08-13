@@ -8,7 +8,6 @@
 #include <QVector>
 #include <QDebug>
 
-#include "textdocumentholder.h"
 #include "usermessages.h"
 #include "filemanager.h"
 #include "codeeditor.h"
@@ -19,26 +18,12 @@ DocumentManager::DocumentManager()
     mpSplitter = new QSplitter;
     mpSplitter->setChildrenCollapsible(false);
     splitWindow();
+    connect(qApp, &QApplication::focusChanged, this, &DocumentManager::onFocusChanged);
 }
 
 void DocumentManager::splitWindow()
 {
     QMdiArea *pNewArea = createMdiArea();
-
-    if (mDocAreas.size() && mDocAreas.back()->currentSubWindow())
-    {
-        QString fileName = qobject_cast<CodeEditor*>
-                (mDocAreas.back()->currentSubWindow()->
-                 widget())->getFileName();
-
-        // create new view
-        CodeEditor *newView = new CodeEditor;
-        newView->setFileName(fileName);
-        newView->setDocument(openedDoc(fileName)->document());
-        pNewArea->addSubWindow(newView);
-        newView->setWindowState(Qt::WindowMaximized);
-    }
-
     mpSplitter->addWidget(pNewArea);
     mDocAreas.push_back(pNewArea);
 }
@@ -50,27 +35,37 @@ QSplitter* DocumentManager::getSplitter()
 
 void DocumentManager::openDocument(const QString &fileName, bool load)
 {
-    // create new view
-    CodeEditor *newView = new CodeEditor;
-    newView->setFileName(fileName);
-
-    // place view
-    selectAreaForPlacement()->addSubWindow(newView);
-    newView->setWindowState(Qt::WindowMaximized);
-
-    TextDocumentHolder *pOpenedDoc = openedDoc(fileName);
+    auto pOpenedDoc = openedDoc(fileName);
+    qDebug() << "found item " << pOpenedDoc;
 
     if (pOpenedDoc)
     {
-        newView->setDocument(pOpenedDoc->document());
+        for (auto& area: mDocAreas)
+        {
+            if (area->subWindowList().contains(pOpenedDoc))
+            {
+                qDebug() << "contains";
+                area->setActiveSubWindow(pOpenedDoc);
+            }
+        }
+        return;
     }
-    else
+
+    // create new view
+    CodeEditor *newView = new CodeEditor;
+    newView->setFileName(fileName);
+    newView->setFocusPolicy(Qt::StrongFocus);
+
+    // place view
+    auto placementArea = selectAreaForPlacement();
+
+    if (!placementArea)
     {
-        QSharedPointer<TextDocumentHolder> newDoc(new TextDocumentHolder(fileName));
-        mDocuments.push_back(newDoc);
-        newDoc->incrementViewCount();
-        newView->setDocument(newDoc->document());
+        throw QException();
     }
+    qDebug() << "placement area: " << placementArea;
+    placementArea->addSubWindow(newView);
+    newView->setWindowState(Qt::WindowMaximized);
 
     if (load)
     {
@@ -99,14 +94,7 @@ void DocumentManager::loadFile(CodeEditor *newView, const QString &fileName)
 }
 
 void DocumentManager::onSplit(Qt::Orientation orientation)
-{    
-    if (mDocAreas.size() <= 1)
-    {
-        splitWindow();
-        mpSplitter->setOrientation(orientation);
-        return;
-    }
-
+{        
     if (orientation == mpSplitter->orientation())
     {
         splitWindow();
@@ -114,6 +102,17 @@ void DocumentManager::onSplit(Qt::Orientation orientation)
     }
 
     mpSplitter->setOrientation(orientation);
+}
+
+void DocumentManager::onFocusChanged(QWidget *old, QWidget *now)
+{
+    auto prevWgtInFocus = qobject_cast<CodeEditor*>(old);
+    if (prevWgtInFocus)
+    {
+        qDebug() << prevWgtInFocus << " is CodeEditor";
+        mpPrevEditorInFocus = prevWgtInFocus;
+        return;
+    }
 }
 
 QMdiArea* DocumentManager::createMdiArea()
@@ -126,17 +125,79 @@ QMdiArea* DocumentManager::createMdiArea()
 
 QMdiArea* DocumentManager::selectAreaForPlacement()
 {
-    // temp solution
-    return mDocAreas.front();
+    if (!mDocAreas.size())
+    {
+        return nullptr;
+    }
+
+    auto placementArea = std::find_if(mDocAreas.cbegin(), mDocAreas.cend(), [](const auto& area)
+    {
+        return !area->subWindowList().size();
+    });
+
+    if (placementArea != mDocAreas.end())
+    {
+        qDebug() << "empty area";
+        return *placementArea;
+    }
+
+    auto pAreaInFocus = areaInFocus();
+    qDebug() << "in focus " << pAreaInFocus;
+    return pAreaInFocus ? pAreaInFocus : mDocAreas.front();
 }
 
-TextDocumentHolder* DocumentManager::openedDoc(const QString &fileName)
+QMdiSubWindow* DocumentManager::openedDoc(const QString &fileName)
 {
-    auto openedDocum = std::find_if(mDocuments.begin(), mDocuments.end(), [&fileName](const auto& doc)
+    qDebug() << "openedDoc";
+    QList<QMdiSubWindow*>::const_iterator openedDocIter;
+
+    for (const auto& area: mDocAreas)
     {
-        return doc->getFileName() == fileName;
-    });
+        auto subWdwList = area->subWindowList();
+
+        openedDocIter = std::find_if(subWdwList.cbegin(), subWdwList.cend(),
+                 [&fileName](const auto& doc)
+        {
+            return static_cast<CodeEditor*>(doc->widget())->getFileName() == fileName;
+        });
+
+        if (openedDocIter != subWdwList.end())
+        {
+            qDebug() << "found";
+            return *openedDocIter;
+        }
+    }
+
     // if document is opened - ptr to it is returned
     // otherwise null is returned
-    return (openedDocum != mDocuments.end()) ? openedDocum->get() : nullptr;
+    return nullptr;
+}
+
+QMdiArea* DocumentManager::areaInFocus()
+{
+    qDebug() << "wgt in focus app " << QApplication::focusWidget();
+    QList<QMdiSubWindow*>::const_iterator areaInFocusIter;
+
+    for (const auto& area: mDocAreas)
+    {
+        auto subWdwList = area->subWindowList();
+
+        areaInFocusIter = std::find_if(subWdwList.cbegin(), subWdwList.cend(),
+                 [this](const auto& doc)
+        {
+            qDebug() << "prev editor in focus "
+                     << (static_cast<CodeEditor*>(doc->widget()) == mpPrevEditorInFocus);
+            return static_cast<CodeEditor*>(doc->widget()) == mpPrevEditorInFocus;
+        });
+
+        if (areaInFocusIter != subWdwList.end())
+        {
+            qDebug() << "found";
+            return area;
+        }
+    }
+
+    // if document is in focus - ptr to it is returned
+    // otherwise null is returned
+    return nullptr;
 }

@@ -3,8 +3,7 @@
 
 #include <QObject>
 
-class TextDocumentHolder;
-class QTextDocument;
+class QMdiSubWindow;
 class CodeEditor;
 class QSplitter;
 class QMdiArea;
@@ -15,7 +14,7 @@ class DocumentManager: public QObject
 
     QSplitter *mpSplitter;
     QVector<QMdiArea*> mDocAreas;
-    QVector<QSharedPointer<TextDocumentHolder>> mDocuments;
+    CodeEditor *mpPrevEditorInFocus;
 
 public:
     explicit DocumentManager();
@@ -26,11 +25,13 @@ public:
 
 public slots:
     void onSplit(Qt::Orientation orientation);
+    void onFocusChanged(QWidget *old, QWidget *now);
 
 private:
     QMdiArea* createMdiArea();
     QMdiArea* selectAreaForPlacement();
-    TextDocumentHolder* openedDoc(const QString &fileName);
+    QMdiSubWindow* openedDoc(const QString &fileName);
+    QMdiArea* areaInFocus();
 };
 
 #endif // MDIAREA_H
