@@ -55,11 +55,14 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     connect(this,              &QPlainTextEdit::cursorPositionChanged,          this, &CodeEditor::textChangedInTheOneLine);
     connect(mAddCommentButton, &AddCommentButton::addCommentButtonPressed ,     this, &CodeEditor::showCommentTextEdit);
     connect(mCommentWidget->getEditTab(), &AddCommentTextEdit::emptyComment,    this, &CodeEditor::emptyCommentWasAdded);
-    connect(mCommentWidget->getEditTab(), &AddCommentTextEdit::notEmptyComment, this, &CodeEditor::notEmptyCommentWasAdded  );
+    connect(mCommentWidget->getEditTab(), &AddCommentTextEdit::notEmptyComment, this, &CodeEditor::notEmptyCommentWasAdded);
+    connect(this,              &CodeEditor::linesCountUpdated,                  this, &CodeEditor::moveComment);
 
     //connect(mCommentsVector[int], SIGNAL(AddCommentButtonPressed(int)), this, SLOT(showCommentTextEdit(int)));
 
     mTimer->start(CHANGE_SAVE_TIME);//save text by this time
+    mLinesCountCurrent = 1;
+    mLinesCountPrev = 1;
 
     // start typing from correct position (in the first line it doesn't consider weight of lineCounter)
     //that's why we need to set this position
@@ -205,7 +208,12 @@ void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event)
                        bottom - top,
                        bottom - top);
     }
-    mLinesCount = blockNumber;
+    if (mLinesCountCurrent != blockNumber)//lines count changed
+    {
+        mLinesCountPrev = mLinesCountCurrent;
+        mLinesCountCurrent = blockNumber;
+        emit linesCountUpdated();
+    }
 }
 
 void CodeEditor::saveStateInTheHistory()
@@ -235,6 +243,8 @@ void CodeEditor::showCommentTextEdit(int line)
     mCommentWidget->setWindowTitle("Comment to " + QString::number(line) + " line");
     mCommentWidget->setPosition(this, mAddCommentButton);
     mCommentWidget->setVisible(true);
+    mCommentWidget->setCommentButtonGeometry(mAddCommentButton->geometry());
+    mCommentWidget->setCommentLine(line);
 }
 
 void CodeEditor::emptyCommentWasAdded()
@@ -255,11 +265,13 @@ void CodeEditor::notEmptyCommentWasAdded()
 {
     //write to the database (for the future)
     AddCommentButton *commentButton = new AddCommentButton(this);
-    commentButton->setGeometry(mAddCommentButton->geometry());
-    commentButton->setCurrentLine(mAddCommentButton->getCurrentLine());
+    commentButton->setGeometry(mCommentWidget->getCommentButtonGeometry());
+    commentButton->setCurrentLine(mCommentWidget->getCommentLine());
+   // qDebug()<<"line existing button 1 = "<<commentButton->getCurrentLine();
     commentButton->setStyleSheet("background-color: #18CD3C");
     commentButton->setText("✔");
     commentButton->setVisible(true);
+    mAddCommentButton->setVisible(false);
 
     mCommentsVector.push_back(commentButton);
     for(int i = 0; i<mCommentsVector.size() - 1; i++)
@@ -270,10 +282,82 @@ void CodeEditor::notEmptyCommentWasAdded()
             mCommentsVector.erase(mCommentsVector.begin() + i);
         }
     }
-    mCommentsSet.insert(commentButton);
-
     connect(mCommentsVector.back(), &AddCommentButton::addCommentButtonPressed, this, &CodeEditor::showCommentTextEdit);
-    mAddCommentButton->setVisible(false);
+  //  qDebug()<<"line existing button 1 = "<<commentButton->getCurrentLine();
+}
+
+void CodeEditor::moveComment()
+{
+    int diff = mLinesCountCurrent - mLinesCountPrev;
+    int cursorLine = this->textCursor().blockNumber() + 1;
+    qDebug()<<"diff = "<<diff;
+    qDebug()<<"cursor line ="<<cursorLine;
+
+    int startLine;
+    int endLine;
+    for (auto &i: mCommentsVector)
+    {
+        if (diff > 0)
+        {
+            startLine = cursorLine - diff;
+            endLine = cursorLine;
+        }
+        else
+        {
+            startLine = cursorLine;
+            endLine = cursorLine - diff;
+        }
+        qDebug()<<"startLine  before= "<<startLine;
+        qDebug()<<"endLine    after = "<<endLine;
+
+        if(diff < 0)
+        {
+           // qDebug()<<"!!!!!!!!!!!!!!!!!!!";
+            for(int i = 0; i<mCommentsVector.size(); i++)
+            {
+               // qDebug()<<"************************";
+              //  qDebug()<<"startLine  = "<<startLine;
+              //  qDebug()<<"endLine    = "<<endLine;
+              //  qDebug()<<"buttonLine = "<<mCommentsVector[i]->getCurrentLine();
+                if( (mCommentsVector[i]->getCurrentLine() > startLine
+                 && mCommentsVector[i]->getCurrentLine() <= endLine)
+                 || mCommentsVector[i]->getCurrentLine() > mLinesCountCurrent
+                 || mCommentsVector[i]->getCurrentLine() < 1)
+                {
+                    qDebug()<<"deleted"<<mCommentsVector[i]->getCurrentLine()<<"line comment";
+                    mCommentsVector[i]->setVisible(false);
+                    mCommentsVector.erase(mCommentsVector.begin() + i);
+                }
+            }
+        }
+       // qDebug()<<"______________________________________";
+       // qDebug()<<"botton line = "<<i->getCurrentLine();
+       // qDebug()<<"cursor line = "<<cursorLine;
+       // qDebug()<<"diff = "<<diff;
+        //qDebug()<<"BUTTON: "<<i->getCurrentLine();
+        /*if(diff < 0)
+        {
+            if (i->getCurrentLine() > cursorLine)
+            {
+                i->setCurrentLine(i->getCurrentLine() + diff);
+            }
+        }
+        else
+        {
+            if (i->getCurrentLine() > cursorLine - diff)
+            {
+                i->setCurrentLine(i->getCurrentLine() + diff);
+            }
+        }*/
+        //qDebug()<<"bottom"<<i<<"line = "<<i->getCurrentLine();
+    }
+    for(int i = 0; i< mCommentsVector.size(); i++)
+    {
+        if (mCommentsVector[i]->getCurrentLine() >= cursorLine)
+        {
+            mCommentsVector[i]->setCurrentLine(mCommentsVector[i]->getCurrentLine() + diff);
+        }
+    }
 }
 
 void CodeEditor::mouseMoveEvent(QMouseEvent *event)
@@ -301,7 +385,7 @@ void CodeEditor::mouseMoveEvent(QMouseEvent *event)
             int currLine = linesFromTheTop + currSliderPos + 1;//because first block = 0
             mAddCommentButton->setCurrentLine(currLine);
 
-            if (currLine <= mLinesCount)// check if the line exists
+            if (currLine <= mLinesCountCurrent)// check if the line exists
             {
                 int commentBottonXpos = commentAreaLeftMargin + getLineNumberAreaWidth();
                 int commentBottonYpos = linesFromTheTop * side;

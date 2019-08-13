@@ -23,6 +23,7 @@ const int TOP_UNUSED_PIXELS_HEIGHT = 4;
 #include<QVector>
 #include<QSet>
 #include<QFont>
+#include<QtAlgorithms>
 
 
 
@@ -70,6 +71,7 @@ public slots:
     void showCommentTextEdit(int);
     void emptyCommentWasAdded();
     void notEmptyCommentWasAdded();
+    void moveComment();
 
 signals:
     void changesAppeared();
@@ -77,6 +79,7 @@ signals:
     void closeDocEventOccured(CodeEditor*);
     void textChangedInLine(int);
     void textChangedInLines(int, int);
+    void linesCountUpdated();
 
 
 private:
@@ -92,7 +95,10 @@ private:
     AddCommentTextEdit *mAddCommentTextEdit;
     CommentWidget *mCommentWidget;
     QLabel *mCurrentCommentLable;
-    int mLinesCount;
+
+    int mLinesCountPrev;
+    int mLinesCountCurrent;
+
     QString mBeginTextState;
     QVector<AddCommentButton*> mCommentsVector;
     QSet<AddCommentButton*> mCommentsSet;

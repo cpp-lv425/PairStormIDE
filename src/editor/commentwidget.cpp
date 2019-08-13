@@ -100,6 +100,26 @@ void CommentWidget::setWholeText(int index)
     setSpecificTextView();
 }
 
+int CommentWidget::getCommentLine() const
+{
+    return commentLine;
+}
+
+void CommentWidget::setCommentLine(int value)
+{
+    commentLine = value;
+}
+
+QRect CommentWidget::getCommentButtonGeometry() const
+{
+    return commentButtonGeometry;
+}
+
+void CommentWidget::setCommentButtonGeometry(const QRect &value)
+{
+    commentButtonGeometry = value;
+}
+
 ViewTextEdit *CommentWidget::getViewTab() const
 {
     return viewTab;

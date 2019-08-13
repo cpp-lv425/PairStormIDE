@@ -42,6 +42,12 @@ public:
     ViewTextEdit *getViewTab() const;
     void setViewTab(ViewTextEdit *value);
 
+    QRect getCommentButtonGeometry() const;
+    void setCommentButtonGeometry(const QRect &value);
+
+    int getCommentLine() const;
+    void setCommentLine(int value);
+
 public slots:
     void setWholeText(int);
 private:
@@ -49,6 +55,7 @@ private:
     AddCommentTextEdit *editTab;
     ViewTextEdit *viewTab;
 
+    QRect commentButtonGeometry;
     int commentLine;
     QString commentString;
     QVector<SpecificText>specificTextVector;
