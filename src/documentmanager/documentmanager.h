@@ -4,6 +4,7 @@
 #include <QObject>
 
 class TextDocumentHolder;
+class QTextDocument;
 class CodeEditor;
 class QSplitter;
 class QMdiArea;

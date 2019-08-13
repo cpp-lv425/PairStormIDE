@@ -733,6 +733,6 @@ void MainWindow::setAppStyle()
     // if platform does not support fusion, default style is applied
     qApp->setStyle(QStyleFactory::create("Fusion"));
     // dark style palette is created & set globally
-    QPalette palette = mpPaletteConfigurator->getPalette("DARK");
-    qApp->setPalette(palette);
+    //QPalette palette = mpPaletteConfigurator->getPalette("DARK");
+    //qApp->setPalette(palette);
 }

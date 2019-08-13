@@ -1,5 +1,6 @@
 #include "documentmanager.h"
 
+#include <QMdiSubWindow>
 #include <QMessageBox>
 #include <QSplitter>
 #include <algorithm>
@@ -23,6 +24,20 @@ DocumentManager::DocumentManager()
 void DocumentManager::splitWindow()
 {
     QMdiArea *pNewArea = createMdiArea();
+
+    if (mDocAreas.size() && mDocAreas.back()->currentSubWindow())
+    {
+        QString fileName = qobject_cast<CodeEditor*>
+                (mDocAreas.back()->currentSubWindow()->
+                 widget())->getFileName();
+
+        // create new view
+        CodeEditor *newView = new CodeEditor;
+        newView->setFileName(fileName);
+        newView->setDocument(openedDoc(fileName)->document());
+        pNewArea->addSubWindow(newView);
+        newView->setWindowState(Qt::WindowMaximized);
+    }
 
     mpSplitter->addWidget(pNewArea);
     mDocAreas.push_back(pNewArea);
@@ -84,8 +99,20 @@ void DocumentManager::loadFile(CodeEditor *newView, const QString &fileName)
 }
 
 void DocumentManager::onSplit(Qt::Orientation orientation)
-{
-    splitWindow();
+{    
+    if (mDocAreas.size() <= 1)
+    {
+        splitWindow();
+        mpSplitter->setOrientation(orientation);
+        return;
+    }
+
+    if (orientation == mpSplitter->orientation())
+    {
+        splitWindow();
+        return;
+    }
+
     mpSplitter->setOrientation(orientation);
 }
 
