@@ -53,6 +53,7 @@ void DocumentManager::openDocument(const QString &fileName, bool load)
 
     // create new view
     CodeEditor *newView = new CodeEditor;
+    connect(newView, &CodeEditor::closeDocEventOccured, this, &DocumentManager::onCloseDocument);
     newView->setFileName(fileName);
     newView->setFocusPolicy(Qt::StrongFocus);
 
@@ -104,7 +105,7 @@ void DocumentManager::onSplit(Qt::Orientation orientation)
     mpSplitter->setOrientation(orientation);
 }
 
-void DocumentManager::onFocusChanged(QWidget *old, QWidget *now)
+void DocumentManager::onFocusChanged(QWidget *old, QWidget *)
 {
     auto prevWgtInFocus = qobject_cast<CodeEditor*>(old);
     if (prevWgtInFocus)
@@ -113,6 +114,18 @@ void DocumentManager::onFocusChanged(QWidget *old, QWidget *now)
         mpPrevEditorInFocus = prevWgtInFocus;
         return;
     }
+}
+
+void DocumentManager::onCloseDocument(CodeEditor *doc)
+{
+    auto placementArea = getArea(doc);
+
+    if (!placementArea)
+    {
+        return;
+    }
+
+    placementArea->deleteLater();
 }
 
 QMdiArea* DocumentManager::createMdiArea()
@@ -198,6 +211,32 @@ QMdiArea* DocumentManager::areaInFocus()
     }
 
     // if document is in focus - ptr to it is returned
+    // otherwise null is returned
+    return nullptr;
+}
+
+QMdiArea* DocumentManager::getArea(CodeEditor *doc)
+{
+    QList<QMdiSubWindow*>::const_iterator areaIter;
+
+    for (const auto& area: mDocAreas)
+    {
+        auto subWdwList = area->subWindowList();
+
+        areaIter = std::find_if(subWdwList.cbegin(), subWdwList.cend(),
+                 [&doc](const auto& document)
+        {
+            return static_cast<CodeEditor*>(document->widget()) == doc;
+        });
+
+        if (areaIter != subWdwList.end())
+        {
+            qDebug() << "found";
+            return area;
+        }
+    }
+
+    // if document is found - ptr to it is returned
     // otherwise null is returned
     return nullptr;
 }

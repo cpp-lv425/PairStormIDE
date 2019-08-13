@@ -26,12 +26,14 @@ public:
 public slots:
     void onSplit(Qt::Orientation orientation);
     void onFocusChanged(QWidget *old, QWidget *now);
+    void onCloseDocument(CodeEditor *doc);
 
 private:
     QMdiArea* createMdiArea();
     QMdiArea* selectAreaForPlacement();
     QMdiSubWindow* openedDoc(const QString &fileName);
     QMdiArea* areaInFocus();
+    QMdiArea* getArea(CodeEditor *doc);
 };
 
 #endif // MDIAREA_H
