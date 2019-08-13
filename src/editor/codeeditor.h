@@ -20,6 +20,8 @@ const int TOP_UNUSED_PIXELS_HEIGHT = 4;
 #include<QMouseEvent>
 #include<QLabel>
 #include<commentwidget.h>
+#include<QVector>
+#include<QFont>
 
 
 
@@ -91,6 +93,7 @@ private:
     QLabel *mCurrentCommentLable;
     int mLinesCount;
     QString mBeginTextState;
+    QVector<AddCommentButton*> mCommentsVector;
 
     QTextCharFormat fmtLiteral;
     QTextCharFormat fmtComment;

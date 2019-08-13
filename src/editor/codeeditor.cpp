@@ -180,6 +180,7 @@ void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event)
     int top = static_cast<int>(blockBoundingGeometry(block).translated(contentOffset()).top());//top of currentblock 0
     int bottom = top + static_cast<int>(blockBoundingRect(block).height());//bottom of current block                 -
 
+
     while (block.isValid())//we have blocks (have lines numbers)
     {
         QString number = QString::number(blockNumber + 1);
@@ -191,6 +192,21 @@ void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event)
         top = bottom;//refresh the top bottom (next block top == this block bottom)
         bottom += bottom - temp;// bottom - temp = dy which is block height
         ++blockNumber;
+    }
+    qDebug()<<"weight = "<<this->width();
+    qDebug()<<"lineAreaWight = "<<getLineNumberAreaWidth();
+    //event->
+    int addedHight = this->verticalScrollBar()->sliderPosition()? 0 : TOP_UNUSED_PIXELS_HEIGHT;
+    qDebug()<<"added hight = "<<addedHight;
+    int height = bottom - top;
+    for(auto &i :mCommentsVector)
+    {
+        i->setGeometry(this->width() - this->verticalScrollBar()->width() - height,
+                       (i->getCurrentLine() - this->verticalScrollBar()->sliderPosition() - 1) * height + addedHight,
+                       bottom - top,
+                       bottom - top);
+
+       qDebug()<<"currLine = "<<i->getCurrentLine();
     }
     mLinesCount = blockNumber;
 }
@@ -226,13 +242,25 @@ void CodeEditor::showCommentTextEdit(int line)
 
 void CodeEditor::emptyCommentWasAdded()
 {
-    //delete from database if record exists(for the future)
+    //delete from the database if record exists(for the future)
     mCommentWidget->setVisible(false);
 }
 
 void CodeEditor::notEmptyCommentWasAdded()
 {
-    qDebug()<<" not empty";
+    //write to the database (for the future)
+    AddCommentButton *commentButton = new AddCommentButton(this);
+    commentButton->setGeometry(mAddCommentButton->geometry());
+    commentButton->setCurrentLine(mAddCommentButton->getCurrentLine());
+    commentButton->setStyleSheet("background-color: #18CD3C");
+    commentButton->setText("✔");
+    commentButton->setVisible(true);
+    mCommentsVector.push_back(commentButton);
+    mAddCommentButton->setVisible(false);
+    for(auto &i:mCommentsVector)
+    {
+        qDebug()<<"line = "<< i->getCurrentLine();
+    }
 }
 
 void CodeEditor::mouseMoveEvent(QMouseEvent *event)
