@@ -16,7 +16,7 @@
 DocumentManager::DocumentManager()
 {
     mpSplitter = new QSplitter;
-    split->setChildrenCollapsible(false);
+    mpSplitter->setChildrenCollapsible(false);
     splitWindow();
 }
 

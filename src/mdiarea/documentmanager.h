@@ -12,7 +12,7 @@ class DocumentManager: public QObject
 {
     Q_OBJECT
 
-    QSplitter* mpSplitter;
+    QSplitter *mpSplitter;
     QVector<QMdiArea*> mDocAreas;
     QVector<QSharedPointer<TextDocumentHolder>> mDocuments;
 
