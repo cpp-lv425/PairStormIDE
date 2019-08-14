@@ -290,9 +290,11 @@ void CodeEditor::notEmptyCommentWasAdded()
 void CodeEditor::moveComment()
 {
     int diff = mLinesCountCurrent - mLinesCountPrev;
+    if (!diff)
+        return;
     int cursorLine = this->textCursor().blockNumber() + 1;
-   // qDebug()<<"diff = "<<diff;
-   // qDebug()<<"cursor line ="<<cursorLine;
+    qDebug()<<"diff = "<<diff;
+    qDebug()<<"cursor line ="<<cursorLine;
 
     int startLine;
     int endLine;
@@ -316,22 +318,34 @@ void CodeEditor::moveComment()
         {
             for(int i = 0; i<mCommentsVector.size(); i++)
             {
-                if (diff < -1)
+                if (lastRemomeKey == LastRemoveKey::DEL)
                 {
-
-                }
-                else
-                {
-                    if (mCommentsVector[i]->getCurrentLine() >= startLine
-                            && mCommentsVector[i]->getCurrentLine() < endLine)
+                    qDebug()<<" startLine = "<<startLine;
+                    qDebug()<<"Comment line ="<<mCommentsVector[i]->getCurrentLine();
+                    if(cursorLine == startLine
+                            && cursorLine != mCommentsVector[i]->getCurrentLine())
                     {
-                        qDebug()<<"deleted"<<mCommentsVector[i]->getCurrentLine()<<"line comment";
+                        qDebug()<<"here!";
+                        continue;
+                    }
+                    if ((mCommentsVector[i]->getCurrentLine() >= startLine
+                                                && mCommentsVector[i]->getCurrentLine() <= endLine))
+                    {
+                       // qDebug()<<"deleted single"<<mCommentsVector[i]->getCurrentLine()<<"line comment";
                         mCommentsVector[i]->setVisible(false);
                         mCommentsVector.erase(mCommentsVector.begin() + i);
                     }
                 }
-
-
+                else
+                {
+                    if ((mCommentsVector[i]->getCurrentLine() > startLine
+                            && mCommentsVector[i]->getCurrentLine() <= endLine))
+                    {
+                       // qDebug()<<"deleted single"<<mCommentsVector[i]->getCurrentLine()<<"line comment";
+                        mCommentsVector[i]->setVisible(false);
+                        mCommentsVector.erase(mCommentsVector.begin() + i);
+                    }
+                }
             }
         }
     }
@@ -358,12 +372,23 @@ void CodeEditor::moveComment()
         }
         else
         {
-            if(mCommentsVector[i]->getCurrentLine() > cursorLine)
+            if(mCommentsVector[i]->getCurrentLine() > startLine)
             {
+                qDebug()<<"kek";
                 mCommentsVector[i]->setCurrentLine(mCommentsVector[i]->getCurrentLine() + diff);
             }
         }
     }
+}
+
+LastRemoveKey CodeEditor::getLastRemomeKey() const
+{
+    return lastRemomeKey;
+}
+
+void CodeEditor::setLastRemomeKey(const LastRemoveKey &value)
+{
+    lastRemomeKey = value;
 }
 
 void CodeEditor::mouseMoveEvent(QMouseEvent *event)

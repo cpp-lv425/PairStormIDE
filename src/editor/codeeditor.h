@@ -33,10 +33,16 @@ class QSize;
 class QWidget;
 class LineNumberArea;
 
+
+enum LastRemoveKey
+{
+    BACK,
+    DEL
+};
+
 class CodeEditor : public QPlainTextEdit
 {
     Q_OBJECT
-
 public:
     CodeEditor(QWidget *parent = nullptr);
     void lineNumberAreaPaintEvent(QPaintEvent *event);
@@ -51,6 +57,9 @@ public:
     bool isChanged();
     void setBeginTextState();
 
+
+    LastRemoveKey getLastRemomeKey() const;
+    void setLastRemomeKey(const LastRemoveKey &value);
 
 protected:
     void resizeEvent(QResizeEvent *event)override;
@@ -107,6 +116,8 @@ private:
     QTextCharFormat fmtComment;
     QTextCharFormat fmtKeyword;
     QTextCharFormat fmtRegular;
+
+    LastRemoveKey lastRemomeKey;
 
 protected:
     int mCurrentZoom;

@@ -143,4 +143,11 @@ public:
     ~EventCtrlV() override;
 };
 
+class EventRemoveKey: public Event
+{
+public:
+    void operator()(CodeEditor *codeEditor, QKeyEvent *e) override;
+    ~EventRemoveKey() override;
+};
+
 #endif // CODEEDITOREVENTS_H
