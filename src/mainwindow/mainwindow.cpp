@@ -20,6 +20,7 @@
 #include "usermessages.h"
 #include "logindialog.h"
 #include "filemanager.h"
+#include "menuoptions.h"
 #include "codeeditor.h"
 #include "storeconf.h"
 #include "startpage.h"
@@ -659,7 +660,8 @@ void MainWindow::onConnectTriggered()
 
 void MainWindow::onSettingsTriggered()
 {
-    //
+    MenuOptions * menuOptions = new MenuOptions(this);
+    Q_UNUSED(menuOptions)
 }
 
 void MainWindow::onAboutTriggered()
