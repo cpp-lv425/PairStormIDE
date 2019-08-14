@@ -95,13 +95,38 @@ bool DocumentManager::saveDocument()
                 (pCurrentDocument->getFileName(),
                  pCurrentDocument->toPlainText());
 
-    } catch (const FileOpeningFailure&)
+    }
+    catch (const FileOpeningFailure&)
     {
         throw;
     }
 
     pCurrentDocument->setBeginTextState();
     return true;
+}
+
+bool DocumentManager::saveAllDocuments()
+{
+    bool savedChanges = false;
+
+    for (const auto& area : mDocAreas)
+    {
+        auto openedDocs = area->subWindowList();
+
+        for (const auto& subWdw : openedDocs)
+        {
+            try
+            {
+                savedChanges |= saveDocument(qobject_cast<CodeEditor*>(subWdw->widget()));
+            }
+            catch (const FileOpeningFailure&)
+            {
+                throw;
+            }
+        }
+    }
+    qDebug() << "saved changes: " << savedChanges;
+    return savedChanges;
 }
 
 void DocumentManager::loadFile(CodeEditor *newView, const QString &fileName)
@@ -316,4 +341,24 @@ CodeEditor* DocumentManager::getCurrentDocument()
 
     auto pCurrentDocument = pAreaInFocus->currentSubWindow();
     return pCurrentDocument ? static_cast<CodeEditor*>(pCurrentDocument->widget()) : nullptr;
+}
+
+bool DocumentManager::saveDocument(CodeEditor *doc)
+{
+    if (!doc || !doc->isChanged())
+    {
+        return false;
+    }
+    try
+    {
+        FileManager().writeToFile
+                (doc->getFileName(),
+                 doc->toPlainText());
+        doc->setBeginTextState();
+        return true;
+    }
+    catch (const FileOpeningFailure&)
+    {
+        throw;
+    }
 }

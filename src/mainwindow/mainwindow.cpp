@@ -459,29 +459,22 @@ void MainWindow::onSaveFileAsTriggered()
 
 void MainWindow::onSaveAllFilesTriggered()
 {
-    // getting all docs
-//    auto docsList = mpDocsArea->subWindowList();
-
-//    // if there are no docs
-//    if(docsList.empty())
-//    {
-//        QMessageBox::information
-//                (this,
-//                 userMessages[UserMessages::SaveTitle],
-//                userMessages[UserMessages::NoFilesToSaveMsg]);
-//        return;
-//    }
-
-//    // if doc is modified then it is saved
-//    for (int i = 0; i < docsList.size(); ++i)
-//    {
-//        auto curDoc = qobject_cast<CodeEditor*>(docsList[i]->widget());
-
-//        if(curDoc && curDoc->isChanged())
-//        {
-//            saveDocument(curDoc, curDoc->getFileName());
-//        }
-//    }
+    try
+    {
+        if (mpDocumentManager->saveAllDocuments())
+        {
+            statusBar()->showMessage(userMessages[UserMessages::DocumentSavedMsg], 3000);
+        }
+        else
+            qDebug() << "there is nothing to save";
+    }
+    catch (const FileOpeningFailure&)
+    {
+        QMessageBox::information
+                (this,
+                 userMessages[UserMessages::ErrorTitle],
+                userMessages[UserMessages::FileOpeningForSavingErrorMsg]);
+    }
 }
 
 void MainWindow::onCloseFileTriggered()

@@ -21,6 +21,7 @@ public:
     QSplitter* getSplitter();
     void openDocument(const QString &fileName, bool load = false);
     bool saveDocument();
+    bool saveAllDocuments();
 
 public slots:
     void onSplit(Qt::Orientation orientation);
@@ -37,6 +38,7 @@ private:
     QMdiArea* areaInFocus();
     QMdiArea* getArea(CodeEditor *doc);
     CodeEditor* getCurrentDocument();
+    bool saveDocument(CodeEditor* doc);
 
 };
 
