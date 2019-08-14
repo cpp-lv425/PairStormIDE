@@ -36,7 +36,6 @@ QSplitter* DocumentManager::getSplitter()
 void DocumentManager::openDocument(const QString &fileName, bool load)
 {
     auto pOpenedDoc = openedDoc(fileName);
-    qDebug() << "found item " << pOpenedDoc;
 
     if (pOpenedDoc)
     {
@@ -44,7 +43,6 @@ void DocumentManager::openDocument(const QString &fileName, bool load)
         {
             if (area->subWindowList().contains(pOpenedDoc))
             {
-                qDebug() << "contains";
                 area->setActiveSubWindow(pOpenedDoc);
             }
         }
@@ -64,7 +62,6 @@ void DocumentManager::openDocument(const QString &fileName, bool load)
     {
         throw QException();
     }
-    qDebug() << "placement area: " << placementArea;
     placementArea->addSubWindow(newView);
     newView->setWindowState(Qt::WindowMaximized);
 
@@ -76,6 +73,35 @@ void DocumentManager::openDocument(const QString &fileName, bool load)
     int position = fileName.lastIndexOf(QChar{'/'});
     newView->setWindowTitle(fileName.mid(position + 1));
     newView->setBeginTextState();
+}
+
+bool DocumentManager::saveDocument()
+{
+    auto pCurrentDocument = getCurrentDocument();
+
+    if (!pCurrentDocument)
+    {
+        return false;
+    }
+
+    if (!pCurrentDocument->isChanged())
+    {
+        return false;
+    }
+
+    try
+    {
+        FileManager().writeToFile
+                (pCurrentDocument->getFileName(),
+                 pCurrentDocument->toPlainText());
+
+    } catch (const FileOpeningFailure&)
+    {
+        throw;
+    }
+
+    pCurrentDocument->setBeginTextState();
+    return true;
 }
 
 void DocumentManager::loadFile(CodeEditor *newView, const QString &fileName)
@@ -110,7 +136,6 @@ void DocumentManager::onFocusChanged(QWidget *old, QWidget *)
     auto prevWgtInFocus = qobject_cast<CodeEditor*>(old);
     if (prevWgtInFocus)
     {
-        qDebug() << prevWgtInFocus << " is CodeEditor";
         mpPrevEditorInFocus = prevWgtInFocus;
         return;
     }
@@ -118,13 +143,26 @@ void DocumentManager::onFocusChanged(QWidget *old, QWidget *)
 
 void DocumentManager::onCloseDocument(CodeEditor *doc)
 {
-    auto placementArea = getArea(doc);
-
-    if (!placementArea)
+    if (mDocAreas.size() == 1)
     {
         return;
     }
 
+    auto placementArea = getArea(doc);
+
+    if (!placementArea || placementArea->subWindowList().size() > 1)
+    {
+        return;
+    }
+
+    if(doc == mpPrevEditorInFocus)
+    {
+        mpPrevEditorInFocus = nullptr;
+    }
+
+    mDocAreas.removeOne(placementArea);
+
+    //delete placementArea;
     placementArea->deleteLater();
 }
 
@@ -150,18 +188,15 @@ QMdiArea* DocumentManager::selectAreaForPlacement()
 
     if (placementArea != mDocAreas.end())
     {
-        qDebug() << "empty area";
         return *placementArea;
     }
 
-    auto pAreaInFocus = areaInFocus();
-    qDebug() << "in focus " << pAreaInFocus;
+    auto pAreaInFocus = lastAreaInFocus();
     return pAreaInFocus ? pAreaInFocus : mDocAreas.front();
 }
 
 QMdiSubWindow* DocumentManager::openedDoc(const QString &fileName)
 {
-    qDebug() << "openedDoc";
     QList<QMdiSubWindow*>::const_iterator openedDocIter;
 
     for (const auto& area: mDocAreas)
@@ -169,14 +204,13 @@ QMdiSubWindow* DocumentManager::openedDoc(const QString &fileName)
         auto subWdwList = area->subWindowList();
 
         openedDocIter = std::find_if(subWdwList.cbegin(), subWdwList.cend(),
-                 [&fileName](const auto& doc)
+                                     [&fileName](const auto& doc)
         {
             return static_cast<CodeEditor*>(doc->widget())->getFileName() == fileName;
         });
 
         if (openedDocIter != subWdwList.end())
         {
-            qDebug() << "found";
             return *openedDocIter;
         }
     }
@@ -186,9 +220,39 @@ QMdiSubWindow* DocumentManager::openedDoc(const QString &fileName)
     return nullptr;
 }
 
-QMdiArea* DocumentManager::areaInFocus()
+QMdiArea* DocumentManager::lastAreaInFocus()
 {
-    qDebug() << "wgt in focus app " << QApplication::focusWidget();
+    QList<QMdiSubWindow*>::const_iterator areaInFocusIter;
+
+    if (!mpPrevEditorInFocus)
+    {
+        return nullptr;
+    }
+
+    for (const auto& area: mDocAreas)
+    {
+        auto subWdwList = area->subWindowList();
+
+        areaInFocusIter = std::find_if(subWdwList.cbegin(), subWdwList.cend(),
+                                       [this](const auto& doc)
+        {
+            return static_cast<CodeEditor*>(doc->widget()) == mpPrevEditorInFocus;
+        });
+
+        if (areaInFocusIter != subWdwList.end())
+        {
+            qDebug() << "found last area in focus";
+            return area;
+        }
+    }
+
+    // if document is in focus - ptr to it is returned
+    // otherwise null is returned
+    return nullptr;
+}
+
+QMdiArea *DocumentManager::areaInFocus()
+{
     QList<QMdiSubWindow*>::const_iterator areaInFocusIter;
 
     for (const auto& area: mDocAreas)
@@ -196,16 +260,13 @@ QMdiArea* DocumentManager::areaInFocus()
         auto subWdwList = area->subWindowList();
 
         areaInFocusIter = std::find_if(subWdwList.cbegin(), subWdwList.cend(),
-                 [this](const auto& doc)
+                                       [](const auto& doc)
         {
-            qDebug() << "prev editor in focus "
-                     << (static_cast<CodeEditor*>(doc->widget()) == mpPrevEditorInFocus);
-            return static_cast<CodeEditor*>(doc->widget()) == mpPrevEditorInFocus;
+            return static_cast<CodeEditor*>(doc->widget())->hasFocus();
         });
 
         if (areaInFocusIter != subWdwList.end())
         {
-            qDebug() << "found";
             return area;
         }
     }
@@ -224,14 +285,13 @@ QMdiArea* DocumentManager::getArea(CodeEditor *doc)
         auto subWdwList = area->subWindowList();
 
         areaIter = std::find_if(subWdwList.cbegin(), subWdwList.cend(),
-                 [&doc](const auto& document)
+                                [&doc](const auto& document)
         {
             return static_cast<CodeEditor*>(document->widget()) == doc;
         });
 
         if (areaIter != subWdwList.end())
         {
-            qDebug() << "found";
             return area;
         }
     }
@@ -239,4 +299,21 @@ QMdiArea* DocumentManager::getArea(CodeEditor *doc)
     // if document is found - ptr to it is returned
     // otherwise null is returned
     return nullptr;
+}
+
+CodeEditor* DocumentManager::getCurrentDocument()
+{
+    if (mDocAreas.size() < 2)
+    {
+        return static_cast<CodeEditor*>(mDocAreas.front()->currentSubWindow()->widget());
+    }
+
+    auto pAreaInFocus = areaInFocus();
+    if (!areaInFocus())
+    {
+        return nullptr;
+    }
+
+    auto pCurrentDocument = pAreaInFocus->currentSubWindow();
+    return pCurrentDocument ? static_cast<CodeEditor*>(pCurrentDocument->widget()) : nullptr;
 }

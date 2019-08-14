@@ -18,10 +18,9 @@ class DocumentManager: public QObject
 
 public:
     explicit DocumentManager();
-    void splitWindow();
     QSplitter* getSplitter();
     void openDocument(const QString &fileName, bool load = false);
-    void loadFile(CodeEditor *newView, const QString &fileName);
+    bool saveDocument();
 
 public slots:
     void onSplit(Qt::Orientation orientation);
@@ -29,11 +28,16 @@ public slots:
     void onCloseDocument(CodeEditor *doc);
 
 private:
+    void splitWindow();
+    void loadFile(CodeEditor *newView, const QString &fileName);
     QMdiArea* createMdiArea();
     QMdiArea* selectAreaForPlacement();
     QMdiSubWindow* openedDoc(const QString &fileName);
+    QMdiArea* lastAreaInFocus();
     QMdiArea* areaInFocus();
     QMdiArea* getArea(CodeEditor *doc);
+    CodeEditor* getCurrentDocument();
+
 };
 
 #endif // MDIAREA_H

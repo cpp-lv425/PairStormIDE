@@ -392,25 +392,22 @@ void MainWindow::onOpenStartPage()
 
 void MainWindow::onSaveFileTriggered()
 {
-    // if there are no opened docs
-//    if (!mpDocsArea->currentSubWindow())
-//    {
-//        QMessageBox::information
-//                (this,
-//                 userMessages[UserMessages::SaveTitle],
-//                userMessages[UserMessages::NoFilesToSaveMsg]);
-//        return;
-//    }
-
-//    auto curDoc = getCurrentDoc();
-
-//    // if doc wasn't modified yet
-//    if (!curDoc || !curDoc->isChanged())
-//    {
-//        return;
-//    }
-//    // saving doc
-//    saveDocument(curDoc, curDoc->getFileName());
+    try
+    {
+        if (mpDocumentManager->saveDocument())
+        {
+            statusBar()->showMessage(userMessages[UserMessages::DocumentSavedMsg], 3000);
+        }
+        else
+            qDebug() << "there is nothing to save";
+    }
+    catch (const FileOpeningFailure&)
+    {
+        QMessageBox::information
+                (this,
+                 userMessages[UserMessages::ErrorTitle],
+                userMessages[UserMessages::FileOpeningForSavingErrorMsg]);
+    }
 }
 
 void MainWindow::onSaveFileAsTriggered()
