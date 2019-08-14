@@ -24,6 +24,7 @@ public:
     bool saveAllDocuments();
     void saveDocumentAs(CodeEditor *currentDocument, const QString &fileName);
     CodeEditor* getCurrentDocument();
+    void closeCurrentDocument();
 
 public slots:
     void onSplit(Qt::Orientation orientation);

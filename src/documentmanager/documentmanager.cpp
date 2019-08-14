@@ -367,6 +367,23 @@ CodeEditor* DocumentManager::getCurrentDocument()
     return pCurrentDocument ? static_cast<CodeEditor*>(pCurrentDocument->widget()) : nullptr;
 }
 
+void DocumentManager::closeCurrentDocument()
+{
+    auto pCurrentDocument = getCurrentDocument();
+
+    if (!pCurrentDocument)
+    {
+        return;
+    }
+
+    auto pCurrentSubWdw = qobject_cast<QMdiSubWindow*>(pCurrentDocument->parent());
+
+    if (pCurrentSubWdw)
+    {
+        pCurrentSubWdw->close();
+    }
+}
+
 bool DocumentManager::saveDocument(CodeEditor *doc)
 {
     if (!doc || !doc->isChanged())

@@ -488,8 +488,7 @@ void MainWindow::onSaveAllFilesTriggered()
 
 void MainWindow::onCloseFileTriggered()
 {    
-    // closing doc
-    //mpDocsArea->closeActiveSubWindow();
+    mpDocumentManager->closeCurrentDocument();
 }
 
 void MainWindow::onExitTriggered()

@@ -10,6 +10,11 @@
 #include<iostream>
 #include<QLabel>
 #include "eventbuilder.h"
+#include "usermessages.h"
+#include "filemanager.h"
+#include "utils.h"
+// temp
+#include <QDebug>
 
 CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
 {
@@ -326,31 +331,44 @@ void CodeEditor::mouseMoveEvent(QMouseEvent *event)
 }
 
 void CodeEditor::closeEvent(QCloseEvent *event)
-{
-//    if (!isChanged())
-//    {
-//        event->accept();
-//        return;
-//    }
-//    QMessageBox::StandardButton reply = QMessageBox::question
-//            (this,
-//             "Saving Changes",
-//             "Do you want to save changes to opened documents?",
-//             QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+{    
+    if (!isChanged())
+    {
+        event->accept();
+        return;
+    }
+    QMessageBox::StandardButton reply = QMessageBox::question
+            (this,
+             userMessages[UserMessages::PromptSaveTitle],
+             userMessages[UserMessages::SaveQuestion],
+             QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
 
-//    // if user closes dialog event is ignored
-//    if (reply == QMessageBox::Cancel)
-//    {
-//        event->ignore();
-//        return;
-//    }
-//    // if document wasn't modified of user doesn't want to save changes
-//    if (reply == QMessageBox::No)
-//    {
-//        event->accept();
-//        return;
-//    }
-    // saving document
+    // if user closes dialog event is ignored
+    if (reply == QMessageBox::Cancel)
+    {
+        event->ignore();
+        return;
+    }
+    // if user doesn't want to save changes
+    if (reply == QMessageBox::No)
+    {
+        event->accept();
+        return;
+    }
+
+    try
+    {
+        FileManager().writeToFile(getFileName(), toPlainText());
+        setBeginTextState();
+    }
+    catch (const FileOpeningFailure&)
+    {
+        QMessageBox::warning(this, userMessages[UserMessages::ErrorTitle],
+                userMessages[UserMessages::FileOpeningForSavingErrorMsg]);
+        event->ignore();
+        return;
+    }
+
     emit closeDocEventOccured(this);
 }
 
