@@ -25,6 +25,7 @@ public:
     void saveDocumentAs(CodeEditor *currentDocument, const QString &fileName);
     CodeEditor* getCurrentDocument();
     void closeCurrentDocument();
+    QVector<CodeEditor*> getChangedDocuments();
 
 public slots:
     void onSplit(Qt::Orientation orientation);

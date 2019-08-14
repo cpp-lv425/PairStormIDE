@@ -2,6 +2,7 @@
 
 #include <QMdiSubWindow>
 #include <QMessageBox>
+#include <algorithm>
 #include <QSplitter>
 #include <algorithm>
 #include <QMdiArea>
@@ -384,6 +385,31 @@ void DocumentManager::closeCurrentDocument()
     }
 }
 
+QVector<CodeEditor*> DocumentManager::getChangedDocuments()
+{
+    QVector<CodeEditor*> changedDocuments;
+
+    for (const auto& area : mDocAreas)
+    {
+        auto windowsList = area->subWindowList();
+
+        if (windowsList.size())
+        {
+            std::for_each(windowsList.begin(), windowsList.end(),
+                          [&changedDocuments](const auto& wdw)
+            {
+                auto doc = qobject_cast<CodeEditor*>(wdw->widget());
+
+                if (doc && doc->isChanged())
+                {
+                    changedDocuments.push_back(doc);
+                }
+            });
+        }
+    }
+    return changedDocuments;
+}
+
 bool DocumentManager::saveDocument(CodeEditor *doc)
 {
     if (!doc || !doc->isChanged())
@@ -392,9 +418,7 @@ bool DocumentManager::saveDocument(CodeEditor *doc)
     }
     try
     {
-        FileManager().writeToFile
-                (doc->getFileName(),
-                 doc->toPlainText());
+        FileManager().writeToFile(doc->getFileName(), doc->toPlainText());
         doc->setBeginTextState();
         return true;
     }

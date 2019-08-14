@@ -362,7 +362,7 @@ void MainWindow::onNewFileTriggered()
     // opening doc with selected name
     try
     {
-         mpDocumentManager->openDocument(newFileName);
+        mpDocumentManager->openDocument(newFileName);
     }
     catch (const QException&)
     {
@@ -672,37 +672,43 @@ void MainWindow::onConnectionStatusChanged(bool status)
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
-{    
+{
+    auto changedDocuments = mpDocumentManager->getChangedDocuments();
+
+
+
+
+
     // getting all docs
-//    auto docsList = mpDocsArea->subWindowList();
+    //    auto docsList = mpDocsArea->subWindowList();
 
-//    // if there are no docs
-//    if(docsList.empty() || !isModified(docsList))
-//    {
-//        event->accept();
-//        return;
-//    }
+    //    // if there are no docs
+    //    if(docsList.empty() || !isModified(docsList))
+    //    {
+    //        event->accept();
+    //        return;
+    //    }
 
-//    // ask user whether changes should be changed
-//    QMessageBox::StandardButton reply = QMessageBox::question
-//            (this,
-//             userMessages[UserMessages::PromptSaveTitle],
-//             userMessages[UserMessages::SaveQuestion],
-//             QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+    //    // ask user whether changes should be changed
+    //    QMessageBox::StandardButton reply = QMessageBox::question
+    //            (this,
+    //             userMessages[UserMessages::PromptSaveTitle],
+    //             userMessages[UserMessages::SaveQuestion],
+    //             QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
 
-//    if (reply == QMessageBox::No)
-//    {
-//        event->accept();
-//        return;
-//    }
-//    if (reply == QMessageBox::Yes)
-//    {
-//        // if appreved then save changes
-//        saveAllModifiedDocuments(docsList);
-//        event->accept();
-//        return;
-//    }
-//    event->ignore();   
+    //    if (reply == QMessageBox::No)
+    //    {
+    //        event->accept();
+    //        return;
+    //    }
+    //    if (reply == QMessageBox::Yes)
+    //    {
+    //        // if appreved then save changes
+    //        saveAllModifiedDocuments(docsList);
+    //        event->accept();
+    //        return;
+    //    }
+    //    event->ignore();
 }
 
 MainWindow::~MainWindow()
