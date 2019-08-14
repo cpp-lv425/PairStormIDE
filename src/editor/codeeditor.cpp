@@ -1,5 +1,6 @@
 #include "codeeditor.h"
 #include "linenumberarea.h"
+#include "eventbuilder.h"
 #include<QtGui>
 #include<QTextCursor>
 #include<QPainter>
@@ -9,7 +10,7 @@
 #include<QMessageBox>
 #include<iostream>
 #include<QLabel>
-#include "eventbuilder.h"
+#include<QtMath>
 
 CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
 {
@@ -49,9 +50,9 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     //If the text is scrolled vertically, dy carries the amount of pixels the viewport was scrolled.
 
     connect(this,              &QPlainTextEdit::updateRequest,                  this, &CodeEditor::updateLineNumberArea);
-    connect(this,              &QPlainTextEdit::cursorPositionChanged,          this, &CodeEditor::runLexer);
+   // connect(this,              &QPlainTextEdit::cursorPositionChanged,          this, &CodeEditor::runLexer);
     connect(mTimer,            &QTimer::timeout,                                this, &CodeEditor::saveStateInTheHistory);
-    connect(this,              &QPlainTextEdit::cursorPositionChanged,          this, &CodeEditor::highlighText);
+   // connect(this,              &QPlainTextEdit::cursorPositionChanged,          this, &CodeEditor::highlighText);
     connect(this,              &QPlainTextEdit::cursorPositionChanged,          this, &CodeEditor::textChangedInTheOneLine);
     connect(mAddCommentButton, &AddCommentButton::addCommentButtonPressed ,     this, &CodeEditor::showCommentTextEdit);
     connect(mCommentWidget->getEditTab(), &AddCommentTextEdit::emptyComment,    this, &CodeEditor::emptyCommentWasAdded);
@@ -290,8 +291,8 @@ void CodeEditor::moveComment()
 {
     int diff = mLinesCountCurrent - mLinesCountPrev;
     int cursorLine = this->textCursor().blockNumber() + 1;
-    qDebug()<<"diff = "<<diff;
-    qDebug()<<"cursor line ="<<cursorLine;
+   // qDebug()<<"diff = "<<diff;
+   // qDebug()<<"cursor line ="<<cursorLine;
 
     int startLine;
     int endLine;
@@ -309,53 +310,58 @@ void CodeEditor::moveComment()
         }
         qDebug()<<"startLine  before= "<<startLine;
         qDebug()<<"endLine    after = "<<endLine;
+        qDebug()<<"comment line ="<<i->getCurrentLine();
 
         if(diff < 0)
         {
-           // qDebug()<<"!!!!!!!!!!!!!!!!!!!";
             for(int i = 0; i<mCommentsVector.size(); i++)
             {
-               // qDebug()<<"************************";
-              //  qDebug()<<"startLine  = "<<startLine;
-              //  qDebug()<<"endLine    = "<<endLine;
-              //  qDebug()<<"buttonLine = "<<mCommentsVector[i]->getCurrentLine();
-                if( (mCommentsVector[i]->getCurrentLine() > startLine
-                 && mCommentsVector[i]->getCurrentLine() <= endLine)
-                 || mCommentsVector[i]->getCurrentLine() > mLinesCountCurrent
-                 || mCommentsVector[i]->getCurrentLine() < 1)
+                if (diff < -1)
                 {
-                    qDebug()<<"deleted"<<mCommentsVector[i]->getCurrentLine()<<"line comment";
-                    mCommentsVector[i]->setVisible(false);
-                    mCommentsVector.erase(mCommentsVector.begin() + i);
+
                 }
+                else
+                {
+                    if (mCommentsVector[i]->getCurrentLine() >= startLine
+                            && mCommentsVector[i]->getCurrentLine() < endLine)
+                    {
+                        qDebug()<<"deleted"<<mCommentsVector[i]->getCurrentLine()<<"line comment";
+                        mCommentsVector[i]->setVisible(false);
+                        mCommentsVector.erase(mCommentsVector.begin() + i);
+                    }
+                }
+
+
             }
         }
-       // qDebug()<<"______________________________________";
-       // qDebug()<<"botton line = "<<i->getCurrentLine();
-       // qDebug()<<"cursor line = "<<cursorLine;
-       // qDebug()<<"diff = "<<diff;
-        //qDebug()<<"BUTTON: "<<i->getCurrentLine();
-        /*if(diff < 0)
+    }
+
+    for(int i = 0; i< mCommentsVector.size(); i++)
+    {
+       // qDebug()<<"line = "<<mCommentsVector[i]->getCurrentLine();
+        //qDebug()<<"curs line = "<<cursorLine;
+        if(diff > 0)
         {
-            if (i->getCurrentLine() > cursorLine)
+            if(mCommentsVector[i]->getCurrentLine() > cursorLine - 1)
             {
-                i->setCurrentLine(i->getCurrentLine() + diff);
+                mCommentsVector[i]->setCurrentLine(mCommentsVector[i]->getCurrentLine() + diff);
+            }
+            if(mCommentsVector[i]->getCurrentLine() == cursorLine - 1)
+            {
+                auto cursor = this->textCursor();
+                cursor.movePosition(QTextCursor::PreviousCharacter);
+                if (cursor.atBlockStart())
+                {
+                    mCommentsVector[i]->setCurrentLine(mCommentsVector[i]->getCurrentLine() + diff);
+                }
             }
         }
         else
         {
-            if (i->getCurrentLine() > cursorLine - diff)
+            if(mCommentsVector[i]->getCurrentLine() > cursorLine)
             {
-                i->setCurrentLine(i->getCurrentLine() + diff);
+                mCommentsVector[i]->setCurrentLine(mCommentsVector[i]->getCurrentLine() + diff);
             }
-        }*/
-        //qDebug()<<"bottom"<<i<<"line = "<<i->getCurrentLine();
-    }
-    for(int i = 0; i< mCommentsVector.size(); i++)
-    {
-        if (mCommentsVector[i]->getCurrentLine() >= cursorLine)
-        {
-            mCommentsVector[i]->setCurrentLine(mCommentsVector[i]->getCurrentLine() + diff);
         }
     }
 }
