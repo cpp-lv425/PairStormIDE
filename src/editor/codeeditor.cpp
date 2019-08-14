@@ -57,7 +57,7 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     connect(mAddCommentButton, &AddCommentButton::addCommentButtonPressed ,     this, &CodeEditor::showCommentTextEdit);
     connect(mCommentWidget->getEditTab(), &AddCommentTextEdit::emptyComment,    this, &CodeEditor::emptyCommentWasAdded);
     connect(mCommentWidget->getEditTab(), &AddCommentTextEdit::notEmptyComment, this, &CodeEditor::notEmptyCommentWasAdded);
-    connect(this,              &CodeEditor::linesCountUpdated,                  this, &CodeEditor::moveComment);
+    connect(this,              &CodeEditor::linesCountUpdated,                  this, &CodeEditor::moveCommentButtons);
 
     //connect(mCommentsVector[int], SIGNAL(AddCommentButtonPressed(int)), this, SLOT(showCommentTextEdit(int)));
 
@@ -287,98 +287,17 @@ void CodeEditor::notEmptyCommentWasAdded()
   //  qDebug()<<"line existing button 1 = "<<commentButton->getCurrentLine();
 }
 
-void CodeEditor::moveComment()
+void CodeEditor::moveCommentButtons()
 {
     int diff = mLinesCountCurrent - mLinesCountPrev;
-    if (!diff)
-        return;
     int cursorLine = this->textCursor().blockNumber() + 1;
-    qDebug()<<"diff = "<<diff;
-    qDebug()<<"cursor line ="<<cursorLine;
 
-    int startLine;
-    int endLine;
-    for (auto &i: mCommentsVector)
-    {
-        if (diff > 0)
-        {
-            startLine = cursorLine - diff;
-            endLine = cursorLine;
-        }
-        else
-        {
-            startLine = cursorLine;
-            endLine = cursorLine - diff;
-        }
-        qDebug()<<"startLine  before= "<<startLine;
-        qDebug()<<"endLine    after = "<<endLine;
-        qDebug()<<"comment line ="<<i->getCurrentLine();
+    int startLine = diff > 0 ? cursorLine - diff : cursorLine;
+    int endLine = diff > 0 ? cursorLine : cursorLine - diff;
 
-        if(diff < 0)
-        {
-            for(int i = 0; i<mCommentsVector.size(); i++)
-            {
-                if (lastRemomeKey == LastRemoveKey::DEL)
-                {
-                    qDebug()<<" startLine = "<<startLine;
-                    qDebug()<<"Comment line ="<<mCommentsVector[i]->getCurrentLine();
-                    if(cursorLine == startLine
-                            && cursorLine != mCommentsVector[i]->getCurrentLine())
-                    {
-                        qDebug()<<"here!";
-                        continue;
-                    }
-                    if ((mCommentsVector[i]->getCurrentLine() >= startLine
-                                                && mCommentsVector[i]->getCurrentLine() <= endLine))
-                    {
-                       // qDebug()<<"deleted single"<<mCommentsVector[i]->getCurrentLine()<<"line comment";
-                        mCommentsVector[i]->setVisible(false);
-                        mCommentsVector.erase(mCommentsVector.begin() + i);
-                    }
-                }
-                else
-                {
-                    if ((mCommentsVector[i]->getCurrentLine() > startLine
-                            && mCommentsVector[i]->getCurrentLine() <= endLine))
-                    {
-                       // qDebug()<<"deleted single"<<mCommentsVector[i]->getCurrentLine()<<"line comment";
-                        mCommentsVector[i]->setVisible(false);
-                        mCommentsVector.erase(mCommentsVector.begin() + i);
-                    }
-                }
-            }
-        }
-    }
+    removeButtons(mCommentsVector, cursorLine, startLine, endLine, diff);
 
-    for(int i = 0; i< mCommentsVector.size(); i++)
-    {
-       // qDebug()<<"line = "<<mCommentsVector[i]->getCurrentLine();
-        //qDebug()<<"curs line = "<<cursorLine;
-        if(diff > 0)
-        {
-            if(mCommentsVector[i]->getCurrentLine() > cursorLine - 1)
-            {
-                mCommentsVector[i]->setCurrentLine(mCommentsVector[i]->getCurrentLine() + diff);
-            }
-            if(mCommentsVector[i]->getCurrentLine() == cursorLine - 1)
-            {
-                auto cursor = this->textCursor();
-                cursor.movePosition(QTextCursor::PreviousCharacter);
-                if (cursor.atBlockStart())
-                {
-                    mCommentsVector[i]->setCurrentLine(mCommentsVector[i]->getCurrentLine() + diff);
-                }
-            }
-        }
-        else
-        {
-            if(mCommentsVector[i]->getCurrentLine() > startLine)
-            {
-                qDebug()<<"kek";
-                mCommentsVector[i]->setCurrentLine(mCommentsVector[i]->getCurrentLine() + diff);
-            }
-        }
-    }
+    rewriteButtonsLines(mCommentsVector,diff,startLine);
 }
 
 LastRemoveKey CodeEditor::getLastRemomeKey() const
@@ -389,6 +308,75 @@ LastRemoveKey CodeEditor::getLastRemomeKey() const
 void CodeEditor::setLastRemomeKey(const LastRemoveKey &value)
 {
     lastRemomeKey = value;
+}
+
+void CodeEditor::rewriteButtonsLines(QVector<AddCommentButton *> &commentV, const int diff, const int startLine)
+{
+    for (auto &i : commentV)
+    {
+        if (i->getCurrentLine() == startLine)
+        {
+            auto cursor = this->textCursor();
+            cursor.movePosition(QTextCursor::PreviousCharacter);
+            if (cursor.atBlockStart())
+            {
+                setAnotherButtonLine(i, diff);
+            }
+        }
+        else if (i->getCurrentLine() > startLine)
+        {
+            setAnotherButtonLine(i, diff);
+        }
+    }
+}
+
+void CodeEditor::setAnotherButtonLine(AddCommentButton *comment, int diff)
+{
+    comment->setCurrentLine(comment->getCurrentLine() + diff);
+}
+
+bool CodeEditor::isInRangeIncludBoth(int val, int leftMargin, int rightMargin)
+{
+    return val >= leftMargin && val <= rightMargin;
+}
+
+bool CodeEditor::isInRangeIncludLast(int val, int leftMargin, int rightMargin)
+{
+    return val > leftMargin && val <= rightMargin;
+}
+
+void CodeEditor::removeBotton(QVector<AddCommentButton *> &commentV, int index)
+{
+    commentV[index]->setVisible(false);
+    commentV.erase(commentV.begin() + index);
+}
+
+void CodeEditor::removeButtons(QVector<AddCommentButton *> &commentV, int cursorLine, int startLine, int endLine, int diff)
+{
+   if (diff > 0)
+       return;
+   for (int i = 0; i < commentV.size(); i++)
+   {
+       if (lastRemomeKey == LastRemoveKey::DEL)
+       {
+           if (cursorLine == startLine
+                   && cursorLine != commentV[i]->getCurrentLine())
+           {
+               continue;
+           }
+           if (isInRangeIncludBoth(commentV[i]->getCurrentLine(), startLine, endLine))
+           {
+               removeBotton(commentV, i);
+           }
+       }
+       else
+       {
+           if(isInRangeIncludLast(commentV[i]->getCurrentLine(), startLine, endLine))
+           {
+               removeBotton(commentV, i);
+           }
+       }
+   }
 }
 
 void CodeEditor::mouseMoveEvent(QMouseEvent *event)

@@ -45,6 +45,8 @@ public:
     QRect getCommentButtonGeometry() const;
     void setCommentButtonGeometry(const QRect &value);
 
+    void setComment(const QString &comment);
+
     int getCommentLine() const;
     void setCommentLine(int value);
 

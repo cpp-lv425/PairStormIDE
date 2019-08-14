@@ -60,6 +60,13 @@ public:
 
     LastRemoveKey getLastRemomeKey() const;
     void setLastRemomeKey(const LastRemoveKey &value);
+private:
+    void rewriteButtonsLines( QVector<AddCommentButton*> &commentV, int diff, int startLine);
+    void setAnotherButtonLine(AddCommentButton *comment, int diff);
+    bool isInRangeIncludBoth(int val, int leftMargin, int rightMargin);
+    bool isInRangeIncludLast(int val, int leftMargin, int rightMargin);
+    void removeBotton(QVector<AddCommentButton*> &commentV, int index);
+    void removeButtons(QVector<AddCommentButton*> &commentV, int cursorLine, int startLine, int endLine, int diff);
 
 protected:
     void resizeEvent(QResizeEvent *event)override;
@@ -80,7 +87,7 @@ public slots:
     void showCommentTextEdit(int);
     void emptyCommentWasAdded();
     void notEmptyCommentWasAdded();
-    void moveComment();
+    void moveCommentButtons();
 
 signals:
     void changesAppeared();
