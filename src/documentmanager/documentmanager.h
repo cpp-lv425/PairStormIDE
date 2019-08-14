@@ -22,6 +22,8 @@ public:
     void openDocument(const QString &fileName, bool load = false);
     bool saveDocument();
     bool saveAllDocuments();
+    void saveDocumentAs(CodeEditor *currentDocument, const QString &fileName);
+    CodeEditor* getCurrentDocument();
 
 public slots:
     void onSplit(Qt::Orientation orientation);
@@ -31,14 +33,15 @@ public slots:
 private:
     void splitWindow();
     void loadFile(CodeEditor *newView, const QString &fileName);
+
     QMdiArea* createMdiArea();
     QMdiArea* selectAreaForPlacement();
     QMdiSubWindow* openedDoc(const QString &fileName);
     QMdiArea* lastAreaInFocus();
     QMdiArea* areaInFocus();
     QMdiArea* getArea(CodeEditor *doc);
-    CodeEditor* getCurrentDocument();
     bool saveDocument(CodeEditor* doc);
+    void saveDocument(const QString &fileName, const QString &fileContent);
 
 };
 

@@ -22,7 +22,7 @@ QMap<UserMessages, QString> userMessages =
     std::pair<UserMessages, const QString>(UserMessages::DocumentAlreadyOpenedMsg, "Selected document is already opened."),
     std::pair<UserMessages, const QString>(UserMessages::OpenDirectoryTitle, "Open Directory"),
     std::pair<UserMessages, const QString>(UserMessages::SaveTitle, "Save"),
-    std::pair<UserMessages, const QString>(UserMessages::NoFilesToSaveMsg, "There are no opened documents to save."),
+    std::pair<UserMessages, const QString>(UserMessages::NoFilesToSaveMsg, "There are no opened documents."),
     std::pair<UserMessages, const QString>(UserMessages::SaveAsTitle, "Save As"),
     std::pair<UserMessages, const QString>(UserMessages::PromptSaveTitle, "Save Changes"),
     std::pair<UserMessages, const QString>(UserMessages::SaveQuestion, "Do you want to save changes?"),

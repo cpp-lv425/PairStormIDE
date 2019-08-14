@@ -276,7 +276,6 @@ void MainWindow::openDoc(QString fileName)
         return;
     }
 
-    //
     mpDocumentManager->openDocument(fileName, true);
 }
 
@@ -361,7 +360,18 @@ void MainWindow::onNewFileTriggered()
         return;
     }
     // opening doc with selected name
-    mpDocumentManager->openDocument(newFileName);
+    try
+    {
+         mpDocumentManager->openDocument(newFileName);
+    }
+    catch (const QException&)
+    {
+        QMessageBox::information
+                (this,
+                 userMessages[UserMessages::ErrorTitle],
+                userMessages[UserMessages::FileOpeningErrorMsg]);
+    }
+
 }
 
 void MainWindow::onOpenFileTriggered()
@@ -412,49 +422,48 @@ void MainWindow::onSaveFileTriggered()
 
 void MainWindow::onSaveFileAsTriggered()
 {
-    // if there are no opened docs
-//    if (!mpDocsArea->currentSubWindow())
-//    {
-//        QMessageBox::information
-//                (this,
-//                 userMessages[UserMessages::SaveTitle],
-//                userMessages[UserMessages::NoFilesToSaveMsg]);
-//        return;
-//    }
+    auto pCurrentDocument = mpDocumentManager->getCurrentDocument();
 
-//    auto curDoc = getCurrentDoc();
+    if (!pCurrentDocument)
+    {
+        QMessageBox::information
+                (this,
+                 userMessages[UserMessages::SaveTitle],
+                userMessages[UserMessages::NoFilesToSaveMsg]);
+        return;
+    }
 
-//    // if there are no opened docs
-//    if (!curDoc)
-//    {
-//        return;
-//    }
-//    QString extension;
+    QString extension;
 
-//    // prompt new filename from user
-//    QString fileName = QFileDialog::getSaveFileName
-//            (this,
-//             userMessages[UserMessages::SaveAsTitle],
-//            QDir::currentPath() + "/Unnamed",
-//            "*.h ;; *.hpp ;; *.cpp ;; *.c ;; *.txt ;; *.json",
-//            &extension);
+    // prompt new filename from user
+    QString fileName = QFileDialog::getSaveFileName
+            (this,
+             userMessages[UserMessages::SaveAsTitle],
+            QDir::currentPath() + "/Unnamed",
+            "*.h ;; *.hpp ;; *.cpp ;; *.c ;; *.txt ;; *.json",
+            &extension);
 
-//    // if user closed dialog
-//    if (fileName.isEmpty())
-//    {
-//        return;
-//    }
+    // if user closed dialog
+    if (fileName.isEmpty())
+    {
+        return;
+    }
 
-//    int position = fileName.indexOf(QChar{'.'});
-//    fileName += extension.mid(position + 1);
+    int position = fileName.indexOf(QChar{'.'});
+    fileName += extension.mid(position + 1);
 
-//    // saving doc
-//    saveDocument(curDoc, fileName);
-
-//    // binding opened doc to new file
-//    curDoc->setFileName(fileName);
-//    position = fileName.lastIndexOf(QChar{'/'});
-//    curDoc->setWindowTitle(fileName.mid(position + 1));
+    // saving doc
+    try
+    {
+        mpDocumentManager->saveDocumentAs(pCurrentDocument, fileName);
+    }
+    catch (const QException&)
+    {
+        QMessageBox::information
+                (this,
+                 userMessages[UserMessages::ErrorTitle],
+                userMessages[UserMessages::CreatingFileFailureMsg]);
+    }
 }
 
 void MainWindow::onSaveAllFilesTriggered()

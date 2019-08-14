@@ -67,7 +67,13 @@ void DocumentManager::openDocument(const QString &fileName, bool load)
 
     if (load)
     {
-        loadFile(newView, fileName);
+        try
+        {
+            loadFile(newView, fileName);
+        } catch (const QException&)
+        {
+            throw;
+        }
     }
 
     int position = fileName.lastIndexOf(QChar{'/'});
@@ -127,6 +133,23 @@ bool DocumentManager::saveAllDocuments()
     }
     qDebug() << "saved changes: " << savedChanges;
     return savedChanges;
+}
+
+void DocumentManager::saveDocumentAs(CodeEditor *currentDocument, const QString &fileName)
+{
+    try
+    {
+        saveDocument(fileName, currentDocument->toPlainText());
+    }
+    catch (const QException&)
+    {
+        throw;
+    }
+
+    currentDocument->setFileName(fileName);
+    int position = fileName.lastIndexOf(QChar{'/'});
+    currentDocument->setWindowTitle(fileName.mid(position + 1));
+    currentDocument->setBeginTextState();
 }
 
 void DocumentManager::loadFile(CodeEditor *newView, const QString &fileName)
@@ -330,11 +353,12 @@ CodeEditor* DocumentManager::getCurrentDocument()
 {
     if (mDocAreas.size() < 2)
     {
-        return static_cast<CodeEditor*>(mDocAreas.front()->currentSubWindow()->widget());
+        auto pCurrentWdw = mDocAreas.front()->currentSubWindow();
+        return pCurrentWdw ? qobject_cast<CodeEditor*>(pCurrentWdw->widget()) : nullptr;
     }
 
     auto pAreaInFocus = areaInFocus();
-    if (!areaInFocus())
+    if (!pAreaInFocus)
     {
         return nullptr;
     }
@@ -356,6 +380,20 @@ bool DocumentManager::saveDocument(CodeEditor *doc)
                  doc->toPlainText());
         doc->setBeginTextState();
         return true;
+    }
+    catch (const FileOpeningFailure&)
+    {
+        throw;
+    }
+}
+
+void DocumentManager::saveDocument(const QString &fileName, const QString &fileContent)
+{
+    try
+    {
+        FileManager().writeToFile
+                (fileName,
+                 fileContent);
     }
     catch (const FileOpeningFailure&)
     {
