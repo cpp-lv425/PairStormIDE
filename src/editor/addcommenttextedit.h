@@ -1,17 +1,11 @@
 #ifndef ADDCOMMENTTEXTEDIT_H
 #define ADDCOMMENTTEXTEDIT_H
 
-#include <QWidget>
 #include <QFont>
 #include <QString>
 #include<QPushButton>
-#include<QPlainTextEdit>
-#include<QRegularExpression>
-#include<QRegularExpressionMatch>
-#include<QRegularExpressionMatchIterator>
-#include<QVector>
 #include<QTextCursor>
-#include<QTextCharFormat>
+#include<QRegularExpression>
 
 namespace Ui
 {
@@ -40,8 +34,8 @@ slots:
 
 signals:
     void setBySpecialSigns(QString sights);
-    void emptyComment();
-    void notEmptyComment();
+    void emptyCommentWasSent();
+    void notEmptyCommentWasSent();
 
 private:
     Ui::AddCommentTextEdit *ui;

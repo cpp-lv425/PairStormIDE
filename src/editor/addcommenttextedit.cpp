@@ -45,26 +45,28 @@ void AddCommentTextEdit::setItalicPressed()
     emit setBySpecialSigns("_");
 }
 
-void AddCommentTextEdit::setSpecialSelect(QString sighns)
+void AddCommentTextEdit::setSpecialSelect(QString sighns)//sights - symbols which we add to the start and to the end ("**", "_")
 {
     int selectionStart = ui->commentTextEdit->textCursor().selectionStart();
-    int selectionEnd = ui->commentTextEdit->textCursor().selectionEnd();
+    int selectionEnd   = ui->commentTextEdit->textCursor().selectionEnd();
 
     QTextCursor curs = ui->commentTextEdit->textCursor();
-    QString after = ui->commentTextEdit->textCursor().selectedText();
+    QString replacingPartStr = ui->commentTextEdit->textCursor().selectedText();//the part of string which we select
 
-    after.prepend(sighns);
-    after.append(sighns);
+    replacingPartStr.prepend(sighns);//add sight(sights) to the begin of selected string
+    replacingPartStr.append(sighns);//add sight(sights) to the end of selected string
+    //after this adding we've gotten new format text. For example after selectin word "code" as bold we'll get "**code**"
 
     ui->commentTextEdit->textCursor().keepPositionOnInsert();
-    QString currString = ui->commentTextEdit->toPlainText();
-    currString.replace(
+    QString ReplacedString = ui->commentTextEdit->toPlainText();//replace previous word (without sights) to the new one
+    ReplacedString.replace(
                 selectionStart,
                 selectionEnd - selectionStart,
-                after);
+                replacingPartStr);
 
-    //ui->commentTextEdit->setText(currString);
-    ui->commentTextEdit->setPlainText(currString);
+    ui->commentTextEdit->setPlainText(ReplacedString);//set this replaced text to the PlaintTextEdit
+
+    //in the code belove we switch "current view window" again to the input text widget
     curs.setPosition(selectionStart + sighns.length());
     ui->commentTextEdit->setTextCursor(curs);
     ui->commentTextEdit->setFocus();
@@ -72,12 +74,12 @@ void AddCommentTextEdit::setSpecialSelect(QString sighns)
 
 void AddCommentTextEdit::sendComment()
 {
-    if(ui->commentTextEdit->toPlainText().isEmpty())
+    if (ui->commentTextEdit->toPlainText().isEmpty())
     {
-        emit emptyComment();
+        emit emptyCommentWasSent();
     }
     else
     {
-        emit notEmptyComment();
+        emit notEmptyCommentWasSent();
     }
 }

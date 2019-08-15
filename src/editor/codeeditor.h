@@ -44,7 +44,7 @@ class CodeEditor : public QPlainTextEdit
     Q_OBJECT
 public:
     CodeEditor(QWidget *parent = nullptr);
-    void lineNumberAreaPaintEvent(QPaintEvent *event);
+    void specialAreasRepaintEvent(QPaintEvent *event);
     int getLineNumberAreaWidth();
     bool isinsidebracket();
     QString& getFileName();
@@ -89,7 +89,7 @@ public slots:
     void showCommentTextEdit(int);
     void emptyCommentWasAdded();
     void notEmptyCommentWasAdded();
-    void moveCommentButtons();
+    void changeCommentButtonsState();
 
 signals:
     void changesAppeared();

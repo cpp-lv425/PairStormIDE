@@ -31,6 +31,3 @@ void AddCommentButton::setCommentString(const QString &value)
 {
     commentString = value;
 }
-
-
-

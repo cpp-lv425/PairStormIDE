@@ -1,8 +1,8 @@
 #ifndef ADDCOMMENTBUTTON_H
 #define ADDCOMMENTBUTTON_H
 
-#include<QObject>
-#include<QPushButton>
+#include <QObject>
+#include <QPushButton>
 
 class AddCommentButton: public QPushButton
 {

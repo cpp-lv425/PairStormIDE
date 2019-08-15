@@ -39,10 +39,7 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     mCurrentCommentLable = new QLabel(this);
     setMouseTracking(true);
 
-     //comment text edit
-  //  mAddCommentTextEdit = new AddCommentTextEdit;
-   // mAddCommentTextEdit->setVisible(false);
-
+    //widget that shows the comment to each line
     mCommentWidget = new CommentWidget;
     mCommentWidget->setVisible(false);
 
@@ -51,17 +48,14 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     //If the text is scrolled, rect will cover the entire viewport area.
     //If the text is scrolled vertically, dy carries the amount of pixels the viewport was scrolled.
 
-    connect(this,              &QPlainTextEdit::updateRequest,                  this, &CodeEditor::updateLineNumberArea);
-  // connect(this,              &QPlainTextEdit::cursorPositionChanged,          this, &CodeEditor::runLexer);
-    connect(mTimer,            &QTimer::timeout,                                this, &CodeEditor::saveStateInTheHistory);
-  //  connect(this,              &QPlainTextEdit::cursorPositionChanged,          this, &CodeEditor::highlighText);
-    connect(this,              &QPlainTextEdit::cursorPositionChanged,          this, &CodeEditor::textChangedInTheOneLine);
-    connect(mAddCommentButton, &AddCommentButton::addCommentButtonPressed ,     this, &CodeEditor::showCommentTextEdit);
-    connect(mCommentWidget->getEditTab(), &AddCommentTextEdit::emptyComment,    this, &CodeEditor::emptyCommentWasAdded);
-    connect(mCommentWidget->getEditTab(), &AddCommentTextEdit::notEmptyComment, this, &CodeEditor::notEmptyCommentWasAdded);
-    connect(this,              &CodeEditor::linesCountUpdated,                  this, &CodeEditor::moveCommentButtons);
+    connect(this,                         &QPlainTextEdit::updateRequest,              this, &CodeEditor::updateLineNumberArea);
+    connect(mTimer,                       &QTimer::timeout,                            this, &CodeEditor::saveStateInTheHistory);
+    connect(this,                         &QPlainTextEdit::cursorPositionChanged,      this, &CodeEditor::textChangedInTheOneLine);
+    connect(mAddCommentButton,            &AddCommentButton::addCommentButtonPressed,  this, &CodeEditor::showCommentTextEdit);
+    connect(mCommentWidget->getEditTab(), &AddCommentTextEdit::emptyCommentWasSent,    this, &CodeEditor::emptyCommentWasAdded);
+    connect(mCommentWidget->getEditTab(), &AddCommentTextEdit::notEmptyCommentWasSent, this, &CodeEditor::notEmptyCommentWasAdded);
+    connect(this,                         &CodeEditor::linesCountUpdated,                  this, &CodeEditor::changeCommentButtonsState);
 
-    //connect(mCommentsVector[int], SIGNAL(AddCommentButtonPressed(int)), this, SLOT(showCommentTextEdit(int)));
 
     mTimer->start(CHANGE_SAVE_TIME);//save text by this time
     mLinesCountCurrent = 1;
@@ -178,7 +172,7 @@ void CodeEditor::resizeEvent(QResizeEvent *e)
     mLineNumberArea->setGeometry(QRect(0, 0, getLineNumberAreaWidth(), cr.height()));//set the same height as codeEditor for lineCouter
 }
 
-void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event)
+void CodeEditor::specialAreasRepaintEvent(QPaintEvent *event)
 {
     QPainter painter(mLineNumberArea);
     painter.fillRect(event->rect(), mConfigParam.mLineCounterAreaColor);
@@ -239,6 +233,14 @@ void CodeEditor::setZoom(int zoomVal)
 void CodeEditor::textChangedInTheOneLine()
 {
     emit(textChangedInLine(this->textCursor().blockNumber() + 1));
+}
+
+AddCommentButton *CodeEditor::getCommentButtonByIndex(int line)
+{
+    for( int i = 0; i < mCommentsVector.size(); i++)
+    {
+        if(i-)
+    }
 }
 
 void CodeEditor::showCommentTextEdit(int line)
@@ -320,17 +322,18 @@ void CodeEditor::notEmptyCommentWasAdded()
     connect(mCommentsVector.back(), &AddCommentButton::addCommentButtonPressed, this, &CodeEditor::showCommentTextEdit);
 }
 
-void CodeEditor::moveCommentButtons()
+void CodeEditor::changeCommentButtonsState()
 {
-    int diff = mLinesCountCurrent - mLinesCountPrev;
-    int cursorLine = this->textCursor().blockNumber() + 1;
+    int diff = mLinesCountCurrent - mLinesCountPrev;//number that keeps the difference between previous and current lines count
+    int cursorLine = this->textCursor().blockNumber() + 1;//get the line where cursor is
 
+    //get the lines of start and end changing
     int startLine = diff > 0 ? cursorLine - diff : cursorLine;
     int endLine = diff > 0 ? cursorLine : cursorLine - diff;
 
-    removeButtons(mCommentsVector, cursorLine, startLine, endLine, diff);
+    removeButtons(mCommentsVector, cursorLine, startLine, endLine, diff);//remove all buttons if we deleted their lines
 
-    rewriteButtonsLines(mCommentsVector,diff,startLine);
+    rewriteButtonsLines(mCommentsVector,diff,startLine);//move position of buttons that need to be moved
 }
 
 LastRemoveKey CodeEditor::getLastRemomeKey() const
@@ -345,12 +348,15 @@ void CodeEditor::setLastRemomeKey(const LastRemoveKey &value)
 
 void CodeEditor::rewriteButtonsLines(QVector<AddCommentButton *> &commentV, const int diff, const int startLine)
 {
+    //move buttons' lines according to diif
     for (auto &i : commentV)
     {
         if (i->getCurrentLine() == startLine)
         {
             auto cursor = this->textCursor();
             cursor.movePosition(QTextCursor::PreviousCharacter);
+//check if cursor was in the start of comment line.
+//that is the only one situation when we consider this line as the line where we should move comment button
             if (cursor.atBlockStart())
             {
                 setAnotherButtonLine(i, diff);
@@ -384,34 +390,6 @@ void CodeEditor::removeBotton(QVector<AddCommentButton *> &commentV, int index)
     commentV.erase(commentV.begin() + index);
 }
 
-void CodeEditor::removeButtons(QVector<AddCommentButton *> &commentV, int cursorLine, int startLine, int endLine, int diff)
-{
-   if (diff > 0)
-       return;
-   for (int i = 0; i < commentV.size(); i++)
-   {
-       if (lastRemomeKey == LastRemoveKey::DEL)
-       {
-           if (cursorLine == startLine
-                   && cursorLine != commentV[i]->getCurrentLine())
-           {
-               continue;
-           }
-           if (isInRangeIncludBoth(commentV[i]->getCurrentLine(), startLine, endLine))
-           {
-               removeBotton(commentV, i);
-           }
-       }
-       else
-       {
-           if(isInRangeIncludLast(commentV[i]->getCurrentLine(), startLine, endLine))
-           {
-               removeBotton(commentV, i);
-           }
-       }
-   }
-}
-
 bool CodeEditor::isCommentButtonExist(int line)
 {
     for (auto &i : mCommentsVector)
@@ -422,6 +400,42 @@ bool CodeEditor::isCommentButtonExist(int line)
         }
     }
     return false;
+}
+
+void CodeEditor::removeButtons(QVector<AddCommentButton *> &commentV, int cursorLine, int startLine, int endLine, int diff)
+{
+   if (diff > 0)//we shouldn't remove button if the wasn't any removing
+   {
+       return;
+   }
+
+   for (int i = 0; i < commentV.size(); i++)
+   {
+       //if the last pressed remove button (delete or backspace) was delete we should check one more condition
+       //because cursor position hasn't changed
+       if (lastRemomeKey == LastRemoveKey::DEL)
+       {
+           //this statment happens when we're staying above the line where comment is and pressed Delete.
+           //we havn't moved the cursor position, but diff became -1 therefore we can't check this as usually
+           //using only startLine position
+           if (cursorLine == startLine
+                   && cursorLine != commentV[i]->getCurrentLine())
+           {
+               continue;
+           }
+           if (isInRangeIncludBoth(commentV[i]->getCurrentLine(), startLine, endLine))
+           {
+               removeBotton(commentV, i);//otherwise delete this button (we delete whole line where comment button was)
+           }
+       }
+       else
+       {
+           if(isInRangeIncludLast(commentV[i]->getCurrentLine(), startLine, endLine))
+           {
+               removeBotton(commentV, i);//the same deleting here
+           }
+       }
+   }
 }
 
 void CodeEditor::mouseMoveEvent(QMouseEvent *event)

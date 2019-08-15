@@ -1,14 +1,13 @@
 #ifndef COMMENTWIDGET_H
 #define COMMENTWIDGET_H
 
+#include "addcommentbutton.h"
+#include "viewtextedit.h"
+#include "addcommenttextedit.h"
 #include <QWidget>
 #include <QTabWidget>
-#include<addcommenttextedit.h>
-#include<QVBoxLayout>
-#include<QPlainTextEdit>
-#include "addcommentbutton.h"
-#include<viewtextedit.h>
-#include<QPalette>
+#include <QVBoxLayout>
+#include <QPlainTextEdit>
 
 enum SpecificTextType{BOLD,
                       ITALIC};
@@ -32,10 +31,9 @@ class CommentWidget : public QWidget
 public:
     explicit CommentWidget(QWidget *parent = nullptr);
     ~CommentWidget();
+
     void setPosition(QPlainTextEdit *editor, AddCommentButton *commentButton);
-    void writeSpecialTextPositions(const QRegularExpression &re, const SpecificTextType &textType);
-    void shiftAllBold(const SpecificText &specText,const int &oneSideSymbolsCount);
-    void setSpecificTextView();
+
     AddCommentTextEdit *getEditTab() const;
     void setEditTab(AddCommentTextEdit *value);
 
@@ -53,8 +51,14 @@ public:
     QTabWidget *getCommentTabWIdget() const;
     void setCommentTabWIdget(QTabWidget *value);
 
+private:
+    void writeSpecialTextPositions(const QRegularExpression &re, const SpecificTextType &textType);
+    void shiftAllBold(const SpecificText &specText,const int &oneSideSymbolsCount);
+    void setSpecificTextView();
+
 public slots:
     void setViewText(int);
+
 private:
     Ui::CommentWidget *ui;
     AddCommentTextEdit *editTab;

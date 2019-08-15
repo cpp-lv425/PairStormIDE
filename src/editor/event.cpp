@@ -1,7 +1,7 @@
 #include "event.h"
 
 QString Event::sTabs="";
-bool Event::sIsSleshPressed=false;
+bool Event::isSleshPressed=false;
 void Event::eventInsertSymbol(CodeEditor *codeEditor, QKeyEvent *e, QString s)
 {
         plainTextPressEvent(codeEditor, e);
