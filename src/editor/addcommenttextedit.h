@@ -27,6 +27,7 @@ public:
     ~AddCommentTextEdit();
 
     QString getText();
+    void setText(const QString &text);
     QPushButton* getSendButton();
 
 public

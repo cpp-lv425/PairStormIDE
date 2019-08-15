@@ -26,6 +26,11 @@ QString AddCommentTextEdit::getText()
     return ui->commentTextEdit->toPlainText();
 }
 
+void AddCommentTextEdit::setText(const QString &text)
+{
+    ui->commentTextEdit->setText(text);
+}
+
 QPushButton* AddCommentTextEdit::getSendButton()
 {
     return ui->sendMessageButton;

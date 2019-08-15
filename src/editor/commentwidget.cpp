@@ -7,7 +7,7 @@ CommentWidget::CommentWidget(QWidget *parent) :
     ui(new Ui::CommentWidget)
 {
     ui->setupUi(this);
-    QTabWidget * commentTabWIdget = new QTabWidget;
+    commentTabWIdget = new QTabWidget;
 
     editTab = new AddCommentTextEdit;
     QVBoxLayout *lay1 = new QVBoxLayout;
@@ -30,9 +30,10 @@ CommentWidget::CommentWidget(QWidget *parent) :
     mainLayout->addWidget(commentTabWIdget);
     this->setLayout(mainLayout);
     connect(commentTabWIdget, SIGNAL(currentChanged(int)), this, SLOT(setWholeText(int)));
-    commentString = editTab->getText();
+    commentStringForView = editTab->getText();
 
     this->setEnabled(true);
+
 
 }
 
@@ -54,9 +55,9 @@ void CommentWidget::writeSpecialTextPositions(const QRegularExpression &re, cons
 {
     int oneSideSymbolsCount = textType == SpecificTextType::BOLD ? 2: 1;
     SpecificText specText;
-    QString findString = textType == SpecificTextType::BOLD ? editTab->getText() : commentString;
+    QString viewString = textType == SpecificTextType::BOLD ? editTab->getText() : commentStringForView;
 
-    QRegularExpressionMatchIterator matchIter =  re.globalMatch(findString);
+    QRegularExpressionMatchIterator matchIter =  re.globalMatch(viewString);
     int shift = 0;
     while(matchIter.hasNext())
     {
@@ -66,7 +67,7 @@ void CommentWidget::writeSpecialTextPositions(const QRegularExpression &re, cons
             int startOffset = match.capturedStart();
             int endOffset = match.capturedEnd();
 
-            findString.replace(startOffset - shift,
+            viewString.replace(startOffset - shift,
                                endOffset - startOffset,
                                match.captured().mid(oneSideSymbolsCount,
                                                     match.captured().length() - oneSideSymbolsCount * 2));
@@ -82,8 +83,8 @@ void CommentWidget::writeSpecialTextPositions(const QRegularExpression &re, cons
             shiftAllBold(specText, oneSideSymbolsCount);
         }
     }
-    commentString = findString;
-    viewTab->setText(findString);
+    commentStringForView = viewString;
+    viewTab->setText(viewString);
 }
 
 void CommentWidget::setWholeText(int index)
@@ -98,6 +99,16 @@ void CommentWidget::setWholeText(int index)
     writeSpecialTextPositions(QRegularExpression("_(.*?)_"), SpecificTextType::ITALIC);
 
     setSpecificTextView();
+}
+
+QTabWidget *CommentWidget::getCommentTabWIdget() const
+{
+    return commentTabWIdget;
+}
+
+void CommentWidget::setCommentTabWIdget(QTabWidget *value)
+{
+    commentTabWIdget = value;
 }
 
 int CommentWidget::getCommentLine() const

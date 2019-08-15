@@ -20,14 +20,22 @@ public:
     void setCurrentLine(int currentLine);
     int getCurrentLine();
 
+    QString getCommentString() const;
+    void setCommentString(const QString &value);
+
 signals:
     void addCommentButtonPressed(int);
+    void mouseEnteredButtonArea(int);
+    void mouseLeftButtonArea();
 
 protected:
     virtual void mousePressEvent(QMouseEvent *event);
+    virtual void enterEvent(QEvent *event);
+    virtual void leaveEvent(QEvent *event);
 
 private:
     int mCurrentLine;
+    QString commentString;
 };
 
 #endif // ADDCOMMENTBUTTON_H

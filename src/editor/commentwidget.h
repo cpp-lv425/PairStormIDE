@@ -50,6 +50,9 @@ public:
     int getCommentLine() const;
     void setCommentLine(int value);
 
+    QTabWidget *getCommentTabWIdget() const;
+    void setCommentTabWIdget(QTabWidget *value);
+
 public slots:
     void setWholeText(int);
 private:
@@ -57,9 +60,10 @@ private:
     AddCommentTextEdit *editTab;
     ViewTextEdit *viewTab;
 
+    QTabWidget *commentTabWIdget;
     QRect commentButtonGeometry;
     int commentLine;
-    QString commentString;
+    QString commentStringForView;
     QVector<SpecificText>specificTextVector;
 };
 

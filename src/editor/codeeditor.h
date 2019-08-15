@@ -67,6 +67,7 @@ private:
     bool isInRangeIncludLast(int val, int leftMargin, int rightMargin);
     void removeBotton(QVector<AddCommentButton*> &commentV, int index);
     void removeButtons(QVector<AddCommentButton*> &commentV, int cursorLine, int startLine, int endLine, int diff);
+    bool isCommentButtonExist(int line);
 
 protected:
     void resizeEvent(QResizeEvent *event)override;
@@ -78,6 +79,7 @@ private slots:
     void updateLineNumberArea(const QRect &rect, int dy);
     void runLexer();
     void highlighText();
+    //void showCommentLine(int line);
 
 public slots:
     void keyPressEvent(QKeyEvent *e) override;
@@ -85,9 +87,11 @@ public slots:
     void setZoom(int zoomVal);
     void textChangedInTheOneLine();
     void showCommentTextEdit(int);
+    void showCommentTextEditView(int);
     void emptyCommentWasAdded();
     void notEmptyCommentWasAdded();
     void moveCommentButtons();
+    void closeCommentTextEditView();
 
 signals:
     void changesAppeared();
@@ -111,6 +115,7 @@ private:
     AddCommentTextEdit *mAddCommentTextEdit;
     CommentWidget *mCommentWidget;
     QLabel *mCurrentCommentLable;
+    QTextEdit *commentView;
 
     int mLinesCountPrev;
     int mLinesCountCurrent;
