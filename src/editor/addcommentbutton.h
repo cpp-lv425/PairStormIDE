@@ -3,12 +3,6 @@
 
 #include<QObject>
 #include<QPushButton>
-#include<QWidget>
-#include<QMouseEvent>
-#include<QTextBlock>
-#include<QPlainTextEdit>
-#include<QtCore/QObject>
-
 
 class AddCommentButton: public QPushButton
 {
@@ -25,8 +19,6 @@ public:
 
 signals:
     void addCommentButtonPressed(int);
-    void mouseEnteredButtonArea(int);
-    void mouseLeftButtonArea();
 
 protected:
     virtual void mousePressEvent(QMouseEvent *event);

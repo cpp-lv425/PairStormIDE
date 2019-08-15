@@ -2,7 +2,6 @@
 
 AddCommentButton::AddCommentButton(QWidget *parent):QPushButton (parent)
 {
-
 }
 
 AddCommentButton::~AddCommentButton() = default;

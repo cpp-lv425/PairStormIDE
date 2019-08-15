@@ -52,9 +52,9 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     //If the text is scrolled vertically, dy carries the amount of pixels the viewport was scrolled.
 
     connect(this,              &QPlainTextEdit::updateRequest,                  this, &CodeEditor::updateLineNumberArea);
-   // connect(this,              &QPlainTextEdit::cursorPositionChanged,          this, &CodeEditor::runLexer);
+  // connect(this,              &QPlainTextEdit::cursorPositionChanged,          this, &CodeEditor::runLexer);
     connect(mTimer,            &QTimer::timeout,                                this, &CodeEditor::saveStateInTheHistory);
-   // connect(this,              &QPlainTextEdit::cursorPositionChanged,          this, &CodeEditor::highlighText);
+  //  connect(this,              &QPlainTextEdit::cursorPositionChanged,          this, &CodeEditor::highlighText);
     connect(this,              &QPlainTextEdit::cursorPositionChanged,          this, &CodeEditor::textChangedInTheOneLine);
     connect(mAddCommentButton, &AddCommentButton::addCommentButtonPressed ,     this, &CodeEditor::showCommentTextEdit);
     connect(mCommentWidget->getEditTab(), &AddCommentTextEdit::emptyComment,    this, &CodeEditor::emptyCommentWasAdded);

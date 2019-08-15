@@ -1,6 +1,5 @@
 #include "addcommenttextedit.h"
 #include "ui_addcommenttextedit.h"
-#include <QDebug>
 
 AddCommentTextEdit::AddCommentTextEdit(QWidget *parent) :
     QWidget(parent),
@@ -10,10 +9,10 @@ AddCommentTextEdit::AddCommentTextEdit(QWidget *parent) :
     ui->setBoldButton->setStyleSheet("font-weight: bold");
     ui->setItalicButton->setStyleSheet("font: italic");
 
-    connect(ui->sendMessageButton, SIGNAL(clicked()),                  this, SLOT(sendComment()));
-    connect(ui->setBoldButton,     SIGNAL(clicked()),                  this, SLOT(setBoldPressed()));
-    connect(ui->setItalicButton,   SIGNAL(clicked()),                  this, SLOT(setItalicPressed()));
-    connect(this,                  SIGNAL(setBySpecialSigns(QString)), this, SLOT(setSpecialSelect(QString)));
+    connect(ui->sendMessageButton, &QAbstractButton::clicked,              this, &AddCommentTextEdit::sendComment);
+    connect(ui->setBoldButton,     &QAbstractButton::clicked,              this, &AddCommentTextEdit::setBoldPressed);
+    connect(ui->setItalicButton,   &QAbstractButton::clicked,              this, &AddCommentTextEdit::setItalicPressed);
+    connect(this,                  &AddCommentTextEdit::setBySpecialSigns, this, &AddCommentTextEdit::setSpecialSelect);
 }
 
 AddCommentTextEdit::~AddCommentTextEdit()
