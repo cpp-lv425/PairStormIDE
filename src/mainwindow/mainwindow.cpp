@@ -238,24 +238,6 @@ void MainWindow::setupMainMenu()
     addToolBar(Qt::TopToolBarArea, pToolbar);
 }
 
-void MainWindow::saveDocument(CodeEditor *pDoc, const QString &fileName)
-{    
-    try
-    {
-        // writing to file
-        FileManager().writeToFile(fileName, pDoc->toPlainText());
-        statusBar()->showMessage(userMessages[UserMessages::DocumentSavedMsg], 3000);
-    } catch (const FileOpeningFailure&)
-    {
-        QMessageBox::warning
-                (this,
-                 userMessages[UserMessages::ErrorTitle],
-                userMessages[UserMessages::FileOpeningForSavingErrorMsg]);
-    }
-    pDoc->document()->setModified(false);
-    pDoc->setBeginTextState();
-}
-
 void MainWindow::openDoc(QString fileName)
 {
     QString readResult;
@@ -278,16 +260,6 @@ void MainWindow::openDoc(QString fileName)
     }
 
     mpDocumentManager->openDocument(fileName, true);
-}
-
-void MainWindow::saveAllModifiedDocuments(QList<QMdiSubWindow*> &docsList)
-{
-    for (int i = 0; i < docsList.size(); ++i)
-    {
-        auto curDoc = qobject_cast<CodeEditor*>(docsList[i]->widget());
-        saveDocument(curDoc, curDoc->getFileName());
-        curDoc->setBeginTextState();
-    }
 }
 
 void MainWindow::createProjectViewer()
@@ -337,12 +309,6 @@ void MainWindow::createButtomPanel()
     mpBottomPanelDock = new BottomPanelDock(this);
     mpBottomPanelDock->setObjectName("mpBottomPanelDock");
     addDockWidget(Qt::BottomDockWidgetArea, mpBottomPanelDock);
-}
-
-CodeEditor* MainWindow::getCurrentDoc()
-{
-    // consider removing current method
-    return nullptr;
 }
 
 void MainWindow::onNewFileTriggered()
@@ -498,62 +464,32 @@ void MainWindow::onExitTriggered()
 
 void MainWindow::onUndoTriggered()
 {
-    auto curDoc = getCurrentDoc();
-
-    if (curDoc)
-    {
-        curDoc->undo();
-    }
+    //
 }
 
 void MainWindow::onRedoTriggered()
 {
-    auto curDoc = getCurrentDoc();
-
-    if (curDoc)
-    {
-        curDoc->redo();
-    }
+    //
 }
 
 void MainWindow::onCutTriggered()
 {
-    auto curDoc = getCurrentDoc();
-
-    if (curDoc)
-    {
-        curDoc->cut();
-    }
+    //
 }
 
 void MainWindow::onCopyTriggered()
 {
-    auto curDoc = getCurrentDoc();
-
-    if (curDoc)
-    {
-        curDoc->copy();
-    }
+    //
 }
 
 void MainWindow::onPasteTriggered()
 {
-    auto curDoc = getCurrentDoc();
-
-    if (curDoc)
-    {
-        curDoc->paste();
-    }
+    //
 }
 
 void MainWindow::onSelectAllTriggered()
 {    
-    auto curDoc = getCurrentDoc();
-
-    if (curDoc)
-    {
-        curDoc->selectAll();
-    }
+    //
 }
 
 void MainWindow::onFindTriggered()
@@ -653,11 +589,6 @@ void MainWindow::onReferenceFromEditor(const QString &keyword)
 void MainWindow::onOpenFileFromProjectViewer(QString fileName)
 {
     openDoc(fileName);
-}
-
-void MainWindow::onCloseWindow(CodeEditor *curDoc)
-{
-    saveDocument(curDoc, curDoc->getFileName());
 }
 
 void MainWindow::onConnectionStatusChanged(bool status)

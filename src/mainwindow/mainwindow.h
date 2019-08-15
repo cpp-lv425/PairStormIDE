@@ -43,14 +43,11 @@ private:
     Browser *mDocumentationBrowser;
     QScopedPointer<PaletteConfigurator> mpPaletteConfigurator;
 
-    void setupMainMenu();
-    void saveDocument(CodeEditor *pDoc, const QString &fileName);
+    void setupMainMenu();    
     void openDoc(QString fileName);
-    void saveAllModifiedDocuments(QList<QMdiSubWindow*> &docsList);
     void createProjectViewer();
     void createChatWindow();
     void createButtomPanel();
-    CodeEditor* getCurrentDoc();
 
     void saveMainWindowState();
     void restoreMainWindowState();
@@ -99,8 +96,7 @@ private slots:
     void onReferenceFromEditor(const QString &keyword);
 
 public slots:
-    void onOpenFileFromProjectViewer(QString fileName);    
-    void onCloseWindow(CodeEditor *curDoc);   
+    void onOpenFileFromProjectViewer(QString fileName);
     void onConnectionStatusChanged(bool status);
 
 protected:

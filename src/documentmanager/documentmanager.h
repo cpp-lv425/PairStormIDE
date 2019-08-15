@@ -12,8 +12,12 @@ class DocumentManager: public QObject
 {
     Q_OBJECT
 
+    // object responsible for laying out several doc area
     QSplitter *mpSplitter;
     QVector<QMdiArea*> mDocAreas;
+    // pointer to previous document in focus
+    // is used when document loses focus upon user input
+    // (e.g. when Project Viewer item is clicked to open another document)
     CodeEditor *mpPrevEditorInFocus;
 
 public:
