@@ -372,7 +372,6 @@ void MainWindow::onNewFileTriggered()
                  userMessages[UserMessages::ErrorTitle],
                 userMessages[UserMessages::FileOpeningErrorMsg]);
     }
-
 }
 
 void MainWindow::onOpenFileTriggered()
@@ -405,12 +404,12 @@ void MainWindow::onSaveFileTriggered()
 {
     try
     {
+        // if document was modified, it is saved &
+        // message is shown on the status bar
         if (mpDocumentManager->saveDocument())
         {
             statusBar()->showMessage(userMessages[UserMessages::DocumentSavedMsg], 3000);
-        }
-        else
-            qDebug() << "there is nothing to save";
+        }        
     }
     catch (const FileOpeningFailure&)
     {
@@ -423,8 +422,10 @@ void MainWindow::onSaveFileTriggered()
 
 void MainWindow::onSaveFileAsTriggered()
 {
+    // receiving current document
     auto pCurrentDocument = mpDocumentManager->getCurrentDocument();
 
+    // if there are no opened documents
     if (!pCurrentDocument)
     {
         QMessageBox::information
@@ -453,7 +454,7 @@ void MainWindow::onSaveFileAsTriggered()
     int position = fileName.indexOf(QChar{'.'});
     fileName += extension.mid(position + 1);
 
-    // saving doc
+    // saving document
     try
     {
         mpDocumentManager->saveDocumentAs(pCurrentDocument, fileName);
@@ -474,9 +475,7 @@ void MainWindow::onSaveAllFilesTriggered()
         if (mpDocumentManager->saveAllDocuments())
         {
             statusBar()->showMessage(userMessages[UserMessages::DocumentSavedMsg], 3000);
-        }
-        else
-            qDebug() << "there is nothing to save";
+        }        
     }
     catch (const FileOpeningFailure&)
     {
@@ -711,7 +710,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
     }
     default:
     {
-        qDebug() << "missed enum";
+        event->ignore();
         break;
     }
     }
