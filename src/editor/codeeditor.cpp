@@ -45,6 +45,8 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
 
     mCommentWidget = new CommentWidget;
     mCommentWidget->setVisible(false);
+
+
     //This signal is emitted when the text document needs an update of the specified rect.
     //If the text is scrolled, rect will cover the entire viewport area.
     //If the text is scrolled vertically, dy carries the amount of pixels the viewport was scrolled.
@@ -281,7 +283,6 @@ void CodeEditor::notEmptyCommentWasAdded()
     //write to the database (for the future)
     if(isCommentButtonExist(mCommentWidget->getCommentLine()))
     {
-        qDebug()<<"here";
         AddCommentButton *commentButton = new AddCommentButton;
         for(auto &i: mCommentsVector)
         {
@@ -292,9 +293,9 @@ void CodeEditor::notEmptyCommentWasAdded()
             }
         }
         replaceExistingButton(commentButton);
-
         mCommentWidget->setViewText(1);
-        qDebug()<<"vector size ="<<mCommentsVector.size();
+        commentButton->setToolTip(mCommentWidget->getViewTab()->getText());
+        mCommentWidget->setVisible(false);
         return;
     }
 
@@ -316,14 +317,6 @@ void CodeEditor::notEmptyCommentWasAdded()
 
     mCommentWidget->setVisible(false);
 
-//    for(int i = 0; i<mCommentsVector.size() - 1; i++)
-//    {
-//        if(mCommentsVector[i]->getCurrentLine() == mAddCommentButton->getCurrentLine())
-//        {
-//            mCommentsVector[i]->setVisible(false);
-//            mCommentsVector.erase(mCommentsVector.begin() + i);
-//        }
-//    }
     connect(mCommentsVector.back(), &AddCommentButton::addCommentButtonPressed, this, &CodeEditor::showCommentTextEdit);
 }
 

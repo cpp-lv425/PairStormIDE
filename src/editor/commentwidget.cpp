@@ -82,7 +82,8 @@ void CommentWidget::writeSpecialTextPositions(const QRegularExpression &re, cons
         }
     }
     commentStringForView = viewString;
-    setViewText(1);
+    viewTab->setText(viewString);
+    //setViewText(1);
 }
 
 void CommentWidget::setViewText(int index)
