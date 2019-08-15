@@ -18,8 +18,13 @@
 #include "tabrepository.h"
 
 #include <QDialog>
-#include <QTabWidget>
-#include <QDialogButtonBox>
+
+QT_BEGIN_NAMESPACE
+class QDialog;
+class QTabWidget;
+class QDialogButtonBox;
+class QAbstractButton;
+QT_END_NAMESPACE
 
 class MenuOptions : public QDialog
 {

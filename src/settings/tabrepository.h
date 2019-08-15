@@ -8,6 +8,9 @@ class TabRepository : public QWidget
     Q_OBJECT
 public:
     explicit TabRepository(QWidget *parent = nullptr);
+private:
+    // design parameters
+    int mBasicStretch                = 1;
 
 signals:
 

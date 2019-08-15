@@ -8,11 +8,12 @@
 #define TABTEXTEDITOR_H
 
 #include <QWidget>
-#include <QtWidgets>
-#include <QHBoxLayout>
 
 QT_BEGIN_NAMESPACE
+class QTreeWidget;
+class QComboBox;
 class QTextEdit;
+class QTreeWidgetItem;
 QT_END_NAMESPACE
 
 class TabTextEditor : public QWidget
@@ -51,7 +52,9 @@ private:
     QTextEdit *mpTextEdit;
 
     // design parameters
+    int mFontSizePreview            = 25;
     int mColumnSpacing              = 10;
+    int mBasicStretch               = 1;
 
 public slots:
     void showFont(QTreeWidgetItem *item);       // show current font in preview window

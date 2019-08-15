@@ -1,5 +1,6 @@
 #include "tabrepository.h"
-#include <QtWidgets>
+#include <QHBoxLayout>
+#include <QLabel>
 
 TabRepository::TabRepository(QWidget *parent) : QWidget(parent)
 {
@@ -7,6 +8,6 @@ TabRepository::TabRepository(QWidget *parent) : QWidget(parent)
     QHBoxLayout *mainLayout = new QHBoxLayout;
     mainLayout->addWidget(fileNameLabel);
 
-    mainLayout->addStretch(1);
+    mainLayout->addStretch(mBasicStretch);
     setLayout(mainLayout);
 }

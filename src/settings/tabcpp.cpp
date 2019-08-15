@@ -1,13 +1,20 @@
 #include "tabcpp.h"
 
-#include <QtWidgets>
-#include <QAbstractItemView>
+#include <QHBoxLayout>
+#include <QSettings>
+#include <QLabel>
+#include <QComboBox>
+#include <QListWidget>
+#include <QPushButton>
+#include <QInputDialog>
+
+//#include <QAbstractItemView>
 
 TabCpp::TabCpp(QWidget *parent)
     : QWidget(parent)
 {
     QHBoxLayout *mainLayout = new QHBoxLayout;//();
-    mainLayout->addStretch(1);
+    mainLayout->addStretch(mBasicStretch);
 
     // getting data from QSettings
     QSettings s;
@@ -21,7 +28,7 @@ TabCpp::TabCpp(QWidget *parent)
 
     //      C++ STANDART
     QVBoxLayout *standartLayout = new QVBoxLayout;//();
-    standartLayout->addStretch(1);
+    standartLayout->addStretch(mBasicStretch);
     QLabel *labelCstandart = new QLabel(tr("C++ standart"));
     mpComboStandart = new QComboBox(this);
     mpComboStandart->addItems(mStandartList);
@@ -47,7 +54,7 @@ TabCpp::TabCpp(QWidget *parent)
 
     //  path to compilers
     QVBoxLayout *compilersLayout = new QVBoxLayout;//();
-    compilersLayout->addStretch(1);
+    compilersLayout->addStretch(mBasicStretch);
     QLabel *labelCompiler = new QLabel(tr("Compilers:"));
     mpCompilersList = new QListWidget(this);
     mpCompilersList->addItems(mCompilersList);

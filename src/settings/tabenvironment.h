@@ -7,7 +7,10 @@
 #define TABENVIRONMENT_H
 
 #include <QWidget>
-#include <QtWidgets>
+
+QT_BEGIN_NAMESPACE
+class QComboBox;
+QT_END_NAMESPACE
 
 class TabEnvironment : public QWidget
 {
@@ -34,6 +37,8 @@ private:
     int mRowSpasing              = 10;
     int mEditorStyleWidth        = 120;
     int mModifyBtnWidth          = 120;
+    int mBasicStretch            = 1;
+    int mSpacing                 = 5;
 public slots:
     void onClicked();                   //  open configuraton file in default application
     void onChangeStyle(const QString &);

@@ -2,9 +2,13 @@
 #define TABCPP_H
 
 #include <QWidget>
-#include <QtWidgets>
-#include <QListWidget>
-#include <QComboBox>
+
+QT_BEGIN_NAMESPACE
+class QComboBox;
+class QListWidget;
+class QPushButton;
+class QListWidgetItem;
+QT_END_NAMESPACE
 
 class TabCpp : public QWidget
 {
@@ -39,6 +43,7 @@ private:
     int mStretchFactor              = 20;
     int mStretchFactorMain          = 100;
     int mCompilerWidth              = 100;
+    int mBasicStretch               = 1;
 public slots:
     void onChangeStandart(const QString&);
     void onAddCompilerClicked();

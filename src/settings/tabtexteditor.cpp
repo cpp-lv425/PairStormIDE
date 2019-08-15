@@ -1,10 +1,19 @@
 #include "tabtexteditor.h"
 
+#include <QHBoxLayout>
+#include <QSettings>
+#include <QTreeWidget>
+#include <QComboBox>
+#include <QLabel>
+#include <QTextEdit>
+#include <QFontDatabase>
+#include <QDebug>
+
 TabTextEditor::TabTextEditor(QWidget *parent)
     : QWidget(parent)
 {
     QHBoxLayout *mainLayout = new QHBoxLayout;
-    mainLayout->addStretch(1);
+    mainLayout->addStretch(mBasicStretch);
 
     // getting data from QSettings
     QSettings s;
@@ -14,8 +23,8 @@ TabTextEditor::TabTextEditor(QWidget *parent)
     mFontNew = mFontCurrent;
 
     //      FONT SIZE
-    QHBoxLayout *fontSizeLayoutHoriz = new QHBoxLayout;//();
-    fontSizeLayoutHoriz->addStretch(1);
+    QHBoxLayout *fontSizeLayoutHoriz = new QHBoxLayout;
+    fontSizeLayoutHoriz->addStretch(mBasicStretch);
     // set a label
     QLabel *fontSizeLabel = new QLabel(tr("Font size"));
     mpComboFontSize = new QComboBox(this);
@@ -28,7 +37,7 @@ TabTextEditor::TabTextEditor(QWidget *parent)
     fontSizeLayoutHoriz->addWidget(mpComboFontSize);
 
     QVBoxLayout *fontSizeLayoutVert = new QVBoxLayout;
-    fontSizeLayoutVert->addStretch(1);
+    fontSizeLayoutVert->addStretch(mBasicStretch);
     fontSizeLayoutVert->addLayout(fontSizeLayoutHoriz);
     fontSizeLayoutVert->addSpacing(100);
     fontSizeLayoutVert->addStretch(100);
@@ -146,7 +155,7 @@ void TabTextEditor::showFont(QTreeWidgetItem *item)
     QString oldText = mpTextEdit->toPlainText().trimmed();
     bool modified = mpTextEdit->document()->isModified();
     mpTextEdit->clear();
-    QFont font(family, 25, QFont::Normal, false);
+    QFont font(family, mFontSizePreview, QFont::Normal, false);
 
     mpTextEdit->document()->setDefaultFont(font);
 
@@ -167,11 +176,9 @@ void TabTextEditor::showFont(QTreeWidgetItem *item)
 void TabTextEditor::onChangeFont(const QString & newItem)
 {
     mFontNew = newItem;
-    qDebug() << "onChangeFont" << newItem;
 }
 
 void TabTextEditor::onChangeFontSize(const QString & newItem)
 {
     mFontSizeNew = newItem;
-    qDebug() << "onChangeFontSize" << newItem;
 }

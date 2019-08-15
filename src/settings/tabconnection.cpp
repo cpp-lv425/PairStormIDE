@@ -1,10 +1,15 @@
 #include "tabconnection.h"
 
+#include <QVBoxLayout>
+#include <QLineEdit>
+#include <QSettings>
+#include <QLabel>
+
 TabConnection::TabConnection(QWidget *parent)
     : QWidget(parent)
 {
     QVBoxLayout *mainLayout = new QVBoxLayout();
-    mainLayout->addStretch(1);
+    mainLayout->addStretch(mBasicStretch);
 
     // getting data from QSettings
     QSettings s;

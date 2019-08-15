@@ -1,13 +1,21 @@
 #include "tabenvironment.h"
 
-#include <QtWidgets>
+#include <QDesktopServices>
+#include <QVBoxLayout>
+#include <QSettings>
+#include <QPushButton>
+#include <QComboBox>
+#include <QLabel>
+#include <QDebug>
+#include <QUrl>
+#include <QDir>
 
 TabEnvironment::TabEnvironment(QWidget *parent)
     : QWidget(parent)
 {
     QVBoxLayout *mainLayout = new QVBoxLayout;//(this);
-    mainLayout->addStretch(1);
-    mainLayout->setSpacing(5);
+    mainLayout->addStretch(mBasicStretch);
+    mainLayout->setSpacing(mSpacing);
 
     // getting data from QSettings
     QSettings s;

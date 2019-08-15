@@ -2,7 +2,11 @@
 #define TABCONNECTION_H
 
 #include <QWidget>
-#include <QtWidgets>
+
+QT_BEGIN_NAMESPACE
+class QLineEdit;
+QT_END_NAMESPACE
+
 
 class TabConnection : public QWidget
 {
@@ -35,10 +39,12 @@ private:
     QString mTCPportNew;
     QLineEdit *mpTCPportEdit;
 
+    // design parameters
     int mRowSpasing                 = 5;
     int mStretchFactor              = 20;
     int mLabelPortNumberWidth       = 80;
     int mLabelUserNameWidth         = 280;
+    int mBasicStretch               = 1;
 public slots:
     void onUDPeditingFinished();
     void onTCPeditingFinished();

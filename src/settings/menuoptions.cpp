@@ -1,7 +1,13 @@
 #include "menuoptions.h"
+
+#include <QDialogButtonBox>
+#include <QAbstractButton>
+#include <QVBoxLayout>
+#include <QTabWidget>
+#include <QSettings>
+#include <QDialog>
 #include <QDebug>
 
-#include <QVBoxLayout>
 MenuOptions::MenuOptions(QWidget *pParent) : QDialog (pParent)
 {
     setModal(true);
@@ -88,7 +94,10 @@ void MenuOptions::onBtnApplyClicked()
         mNewValuesToChange["TcpPortNumber"] = mpTabConnection->getTcpNew(); // add change to emit to uplevel
     }
 
-    emit valuesChanged(mNewValuesToChange);
+    if (mNewValuesToChange.size())
+    {
+        emit valuesChanged(mNewValuesToChange);
+    }
 }
 
 void MenuOptions::onBtnClicked(QAbstractButton *button)
