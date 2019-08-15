@@ -41,13 +41,17 @@ private:
     TabRepository * mpTabRepository;
     TabConnection * mpTabConnection;
 
-    QDialogButtonBox *buttonBox;
+    QDialogButtonBox *mpButtonBox;
 
                                                   // map keep changed values
     std::map<QString, QString> mNewValuesToChange;// has fields: "editorFontSize" "editorFont" "style"
                                                   // "UdpPortNumber" "TcpPortNumber" "cppStandart"
 
     void onBtnApplyClicked();
+
+    // design parameters
+    int mMenuWidth              = 800;
+    int mMenuHeight             = 280;
 private slots:
     void onBtnClicked(QAbstractButton * button);
 signals:

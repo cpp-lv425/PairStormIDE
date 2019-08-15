@@ -11,12 +11,10 @@
 MenuOptions::MenuOptions(QWidget *pParent) : QDialog (pParent)
 {
     setModal(true);
-    int width = 800;
-    int height = 280;
-    setMinimumWidth(width);
-    setMaximumWidth(width);
-    setMinimumHeight(height);
-    setMaximumHeight(height);
+    setMinimumWidth(mMenuWidth);
+    setMaximumWidth(mMenuWidth);
+    setMinimumHeight(mMenuHeight);
+    setMaximumHeight(mMenuHeight);
     setWindowTitle("Settings");
 
     mpTabWidget = new QTabWidget(this);
@@ -34,14 +32,14 @@ MenuOptions::MenuOptions(QWidget *pParent) : QDialog (pParent)
     mpTabWidget->addTab(mpTabRepository, "Repository");
     mpTabWidget->addTab(mpTabConnection, "Connection");
 
-    buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok
+    mpButtonBox = new QDialogButtonBox(QDialogButtonBox::Ok
            | QDialogButtonBox::Apply | QDialogButtonBox::Cancel, this);
 
-    connect(buttonBox, &QDialogButtonBox::clicked, this, &MenuOptions::onBtnClicked);
+    connect(mpButtonBox, &QDialogButtonBox::clicked, this, &MenuOptions::onBtnClicked);
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(mpTabWidget);
-    mainLayout->addWidget(buttonBox);
+    mainLayout->addWidget(mpButtonBox);
     setLayout(mainLayout);
     show();
 }
@@ -102,15 +100,18 @@ void MenuOptions::onBtnApplyClicked()
 
 void MenuOptions::onBtnClicked(QAbstractButton *button)
 {
-    if (button->text() == "&Cancel")
+    QDialogButtonBox::StandardButton pressedButton;
+    pressedButton = mpButtonBox->standardButton(button);
+
+    if (pressedButton == QDialogButtonBox::Cancel)
     {
         close();
     }
-    if (button->text() == "Apply")
+    if (pressedButton == QDialogButtonBox::Apply)
     {
         onBtnApplyClicked();
     }
-    if (button->text() == "&OK")
+    if (pressedButton == QDialogButtonBox::Ok)
     {
         onBtnApplyClicked();
         close();
