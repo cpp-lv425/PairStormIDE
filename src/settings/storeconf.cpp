@@ -13,20 +13,22 @@ StoreConf::StoreConf(QString userName)
 {
     mConFile = userName;
     mConFile += ".json";
-    mFields["applicationName"] = "Pair Storm";       //  default values used when json file
-    mFields["applicationVersion"] = "0.1";           //      not exist or corrupted
-    mFields["organizationName"] = "Lv-425.C++";
-    mFields["style"] = "WHITE";
-    mFields["editorFontName"] = "Consolas";
-    mFields["editorFontSize"] = "12";
+    mFields["applicationName"]      = "Pair Storm";       //  default values used when json file
+    mFields["applicationVersion"]   = "0.1";           //      not exist or corrupted
+    mFields["organizationName"]     = "Lv-425.C++";
+    mFields["style"]                = "WHITE";
+    mFields["editorFontName"]       = "Consolas";
+    mFields["editorFontSize"]       = "12";
+    mFields["guiFontName"]          = "Consolas";
+    mFields["guiFontSize"]          = "12";
     mFields["defaultUdpPortNumber"] = "36108";
     mFields["defaultTcpPortNumber"] = "32807";
-    mFields["userName"] = userName;
-    mFields["cppStandart"] = "C++11";
-    mFields["cppExtentions"] = ".c;.cpp;.h;.hpp;.json;.txt";
-    mFields["cppCompilers"] = "";
-    mFields["cppLibraryHeaders"] = "";
-    mFields["cppLibraryBinarys"] = "";
+    mFields["userName"]             = userName;
+    mFields["cppStandart"]          = "C++11";
+    mFields["cppExtentions"]        = ".c;.cpp;.h;.hpp;.json;.txt";
+    mFields["cppCompilers"]         = "";
+    mFields["cppLibraryHeaders"]    = "";
+    mFields["cppLibraryBinarys"]    = "";
     separateList(mFields["cppExtentions"], mCppExtentionsList);
 }
 
