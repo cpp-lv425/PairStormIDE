@@ -28,7 +28,7 @@ QString AddCommentTextEdit::getText()
 
 void AddCommentTextEdit::setText(const QString &text)
 {
-    ui->commentTextEdit->setText(text);
+    ui->commentTextEdit->setPlainText(text);
 }
 
 QPushButton* AddCommentTextEdit::getSendButton()
@@ -64,7 +64,8 @@ void AddCommentTextEdit::setSpecialSelect(QString sighns)
                 selectionEnd - selectionStart,
                 after);
 
-    ui->commentTextEdit->setText(currString);
+    //ui->commentTextEdit->setText(currString);
+    ui->commentTextEdit->setPlainText(currString);
     curs.setPosition(selectionStart + sighns.length());
     ui->commentTextEdit->setTextCursor(curs);
     ui->commentTextEdit->setFocus();

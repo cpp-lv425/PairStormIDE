@@ -21,7 +21,7 @@ QString ViewTextEdit::getText()
 
 void ViewTextEdit::setText(const QString &str)
 {
-    ui->viewTextEdit->setText(str);
+    ui->viewTextEdit->setPlainText(str);
 }
 
 QTextDocument* ViewTextEdit::getDocument()

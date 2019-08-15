@@ -271,39 +271,59 @@ void CodeEditor::emptyCommentWasAdded()
     }
 }
 
+void CodeEditor::replaceExistingButton(AddCommentButton *commentButton)
+{
+    commentButton->setCommentString(mCommentWidget->getEditTab()->getText());
+}
+
 void CodeEditor::notEmptyCommentWasAdded()
 {
     //write to the database (for the future)
+    if(isCommentButtonExist(mCommentWidget->getCommentLine()))
+    {
+        qDebug()<<"here";
+        AddCommentButton *commentButton = new AddCommentButton;
+        for(auto &i: mCommentsVector)
+        {
+            if(i->getCurrentLine() == mCommentWidget->getCommentLine())
+            {
+                commentButton = i;
+                break;
+            }
+        }
+        replaceExistingButton(commentButton);
+
+        mCommentWidget->setViewText(1);
+        qDebug()<<"vector size ="<<mCommentsVector.size();
+        return;
+    }
+
     AddCommentButton *commentButton = new AddCommentButton(this);
     commentButton->setGeometry(mCommentWidget->getCommentButtonGeometry());
     commentButton->setCurrentLine(mCommentWidget->getCommentLine());
+
    // qDebug()<<"line existing button 1 = "<<commentButton->getCurrentLine();
     commentButton->setStyleSheet("background-color: #18CD3C");
     commentButton->setText("✔");
     commentButton->setVisible(true);
+    mCommentWidget->setViewText(1);
     commentButton->setCommentString(mCommentWidget->getEditTab()->getText());
-//*******************************************************************************
-    //commentButton->setToolTip(commentButton->getCommentString());
-    QPlainTextEdit *testRich = new QPlainTextEdit;
-    testRich->document()->setPlainText("some\nrich\ntext\nis\nhere");
-    QString myToolTip = "<html><head/><body><p>" +
-            mCommentWidget->getEditTab()->getText()
-            +"</p></body></html>";
-    commentButton->setToolTip(testRich->document()->toPlainText());
+
+    commentButton->setToolTip(mCommentWidget->getViewTab()->getText());
 
     mAddCommentButton->setVisible(false);
     mCommentsVector.push_back(commentButton);
 
     mCommentWidget->setVisible(false);
 
-    for(int i = 0; i<mCommentsVector.size() - 1; i++)
-    {
-        if(mCommentsVector[i]->getCurrentLine() == mAddCommentButton->getCurrentLine())
-        {
-            mCommentsVector[i]->setVisible(false);
-            mCommentsVector.erase(mCommentsVector.begin() + i);
-        }
-    }
+//    for(int i = 0; i<mCommentsVector.size() - 1; i++)
+//    {
+//        if(mCommentsVector[i]->getCurrentLine() == mAddCommentButton->getCurrentLine())
+//        {
+//            mCommentsVector[i]->setVisible(false);
+//            mCommentsVector.erase(mCommentsVector.begin() + i);
+//        }
+//    }
     connect(mCommentsVector.back(), &AddCommentButton::addCommentButtonPressed, this, &CodeEditor::showCommentTextEdit);
 }
 

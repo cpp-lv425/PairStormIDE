@@ -54,7 +54,7 @@ public:
     void setCommentTabWIdget(QTabWidget *value);
 
 public slots:
-    void setWholeText(int);
+    void setViewText(int);
 private:
     Ui::CommentWidget *ui;
     AddCommentTextEdit *editTab;

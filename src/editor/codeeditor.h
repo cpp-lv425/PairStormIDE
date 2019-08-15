@@ -67,6 +67,7 @@ private:
     void removeBotton(QVector<AddCommentButton*> &commentV, int index);
     void removeButtons(QVector<AddCommentButton*> &commentV, int cursorLine, int startLine, int endLine, int diff);
     bool isCommentButtonExist(int line);
+    void replaceExistingButton(AddCommentButton *commentButton);
 
 protected:
     void resizeEvent(QResizeEvent *event)override;

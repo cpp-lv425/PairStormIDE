@@ -29,12 +29,10 @@ CommentWidget::CommentWidget(QWidget *parent) :
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(commentTabWIdget);
     this->setLayout(mainLayout);
-    connect(commentTabWIdget, SIGNAL(currentChanged(int)), this, SLOT(setWholeText(int)));
+    connect(commentTabWIdget, SIGNAL(currentChanged(int)), this, SLOT(setViewText(int)));
     commentStringForView = editTab->getText();
 
     this->setEnabled(true);
-
-
 }
 
 CommentWidget::~CommentWidget()
@@ -84,10 +82,10 @@ void CommentWidget::writeSpecialTextPositions(const QRegularExpression &re, cons
         }
     }
     commentStringForView = viewString;
-    viewTab->setText(viewString);
+    setViewText(1);
 }
 
-void CommentWidget::setWholeText(int index)
+void CommentWidget::setViewText(int index)
 {
     if (!index)
     {
