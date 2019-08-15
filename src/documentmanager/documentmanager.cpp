@@ -132,7 +132,6 @@ bool DocumentManager::saveAllDocuments()
             }
         }
     }
-    qDebug() << "saved changes: " << savedChanges;
     return savedChanges;
 }
 
@@ -192,26 +191,32 @@ void DocumentManager::onFocusChanged(QWidget *old, QWidget *)
 
 void DocumentManager::onCloseDocument(CodeEditor *doc)
 {
+    // if only one doc area left - it will not be removed
     if (mDocAreas.size() == 1)
     {
         return;
-    }
+    }    
 
+    // find area to be removed
     auto placementArea = getArea(doc);
 
+    // if area is not found or has other opened docs
     if (!placementArea || placementArea->subWindowList().size() > 1)
     {
         return;
     }
 
-    if(doc == mpPrevEditorInFocus)
+    // if we remove doc we must make sure that ptr to it (mpPrevEditorInFocus)
+    // is brought to safe condition
+    if (doc == mpPrevEditorInFocus)
     {
         mpPrevEditorInFocus = nullptr;
     }
 
+    // area is removed from container
     mDocAreas.removeOne(placementArea);
 
-    //delete placementArea;
+    // area wgt is scheduled for deletion
     placementArea->deleteLater();
 }
 

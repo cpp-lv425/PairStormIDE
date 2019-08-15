@@ -334,6 +334,7 @@ void CodeEditor::closeEvent(QCloseEvent *event)
 {    
     if (!isChanged())
     {
+        emit closeDocEventOccured(this);
         event->accept();
         return;
     }
@@ -352,6 +353,7 @@ void CodeEditor::closeEvent(QCloseEvent *event)
     // if user doesn't want to save changes
     if (reply == QMessageBox::No)
     {
+        emit closeDocEventOccured(this);
         event->accept();
         return;
     }
@@ -368,7 +370,6 @@ void CodeEditor::closeEvent(QCloseEvent *event)
         event->ignore();
         return;
     }
-
     emit closeDocEventOccured(this);
 }
 
