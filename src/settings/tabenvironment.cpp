@@ -53,7 +53,9 @@ TabEnvironment::TabEnvironment(QWidget *parent)
     mainLayout->addWidget(label);
 
     mCurrentPath = QDir::currentPath();
-    mCurrentPath += "/conf/";
+    mCurrentPath += QDir::separator();
+    mCurrentPath += "conf";
+    mCurrentPath += QDir::separator();
     mCurrentPath += userName;
     mCurrentPath += ".json";
     QFile file(mCurrentPath);
@@ -79,7 +81,6 @@ void TabEnvironment::onClicked()
 void TabEnvironment::onChangeStyle(const QString & newItem)
 {
     mStyleNew = newItem;
-    qDebug() << "onChangeStyle" << newItem;
 }
 const QString & TabEnvironment::getStyleCurrernt() const
 {

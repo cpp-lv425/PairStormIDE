@@ -38,7 +38,6 @@ void StoreConf::restoreConFile()
     if (!file.exists()) // userName.json file not exist. keep all fields with default values,
     {                   // create userName.json with these values
         writeJson();
-        //saveData();
     }
     else
     {
@@ -51,7 +50,6 @@ void StoreConf::restoreConFile()
         {                        //  file corrupted
             writeJson();        //      rewrite with default values
         }
-        //saveData();
     }
     saveData();
 }
@@ -69,7 +67,9 @@ void StoreConf::saveConFile()
 void StoreConf::getPathToConFile()
 {
     mPathToConFile = QDir::currentPath();
-    mPathToConFile += "/conf/";
+    mPathToConFile += QDir::separator();
+    mPathToConFile += "conf";
+    mPathToConFile += QDir::separator();
     mPathToConFile += mConFile;
 }
 
