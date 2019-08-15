@@ -2,6 +2,7 @@
 
 AddCommentButton::AddCommentButton(QWidget *parent):QPushButton (parent)
 {
+
 }
 
 AddCommentButton::~AddCommentButton() = default;
@@ -20,16 +21,6 @@ void AddCommentButton::mousePressEvent(QMouseEvent *event)
 {
     QPushButton::mousePressEvent(event);
     emit addCommentButtonPressed(mCurrentLine);
-}
-
-void AddCommentButton::enterEvent(QEvent *event)
-{
-    emit mouseEnteredButtonArea(mCurrentLine);
-}
-
-void AddCommentButton::leaveEvent(QEvent *event)
-{
-    emit mouseLeftButtonArea();
 }
 
 QString AddCommentButton::getCommentString() const

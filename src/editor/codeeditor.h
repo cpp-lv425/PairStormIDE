@@ -21,9 +21,8 @@ const int TOP_UNUSED_PIXELS_HEIGHT = 4;
 #include<QLabel>
 #include<commentwidget.h>
 #include<QVector>
-#include<QSet>
 #include<QFont>
-#include<QtAlgorithms>
+#include<QStatusBar>
 
 
 
@@ -87,11 +86,9 @@ public slots:
     void setZoom(int zoomVal);
     void textChangedInTheOneLine();
     void showCommentTextEdit(int);
-    void showCommentTextEditView(int);
     void emptyCommentWasAdded();
     void notEmptyCommentWasAdded();
     void moveCommentButtons();
-    void closeCommentTextEditView();
 
 signals:
     void changesAppeared();
@@ -115,7 +112,6 @@ private:
     AddCommentTextEdit *mAddCommentTextEdit;
     CommentWidget *mCommentWidget;
     QLabel *mCurrentCommentLable;
-    QTextEdit *commentView;
 
     int mLinesCountPrev;
     int mLinesCountCurrent;

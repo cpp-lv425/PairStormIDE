@@ -30,8 +30,6 @@ signals:
 
 protected:
     virtual void mousePressEvent(QMouseEvent *event);
-    virtual void enterEvent(QEvent *event);
-    virtual void leaveEvent(QEvent *event);
 
 private:
     int mCurrentLine;

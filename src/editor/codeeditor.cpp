@@ -37,7 +37,6 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     mAddCommentButton->setText("+");
     mAddCommentButton->setVisible(false);
     mCurrentCommentLable = new QLabel(this);
-    commentView = new QTextEdit;
     setMouseTracking(true);
 
      //comment text edit
@@ -242,7 +241,6 @@ void CodeEditor::textChangedInTheOneLine()
 
 void CodeEditor::showCommentTextEdit(int line)
 {
-    mCommentWidget->getEditTab()->setText("********************");
     mCommentWidget->setWindowTitle("Comment to " + QString::number(line) + " line");
     mCommentWidget->setPosition(this, mAddCommentButton);
     mCommentWidget->setVisible(true);
@@ -257,23 +255,6 @@ void CodeEditor::showCommentTextEdit(int line)
         }
     }
     mCommentWidget->getEditTab()->setText("");
-}
-
-void CodeEditor::showCommentTextEditView(int line)
-{
-    for (auto &i: mCommentsVector)
-    {
-        if(i->getCurrentLine() == line)
-        {
-            mCommentWidget->getEditTab()->setText(i->getCommentString());
-            mCommentWidget->setPosition(this, mAddCommentButton);
-            commentView->setDocument(mCommentWidget->getViewTab()->getDocument());
-            commentView->setGeometry(mCommentWidget->geometry());
-            commentView->setVisible(true);
-            //commentView->setWindowTitle("Comment view to " + QString::number(line) + " line");
-           // break;
-        }
-    }
 }
 
 void CodeEditor::emptyCommentWasAdded()
@@ -301,9 +282,20 @@ void CodeEditor::notEmptyCommentWasAdded()
     commentButton->setText("✔");
     commentButton->setVisible(true);
     commentButton->setCommentString(mCommentWidget->getEditTab()->getText());
-    mAddCommentButton->setVisible(false);
+//*******************************************************************************
+    //commentButton->setToolTip(commentButton->getCommentString());
+    QPlainTextEdit *testRich = new QPlainTextEdit;
+    testRich->document()->setPlainText("some\nrich\ntext\nis\nhere");
+    QString myToolTip = "<html><head/><body><p>" +
+            mCommentWidget->getEditTab()->getText()
+            +"</p></body></html>";
+    commentButton->setToolTip(testRich->document()->toPlainText());
 
+    mAddCommentButton->setVisible(false);
     mCommentsVector.push_back(commentButton);
+
+    mCommentWidget->setVisible(false);
+
     for(int i = 0; i<mCommentsVector.size() - 1; i++)
     {
         if(mCommentsVector[i]->getCurrentLine() == mAddCommentButton->getCurrentLine())
@@ -313,8 +305,6 @@ void CodeEditor::notEmptyCommentWasAdded()
         }
     }
     connect(mCommentsVector.back(), &AddCommentButton::addCommentButtonPressed, this, &CodeEditor::showCommentTextEdit);
-    connect(mCommentsVector.back(), &AddCommentButton::mouseEnteredButtonArea, this, &CodeEditor::showCommentTextEditView);
-    //connect(mCommentsVector.back(), &AddCommentButton::mouseLeftButtonArea, this, &CodeEditor::closeCommentTextEditView);
 }
 
 void CodeEditor::moveCommentButtons()
@@ -328,11 +318,6 @@ void CodeEditor::moveCommentButtons()
     removeButtons(mCommentsVector, cursorLine, startLine, endLine, diff);
 
     rewriteButtonsLines(mCommentsVector,diff,startLine);
-}
-
-void CodeEditor::closeCommentTextEditView()
-{
-    commentView->setVisible(false);
 }
 
 LastRemoveKey CodeEditor::getLastRemomeKey() const
