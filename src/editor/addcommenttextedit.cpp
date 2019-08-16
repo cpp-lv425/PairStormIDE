@@ -8,6 +8,7 @@ AddCommentTextEdit::AddCommentTextEdit(QWidget *parent) :
     ui->setupUi(this);
     ui->setBoldButton->setStyleSheet("font-weight: bold");
     ui->setItalicButton->setStyleSheet("font: italic");
+    ui->commentTextEdit->setLineWrapMode(QPlainTextEdit::NoWrap);
 
     connect(ui->sendMessageButton, &QAbstractButton::clicked,              this, &AddCommentTextEdit::sendComment);
     connect(ui->setBoldButton,     &QAbstractButton::clicked,              this, &AddCommentTextEdit::setBoldPressed);

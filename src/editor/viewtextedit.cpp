@@ -7,6 +7,7 @@ ViewTextEdit::ViewTextEdit(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->viewTextEdit->setReadOnly(true);
+    ui->viewTextEdit->setLineWrapMode(QPlainTextEdit::NoWrap);
 }
 
 ViewTextEdit::~ViewTextEdit()

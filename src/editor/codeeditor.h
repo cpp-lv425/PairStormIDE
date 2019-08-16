@@ -45,6 +45,7 @@ class CodeEditor : public QPlainTextEdit
 public:
     CodeEditor(QWidget *parent = nullptr);
     void specialAreasRepaintEvent(QPaintEvent *event);
+    void repaintButtonsArea(int bottom, int top, int blockNumber);
     int getLineNumberAreaWidth();
     bool isinsidebracket();
     QString& getFileName();
@@ -64,10 +65,14 @@ private:
     void setAnotherButtonLine(AddCommentButton *comment, int diff);
     bool isInRangeIncludBoth(int val, int leftMargin, int rightMargin);
     bool isInRangeIncludLast(int val, int leftMargin, int rightMargin);
-    void removeBotton(QVector<AddCommentButton*> &commentV, int index);
+
+    void removeBottonByIndex(QVector<AddCommentButton*> &commentV, int index);
+    void removeButtomByValue(QVector<AddCommentButton*> &commentV, AddCommentButton* commentButton);
     void removeButtons(QVector<AddCommentButton*> &commentV, int cursorLine, int startLine, int endLine, int diff);
+
     bool isCommentButtonExist(int line);
-    void replaceExistingButton(AddCommentButton *commentButton);
+    AddCommentButton* getCommentButtonByIndex(const int line);
+    void setNewAddedButtonSettings(AddCommentButton *commentButton);
 
 protected:
     void resizeEvent(QResizeEvent *event)override;
