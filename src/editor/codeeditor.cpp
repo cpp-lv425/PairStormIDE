@@ -5,12 +5,11 @@
 #include<QTextCursor>
 #include<QPainter>
 #include<QTextCharFormat>
-#include <QFontDatabase>
+#include<QFontDatabase>
 #include<QScrollBar>
 #include<QMessageBox>
 #include<iostream>
 #include<QLabel>
-#include<QtMath>
 
 CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
 {
