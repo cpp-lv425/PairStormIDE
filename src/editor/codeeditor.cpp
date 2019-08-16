@@ -61,6 +61,12 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     this->setFont(mFont);
 
     //set text highlighting color
+    fmtLiteral.setForeground(Qt::red);
+    fmtKeyword.setForeground(Qt::blue);
+    fmtComment.setForeground(Qt::green);
+    fmtUndefined.setUnderlineStyle(QTextCharFormat::WaveUnderline);
+    fmtUndefined.setUnderlineColor(Qt::red);
+    fmtRegular.setForeground(Qt::black);
     fmtLiteral.setForeground(mConfigParam.mStringsColor);
     fmtKeyword.setForeground(mConfigParam.mBasicLiteralsColor);
     fmtComment.setForeground(mConfigParam.mCommentColor);
@@ -302,6 +308,9 @@ void CodeEditor::highlighText()
             break;
         case(State::COM):
             formating(fmtComment, cursor, i);
+            break;
+        case(State::UNDEF):
+            formating(fmtUndefined, cursor, i);
             break;
         default:
             formating(fmtRegular, cursor, i);

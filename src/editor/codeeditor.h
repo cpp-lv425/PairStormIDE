@@ -85,11 +85,12 @@ private:
     QTextCharFormat fmtComment;
     QTextCharFormat fmtKeyword;
     QTextCharFormat fmtRegular;
+    QTextCharFormat fmtUndefined;
 
 protected:
     int mCurrentZoom;
     QVector<Token> mTokens;
- friend class Event;
+    friend class Event;
 };
 
 #endif // CODEEDITOR_H

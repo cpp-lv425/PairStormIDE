@@ -37,6 +37,7 @@ private:
     void handleFloatNumberState(const QChar&);
     void handleLiteralState(const QChar&);
     void handleCommentState(const QChar&);
+    void handleUndefinedState(const QChar&);
 
 public:
     LexerCPP() = default;
