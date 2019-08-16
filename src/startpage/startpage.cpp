@@ -20,8 +20,6 @@ StartPage::StartPage(QWidget *parent) :
     QFont lblFont("Segoe UI", 10);
     lblFont.setBold(true);
 
-    QPalette palette;
-    palette.setColor(QPalette::WindowText, Qt::blue);
 
     // creating & configuring new file button
     mpNewBtn = new QPushButton;
@@ -68,16 +66,16 @@ StartPage::StartPage(QWidget *parent) :
 
     // creating & laying out labels
     QLabel *pNewLbl = new QLabel(tr("Create new file"));
-    setupLabels(pNewLbl, lblFont, palette);
+    setupLabels(pNewLbl, lblFont);
 
     QLabel *pOpenLbl = new QLabel(tr("Open existing file"));
-    setupLabels(pOpenLbl, lblFont, palette);
+    setupLabels(pOpenLbl, lblFont);
 
     QLabel *pOpenDirLbl = new QLabel(tr("Open existing project directory"));
-    setupLabels(pOpenDirLbl, lblFont, palette);
+    setupLabels(pOpenDirLbl, lblFont);
 
     QLabel *pSettingsLbl = new QLabel(tr("Configure IDE"));
-    setupLabels(pSettingsLbl, lblFont, palette);
+    setupLabels(pSettingsLbl, lblFont);
     pSettingsLbl->setDisabled(true);
 
     QVBoxLayout *pLblLayout = new QVBoxLayout;
@@ -157,10 +155,8 @@ void StartPage::settingsBtnPressed()
 }
 
 void StartPage::setupLabels(QLabel *pLabel,
-                            QFont &lblFont,
-                            QPalette &palette)
+                            QFont &lblFont)
 {
     pLabel->setAlignment(Qt::AlignCenter);
-    pLabel->setFont(lblFont);
-    pLabel->setPalette(palette);
+    pLabel->setFont(lblFont);    
 }

@@ -11,6 +11,7 @@
 #include <QFile>
 
 #include "localconnectorgenerator.h"
+#include "paletteconfigurator.h"
 #include "projectviewerdock.h"
 #include "bottompaneldock.h"
 #include "chatwindowdock.h"
@@ -27,20 +28,24 @@
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    ui(new Ui::MainWindow),
+    // initializing palette configurator with current palette
+    mpPaletteConfigurator(new PaletteConfigurator(palette()))
 {
     // Generate default local network connector
     mplocalConnector =
             LocalConnectorGenerator::getDefaultConnector();
     // And output its state in case of changes
-    connect(
-        mplocalConnector, &LocalConnectorInterface::serviceStatusChanged,
-        this,             &MainWindow::onConnectionStatusChanged,
-        Qt::UniqueConnection);
+    connect(mplocalConnector,
+            &LocalConnectorInterface::serviceStatusChanged,
+            this,
+            &MainWindow::onConnectionStatusChanged,
+            Qt::UniqueConnection);
 
     ui->setupUi(this);
     {
-        StoreConf conf(this);
+        StoreConf conf;
+        conf.restoreConFile();
     }
 
     // when first started main window is maximized
@@ -63,7 +68,7 @@ MainWindow::MainWindow(QWidget *parent) :
     //create instance of documentation browser
     //mDocumentationBrowser->hide();
 
-// connect(mDocumentationBrowser,&Browser::close,this,&MainWindow::createNewBrowser);
+    // connect(mDocumentationBrowser,&Browser::close,this,&MainWindow::createNewBrowser);
     // create instance of Project Viewer
     createProjectViewer();
 
@@ -411,8 +416,8 @@ void MainWindow::onOpenFileTriggered()
     QString fileName = QFileDialog::getOpenFileName
             (this,
              userMessages[UserMessages::OpenFileTitle],
-             QDir::currentPath(),
-             "C++/C files (*.h *.hpp *.cpp *.c) ;; Text Files (*.txt) ;; JSON Files (*.json)");
+            QDir::currentPath(),
+            "C++/C files (*.h *.hpp *.cpp *.c) ;; Text Files (*.txt) ;; JSON Files (*.json)");
 
     // if document already opened then return
     if (isOpened(fileName))
@@ -719,7 +724,7 @@ void MainWindow::onConnectionStatusChanged(bool status)
     {
         QMessageBox::warning
                 (this,
-                userMessages[UserMessages::ConnectionFailureTitle],
+                 userMessages[UserMessages::ConnectionFailureTitle],
                 userMessages[UserMessages::ConnectionFailureMsg]);
     }
 }
@@ -748,14 +753,14 @@ void MainWindow::closeEvent(QCloseEvent *event)
     {
         event->accept();
         return;
-    }    
+    }
 
     // ask user whether changes should be changed
     QMessageBox::StandardButton reply = QMessageBox::question
             (this,
              userMessages[UserMessages::PromptSaveTitle],
-             userMessages[UserMessages::SaveQuestion],
-             QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+            userMessages[UserMessages::SaveQuestion],
+            QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
 
     if (reply == QMessageBox::No)
     {
@@ -775,6 +780,9 @@ void MainWindow::closeEvent(QCloseEvent *event)
 MainWindow::~MainWindow()
 {
     saveMainWindowState();
+    StoreConf conf;
+    conf.saveConFile();
+
     delete ui;
 }
 
@@ -790,16 +798,19 @@ void MainWindow::saveMainWindowState()
 void MainWindow::restoreMainWindowState()
 {
     QSettings settings(QApplication::organizationName(), QApplication::applicationName());
-    restoreGeometry(settings.value("mainWindowGeometry").toByteArray());
-    restoreState(settings.value("mainWindowState").toByteArray());
+    if (settings.contains("mainWindowGeometry"))
+        restoreGeometry(settings.value("mainWindowGeometry").toByteArray());
+    if (settings.contains("mainWindowState"))
+        restoreState(settings.value("mainWindowState").toByteArray());
 }
 
 void MainWindow::setAppStyle()
 {
-    QString styleName = "Fusion";
-    QStringList availableStyles = QStyleFactory::keys();
-    if (availableStyles.contains(styleName))
-    {
-        QApplication::setStyle(QStyleFactory::create(styleName));
-    }
+    // fusion style is applied globally
+    // if platform does not support fusion, default style is applied
+    qApp->setStyle(QStyleFactory::create("Fusion"));
+    // dark style palette is created & set globally
+    QPalette palette = mpPaletteConfigurator->getPalette("DARK");
+    //QPalette newPal = palette();
+    qApp->setPalette(palette);
 }
