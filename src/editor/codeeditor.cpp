@@ -391,7 +391,7 @@ bool CodeEditor::isCommentButtonExist(int line)
 {
     for (auto &i : mCommentsVector)
     {
-        if(i->getCurrentLine() == line)
+        if (i->getCurrentLine() == line)
         {
             return true;
         }
@@ -427,7 +427,7 @@ void CodeEditor::removeButtons(QVector<AddCommentButton *> &commentV, int cursor
        }
        else
        {
-           if(isInRangeIncludLast(commentV[i]->getCurrentLine(), startLine, endLine))
+           if (isInRangeIncludLast(commentV[i]->getCurrentLine(), startLine, endLine))
            {
                removeBottonByIndex(commentV, i);//the same deleting here
            }

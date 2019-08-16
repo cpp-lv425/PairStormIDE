@@ -197,7 +197,7 @@ void CommentWidget::setSpecificTextView()
 {
     //create special text view in the View tab using vector of special text
     QTextCursor cursor(viewTab->getDocument());
-    for(auto &i : specificTextVector)
+    for (auto &i : specificTextVector)
     {
         cursor.setPosition(i.startIndex);
         cursor.movePosition(QTextCursor::Right,
