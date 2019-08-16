@@ -53,6 +53,7 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     connect(mAddCommentButton,            &AddCommentButton::addCommentButtonPressed,      this, &CodeEditor::showCommentTextEdit);
     connect(mCommentWidget->getEditTab(), &AddCommentTextEdit::emptyCommentWasSent,        this, &CodeEditor::emptyCommentWasAdded);
     connect(mCommentWidget->getEditTab(), &AddCommentTextEdit::notEmptyCommentWasSent,     this, &CodeEditor::notEmptyCommentWasAdded);
+    connect(mCommentWidget->getEditTab(), &AddCommentTextEdit::commentWasDeleted,          this, &CodeEditor::deleteComment);
     connect(this,                         &CodeEditor::linesCountUpdated,                  this, &CodeEditor::changeCommentButtonsState);
 
 
@@ -308,8 +309,17 @@ void CodeEditor::notEmptyCommentWasAdded()
 
         mCommentsVector.push_back(commentButtonNew);
         connect(mCommentsVector.back(), &AddCommentButton::addCommentButtonPressed, this, &CodeEditor::showCommentTextEdit);
-
     }
+}
+
+void CodeEditor::deleteComment()
+{
+    auto commentButon = getCommentButtonByIndex(mCommentWidget->getCommentLine());
+    if (commentButon)
+    {
+        removeButtomByValue(mCommentsVector, commentButon);
+    }
+    mCommentWidget->setVisible(false);
 }
 
 void CodeEditor::changeCommentButtonsState()
@@ -374,7 +384,7 @@ bool CodeEditor::isInRangeIncludLast(int val, int leftMargin, int rightMargin)
     return val > leftMargin && val <= rightMargin;
 }
 
-void CodeEditor::removeBottonByIndex(QVector<AddCommentButton *> &commentV, int index)
+void CodeEditor::removeButtonByIndex(QVector<AddCommentButton *> &commentV, int index)
 {
     commentV[index]->setVisible(false);
     commentV.erase(commentV.begin() + index);
@@ -421,14 +431,14 @@ void CodeEditor::removeButtons(QVector<AddCommentButton *> &commentV, int cursor
            }
            if (isInRangeIncludBoth(commentV[i]->getCurrentLine(), startLine, endLine))
            {
-               removeBottonByIndex(commentV, i);//otherwise delete this button (we delete whole line where comment button was)
+               removeButtonByIndex(commentV, i);//otherwise delete this button (we delete whole line where comment button was)
            }
        }
        else
        {
            if (isInRangeIncludLast(commentV[i]->getCurrentLine(), startLine, endLine))
            {
-               removeBottonByIndex(commentV, i);//the same deleting here
+               removeButtonByIndex(commentV, i);//the same deleting here
            }
        }
    }

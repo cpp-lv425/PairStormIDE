@@ -66,7 +66,7 @@ private:
     bool isInRangeIncludBoth(int val, int leftMargin, int rightMargin);
     bool isInRangeIncludLast(int val, int leftMargin, int rightMargin);
 
-    void removeBottonByIndex(QVector<AddCommentButton*> &commentV, int index);
+    void removeButtonByIndex(QVector<AddCommentButton*> &commentV, int index);
     void removeButtomByValue(QVector<AddCommentButton*> &commentV, AddCommentButton* commentButton);
     void removeButtons(QVector<AddCommentButton*> &commentV, int cursorLine, int startLine, int endLine, int diff);
 
@@ -85,6 +85,7 @@ private slots:
     void runLexer();
     void highlighText();
     //void showCommentLine(int line);
+    void deleteComment();
 
 public slots:
     void keyPressEvent(QKeyEvent *e) override;

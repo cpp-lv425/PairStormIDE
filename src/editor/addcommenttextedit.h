@@ -30,11 +30,13 @@ slots:
     void setItalicPressed();
     void setSpecialSelect(QString sighns);
     void sendComment();
+    void deleteComment();
 
 signals:
     void setBySpecialSigns(QString sights);
     void emptyCommentWasSent();
     void notEmptyCommentWasSent();
+    void commentWasDeleted();
 
 private:
     Ui::AddCommentTextEdit *ui;

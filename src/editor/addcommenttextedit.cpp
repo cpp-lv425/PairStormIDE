@@ -10,10 +10,11 @@ AddCommentTextEdit::AddCommentTextEdit(QWidget *parent) :
     ui->setItalicButton->setStyleSheet("font: italic");
     ui->commentTextEdit->setLineWrapMode(QPlainTextEdit::NoWrap);
 
-    connect(ui->sendMessageButton, &QAbstractButton::clicked,              this, &AddCommentTextEdit::sendComment);
-    connect(ui->setBoldButton,     &QAbstractButton::clicked,              this, &AddCommentTextEdit::setBoldPressed);
-    connect(ui->setItalicButton,   &QAbstractButton::clicked,              this, &AddCommentTextEdit::setItalicPressed);
-    connect(this,                  &AddCommentTextEdit::setBySpecialSigns, this, &AddCommentTextEdit::setSpecialSelect);
+    connect(ui->sendMessageButton,   &QAbstractButton::clicked,              this, &AddCommentTextEdit::sendComment);
+    connect(ui->deleteMessageButton, &QAbstractButton::clicked,              this, &AddCommentTextEdit::deleteComment);
+    connect(ui->setBoldButton,       &QAbstractButton::clicked,              this, &AddCommentTextEdit::setBoldPressed);
+    connect(ui->setItalicButton,     &QAbstractButton::clicked,              this, &AddCommentTextEdit::setItalicPressed);
+    connect(this,                    &AddCommentTextEdit::setBySpecialSigns, this, &AddCommentTextEdit::setSpecialSelect);
 }
 
 AddCommentTextEdit::~AddCommentTextEdit()
@@ -83,4 +84,9 @@ void AddCommentTextEdit::sendComment()
     {
         emit notEmptyCommentWasSent();
     }
+}
+
+void AddCommentTextEdit::deleteComment()
+{
+    emit commentWasDeleted();
 }
