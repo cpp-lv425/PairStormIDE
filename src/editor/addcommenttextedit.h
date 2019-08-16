@@ -23,6 +23,7 @@ public:
     QString getText();
     void setText(const QString &text);
     QPushButton* getSendButton();
+    QPushButton* getSetBoldButton();
 
 public
 slots:

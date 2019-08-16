@@ -52,12 +52,12 @@ public:
     void setCommentTabWIdget(QTabWidget *value);
 
 private:
-    void writeSpecialTextPositions(const QRegularExpression &re, const SpecificTextType &textType);
     void shiftAllBold(const SpecificText &specText,const int &oneSideSymbolsCount);
     void setSpecificTextView();
 
 public slots:
     void setViewText(int);
+    void writeSpecialTextPositions(const QRegularExpression &re, const SpecificTextType &textType);
 
 private:
     Ui::CommentWidget *ui;

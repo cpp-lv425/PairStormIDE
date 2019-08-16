@@ -37,6 +37,11 @@ QPushButton* AddCommentTextEdit::getSendButton()
     return ui->sendMessageButton;
 }
 
+QPushButton *AddCommentTextEdit::getSetBoldButton()
+{
+    return ui->setBoldButton;
+}
+
 void AddCommentTextEdit::setBoldPressed()
 {
     emit setBySpecialSigns("**");

@@ -32,7 +32,8 @@ CommentWidget::CommentWidget(QWidget *parent) :
     mainLayout->addWidget(commentTabWIdget);
     this->setLayout(mainLayout);
     //if we switch tab we should set formated text into view tab
-    connect(commentTabWIdget, &QTabWidget::currentChanged, this, &CommentWidget::setViewText);
+    connect(commentTabWIdget,            &QTabWidget::currentChanged, this, &CommentWidget::setViewText);
+    connect(editTab->getSetBoldButton(), &QPushButton::clicked,       this,&CommentWidget::setViewText);
     commentStringForView = editTab->getText();
 
     this->setEnabled(true);
@@ -65,6 +66,7 @@ void CommentWidget::setPosition(QPlainTextEdit *editor, AddCommentButton *commen
 //to set special text. We set replaced text(without symbols) ONLY FOR VIEW MODE
 void CommentWidget::writeSpecialTextPositions(const QRegularExpression &re, const SpecificTextType &textType)
 {
+    qDebug()<<"here1!";
     int oneSideSymbolsCount = textType == SpecificTextType::BOLD ? 2: 1;// number of special symbols by one side ("**" has 2, "_" has 1)
     //firstly we detect all bold match because they can be inside italic. (For example "_**text**_")
     //so, when we detect bold, our text contains "**" symbols. if we detect italic, we should use text where bold symbols("**") are replaced
@@ -82,10 +84,24 @@ void CommentWidget::writeSpecialTextPositions(const QRegularExpression &re, cons
             int startOffset = match.capturedStart();//start of matched val
             int endOffset = match.capturedEnd();//end of matched val
 
-            viewString.replace(startOffset - shift,//replace text to the new text without symbols
-                               endOffset - startOffset,
-                               match.captured().mid(oneSideSymbolsCount,
-                                                    match.captured().length() - oneSideSymbolsCount * 2));
+            if (match.capturedTexts() == QStringList("****"))
+            {
+                qDebug()<<"start offset = "<<startOffset;
+                qDebug()<<"endOffset = "<<endOffset;
+                viewString.replace(startOffset - shift,
+                                   endOffset - startOffset,
+                                   "");
+                qDebug()<<"qstring ="<<viewString;
+                editTab->setText(viewString);
+                qDebug()<<"afterReplacing = "<<editTab->getText();
+            }
+            else
+            {
+                viewString.replace(startOffset - shift,//replace text to the new text without symbols
+                                               endOffset - startOffset,
+                                               match.captured().mid(oneSideSymbolsCount,
+                                                                    match.captured().length() - oneSideSymbolsCount * 2));
+            }
 
             specText.startIndex = startOffset - shift > 0 ? startOffset - shift : 0;//write start of special text position
 
@@ -104,10 +120,11 @@ void CommentWidget::writeSpecialTextPositions(const QRegularExpression &re, cons
 
 void CommentWidget::setViewText(int index)
 {
-    if (!index)
-    {
-        return;
-    }
+    qDebug()<<"here0!";
+//    if (!index)
+//    {
+//        return;
+//    }
     specificTextVector.clear();//when we got the new text we schould delete all previous positions of this text
 
     //firsly we should find all bold text matches by regex, write their positions and delete them
