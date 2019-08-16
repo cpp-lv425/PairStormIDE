@@ -115,7 +115,6 @@ private:
     QTimer *mTimer;
     LexerCPP mLexer;
     AddCommentButton *mAddCommentButton;
-    AddCommentTextEdit *mAddCommentTextEdit;
     CommentWidget *mCommentWidget;
     QLabel *mCurrentCommentLable;
 
@@ -124,7 +123,6 @@ private:
 
     QString mBeginTextState;
     QVector<AddCommentButton*> mCommentsVector;
-    QSet<AddCommentButton*> mCommentsSet;
 
     QTextCharFormat fmtLiteral;
     QTextCharFormat fmtComment;

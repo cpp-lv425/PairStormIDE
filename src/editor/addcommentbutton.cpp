@@ -24,10 +24,10 @@ void AddCommentButton::mousePressEvent(QMouseEvent *event)
 
 QString AddCommentButton::getCommentString() const
 {
-    return commentString;
+    return mCommentString;
 }
 
 void AddCommentButton::setCommentString(const QString &value)
 {
-    commentString = value;
+    mCommentString = value;
 }

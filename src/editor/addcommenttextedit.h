@@ -25,7 +25,6 @@ public:
     QPushButton* getSendButton();
 
 public
-
 slots:
     void setBoldPressed();
     void setItalicPressed();

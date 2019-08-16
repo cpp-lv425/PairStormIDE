@@ -14,7 +14,7 @@ protected:
     int editorCurrentZoom(CodeEditor *codeEditor);
     QVector<Token> editorTokens(CodeEditor *codeEditor);
     static QString sTabs;
-    static bool isSleshPressed;
+    static bool sIsSleshPressed;
 
 public slots:
     void autotab(CodeEditor *code);

@@ -25,7 +25,7 @@ protected:
 
 private:
     int mCurrentLine;
-    QString commentString;
+    QString mCommentString;
 };
 
 #endif // ADDCOMMENTBUTTON_H

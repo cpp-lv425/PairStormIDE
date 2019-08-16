@@ -3,7 +3,6 @@
 #include<QPlainTextEdit>
 #include "codeeditor.h"
 #include "event.h"
-#include<QDebug>
 
 //Event for non-specific key press
 class EventDefault: public Event

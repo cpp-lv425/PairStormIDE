@@ -109,7 +109,7 @@ EventCtrlY::~EventCtrlY() = default;
 //EventSlash
 void EventSlash::operator()(CodeEditor *codeEditor, QKeyEvent *e)
 {
-    isSleshPressed=true;
+    sIsSleshPressed=true;
     plainTextPressEvent(codeEditor, e);
 }
 EventSlash::~EventSlash() = default;
@@ -117,7 +117,7 @@ EventSlash::~EventSlash() = default;
 //EventAsterisk
 void EventAsterisk::operator()(CodeEditor * codeEditor, QKeyEvent *e)
 {
-    if (isSleshPressed)
+    if (sIsSleshPressed)
     {
         eventInsertSymbol(codeEditor, e, "*/");
     }
@@ -125,7 +125,7 @@ void EventAsterisk::operator()(CodeEditor * codeEditor, QKeyEvent *e)
     {
          plainTextPressEvent(codeEditor, e);
     }
-    isSleshPressed=false;
+    sIsSleshPressed=false;
 }
 EventAsterisk::~EventAsterisk() = default;
 
