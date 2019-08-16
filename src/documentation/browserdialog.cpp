@@ -41,9 +41,9 @@ BrowserDialog::~BrowserDialog()
 
     QDir dir = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
 
-    bool result;
-    result = dir.cd("PairStorm");
-    result = dir.cd("temp");
+    bool result = true;
+    result = !dir.cd("PairStorm") ? false : result;
+    result = !dir.cd("temp")      ? false : result;
 
     if(result)
     {
