@@ -79,7 +79,6 @@ void AddCommentTextEdit::setSpecialSelect(QString sighns)//sights - symbols whic
     replacingPartStr.append(sighns);//add sight(sights) to the end of selected string
     //after this adding we've gotten new format text. For example after selectin word "code" as bold we'll get "**code**"
 
-   // ui->commentTextEdit->textCursor().keepPositionOnInsert();
     QString ReplacedString = ui->commentTextEdit->toPlainText();//replace previous word (without sights) to the new one
     ReplacedString.replace(
                 selectionStart,
