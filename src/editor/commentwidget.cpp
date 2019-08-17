@@ -7,34 +7,31 @@ CommentWidget::CommentWidget(QWidget *parent) :
     ui(new Ui::CommentWidget)
 {
     ui->setupUi(this);
-    commentTabWIdget = new QTabWidget;//create the new tabwidget where
+    mCommentTabWIdget = new QTabWidget;//create the new tabwidget where
 
     //first tab will be for editing text, setting bold/italic text, writing, etc.
-    editTab = new AddCommentTextEdit;
+    mEditTab = new AddCommentTextEdit;
     QVBoxLayout *lay1 = new QVBoxLayout;
-    lay1->addWidget(editTab);
-    QWidget *tab1 = new QWidget;
-    tab1->setLayout(lay1);
+    lay1->addWidget(mEditTab);
 
     //second tab will be for viewing text which has been formated. This tab only for view
-    viewTab = new ViewTextEdit;
+    mViewTab = new ViewTextEdit;
     QVBoxLayout *lay2 = new QVBoxLayout;
-    lay2->addWidget(viewTab);
-    QWidget *tab2 = new QWidget;
-    tab2->setLayout(lay2);
+    lay2->addWidget(mViewTab);
 
-    commentTabWIdget->addTab(editTab, "Edit");// 0 tab index
-    commentTabWIdget->addTab(viewTab, "View");// 1 tab index
+    mCommentTabWIdget->addTab(mEditTab, "Edit");// 0 tab index
+    mCommentTabWIdget->addTab(mViewTab, "View");// 1 tab index
 
     this->setWindowIcon(QIcon(":/img/comment.ico"));
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
-    mainLayout->addWidget(commentTabWIdget);
+    mainLayout->addWidget(mCommentTabWIdget);
     this->setLayout(mainLayout);
     //if we switch tab we should set formated text into view tab
-    connect(commentTabWIdget,            &QTabWidget::currentChanged, this, &CommentWidget::setViewText);
-    connect(editTab->getSetBoldButton(), &QPushButton::clicked,       this,&CommentWidget::setViewText);
-    commentStringForView = editTab->getText();
+    connect(mCommentTabWIdget,              &QTabWidget::currentChanged, this, &CommentWidget::setViewText);
+    connect(mEditTab->getSetBoldButton(),   &QPushButton::clicked,       this, &CommentWidget::setViewText);
+    connect(mEditTab->getSetItalicButton(), &QPushButton::clicked,       this, &CommentWidget::setViewText);
+    mCommentStringForView = mEditTab->getText();
 
     this->setEnabled(true);
 }
@@ -64,13 +61,12 @@ void CommentWidget::setPosition(QPlainTextEdit *editor, AddCommentButton *commen
 //to the string without special symbols and save the position which shows us where we should use special text.
 //We delete this symbols but should keep the posiotion, and using these positions in the future we'll be able
 //to set special text. We set replaced text(without symbols) ONLY FOR VIEW MODE
-void CommentWidget::writeSpecialTextPositions(const QRegularExpression &re, const SpecificTextType &textType)
+void CommentWidget::writeSpecialTextPositions(const QRegularExpression &re, const QString &specialSymbolsOneSide)
 {
-    qDebug()<<"here1!";
-    int oneSideSymbolsCount = textType == SpecificTextType::BOLD ? 2: 1;// number of special symbols by one side ("**" has 2, "_" has 1)
+    int oneSideSymbolsCount = specialSymbolsOneSide.length();// number of special symbols by one side ("**" has 2, "_" has 1)
     //firstly we detect all bold match because they can be inside italic. (For example "_**text**_")
     //so, when we detect bold, our text contains "**" symbols. if we detect italic, we should use text where bold symbols("**") are replaced
-    QString viewString = textType == SpecificTextType::BOLD ? editTab->getText() : commentStringForView;
+    QString viewString = specialSymbolsOneSide == "**" ? mEditTab->getText() : mCommentStringForView;
 
     QRegularExpressionMatchIterator matchIter = re.globalMatch(viewString);//find all match by regex
 
@@ -84,16 +80,16 @@ void CommentWidget::writeSpecialTextPositions(const QRegularExpression &re, cons
             int startOffset = match.capturedStart();//start of matched val
             int endOffset = match.capturedEnd();//end of matched val
 
-            if (match.capturedTexts() == QStringList("****"))
+            //if we have "****" or "__" we shoould delete them
+            if (match.capturedTexts().first() == QString(specialSymbolsOneSide) + QString(specialSymbolsOneSide))//create full special text from one side
             {
-                qDebug()<<"start offset = "<<startOffset;
-                qDebug()<<"endOffset = "<<endOffset;
+                QTextCursor curs = mEditTab->getCursor();
                 viewString.replace(startOffset - shift,
                                    endOffset - startOffset,
                                    "");
-                qDebug()<<"qstring ="<<viewString;
-                editTab->setText(viewString);
-                qDebug()<<"afterReplacing = "<<editTab->getText();
+                mEditTab->setText(viewString);
+                curs.setPosition(startOffset);
+                mEditTab->setCursor(curs);
             }
             else
             {
@@ -108,82 +104,77 @@ void CommentWidget::writeSpecialTextPositions(const QRegularExpression &re, cons
             shift += oneSideSymbolsCount * 2;//increase shift by value which is equal to count of deleted special symbols
             specText.endIndex = endOffset - shift;//set end of special text position
 
-            specText.textType = textType;// set the type of special symbols
-            specificTextVector.push_back(specText);//write
+            specText.textType = specialSymbolsOneSide == "**"? SpecificTextType::BOLD : SpecificTextType::ITALIC;// set the type of special symbols
+            mSpecificTextVector.push_back(specText);//write
 
             shiftAllBold(specText, oneSideSymbolsCount);//move all positions of bold
         }
     }
-    commentStringForView = viewString;//set formated text to the view field
-    viewTab->setText(viewString);//and to the view tab of widget
+    mCommentStringForView = viewString;//set formated text to the view field
+    mViewTab->setText(viewString);//and to the view tab of widget
 }
 
 void CommentWidget::setViewText(int index)
 {
-    qDebug()<<"here0!";
-//    if (!index)
-//    {
-//        return;
-//    }
-    specificTextVector.clear();//when we got the new text we schould delete all previous positions of this text
+    mSpecificTextVector.clear();//when we got the new text we schould delete all previous positions of this text
 
     //firsly we should find all bold text matches by regex, write their positions and delete them
-    writeSpecialTextPositions(QRegularExpression("\\*\\*(?:(?:[^*])|(?:\\*[^*])|(?:[^*]\\*))*(?:\\*| |\n)*\\*\\*"),
-                              SpecificTextType::BOLD);
+    writeSpecialTextPositions(QRegularExpression("\\*\\*(?:(?:[^*])|(?:\\*[^*])|(?:[^*]\\*))*(?:\\*)*\\*\\*"),
+                              "**");
     //after we schould do the same to italic text
-    writeSpecialTextPositions(QRegularExpression("_(.*?)_"), SpecificTextType::ITALIC);
+    writeSpecialTextPositions(QRegularExpression("_(.*?)_"), "_");
 
     setSpecificTextView();//when we have gotten the position of all special text, we should set this special text to the viewTab
 }
 
 QTabWidget *CommentWidget::getCommentTabWIdget() const
 {
-    return commentTabWIdget;
+    return mCommentTabWIdget;
 }
 
 void CommentWidget::setCommentTabWIdget(QTabWidget *value)
 {
-    commentTabWIdget = value;
+    mCommentTabWIdget = value;
 }
 
 int CommentWidget::getCommentLine() const
 {
-    return commentLine;
+    return mCommentLine;
 }
 
 void CommentWidget::setCommentLine(int value)
 {
-    commentLine = value;
+    mCommentLine = value;
 }
 
 QRect CommentWidget::getCommentButtonGeometry() const
 {
-    return commentButtonGeometry;
+    return mCommentButtonGeometry;
 }
 
 void CommentWidget::setCommentButtonGeometry(const QRect &value)
 {
-    commentButtonGeometry = value;
+    mCommentButtonGeometry = value;
 }
 
 ViewTextEdit *CommentWidget::getViewTab() const
 {
-    return viewTab;
+    return mViewTab;
 }
 
 void CommentWidget::setViewTab(ViewTextEdit *value)
 {
-    viewTab = value;
+    mViewTab = value;
 }
 
 AddCommentTextEdit *CommentWidget::getEditTab() const
 {
-    return editTab;
+    return mEditTab;
 }
 
 void CommentWidget::setEditTab(AddCommentTextEdit *value)
 {
-    editTab = value;
+    mEditTab = value;
 }
 
 void CommentWidget::shiftAllBold(const SpecificText &specText,const int &oneSideSymbolsCount)
@@ -191,7 +182,7 @@ void CommentWidget::shiftAllBold(const SpecificText &specText,const int &oneSide
     //move all bold positions in the vector. We don't need to do that to the italic text because
     //when we write italic positions we'll not move them in the future(bold considers in the first place)
     //and at this time bold positions are already written
-    for (auto &i: specificTextVector)
+    for (auto &i: mSpecificTextVector)
     {
         if (i.textType != SpecificTextType::BOLD)
         {
@@ -213,8 +204,8 @@ void CommentWidget::shiftAllBold(const SpecificText &specText,const int &oneSide
 void CommentWidget::setSpecificTextView()
 {
     //create special text view in the View tab using vector of special text
-    QTextCursor cursor(viewTab->getDocument());
-    for (auto &i : specificTextVector)
+    QTextCursor cursor(mViewTab->getDocument());
+    for (auto &i : mSpecificTextVector)
     {
         cursor.setPosition(i.startIndex);
         cursor.movePosition(QTextCursor::Right,

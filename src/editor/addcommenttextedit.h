@@ -24,6 +24,9 @@ public:
     void setText(const QString &text);
     QPushButton* getSendButton();
     QPushButton* getSetBoldButton();
+    QPushButton* getSetItalicButton();
+    QTextCursor getCursor();
+    void setCursor(const QTextCursor &cursor);
 
 public
 slots:

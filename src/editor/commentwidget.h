@@ -57,18 +57,18 @@ private:
 
 public slots:
     void setViewText(int);
-    void writeSpecialTextPositions(const QRegularExpression &re, const SpecificTextType &textType);
+    void writeSpecialTextPositions(const QRegularExpression &re, const QString &specialSymbolsOneSide);
 
 private:
     Ui::CommentWidget *ui;
-    AddCommentTextEdit *editTab;
-    ViewTextEdit *viewTab;
+    AddCommentTextEdit *mEditTab;
+    ViewTextEdit *mViewTab;
 
-    QTabWidget *commentTabWIdget;
-    QRect commentButtonGeometry;
-    int commentLine;
-    QString commentStringForView;
-    QVector<SpecificText>specificTextVector;
+    QTabWidget *mCommentTabWIdget;
+    QRect mCommentButtonGeometry;
+    int mCommentLine;
+    QString mCommentStringForView;
+    QVector<SpecificText>mSpecificTextVector;
 };
 
 #endif // COMMENTWIDGET_H

@@ -42,6 +42,21 @@ QPushButton *AddCommentTextEdit::getSetBoldButton()
     return ui->setBoldButton;
 }
 
+QPushButton *AddCommentTextEdit::getSetItalicButton()
+{
+    return ui->setItalicButton;
+}
+
+QTextCursor AddCommentTextEdit::getCursor()
+{
+    return ui->commentTextEdit->textCursor();
+}
+
+void AddCommentTextEdit::setCursor(const QTextCursor &cursor)
+{
+    ui->commentTextEdit->setTextCursor(cursor);
+}
+
 void AddCommentTextEdit::setBoldPressed()
 {
     emit setBySpecialSigns("**");
@@ -64,7 +79,7 @@ void AddCommentTextEdit::setSpecialSelect(QString sighns)//sights - symbols whic
     replacingPartStr.append(sighns);//add sight(sights) to the end of selected string
     //after this adding we've gotten new format text. For example after selectin word "code" as bold we'll get "**code**"
 
-    ui->commentTextEdit->textCursor().keepPositionOnInsert();
+   // ui->commentTextEdit->textCursor().keepPositionOnInsert();
     QString ReplacedString = ui->commentTextEdit->toPlainText();//replace previous word (without sights) to the new one
     ReplacedString.replace(
                 selectionStart,
