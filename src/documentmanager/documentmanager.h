@@ -30,6 +30,8 @@ public:
     CodeEditor* getCurrentDocument();
     void closeCurrentDocument();
     QVector<CodeEditor*> getChangedDocuments();
+    void closeEmptyDocArea();
+    void closeCurrentDocArea();
 
 public slots:
     void onSplit(Qt::Orientation orientation);

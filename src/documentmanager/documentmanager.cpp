@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <QMdiArea>
 #include <QVector>
+#include <QDebug>
 
 #include "usermessages.h"
 #include "filemanager.h"
@@ -156,7 +157,7 @@ void DocumentManager::saveDocumentAs(CodeEditor *currentDocument, const QString 
     catch (const QException&)
     {
         throw;
-    }    
+    }
 
     // opened doc represents newly created file
     currentDocument->setFileName(fileName);
@@ -217,7 +218,7 @@ void DocumentManager::onCloseDocument(CodeEditor *doc)
     if (mDocAreas.size() == 1)
     {
         return;
-    }    
+    }
 
     // find area to be removed
     auto placementArea = getArea(doc);
@@ -326,7 +327,7 @@ QMdiArea* DocumentManager::lastAreaInFocus()
         });
 
         if (areaInFocusIter != subWdwList.end())
-        {            
+        {
             return area;
         }
     }
@@ -453,6 +454,49 @@ QVector<CodeEditor*> DocumentManager::getChangedDocuments()
         }
     }
     return changedDocuments;
+}
+
+void DocumentManager::closeEmptyDocArea()
+{
+    if (mDocAreas.size() < 2)
+    {
+        return;
+    }
+
+    // closing empty rightmost doc area
+    auto rightDocArea = mDocAreas.back();
+
+    if (!rightDocArea->currentSubWindow())
+    {
+        // area is removed from container
+        mDocAreas.pop_back();
+
+        // area wgt is scheduled for deletion
+        rightDocArea->deleteLater();
+    }
+}
+
+void DocumentManager::closeCurrentDocArea()
+{
+    if (mDocAreas.size() < 2)
+    {
+        return;
+    }
+
+    // close area in focus
+    auto pAreaInFocus = areaInFocus();
+
+    if (!pAreaInFocus)
+    {
+        return;
+    }
+
+    auto windowsList = pAreaInFocus->subWindowList();
+
+    for (const auto& wdw: windowsList)
+    {
+        wdw->close();
+    }
 }
 
 bool DocumentManager::saveDocument(CodeEditor *doc)

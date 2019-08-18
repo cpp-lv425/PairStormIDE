@@ -163,6 +163,8 @@ void MainWindow::setupMainMenu()
                         Qt::CTRL + Qt::Key_E);
     viewMenu->addAction("Split &Vectically", this, &MainWindow::onSplitVerticallyTriggered,
                         Qt::CTRL + Qt::SHIFT + Qt::Key_E);
+    viewMenu->addAction("Close &Empty Document Area", this, &MainWindow::onCloseEmptyDocArea, Qt::ALT + Qt::SHIFT + Qt::Key_W);
+    viewMenu->addAction("Close Cu&rrent Document Area", this, &MainWindow::onCloseCurrentDocArea, Qt::ALT + Qt::SHIFT + Qt::Key_E);
 
     viewMenu->addSeparator();
     viewMenu->addAction("Show &Project Viewer", this, &MainWindow::onShowProjectViewerTriggered);
@@ -525,6 +527,16 @@ void MainWindow::onShowChatWindowDockTriggered()
 void MainWindow::onShowBottomPanel()
 {
     mpBottomPanelDock->show();
+}
+
+void MainWindow::onCloseEmptyDocArea()
+{
+    mpDocumentManager->closeEmptyDocArea();
+}
+
+void MainWindow::onCloseCurrentDocArea()
+{
+    mpDocumentManager->closeCurrentDocArea();
 }
 
 void MainWindow::onRefactorTriggered()
