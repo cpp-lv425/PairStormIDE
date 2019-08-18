@@ -20,9 +20,9 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
 
     //read settings
     QSettings settings(QApplication::organizationName(), QApplication::applicationName());
-    QString analizerFontSize = settings.value("analizerFontSize").toString();
-    QString analizerFontName = settings.value("analizerFontName").toString();
-    QString analizerStyle = settings.value("analizerStyle").toString();
+    QString analizerFontSize = settings.value("editorFontSize").toString();
+    QString analizerFontName = settings.value("editorFontName").toString();
+    QString analizerStyle = settings.value("style").toString();
     mConfigParam.setConfigParams(analizerFontName,analizerFontSize,analizerStyle);
 
     //create objects connected to codeEditor
@@ -62,6 +62,12 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     this->setFont(mFont);
 
     //set text highlighting color
+    fmtLiteral.setForeground(Qt::red);
+    fmtKeyword.setForeground(Qt::blue);
+    fmtComment.setForeground(Qt::green);
+    fmtUndefined.setUnderlineStyle(QTextCharFormat::WaveUnderline);
+    fmtUndefined.setUnderlineColor(Qt::red);
+    fmtRegular.setForeground(Qt::black);
     fmtLiteral.setForeground(mConfigParam.mStringsColor);
     fmtKeyword.setForeground(mConfigParam.mBasicLiteralsColor);
     fmtComment.setForeground(mConfigParam.mCommentColor);
@@ -308,6 +314,9 @@ void CodeEditor::highlighText()
             break;
         case(State::COM):
             formating(fmtComment, cursor, i);
+            break;
+        case(State::UNDEF):
+            formating(fmtUndefined, cursor, i);
             break;
         default:
             formating(fmtRegular, cursor, i);
