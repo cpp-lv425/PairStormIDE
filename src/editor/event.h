@@ -12,7 +12,7 @@ protected:
     bool IsInsideBracket(CodeEditor *codeEditor);
     void plainTextPressEvent(CodeEditor *codeEditor, QKeyEvent *e);
     int editorCurrentZoom(CodeEditor *codeEditor);
-    QVector<Token> editorTokens(CodeEditor *codeEditor);
+    QMap<int, QVector<Token>> editorTokens(CodeEditor *codeEditor);
     static QString sTabs;
     static bool sIsSleshPressed;
 

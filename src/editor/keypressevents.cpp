@@ -136,9 +136,9 @@ void EventSendLexem::operator()(CodeEditor * codeEditor, QKeyEvent *e)
     int position = cursor.position();
     for (const auto &it: editorTokens(codeEditor))
     {
-        if (it.mType == State::KW && it.mBegin <= position && it.mEnd >= position)
+        if (it[position].mType == State::KW && it[position].mBegin <= position && it[position].mEnd >= position)
         {
-            emit codeEditor->sendLexem(it.mName);
+            emit codeEditor->sendLexem(it[position].mName);
         }
     }
 }

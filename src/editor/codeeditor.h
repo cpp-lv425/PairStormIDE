@@ -82,6 +82,7 @@ protected:
 private slots:
     void updateLineNumberAreaWidth();
     void updateLineNumberArea(const QRect &rect, int dy);
+    void handleLineChange(int);
     void runLexer();
     void highlighText();
     //void showCommentLine(int line);
@@ -135,7 +136,7 @@ private:
 
 protected:
     int mCurrentZoom;
-    QVector<Token> mTokens;
+    QMap<int, QVector<Token>> mTokens;
     friend class Event;
 };
 

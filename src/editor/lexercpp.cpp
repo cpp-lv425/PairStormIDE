@@ -1,4 +1,5 @@
 #include "lexercpp.h"
+#include <QDebug>
 
 inline bool LexerCPP::isKeyword(const QString &lexem)
 {
@@ -84,11 +85,11 @@ inline bool LexerCPP::isLexemEnd(const QChar& sym)
 inline void LexerCPP::addLexem()
 {
     --mIndex;
-    mTokens.append(Token(QString(mCurrentLexem), State(mState), mIndex - mCurrentLexem.size(), mIndex));
+    mTokensOnCurrentLine.append(Token(QString(mCurrentLexem), State(mState), mIndex - mCurrentLexem.size(), mIndex));
+    mTokens[mCurrentLine] = mTokensOnCurrentLine;
     mCurrentLexem.clear();
     mState = State::ST;
 }
-
 
 inline void LexerCPP::changeState(State state, QChar sym)
 {
@@ -99,11 +100,12 @@ inline void LexerCPP::changeState(State state, QChar sym)
 void LexerCPP::clear()
 {
     mTokens.clear();
+    mTokensOnCurrentLine.clear();
     mCurrentLexem.clear();
     mState = State::ST;
 }
 
-QVector<Token> LexerCPP::getTokens() const
+QMap<int, QVector<Token>> LexerCPP::getTokens() const
 {
     return mTokens;
 }
@@ -268,21 +270,33 @@ void LexerCPP::handleLiteralState(const QChar &sym)
     }
 }
 
-void LexerCPP::lexicalAnalysis(QString code)
+void LexerCPP::lexicalAnalysis(QTextDocument* code, int begin, int end)
 {
-    mCodeSize = code.size();
+    mCodeSize = code->toPlainText().size();
+    mCurrentLine = begin;
     mIndex = 0;
     QChar sym = 0;
 
-    while(mIndex < code.size())
+    if(mTokens.contains(begin - 1))
     {
-        sym = code[mIndex];
+        mIndex = (mTokens[begin - 1].end() - 1)->mEnd;ijnhidf
+    }
+
+    while(mIndex < mCodeSize)
+    {
+        sym = code->characterAt(mIndex);
         ++mIndex;
 
         switch(mState)
         {
         case State::ST:
-            if(isSpace(sym))
+            if(sym == QChar::ParagraphSeparator)
+            {
+                mTokensOnCurrentLine.clear();
+                ++mCurrentLine;
+                break;
+            }
+            else if(isSpace(sym))
             {
                 break;
             }

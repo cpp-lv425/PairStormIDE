@@ -67,7 +67,7 @@ int Event::editorCurrentZoom(CodeEditor *codeEditor)
     return codeEditor->mCurrentZoom;
 }
 
-QVector<Token> Event::editorTokens(CodeEditor *codeEditor)
+QMap<int, QVector<Token>> Event::editorTokens(CodeEditor *codeEditor)
 {
     return codeEditor->mTokens;
 }
