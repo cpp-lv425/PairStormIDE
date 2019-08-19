@@ -484,14 +484,24 @@ void DocumentManager::combineDocAreas()
             {
                 // every window is detached from current doc area
                 // & placed on the first doc area
-                auto doc = qobject_cast<CodeEditor*>(wdw);
+                auto doc = qobject_cast<CodeEditor*>(wdw->widget());
 
                 if (doc)
                 {
                     (*areaIter)->removeSubWindow(wdw);
-                    CodeEditor *newView = createDoc(doc->getFileName());
+                    QString fileName = doc->getFileName();
+                    CodeEditor *newView = createDoc(fileName);
                     newView->setPlainText(doc->toPlainText());
                     mDocAreas.front()->addSubWindow(newView);
+                    newView->setWindowState(Qt::WindowMaximized);
+
+                    // doc name is set on tab
+                    int position = fileName.lastIndexOf(QChar{'/'});
+                    newView->setWindowTitle(fileName.mid(position + 1));
+
+                    // doc snaps current content state
+                    newView->setBeginTextState();
+                    delete wdw;
                 }
             }
         }
