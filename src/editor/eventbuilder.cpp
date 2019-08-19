@@ -14,6 +14,10 @@ Event *EventBuilder::getEventNoModifier(QKeyEvent *e)
         return new EventApostrophe();
     case Qt::Key_Slash:
         return new EventSlash();
+    case Qt::Key_Backspace:
+        return new EventRemoveKey();
+    case Qt::Key_Delete:
+        return new EventRemoveKey();
     default:
         return new EventDefault();
     }

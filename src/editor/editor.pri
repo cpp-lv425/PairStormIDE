@@ -32,6 +32,7 @@ HEADERS += \
         $$PWD/linenumberarea.h \
         $$PWD/operators.h \
         $$PWD/spaces.h \
+        $$PWD/specialsymbols.h \
         $$PWD/token.h \
         $$PWD/viewtextedit.h \
         $$PWD/widget.h

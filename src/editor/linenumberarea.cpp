@@ -8,5 +8,5 @@ LineNumberArea::LineNumberArea(CodeEditor *editor) : QWidget(editor)
 
 void LineNumberArea::paintEvent(QPaintEvent *event)
 {
-    codeEditor->lineNumberAreaPaintEvent(event);
+    codeEditor->specialAreasRepaintEvent(event);
 }

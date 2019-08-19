@@ -30,27 +30,6 @@ std::string HTMLContentGenerator::generate(const QVector<QFileInfo> &files)
 
         dirEntryMustashe.set("showIcons", showIconsColumn ? kainjow::mustache::data::type::bool_true
                                                           : kainjow::mustache::data::type::bool_false);
-
-        // File Icon
-        if (showIconsColumn)
-        {
-            dirEntryMustashe.set("showIcons", kainjow::mustache::data::type::bool_true);
-
-            if (!files.at(fileIndex).isDir())
-            {
-                    dirEntryMustashe.set("fileIcon", R"(<i class="fas fa-code"></i>)");
-
-            }
-            else
-            {
-                dirEntryMustashe.set("fileIcon", R"(<i class="fas fa-code"></i>)");
-            }
-        }
-        else
-        {
-            dirEntryMustashe.set("showIcons", kainjow::mustache::data::type::bool_false);
-        }
-
         // File Name
         QString filename = files.at(fileIndex).dir().dirName()+ "/" + files.at(fileIndex).fileName();
         dirEntryMustashe.set("fileName", filename.toStdString());

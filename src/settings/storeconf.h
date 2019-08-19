@@ -3,8 +3,8 @@
  * and save it in persistent platform-independent application settings.
  * Reach out these data are posible from any point in application using statements:
  * QSettings settings;
- * int i = settings.value("fieldName").toString();
- * where <fieldName> same as in configuration file.
+ * int i = settings.value("fieldName").toInt();
+ * where <fieldName> field in configuration file.
  *
  * Also writes application version, application name, organization name
  * to QApplication settings. They are available through static fields:
@@ -14,37 +14,43 @@
 #ifndef STORECONF_H
 #define STORECONF_H
 
-#include <QWidget>
 #include <QJsonObject>
 #include <QJsonDocument>
+#include <QStringList>
+#include <QMap>
+#include <QFile>
 
-class StoreConf : public QWidget
+class StoreConf
 {
-    Q_OBJECT
 public:
-    explicit StoreConf(QWidget * parent = nullptr);
+    explicit StoreConf(QString userName = "unnamed");
+
+    void restoreConFile();          //  restoring settings from last session
+    void saveConFile();             //  saving settings at the end of current session
 private:
-    QString getPathToConFile(); // search configuration file. if not exist - create it with default parameters
-    QString conFile;
-    QString conFileDefault          = "conf.json";
+    void getPathToConFile();        //  search configuration file. if not exist - create it with default parameters
 
-    QString organizationName        = "Lv-425.C++";
-    QString applicationVersion      = "0.1";
-    QString applicationName         = "Pair Storm";
-    QString analizerStyle           = "white";
-    QString analizerFontSize        = "12";
-    QString analizerFontName        = "Courier 10 Pitch";
-    QString cppExtentions           = ".c;.cpp;.h;.hpp;.json;.txt";
-    QStringList cppExtentionsList {".c", ".cpp", ".h", ".hpp", ".json", ".txt"};
+    QString mConFile;               //  name of configuration file
+    QString mPathToConFile;         //  path to configuration file
+    QMap<QString, QString> mFields; //  first -> valueName, second -> valueItself
+    enum class sessionMode {Start, Finish, Size};   //  Start - start session, Finish - finish session, Size - size of enumeration
 
-    void writeJson();               //  if conf.json not exist - creates it in current directory
-    void readJson();                //  read [confile] to [loadDoc]. status write to [readStatus]
+    QStringList mCppExtentionsList;     //  all extentions available in C++ mode
+    QStringList mCppCompilersList;      //  all compilers available in C++ mode
+    QStringList mCppLibraryHeadersList; //  all included library headers in C++ mode
+    QStringList mCppLibraryBinarysList; //  all included library binarys in C++ mode
+
+    void checkConfDir(QString str = "exe");    //  check existance directory <conf>, create if not exist
+                                               //  str = "exe" - directory in same dir as execution file
+    void writeJson(sessionMode mode = sessionMode::Start);     //  on application start: if conf.json not exist - creates it in conf directory
+                                               //  on application quit:  rewrite json with values from QSettings
+    void readJson();                //  read configuration file to [loadDoc]. status write to [readStatus]
     void parseJson();
     void saveData();                // save data to QSettings file and QApplication fields
+    void separateList(QString &str, QStringList &lst);// separate <str> into tokens to <lst>
 
-    QJsonDocument loadDoc;
-    bool readStatus = false;        //  status to read conf.json
-    bool writeStatus = false;       //  status to write default conf.json
+    QJsonDocument mJsonDoc;
+    bool mReadStatus = false;        //  status after read conf.json 
 };
 
 #endif // STORECONF_H

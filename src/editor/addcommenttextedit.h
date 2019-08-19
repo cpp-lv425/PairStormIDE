@@ -1,17 +1,11 @@
 #ifndef ADDCOMMENTTEXTEDIT_H
 #define ADDCOMMENTTEXTEDIT_H
 
-#include <QWidget>
 #include <QFont>
 #include <QString>
 #include<QPushButton>
-#include<QPlainTextEdit>
-#include<QRegularExpression>
-#include<QRegularExpressionMatch>
-#include<QRegularExpressionMatchIterator>
-#include<QVector>
 #include<QTextCursor>
-#include<QTextCharFormat>
+#include<QRegularExpression>
 
 namespace Ui
 {
@@ -27,20 +21,26 @@ public:
     ~AddCommentTextEdit();
 
     QString getText();
+    void setText(const QString &text);
     QPushButton* getSendButton();
+    QPushButton* getSetBoldButton();
+    QPushButton* getSetItalicButton();
+    QTextCursor getCursor();
+    void setCursor(const QTextCursor &cursor);
 
 public
-
 slots:
     void setBoldPressed();
     void setItalicPressed();
     void setSpecialSelect(QString sighns);
     void sendComment();
+    void deleteComment();
 
 signals:
     void setBySpecialSigns(QString sights);
-    void emptyComment();
-    void notEmptyComment();
+    void emptyCommentWasSent();
+    void notEmptyCommentWasSent();
+    void commentWasDeleted();
 
 private:
     Ui::AddCommentTextEdit *ui;

@@ -23,6 +23,7 @@
 #include "usermessages.h"
 #include "logindialog.h"
 #include "filemanager.h"
+#include "menuoptions.h"
 #include "codeeditor.h"
 #include "storeconf.h"
 #include "startpage.h"
@@ -48,7 +49,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->setupUi(this);
     {
-        StoreConf conf(this);
+        StoreConf conf;
+        conf.restoreConFile();
     }
 
     // when first started main window is maximized
@@ -566,7 +568,8 @@ void MainWindow::onConnectTriggered()
 
 void MainWindow::onSettingsTriggered()
 {
-    //
+    MenuOptions * menuOptions = new MenuOptions(this);
+    Q_UNUSED(menuOptions)
 }
 
 void MainWindow::onAboutTriggered()
@@ -669,6 +672,9 @@ void MainWindow::closeEvent(QCloseEvent *event)
 MainWindow::~MainWindow()
 {
     saveMainWindowState();
+    StoreConf conf;
+    conf.saveConFile();
+
     delete ui;
 }
 
@@ -684,16 +690,19 @@ void MainWindow::saveMainWindowState()
 void MainWindow::restoreMainWindowState()
 {
     QSettings settings(QApplication::organizationName(), QApplication::applicationName());
-    restoreGeometry(settings.value("mainWindowGeometry").toByteArray());
-    restoreState(settings.value("mainWindowState").toByteArray());
+    if (settings.contains("mainWindowGeometry"))
+        restoreGeometry(settings.value("mainWindowGeometry").toByteArray());
+    if (settings.contains("mainWindowState"))
+        restoreState(settings.value("mainWindowState").toByteArray());
 }
 
 void MainWindow::setAppStyle()
-{    
+{
     // fusion style is applied globally
     // if platform does not support fusion, default style is applied
     qApp->setStyle(QStyleFactory::create("Fusion"));
     // dark style palette is created & set globally
     QPalette palette = mpPaletteConfigurator->getPalette("DARK");
+    //QPalette newPal = palette();
     qApp->setPalette(palette);
 }

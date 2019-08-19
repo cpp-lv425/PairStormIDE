@@ -1,20 +1,20 @@
 #include "codeeditor.h"
 #include "linenumberarea.h"
+#include "eventbuilder.h"
 #include<QtGui>
 #include<QTextCursor>
 #include<QPainter>
 #include<QTextCharFormat>
-#include <QFontDatabase>
+#include<QFontDatabase>
 #include<QScrollBar>
 #include<QMessageBox>
 #include<iostream>
 #include<QLabel>
+
 #include "eventbuilder.h"
 #include "usermessages.h"
 #include "filemanager.h"
 #include "utils.h"
-// temp
-#include <QDebug>
 
 CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
 {
@@ -25,9 +25,9 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
 
     //read settings
     QSettings settings(QApplication::organizationName(), QApplication::applicationName());
-    QString analizerFontSize = settings.value("analizerFontSize").toString();
-    QString analizerFontName = settings.value("analizerFontName").toString();
-    QString analizerStyle = settings.value("analizerStyle").toString();
+    QString analizerFontSize = {settings.contains("editorFontSize") ? settings.value("editorFontSize").toString() : "12"};
+    QString analizerFontName = {settings.contains("editorFontName") ? settings.value("editorFontName").toString() : "Consolas"};
+    QString analizerStyle = {settings.contains("style") ? settings.value("style").toString() : "WHITE"};
     mConfigParam.setConfigParams(analizerFontName,analizerFontSize,analizerStyle);
 
     //create objects connected to codeEditor
@@ -43,28 +43,28 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     mCurrentCommentLable = new QLabel(this);
     setMouseTracking(true);
 
-     //comment text edit
-  //  mAddCommentTextEdit = new AddCommentTextEdit;
-   // mAddCommentTextEdit->setVisible(false);
-
+    //widget that shows the comment to each line
     mCommentWidget = new CommentWidget;
     mCommentWidget->setVisible(false);
+
+
     //This signal is emitted when the text document needs an update of the specified rect.
     //If the text is scrolled, rect will cover the entire viewport area.
     //If the text is scrolled vertically, dy carries the amount of pixels the viewport was scrolled.
 
-    connect(this,              &QPlainTextEdit::updateRequest,                  this, &CodeEditor::updateLineNumberArea);
-    connect(this,              &QPlainTextEdit::cursorPositionChanged,          this, &CodeEditor::runLexer);
-    connect(mTimer,            &QTimer::timeout,                                this, &CodeEditor::saveStateInTheHistory);
-    connect(this,              &QPlainTextEdit::cursorPositionChanged,          this, &CodeEditor::highlighText);
-    connect(this,              &QPlainTextEdit::cursorPositionChanged,          this, &CodeEditor::textChangedInTheOneLine);
-    connect(mAddCommentButton, &AddCommentButton::addCommentButtonPressed ,     this, &CodeEditor::showCommentTextEdit);
-    connect(mCommentWidget->getEditTab(), &AddCommentTextEdit::emptyComment,    this, &CodeEditor::emptyCommentWasAdded);
-    connect(mCommentWidget->getEditTab(), &AddCommentTextEdit::notEmptyComment, this, &CodeEditor::notEmptyCommentWasAdded  );
+    connect(this,                         &QPlainTextEdit::updateRequest,                  this, &CodeEditor::updateLineNumberArea);
+    connect(mTimer,                       &QTimer::timeout,                                this, &CodeEditor::saveStateInTheHistory);
+    connect(this,                         &QPlainTextEdit::cursorPositionChanged,          this, &CodeEditor::textChangedInTheOneLine);
+    connect(mAddCommentButton,            &AddCommentButton::addCommentButtonPressed,      this, &CodeEditor::showCommentTextEdit);
+    connect(mCommentWidget->getEditTab(), &AddCommentTextEdit::emptyCommentWasSent,        this, &CodeEditor::emptyCommentWasAdded);
+    connect(mCommentWidget->getEditTab(), &AddCommentTextEdit::notEmptyCommentWasSent,     this, &CodeEditor::notEmptyCommentWasAdded);
+    connect(mCommentWidget->getEditTab(), &AddCommentTextEdit::commentWasDeleted,          this, &CodeEditor::deleteComment);
+    connect(this,                         &CodeEditor::linesCountUpdated,                  this, &CodeEditor::changeCommentButtonsState);
 
-    //connect(mCommentsVector[int], SIGNAL(AddCommentButtonPressed(int)), this, SLOT(showCommentTextEdit(int)));
 
     mTimer->start(CHANGE_SAVE_TIME);//save text by this time
+    mLinesCountCurrent = 1;
+    mLinesCountPrev = 1;
 
     // start typing from correct position (in the first line it doesn't consider weight of lineCounter)
     //that's why we need to set this position
@@ -78,6 +78,12 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     this->setFont(mFont);
 
     //set text highlighting color
+    fmtLiteral.setForeground(Qt::red);
+    fmtKeyword.setForeground(Qt::blue);
+    fmtComment.setForeground(Qt::green);
+    fmtUndefined.setUnderlineStyle(QTextCharFormat::WaveUnderline);
+    fmtUndefined.setUnderlineColor(Qt::red);
+    fmtRegular.setForeground(Qt::black);
     fmtLiteral.setForeground(mConfigParam.mStringsColor);
     fmtKeyword.setForeground(mConfigParam.mBasicLiteralsColor);
     fmtComment.setForeground(mConfigParam.mCommentColor);
@@ -177,7 +183,7 @@ void CodeEditor::resizeEvent(QResizeEvent *e)
     mLineNumberArea->setGeometry(QRect(0, 0, getLineNumberAreaWidth(), cr.height()));//set the same height as codeEditor for lineCouter
 }
 
-void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event)
+void CodeEditor::specialAreasRepaintEvent(QPaintEvent *event)
 {
     QPainter painter(mLineNumberArea);
     painter.fillRect(event->rect(), mConfigParam.mLineCounterAreaColor);
@@ -186,7 +192,6 @@ void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event)
     int blockNumber = block.blockNumber();//get line number (start from 0)
     int top = static_cast<int>(blockBoundingGeometry(block).translated(contentOffset()).top());//top of currentblock 0
     int bottom = top + static_cast<int>(blockBoundingRect(block).height());//bottom of current block                 -
-
 
     while (block.isValid())//we have blocks (have lines numbers)
     {
@@ -201,16 +206,26 @@ void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event)
         ++blockNumber;
     }
 
+    repaintButtonsArea(bottom, top, blockNumber);
+}
+
+void CodeEditor::repaintButtonsArea(int bottom, int top, int blockNumber)
+{
     int addedHight = this->verticalScrollBar()->sliderPosition()? 0 : TOP_UNUSED_PIXELS_HEIGHT;
     int height = bottom - top;
-    for(auto &i :mCommentsVector)
+    for (auto &i : mCommentsVector)
     {
         i->setGeometry(this->width() - this->verticalScrollBar()->width() - height,
                        (i->getCurrentLine() - this->verticalScrollBar()->sliderPosition() - 1) * height + addedHight,
                        bottom - top,
                        bottom - top);
     }
-    mLinesCount = blockNumber;
+    if (mLinesCountCurrent != blockNumber)//lines count changed
+    {
+        mLinesCountPrev = mLinesCountCurrent;
+        mLinesCountCurrent = blockNumber;
+        emit linesCountUpdated();
+    }
 }
 
 void CodeEditor::saveStateInTheHistory()
@@ -235,50 +250,209 @@ void CodeEditor::textChangedInTheOneLine()
     emit(textChangedInLine(this->textCursor().blockNumber() + 1));
 }
 
+AddCommentButton *CodeEditor::getCommentButtonByIndex(const int line)
+{
+    for (int i = 0; i < mCommentsVector.size(); i++)
+    {
+        if (mCommentsVector[i]->getCurrentLine() == line)
+        {
+            return mCommentsVector[i];
+        }
+    }
+    return nullptr;
+}
+
+void CodeEditor::setNewAddedButtonSettings(AddCommentButton *commentButton)
+{
+    mCommentWidget->setViewText(1);//set text to view. because it dons't set automiticaly when we set to edit
+    commentButton->setCommentString(mCommentWidget->getEditTab()->getText());
+    commentButton->setToolTip(mCommentWidget->getViewTab()->getText());
+    mCommentWidget->setVisible(false);
+}
+
 void CodeEditor::showCommentTextEdit(int line)
 {
     mCommentWidget->setWindowTitle("Comment to " + QString::number(line) + " line");
     mCommentWidget->setPosition(this, mAddCommentButton);
     mCommentWidget->setVisible(true);
+    mCommentWidget->setCommentButtonGeometry(mAddCommentButton->geometry());
+    mCommentWidget->setCommentLine(line);
+
+    auto commentButton = getCommentButtonByIndex(line);
+    if (commentButton)//if comment button by passed in the parametr line existed
+    {
+        mCommentWidget->getEditTab()->setText(commentButton->getCommentString());//set text from this button text
+    }
+    else
+    {
+        mCommentWidget->getEditTab()->setText("");
+    }
 }
 
 void CodeEditor::emptyCommentWasAdded()
 {
-    //delete from the database if record exists(for the future)
     mCommentWidget->setVisible(false);
-    for (int i = 0; i < mCommentsVector.size(); i++)
+    auto commentButton = getCommentButtonByIndex(mCommentWidget->getCommentLine());
+    if (commentButton)
     {
-        if (mCommentsVector[i]->getCurrentLine() == mAddCommentButton->getCurrentLine())
-        {
-            mCommentsVector[i]->setVisible(false);
-            mCommentsVector.erase(mCommentsVector.begin() + i);
-        }
+        removeButtomByValue(mCommentsVector, commentButton);
     }
 }
 
 void CodeEditor::notEmptyCommentWasAdded()
 {
-    //write to the database (for the future)
-    AddCommentButton *commentButton = new AddCommentButton(this);
-    commentButton->setGeometry(mAddCommentButton->geometry());
-    commentButton->setCurrentLine(mAddCommentButton->getCurrentLine());
-    commentButton->setStyleSheet("background-color: #18CD3C");
-    commentButton->setText("✔");
-    commentButton->setVisible(true);
-
-    mCommentsVector.push_back(commentButton);
-    for(int i = 0; i<mCommentsVector.size() - 1; i++)
+    if (isCommentButtonExist(mCommentWidget->getCommentLine()))
     {
-        if(mCommentsVector[i]->getCurrentLine() == mAddCommentButton->getCurrentLine())
+        auto commentButonExisted = getCommentButtonByIndex(mCommentWidget->getCommentLine());
+        setNewAddedButtonSettings(commentButonExisted);
+    }
+    else
+    {
+        AddCommentButton *commentButtonNew = new AddCommentButton(this);
+        commentButtonNew->setGeometry(mCommentWidget->getCommentButtonGeometry());
+        commentButtonNew->setCurrentLine(mCommentWidget->getCommentLine());
+
+        commentButtonNew->setStyleSheet("background-color: #18CD3C");
+        commentButtonNew->setText("✔");
+        commentButtonNew->setVisible(true);
+
+        setNewAddedButtonSettings(commentButtonNew);
+
+        mCommentsVector.push_back(commentButtonNew);
+        connect(mCommentsVector.back(), &AddCommentButton::addCommentButtonPressed, this, &CodeEditor::showCommentTextEdit);
+    }
+}
+
+void CodeEditor::deleteComment()
+{
+    auto commentButon = getCommentButtonByIndex(mCommentWidget->getCommentLine());
+    if (commentButon)
+    {
+        removeButtomByValue(mCommentsVector, commentButon);
+    }
+    mCommentWidget->setVisible(false);
+}
+
+void CodeEditor::changeCommentButtonsState()
+{
+    int diff = mLinesCountCurrent - mLinesCountPrev;//number that keeps the difference between previous and current lines count
+    int cursorLine = this->textCursor().blockNumber() + 1;//get the line where cursor is
+
+    //get the lines of start and end changing
+    int startLine = diff > 0 ? cursorLine - diff : cursorLine;
+    int endLine = diff > 0 ? cursorLine : cursorLine - diff;
+
+    removeButtons(mCommentsVector, cursorLine, startLine, endLine, diff);//remove all buttons if we deleted their lines
+
+    rewriteButtonsLines(mCommentsVector,diff,startLine);//move position of buttons that need to be moved
+}
+
+LastRemoveKey CodeEditor::getLastRemomeKey() const
+{
+    return lastRemomeKey;
+}
+
+void CodeEditor::setLastRemomeKey(const LastRemoveKey &value)
+{
+    lastRemomeKey = value;
+}
+
+void CodeEditor::rewriteButtonsLines(QVector<AddCommentButton *> &commentV, const int diff, const int startLine)
+{
+    //move buttons' lines according to diif
+    for (auto &i : commentV)
+    {
+        if (i->getCurrentLine() == startLine)
         {
-            mCommentsVector[i]->setVisible(false);
-            mCommentsVector.erase(mCommentsVector.begin() + i);
+            auto cursor = this->textCursor();
+            cursor.movePosition(QTextCursor::PreviousCharacter);
+//check if cursor was in the start of comment line.
+//that is the only one situation when we consider this line as the line where we should move comment button
+            if (cursor.atBlockStart())
+            {
+                setAnotherButtonLine(i, diff);
+            }
+        }
+        else if (i->getCurrentLine() > startLine)
+        {
+            setAnotherButtonLine(i, diff);
         }
     }
-    mCommentsSet.insert(commentButton);
+}
 
-    connect(mCommentsVector.back(), &AddCommentButton::addCommentButtonPressed, this, &CodeEditor::showCommentTextEdit);
-    mAddCommentButton->setVisible(false);
+void CodeEditor::setAnotherButtonLine(AddCommentButton *comment, int diff)
+{
+    comment->setCurrentLine(comment->getCurrentLine() + diff);
+}
+
+bool CodeEditor::isInRangeIncludBoth(int val, int leftMargin, int rightMargin)
+{
+    return val >= leftMargin && val <= rightMargin;
+}
+
+bool CodeEditor::isInRangeIncludLast(int val, int leftMargin, int rightMargin)
+{
+    return val > leftMargin && val <= rightMargin;
+}
+
+void CodeEditor::removeButtonByIndex(QVector<AddCommentButton *> &commentV, int index)
+{
+    commentV[index]->setVisible(false);
+    commentV.erase(commentV.begin() + index);
+}
+
+void CodeEditor::removeButtomByValue(QVector<AddCommentButton *> &commentV, AddCommentButton *commentButton)
+{
+     commentButton->setVisible(false);
+     mCommentsVector.erase(std::remove(commentV.begin(), commentV.end(), commentButton), commentV.end());
+}
+
+bool CodeEditor::isCommentButtonExist(int line)
+{
+    for (auto &i : mCommentsVector)
+    {
+        if (i->getCurrentLine() == line)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+void CodeEditor::removeButtons(QVector<AddCommentButton *> &commentV, int cursorLine, int startLine, int endLine, int diff)
+{
+   if (diff > 0)//we shouldn't remove button if the wasn't any removing
+   {
+       return;
+   }
+
+   for (int i = 0; i < commentV.size(); i++)
+   {
+       //if the last pressed remove button (delete or backspace) was delete we should check one more condition
+       //because cursor position hasn't changed
+       if (lastRemomeKey == LastRemoveKey::DEL)
+       {
+           //this statment happens when we're staying above the line where comment is and pressed Delete.
+           //we havn't moved the cursor position, but diff became -1 therefore we can't check this as usually
+           //using only startLine position
+           if (cursorLine == startLine
+                   && cursorLine != commentV[i]->getCurrentLine())
+           {
+               continue;
+           }
+           if (isInRangeIncludBoth(commentV[i]->getCurrentLine(), startLine, endLine))
+           {
+               removeButtonByIndex(commentV, i);//otherwise delete this button (we delete whole line where comment button was)
+           }
+       }
+       else
+       {
+           if (isInRangeIncludLast(commentV[i]->getCurrentLine(), startLine, endLine))
+           {
+               removeButtonByIndex(commentV, i);//the same deleting here
+           }
+       }
+   }
 }
 
 void CodeEditor::mouseMoveEvent(QMouseEvent *event)
@@ -306,7 +480,7 @@ void CodeEditor::mouseMoveEvent(QMouseEvent *event)
             int currLine = linesFromTheTop + currSliderPos + 1;//because first block = 0
             mAddCommentButton->setCurrentLine(currLine);
 
-            if (currLine <= mLinesCount)// check if the line exists
+            if (currLine <= mLinesCountCurrent)// check if the line exists
             {
                 int commentBottonXpos = commentAreaLeftMargin + getLineNumberAreaWidth();
                 int commentBottonYpos = linesFromTheTop * side;
@@ -395,6 +569,9 @@ void CodeEditor::highlighText()
             break;
         case(State::COM):
             formating(fmtComment, cursor, i);
+            break;
+        case(State::UNDEF):
+            formating(fmtUndefined, cursor, i);
             break;
         default:
             formating(fmtRegular, cursor, i);

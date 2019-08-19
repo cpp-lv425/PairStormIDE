@@ -58,7 +58,7 @@
     </layout>
    </item>
    <item>
-    <widget class="QTextEdit" name="commentTextEdit"/>
+    <widget class="QPlainTextEdit" name="commentTextEdit"/>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -74,6 +74,13 @@
         </size>
        </property>
       </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="deleteMessageButton">
+       <property name="text">
+        <string>Delete</string>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QPushButton" name="sendMessageButton">
