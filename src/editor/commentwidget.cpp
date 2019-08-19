@@ -1,5 +1,6 @@
 #include "commentwidget.h"
 #include "ui_commentwidget.h"
+#include "specialsymbols.h"
 #include<QDebug>
 
 CommentWidget::CommentWidget(QWidget *parent) :
@@ -66,7 +67,7 @@ void CommentWidget::writeSpecialTextPositions(const QRegularExpression &re, cons
     int oneSideSymbolsCount = specialSymbolsOneSide.length();// number of special symbols by one side ("**" has 2, "_" has 1)
     //firstly we detect all bold match because they can be inside italic. (For example "_**text**_")
     //so, when we detect bold, our text contains "**" symbols. if we detect italic, we should use text where bold symbols("**") are replaced
-    QString viewString = specialSymbolsOneSide == "**" ? mEditTab->getText() : mCommentStringForView;
+    QString viewString = specialSymbolsOneSide == specialCommentAsterisk ? mEditTab->getText() : mCommentStringForView;
 
     QRegularExpressionMatchIterator matchIter = re.globalMatch(viewString);//find all match by regex
 
@@ -120,9 +121,9 @@ void CommentWidget::setViewText(int index)
 
     //firsly we should find all bold text matches by regex, write their positions and delete them
     writeSpecialTextPositions(QRegularExpression("\\*\\*(?:(?:[^*])|(?:\\*[^*])|(?:[^*]\\*))*(?:\\*)*\\*\\*"),
-                              "**");
+                              specialCommentAsterisk);
     //after we schould do the same to italic text
-    writeSpecialTextPositions(QRegularExpression("_(.*?)_"), "_");
+    writeSpecialTextPositions(QRegularExpression("_(.*?)_"), specialCommentUnderscore);
 
     setSpecificTextView();//when we have gotten the position of all special text, we should set this special text to the viewTab
 }

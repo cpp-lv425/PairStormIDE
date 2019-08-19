@@ -1,5 +1,6 @@
 #include "addcommenttextedit.h"
 #include "ui_addcommenttextedit.h"
+#include "specialsymbols.h"
 
 AddCommentTextEdit::AddCommentTextEdit(QWidget *parent) :
     QWidget(parent),
@@ -37,12 +38,12 @@ QPushButton* AddCommentTextEdit::getSendButton()
     return ui->sendMessageButton;
 }
 
-QPushButton *AddCommentTextEdit::getSetBoldButton()
+QPushButton* AddCommentTextEdit::getSetBoldButton()
 {
     return ui->setBoldButton;
 }
 
-QPushButton *AddCommentTextEdit::getSetItalicButton()
+QPushButton* AddCommentTextEdit::getSetItalicButton()
 {
     return ui->setItalicButton;
 }
@@ -59,12 +60,12 @@ void AddCommentTextEdit::setCursor(const QTextCursor &cursor)
 
 void AddCommentTextEdit::setBoldPressed()
 {
-    emit setBySpecialSigns("**");
+    emit setBySpecialSigns(specialCommentAsterisk);
 }
 
 void AddCommentTextEdit::setItalicPressed()
 {
-    emit setBySpecialSigns("_");
+    emit setBySpecialSigns(specialCommentUnderscore);
 }
 
 void AddCommentTextEdit::setSpecialSelect(QString sighns)//sights - symbols which we add to the start and to the end ("**", "_")
