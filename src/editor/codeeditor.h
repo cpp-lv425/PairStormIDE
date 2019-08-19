@@ -126,6 +126,7 @@ private:
     AddCommentButton *mAddCommentButton;
     CommentWidget *mCommentWidget;
     QLabel *mCurrentCommentLable;
+    QCompleter *mCompleter;
 
     int mLinesCountPrev;
     int mLinesCountCurrent;

@@ -22,6 +22,10 @@ public:
 
     int getMinCompletionPrefixLength() const;
     void setMinCompletionPrefixLength(int minCompletionPrefixLength);
+public slots:
+    void replaceCurrentWord(QString text);
+signals:
+    void kek(QString);
 
 private:
     int mMinCompletionPrefixLength = 1;

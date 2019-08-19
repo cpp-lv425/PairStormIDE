@@ -58,7 +58,6 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     connect(this,                         &QPlainTextEdit::cursorPositionChanged,      this, &CodeEditor::runLexer);
     connect(this,                         &QPlainTextEdit::cursorPositionChanged,      this, &CodeEditor::highlighText);
 
-
     mTimer->start(CHANGE_SAVE_TIME);//save text by this time
     mLinesCountCurrent = 1;
     mLinesCountPrev = 1;
@@ -80,9 +79,9 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     //completer
     QStringList keywords;
     keywords <<"SELECT" <<"FROM" <<"WHERE";
-    QCompleter *completer = new AutoCodeCompleter(keywords, this);
-    completer->setCaseSensitivity(Qt::CaseInsensitive);
-    completer->setWidget(this);
+    mCompleter = new AutoCodeCompleter(keywords, this);
+    mCompleter->setCaseSensitivity(Qt::CaseInsensitive);
+    mCompleter->setWidget(this);
     qDebug()<<"inside list:";
     for(auto &i:keywords)
     {
