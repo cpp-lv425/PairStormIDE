@@ -91,7 +91,6 @@ inline void LexerCPP::addLexem()
     mState = State::ST;
 }
 
-
 inline void LexerCPP::changeState(State state, QChar sym)
 {
     mState = state;
@@ -271,14 +270,15 @@ void LexerCPP::handleLiteralState(const QChar &sym)
     }
 }
 
-void LexerCPP::lexicalAnalysis(QTextDocument* code)
+void LexerCPP::lexicalAnalysis(QTextDocument* code, int begin, int end)
 {
-    mCodeSize = code->characterCount();
+    mCodeSize = code->toPlainText().size();
     mCurrentLine = 0;
     mIndex = 0;
-    QChar sym = 0;
+    QChar sym = 0;   
+    qDebug() << begin << ' ' << end;
 
-    while(mIndex < mCodeSize)
+    while(mIndex < mCodeSize && mCurrentLine <= end)
     {
         sym = code->characterAt(mIndex);
         ++mIndex;

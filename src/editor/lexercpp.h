@@ -7,8 +7,9 @@
 #include "keywords.h"
 #include "spaces.h"
 #include "operators.h"
-#include "QVector"
+#include <QVector>
 #include <QMap>
+#include <QTextBlock>
 
 class LexerCPP: public iLexer
 {
@@ -45,7 +46,7 @@ private:
 public:
     LexerCPP() = default;
     ~LexerCPP() override = default;
-    void lexicalAnalysis(QTextDocument*) override;
+    void lexicalAnalysis(QTextDocument*, int begin = -1, int end = -1) override;
     QMap<int, QVector<Token>> getTokens() const;
     void clear();
 };

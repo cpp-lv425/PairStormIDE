@@ -16,7 +16,7 @@ protected:
 public:
     iLexer() = default;
     virtual ~iLexer() = default;
-    virtual void lexicalAnalysis(QTextDocument*) = 0;
+    virtual void lexicalAnalysis(QTextDocument*, int begin = -1, int end = -1) = 0;
 };
 
 #endif // ILEXER_H

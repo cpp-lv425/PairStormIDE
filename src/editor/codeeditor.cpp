@@ -30,6 +30,8 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     mLineNumberArea = new LineNumberArea(this);
     mTimer = new QTimer;
     mLcpp = new LexerCPP();
+    mLcpp->lexicalAnalysis(document());
+    mTokens = mLcpp->getTokens();
     mTimer = new QTimer;
     mChangeManager = new ChangeManager(this->toPlainText().toUtf8().constData());
     //comment button
@@ -47,7 +49,8 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     connect(this,   SIGNAL(cursorPositionChanged()),  this, SLOT(runLexer()));
     connect(mTimer, SIGNAL(timeout()),                this, SLOT(saveStateInTheHistory()));
     connect(this,   SIGNAL(cursorPositionChanged()),  this, SLOT(highlighText()));
-    connect(this,   SIGNAL(cursorPositionChanged()),            this, SLOT(textChangedInTheOneLine()));
+    connect(this,   SIGNAL(textChanged()),            this, SLOT(textChangedInTheOneLine()));
+    connect(this, SIGNAL(textChangedInLine(int)), this, SLOT(handleLineChange(int)));
 
     mTimer->start(CHANGE_SAVE_TIME);//save text by this time
 
@@ -75,19 +78,23 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     fmtRegular.setForeground(mConfigParam.mCodeTextColor);
 }
 
+void CodeEditor::handleLineChange(int line)
+{
+    mLcpp->lexicalAnalysis(document(), line);
+    mTokens = mLcpp->getTokens();
+//    for(int i = 0; i < mTokens.size(); ++i)
+//    {
+//        qDebug() << i;
+//        for(int j = 0; j < mTokens[i].size(); ++j)
+//        {
+//            qDebug() << mTokens[i][j].mName << ' ' << mTokens[i][j].mBegin << ' ' << mTokens[i][j].mEnd;
+//        }
+//    }
+}
+
 void CodeEditor::runLexer()
 {
-    mLcpp->clear();
-    mLcpp->lexicalAnalysis(document());
-    mTokens = mLcpp->getTokens();
-    for(int i = 0; i < mTokens.size(); ++i)
-    {
-        qDebug() << i;
-        for(int j = 0; j < mTokens[i].size(); ++j)
-        {
-            qDebug() << mTokens[i][j].mName << ' ' << mTokens[i][j].mBegin << ' ' << mTokens[i][j].mEnd;
-        }
-    }
+    int i = 0;
 }
 
 int CodeEditor::getLineNumberAreaWidth()
@@ -220,7 +227,7 @@ void CodeEditor::setZoom(int zoomVal)
 
 void CodeEditor::textChangedInTheOneLine()
 {
-    emit(textChangedInLine(this->textCursor().blockNumber() + 1));
+    emit(textChangedInLine(this->textCursor().blockNumber()));
 }
 
 void CodeEditor::mouseMoveEvent(QMouseEvent *event)
