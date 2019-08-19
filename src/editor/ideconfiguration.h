@@ -2,7 +2,7 @@
 #define IDECONFIGURATION_H
 #include<QString>
 #include<QColor>
-
+#include<QDebug>
 struct ConfigParams
 {
     QColor mCodeTextColor;
@@ -19,26 +19,24 @@ struct ConfigParams
 
     void setConfigParams(QString textStyle, QString fontSize, QString ideType)
     {
-        mTextStyle = textStyle;
-        mFontSize  = fontSize.toInt();
-        mBasicLiteralsColor =   QColor("#5377DB");// blue
-        mUserTypesColor =       QColor("#46C976");//light green
-        mDefineTypesColor =     QColor("#CA55E8");//purpule
-        mCommentColor =         QColor("#a0bf55");//green
-        mLineCounterAreaColor = QColor("#B5A8A8");//gray
-        mStringsColor =         QColor("#CD9D2C");//orange
+       mTextStyle = textStyle;
+       mFontSize  = fontSize.toInt();
+       mBasicLiteralsColor =   QColor("#0080FF");// blue
+       mUserTypesColor =       QColor("#46C976");//light green
+       mDefineTypesColor =     QColor("#CA55E8");//purpule
+       mCommentColor =         QColor("#009900");//green
+       mStringsColor =         QColor("#CD9D2C");//orange
 
-        if(ideType == "WHITE" || ideType == "BLUE")
-        {
-            mCodeTextColor =    QColor("#000000");//black
-            mCurrentLineColor = QColor("#EBDFE8");//very light gray
-        }
-
-        else//dark
-        {
-            mCodeTextColor =    QColor("#FAF8F2");//almost white
-            mCurrentLineColor = QColor("#8010FF");// almost black
-        }
+       if (ideType == "WHITE" || ideType == "BLUE")
+       {
+           mCodeTextColor =    QColor("#000000");//black
+           mLineCounterAreaColor = QColor("#B5A8A8");//gray
+       }
+       else//dark
+       {
+           mCodeTextColor =    QColor("#FAF8F2");//almost white
+           mLineCounterAreaColor = QColor("#404040");//gray
+       }
     }
 };
 #endif // IDECONFIGURATION_H

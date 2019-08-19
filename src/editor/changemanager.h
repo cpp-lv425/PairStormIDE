@@ -23,26 +23,17 @@ public:
     std::deque<IntegralChange>::iterator mCurrentFileStateIter;
 
     void limitCheck();
-
     void removeHistory();
-
     bool isFileChanged(const std::string &newFileState);
-
     int getCursorPosPrev();
-
     int getCursorPosNext();
 
 public:
     ChangeManager();
-
     ChangeManager(const std::string &fileState);
-
     ~ChangeManager();
-
     void writeChange(std::string newFileState);
-
     std::string undo();
-
     std::string redo();
 };
 
