@@ -78,7 +78,7 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
 
     //completer
     QStringList keywords;
-    keywords <<"SELECT" <<"FROM" <<"WHERE";
+    keywords <<"SELECT" <<"FROM" <<"WHERE"<<"WHEN";
     mCompleter = new AutoCodeCompleter(keywords, this);
     mCompleter->setCaseSensitivity(Qt::CaseInsensitive);
     mCompleter->setWidget(this);
