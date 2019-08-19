@@ -81,6 +81,7 @@ private slots:
     void onShowProjectViewerTriggered();
     void onShowChatWindowDockTriggered();
     void onShowBottomPanel();
+    void onCombineAreas();
     void onCloseEmptyDocArea();
     void onCloseCurrentDocArea();
 

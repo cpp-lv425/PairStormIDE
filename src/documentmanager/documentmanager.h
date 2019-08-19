@@ -30,6 +30,7 @@ public:
     CodeEditor* getCurrentDocument();
     void closeCurrentDocument();
     QVector<CodeEditor*> getChangedDocuments();
+    void combineDocAreas();
     void closeEmptyDocArea();
     void closeCurrentDocArea();
 
@@ -43,6 +44,7 @@ private:
     void loadFile(CodeEditor *newView, const QString &fileName);
 
     QMdiArea* createMdiArea();
+    CodeEditor* createDoc(const QString &fileName);
     QMdiArea* selectAreaForPlacement();
     QMdiSubWindow* openedDoc(const QString &fileName);
     QMdiArea* lastAreaInFocus();
