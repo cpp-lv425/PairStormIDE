@@ -5,6 +5,8 @@
 
 class QListWidgetItem;
 class QPlainTextEdit;
+class QQuickWidget;
+class QQmlContext;
 class QListWidget;
 class QLineEdit;
 
@@ -20,10 +22,16 @@ class ChatWidget: public QWidget
     QPlainTextEdit *mpFeed;
     QLineEdit      *mpEnterLine;
 
+
+
+    QQuickWidget * mChatQuickWidget;
+    QQmlContext * mChatContext;
+
     void updateUsersList();
 
 public:
     explicit ChatWidget(QWidget *pParent = nullptr);
+
     void setOnlineUsers(const QStringList & onlineUsers);
     void setConnectedUsers(const QStringList & connectedUsers);
 

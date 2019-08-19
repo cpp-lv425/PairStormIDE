@@ -4,13 +4,55 @@
 #include <QPushButton>
 #include <QListWidget>
 #include <QBoxLayout>
+#include <QQuickView>
+#include <QQuickWidget>
 #include <QLineEdit>
 #include <QLabel>
+
+#include <QHBoxLayout>
+#include <QQmlComponent>
+#include <QQmlContext>
+#include <QQmlEngine>
+#include <QQuickView>
+#include <QDockWidget>
+#include <QQuickStyle>
 
 ChatWidget::ChatWidget(QWidget *pParent):
     QWidget (pParent),
     mUserName("Unnamed")
-{    
+{
+    QBoxLayout *box = new QBoxLayout(QBoxLayout::BottomToTop, this);
+    box->setSpacing(0);
+    box->setMargin(0);
+
+    QQuickWindow::setSceneGraphBackend(QSGRendererInterface::Software);
+
+    QQuickView * view = new QQuickView();
+    view->setResizeMode(QQuickView::SizeRootObjectToView);
+    view->setSource(QUrl("qrc:/chat.qml"));
+    mChatContext = view->engine()->rootContext();
+    //mChatContext->setContextProperty(QStringLiteral("something"), &something)
+
+    QWidget *container = QWidget::createWindowContainer(view, this);
+    container->setContextMenuPolicy(Qt::NoContextMenu);
+    container->setContentsMargins(0, 0, 0, 0);
+
+    container->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    container->setFocusPolicy(Qt::StrongFocus);
+
+
+    setWindowIcon(QIcon(":/chatelements/res/CONNECTED.png"));
+    setWindowTitle(QString("QML chat"));
+    setEnabled(false);
+    setMinimumSize(200, 200);
+    setMaximumSize(800, 800);
+
+    setGeometry(100, 100, 800, 800);
+
+    box->addWidget(container);
+    setLayout(box);
+
+    /*
     // creating user list
     mpUsersList = new QListWidget;
     connect(mpUsersList, &QListWidget::itemDoubleClicked,
@@ -46,6 +88,7 @@ ChatWidget::ChatWidget(QWidget *pParent):
 
     // Set empty users list
     updateUsersList();
+    */
 }
 
 void ChatWidget::updateUsersList()
