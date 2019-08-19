@@ -9,6 +9,7 @@
 #include<QMessageBox>
 #include<iostream>
 #include<QLabel>
+#include <QDebug>
 #include "eventbuilder.h"
 
 CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
@@ -77,8 +78,16 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
 void CodeEditor::runLexer()
 {
     mLcpp->clear();
-    mLcpp->lexicalAnalysis(document()->toPlainText());
+    mLcpp->lexicalAnalysis(document());
     mTokens = mLcpp->getTokens();
+    for(int i = 0; i < mTokens.size(); ++i)
+    {
+        qDebug() << i;
+        for(int j = 0; j < mTokens[i].size(); ++j)
+        {
+            qDebug() << mTokens[i][j].mName << ' ' << mTokens[i][j].mBegin << ' ' << mTokens[i][j].mEnd;
+        }
+    }
 }
 
 int CodeEditor::getLineNumberAreaWidth()
@@ -301,28 +310,29 @@ void formating(QTextCharFormat fmt, QTextCursor cursor,  Token token)
 
 void CodeEditor::highlighText()
 {
-    QTextCursor cursor = textCursor();
-    for(const auto &i: mTokens)
-    {
-        switch(i.mType)
-        {
-        case(State::KW):
-            formating(fmtKeyword, cursor, i);
-            break;
-        case(State::LIT):
-            formating(fmtLiteral, cursor, i);
-            break;
-        case(State::COM):
-            formating(fmtComment, cursor, i);
-            break;
-        case(State::UNDEF):
-            formating(fmtUndefined, cursor, i);
-            break;
-        default:
-            formating(fmtRegular, cursor, i);
-            break;
-        }
-    }
+    int i;
+//    QTextCursor cursor = textCursor();
+//    for(const auto &i: mTokens)
+//    {
+//        switch(i.mType)
+//        {
+//        case(State::KW):
+//            formating(fmtKeyword, cursor, i);
+//            break;
+//        case(State::LIT):
+//            formating(fmtLiteral, cursor, i);
+//            break;
+//        case(State::COM):
+//            formating(fmtComment, cursor, i);
+//            break;
+//        case(State::UNDEF):
+//            formating(fmtUndefined, cursor, i);
+//            break;
+//        default:
+//            formating(fmtRegular, cursor, i);
+//            break;
+//        }
+//    }
 }
 
 void CodeEditor::keyPressEvent(QKeyEvent *e)

@@ -92,7 +92,7 @@ private:
 
 protected:
     int mCurrentZoom;
-    QVector<Token> mTokens;
+    QMap<int, QVector<Token>> mTokens;
     friend class Event;
 };
 
