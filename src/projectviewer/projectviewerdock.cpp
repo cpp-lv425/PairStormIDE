@@ -11,25 +11,21 @@
 #include "projecttreeview.h"
 #include "mainwindow.h"
 
-ProjectViewerDock::ProjectViewerDock(QWidget *pParent): QDockWidget(pParent)
+ProjectViewerDock::ProjectViewerDock(QStringList filters,
+                                     QWidget *pParent):
+    QDockWidget(pParent)
 {
     setWindowTitle("Project Viewer");
 
-    auto pMainWindow = qobject_cast<MainWindow*>(pParent);
-
-    if (!pMainWindow)
-    {
-        return;
-    }
-
     // constructing filters
-    QStringList filters = pMainWindow->getFileExtensions();
-    for (auto& item: filters)
+    for (auto &item: filters)
     {
         item.push_front('*');
     }
 
+    // creating an instance of model
     mpViewerModel = new ProjectViewerModel(this);
+    // creating an instance of view
     mpTreeViewer = new ProjectTreeView(mpViewerModel,this);
     mpTreeViewer->setCurrentIndex(mpViewerModel->index(0,0));
 
@@ -38,9 +34,9 @@ ProjectViewerDock::ProjectViewerDock(QWidget *pParent): QDockWidget(pParent)
 
     setWidget(mpTreeViewer);    
 
+    mpTreeViewer->setMinimumWidth(pParent->width() / 3);
     connect(mpTreeViewer, &ProjectTreeView::codeFileSelected,
-            pMainWindow, &MainWindow::onOpenFileFromProjectViewer);
-    setMinimumWidth(150);
+            this, &ProjectViewerDock::onOpenFileFromProjectViewer);    
 }
 
 void ProjectViewerDock::setFilters(QStringList filters)
@@ -51,4 +47,9 @@ void ProjectViewerDock::setFilters(QStringList filters)
 void ProjectViewerDock::setDir(QDir curDir)
 {
     mpTreeViewer->setDirectory(curDir);
+}
+
+void ProjectViewerDock::onOpenFileFromProjectViewer(QString fileName)
+{
+    emit openFileFromProjectViewer(fileName);
 }
