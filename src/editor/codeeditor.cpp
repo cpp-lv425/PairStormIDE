@@ -250,7 +250,14 @@ void CodeEditor::saveStateInTheHistory()
 
 void CodeEditor::zoom(int val)
 {
-    val > 0 ?this->zoomIn(val):this->zoomOut(-val);
+    if (val > 0)
+    {
+        this->zoomIn(val);
+    }
+    else
+    {
+        this->zoomOut(-val);
+    }
     mCurrentZoom+=val;
 }
 
