@@ -121,9 +121,9 @@ void TabCpp::onCompilerListDoubleClicked(QListWidgetItem *item)
                                          , item->text());
 
     if (!text.size())           //  user removed item from list
-    {
-        mpCompilersList->takeItem(mpCompilersList->row(item)); // remove item from widget
-        for (int i = 0; i < mCompilersList.size(); ++i)        // remove item from list
+    {                                                           // remove item from widget
+        mpCompilersList->removeItemWidget(mpCompilersList->takeItem(mpCompilersList->row(item)));
+        for (int i = 0; i < mCompilersList.size(); ++i)         // remove item from list
         {
             if (mCompilersList.at(i) == initialText)
             {

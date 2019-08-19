@@ -11,15 +11,15 @@
 #ifndef MENUOPTIONS_H
 #define MENUOPTIONS_H
 
-#include "tabenvironment.h"
-#include "tabtexteditor.h"
-#include "tabconnection.h"
-#include "tabcpp.h"
-#include "tabrepository.h"
-
 #include <QDialog>
 
 QT_BEGIN_NAMESPACE
+class TabEnvironment;
+class TabTextEditor;
+class TabConnection;
+class TabCpp;
+class TabRepository;
+
 class QDialog;
 class QTabWidget;
 class QDialogButtonBox;
@@ -35,11 +35,11 @@ public:
 private:
     QTabWidget *mpTabWidget;
 
-    TabEnvironment * mpTabEnvironment;
-    TabTextEditor * mpTabTextEditor;
-    TabCpp * mpTabCpp;
-    TabRepository * mpTabRepository;
-    TabConnection * mpTabConnection;
+    TabEnvironment *mpTabEnvironment;
+    TabTextEditor *mpTabTextEditor;
+    TabCpp *mpTabCpp;
+    TabRepository *mpTabRepository;
+    TabConnection *mpTabConnection;
 
     QDialogButtonBox *mpButtonBox;
 

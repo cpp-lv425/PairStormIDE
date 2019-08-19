@@ -38,8 +38,7 @@ TabEnvironment::TabEnvironment(QWidget *parent)
     mpComboEditorStyle->setCurrentIndex(0);
     for(int i = 0; i < mEditorStylesList.size(); ++i)
     {
-        auto &item = mEditorStylesList[i];
-        if (item == mStyleCurrernt)
+        if (mEditorStylesList[i] == mStyleCurrernt)
         {
             mpComboEditorStyle->setCurrentIndex(i);
             break;

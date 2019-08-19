@@ -1,5 +1,11 @@
 #include "menuoptions.h"
 
+#include "tabenvironment.h"
+#include "tabtexteditor.h"
+#include "tabconnection.h"
+#include "tabcpp.h"
+#include "tabrepository.h"
+
 #include <QDialogButtonBox>
 #include <QAbstractButton>
 #include <QVBoxLayout>
