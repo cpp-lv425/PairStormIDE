@@ -23,6 +23,9 @@ const int TOP_UNUSED_PIXELS_HEIGHT = 4;
 #include<QVector>
 #include<QFont>
 #include<QStatusBar>
+#include<QStringList>
+#include<QCompleter>
+#include"autocodecompleter.h"
 
 
 
@@ -141,6 +144,7 @@ private:
 protected:
     int mCurrentZoom;
     QVector<Token> mTokens;
+
  friend class Event;
 };
 

@@ -4,6 +4,7 @@ INCLUDEPATH += $$PWD
 SOURCES += \
         $$PWD/addcommentbutton.cpp \
         $$PWD/addcommenttextedit.cpp \
+        $$PWD/autocodecompleter.cpp \
         $$PWD/changesmanager.cpp \
         $$PWD/codeeditor.cpp \
         $$PWD/commentwidget.cpp \
@@ -19,6 +20,7 @@ SOURCES += \
 HEADERS += \
         $$PWD/addcommentbutton.h \
         $$PWD/addcommenttextedit.h \
+        $$PWD/autocodecompleter.h \
         $$PWD/changemanager.h \
         $$PWD/codeeditor.h \
         $$PWD/commentwidget.h \

@@ -55,6 +55,8 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     connect(mCommentWidget->getEditTab(), &AddCommentTextEdit::notEmptyCommentWasSent, this, &CodeEditor::notEmptyCommentWasAdded);
     connect(mCommentWidget->getEditTab(), &AddCommentTextEdit::commentWasDeleted,      this, &CodeEditor::deleteComment);
     connect(this,                         &CodeEditor::linesCountUpdated,              this, &CodeEditor::changeCommentButtonsState);
+    connect(this,                         &QPlainTextEdit::cursorPositionChanged,      this, &CodeEditor::runLexer);
+    connect(this,                         &QPlainTextEdit::cursorPositionChanged,      this, &CodeEditor::highlighText);
 
 
     mTimer->start(CHANGE_SAVE_TIME);//save text by this time
@@ -74,6 +76,18 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
 
     //set text highlighting color
     setTextColors();
+
+    //completer
+    QStringList keywords;
+    keywords <<"SELECT" <<"FROM" <<"WHERE";
+    QCompleter *completer = new AutoCodeCompleter(keywords, this);
+    completer->setCaseSensitivity(Qt::CaseInsensitive);
+    completer->setWidget(this);
+    qDebug()<<"inside list:";
+    for(auto &i:keywords)
+    {
+        qDebug()<<i;
+    }
 }
 
 void CodeEditor::setTextColors()
@@ -308,6 +322,22 @@ void CodeEditor::showCommentTextEdit(int line)
     {
         mCommentWidget->getEditTab()->setText("");
     }
+    //for text tokens
+//    qDebug()<<"tokens vector size = "<<mTokens.size();
+//    for (auto &i: mTokens)
+//    {
+//        if (i.mType == State::ID)
+//        {
+//            mLexer.getIdentificatorsList()
+//            qDebug()<<i.mName;
+//        }
+//    }
+    //
+    /*qDebug()<<"vector size = "<<mLexer.getIdentificatorsList().size();
+    for (auto &i: mLexer.getIdentificatorsList())
+    {
+        qDebug()<<i;
+    }*/
 }
 
 void CodeEditor::emptyCommentWasAdded()
