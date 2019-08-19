@@ -9,6 +9,7 @@ SOURCES += \
         $$PWD/commentwidget.cpp \
         $$PWD/event.cpp \
         $$PWD/eventbuilder.cpp \
+        $$PWD/ideconficuration.cpp \
         $$PWD/keypressevents.cpp \
         $$PWD/lexercpp.cpp \
         $$PWD/linenumberarea.cpp \

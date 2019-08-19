@@ -60,6 +60,10 @@ public:
 
     LastRemoveKey getLastRemomeKey() const;
     void setLastRemomeKey(const LastRemoveKey &value);
+
+    ConfigParams getConfigParam();
+    void setConfigParam(const ConfigParams &configParam);
+
 private:
     void rewriteButtonsLines( QVector<AddCommentButton*> &commentV, int diff, int startLine);
     void setAnotherButtonLine(AddCommentButton *comment, int diff);
@@ -84,7 +88,6 @@ private slots:
     void updateLineNumberArea(const QRect &rect, int dy);
     void runLexer();
     void highlighText();
-    //void showCommentLine(int line);
     void deleteComment();
 
 public slots:
@@ -96,6 +99,9 @@ public slots:
     void emptyCommentWasAdded();
     void notEmptyCommentWasAdded();
     void changeCommentButtonsState();
+    void setTextColors();
+    void setFontSize();
+    void setFontStyle();
 
 signals:
     void changesAppeared();
@@ -104,7 +110,6 @@ signals:
     void textChangedInLine(int);
     void textChangedInLines(int, int);
     void linesCountUpdated();
-
 
 private:
     QWidget *mLineNumberArea;
@@ -129,6 +134,7 @@ private:
     QTextCharFormat fmtComment;
     QTextCharFormat fmtKeyword;
     QTextCharFormat fmtRegular;
+
 
     LastRemoveKey lastRemomeKey;
 

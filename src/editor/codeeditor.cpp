@@ -47,14 +47,14 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     //If the text is scrolled, rect will cover the entire viewport area.
     //If the text is scrolled vertically, dy carries the amount of pixels the viewport was scrolled.
 
-    connect(this,                         &QPlainTextEdit::updateRequest,                  this, &CodeEditor::updateLineNumberArea);
-    connect(mTimer,                       &QTimer::timeout,                                this, &CodeEditor::saveStateInTheHistory);
-    connect(this,                         &QPlainTextEdit::cursorPositionChanged,          this, &CodeEditor::textChangedInTheOneLine);
-    connect(mAddCommentButton,            &AddCommentButton::addCommentButtonPressed,      this, &CodeEditor::showCommentTextEdit);
-    connect(mCommentWidget->getEditTab(), &AddCommentTextEdit::emptyCommentWasSent,        this, &CodeEditor::emptyCommentWasAdded);
-    connect(mCommentWidget->getEditTab(), &AddCommentTextEdit::notEmptyCommentWasSent,     this, &CodeEditor::notEmptyCommentWasAdded);
-    connect(mCommentWidget->getEditTab(), &AddCommentTextEdit::commentWasDeleted,          this, &CodeEditor::deleteComment);
-    connect(this,                         &CodeEditor::linesCountUpdated,                  this, &CodeEditor::changeCommentButtonsState);
+    connect(this,                         &QPlainTextEdit::updateRequest,              this, &CodeEditor::updateLineNumberArea);
+    connect(mTimer,                       &QTimer::timeout,                            this, &CodeEditor::saveStateInTheHistory);
+    connect(this,                         &QPlainTextEdit::cursorPositionChanged,      this, &CodeEditor::textChangedInTheOneLine);
+    connect(mAddCommentButton,            &AddCommentButton::addCommentButtonPressed,  this, &CodeEditor::showCommentTextEdit);
+    connect(mCommentWidget->getEditTab(), &AddCommentTextEdit::emptyCommentWasSent,    this, &CodeEditor::emptyCommentWasAdded);
+    connect(mCommentWidget->getEditTab(), &AddCommentTextEdit::notEmptyCommentWasSent, this, &CodeEditor::notEmptyCommentWasAdded);
+    connect(mCommentWidget->getEditTab(), &AddCommentTextEdit::commentWasDeleted,      this, &CodeEditor::deleteComment);
+    connect(this,                         &CodeEditor::linesCountUpdated,              this, &CodeEditor::changeCommentButtonsState);
 
 
     mTimer->start(CHANGE_SAVE_TIME);//save text by this time
@@ -67,16 +67,41 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
 
     //fonts and colors configurations
     mFont.setPointSize(mConfigParam.mFontSize);
-    mFont.setFamily(mConfigParam.mTextStyle);
+    mFont.setFamily(mConfigParam.mFontStyle);
     mFont.setBold(false);
     mFont.setItalic(false);
     this->setFont(mFont);
 
     //set text highlighting color
-    fmtLiteral.setForeground(mConfigParam.mStringsColor);
-    fmtKeyword.setForeground(mConfigParam.mBasicLiteralsColor);
-    fmtComment.setForeground(mConfigParam.mCommentColor);
-    fmtRegular.setForeground(mConfigParam.mCodeTextColor);
+    setTextColors();
+}
+
+void CodeEditor::setTextColors()
+{
+    fmtLiteral.setForeground(mConfigParam.textColors.mStringsColor);
+    fmtKeyword.setForeground(mConfigParam.textColors.mBasicLiteralsColor);
+    fmtComment.setForeground(mConfigParam.textColors.mCommentColor);
+    fmtRegular.setForeground(mConfigParam.textColors.mCodeTextColor);
+}
+
+void CodeEditor::setFontSize()
+{
+    mFont.setPointSize(mConfigParam.mFontSize);
+}
+
+void CodeEditor::setFontStyle()
+{
+    mFont.setFamily(mConfigParam.mFontStyle);
+}
+
+ConfigParams CodeEditor::getConfigParam()
+{
+    return mConfigParam;
+}
+
+void CodeEditor::setConfigParam(const ConfigParams &configParam)
+{
+    mConfigParam = configParam;
 }
 
 void CodeEditor::runLexer()
@@ -175,7 +200,7 @@ void CodeEditor::resizeEvent(QResizeEvent *e)
 void CodeEditor::specialAreasRepaintEvent(QPaintEvent *event)
 {
     QPainter painter(mLineNumberArea);
-    painter.fillRect(event->rect(), mConfigParam.mLineCounterAreaColor);
+    painter.fillRect(event->rect(), mConfigParam.textColors.mLineCounterAreaColor);
 
     QTextBlock block = firstVisibleBlock();//area of first numeration block from linecounter
     int blockNumber = block.blockNumber();//get line number (start from 0)
@@ -185,7 +210,7 @@ void CodeEditor::specialAreasRepaintEvent(QPaintEvent *event)
     while (block.isValid())//we have blocks (have lines numbers)
     {
         QString number = QString::number(blockNumber + 1);
-        painter.setPen(mConfigParam.mCodeTextColor);
+        painter.setPen(mConfigParam.textColors.mCodeTextColor);
         painter.drawText(0, top, mLineNumberArea->width(), fontMetrics().height(),//draw line count
                          Qt::AlignCenter, number);
         block = block.next();
