@@ -14,12 +14,12 @@ class PaletteConfigurator;
 class ProjectViewerDock;
 class QFileSystemModel;
 class BottomPanelDock;
+class DocumentManager;
 class QListWidgetItem;
 class ChatWindowDock;
 class QMdiSubWindow;
 class CodeEditor;
 class Browser;
-class MDIArea;
 QT_END_NAMESPACE
 
 class MainWindow : public QMainWindow
@@ -38,21 +38,16 @@ private:
     ProjectViewerDock *mpProjectViewerDock;
     ChatWindowDock *mpChatWindowDock;
     BottomPanelDock *mpBottomPanelDock;
-    MDIArea *mpDocsArea;
+    QScopedPointer<DocumentManager> mpDocumentManager;
     QString mCurrentUserName;
     Browser *mDocumentationBrowser;
     QScopedPointer<PaletteConfigurator> mpPaletteConfigurator;
 
-    void setupMainMenu();
-    void saveDocument(CodeEditor *pDoc, const QString &fileName);
+    void setupMainMenu();    
     void openDoc(QString fileName);
-    bool isOpened(const QString &fileName)const;
-    bool isModified(QList<QMdiSubWindow*> &docsList);
-    void saveAllModifiedDocuments(QList<QMdiSubWindow*> &docsList);
     void createProjectViewer();
     void createChatWindow();
     void createButtomPanel();
-    CodeEditor* getCurrentDoc();
 
     void saveMainWindowState();
     void restoreMainWindowState();
@@ -81,9 +76,14 @@ private slots:
 
     // view menu
     void onFullScreenTriggered();
+    void onSplitHorizontallyTriggered();
+    void onSplitVerticallyTriggered();
     void onShowProjectViewerTriggered();
     void onShowChatWindowDockTriggered();
     void onShowBottomPanel();
+    void onCombineAreas();
+    void onCloseEmptyDocArea();
+    void onCloseCurrentDocArea();
 
     // tools menu
     void onRefactorTriggered();
@@ -99,13 +99,8 @@ private slots:
     void onReferenceFromEditor(const QString &keyword);
 
 public slots:
-    void onOpenFileFromProjectViewer(QString fileName);    
-    void onCloseWindow(CodeEditor *curDoc);   
+    void onOpenFileFromProjectViewer(QString fileName);
     void onConnectionStatusChanged(bool status);
-
-private:
-    // creates new doc in MDIArea
-    CodeEditor* createNewDoc();
 
 protected:
     void closeEvent(QCloseEvent *event);
