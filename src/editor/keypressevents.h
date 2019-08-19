@@ -132,6 +132,21 @@ class  EventSaveChangeInHistory : public Event
 public:
     void operator()(CodeEditor *codeEditor, QKeyEvent *e) override;
     ~EventSaveChangeInHistory() override;
-
 };
+
+//EventCtrlV
+class  EventCtrlV : public Event
+{
+public:
+    void operator()(CodeEditor *codeEditor, QKeyEvent *e) override;
+    ~EventCtrlV() override;
+};
+
+class EventRemoveKey: public Event
+{
+public:
+    void operator()(CodeEditor *codeEditor, QKeyEvent *e) override;
+    ~EventRemoveKey() override;
+};
+
 #endif // CODEEDITOREVENTS_H

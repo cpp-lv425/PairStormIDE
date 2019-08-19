@@ -1,13 +1,8 @@
 #ifndef ADDCOMMENTBUTTON_H
 #define ADDCOMMENTBUTTON_H
 
-#include<QObject>
-#include<QPushButton>
-#include<QWidget>
-#include<QMouseEvent>
-#include<QTextBlock>
-#include<QPlainTextEdit>
-#include <QtCore/QObject>
+#include <QObject>
+#include <QPushButton>
 
 class AddCommentButton: public QPushButton
 {
@@ -19,6 +14,9 @@ public:
     void setCurrentLine(int currentLine);
     int getCurrentLine();
 
+    QString getCommentString() const;
+    void setCommentString(const QString &value);
+
 signals:
     void addCommentButtonPressed(int);
 
@@ -27,6 +25,7 @@ protected:
 
 private:
     int mCurrentLine;
+    QString mCommentString;
 };
 
 #endif // ADDCOMMENTBUTTON_H
