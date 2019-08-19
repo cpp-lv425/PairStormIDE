@@ -13,11 +13,11 @@ Accessor::~Accessor()
 
 void Accessor::setQuery(QSqlDatabase db)
 {
-    guery = QSqlQuery(db);
+    query = QSqlQuery(db);
 }
 
 void Accessor::execQuery(QString queryStr)
 {
-    guery.prepare(queryStr);
-    guery.exec();
+    query.prepare(queryStr);
+    query.exec();
 }

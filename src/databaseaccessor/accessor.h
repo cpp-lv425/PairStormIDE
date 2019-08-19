@@ -11,7 +11,7 @@ protected:
     void setQuery(QSqlDatabase db);
     void execQuery(QString query);
 private:
-    QSqlQuery guery;
+    QSqlQuery query;
     Connection* database;
 };
 
