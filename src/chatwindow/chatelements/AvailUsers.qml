@@ -7,6 +7,7 @@ import QtGraphicalEffects 1.12
 import "scripts/ChatBase.js" as ChatBase
 import "basicelements" as BasicElements
 
+import AvailableUsers 1.0
 
 
 Item {
@@ -41,7 +42,8 @@ Item {
     DelegateModel {
         id: availableUsersModel
 
-        model: ListModel {
+        model: AvailableUsersModel {}
+        /*ListModel {
             //@disable-check M16
             ListElement { name: "Vasia nickname and something"; connected: true; }
             //@disable-check M16
@@ -54,7 +56,7 @@ Item {
             ListElement { name: "Dima nickname"; online: true; connected: false; }
             //@disable-check M16
             ListElement { name: "Roman nickname"; online: true; connected: false; }
-        }
+        }*/
 
         delegate: Component {
             Rectangle {
@@ -96,6 +98,8 @@ Item {
                         text: qsTr(model.name)
                         font.pixelSize: userElement.height / (ChatBase.golden_ratio)
                         font.family: "consolas"
+
+                        color: "lightgrey"
 
                         clip: true
                         Layout.preferredWidth: 50

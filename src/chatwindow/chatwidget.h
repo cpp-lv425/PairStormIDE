@@ -3,6 +3,7 @@
 
 #include <QWidget>
 
+class OnlineUsersList;
 class QListWidgetItem;
 class QPlainTextEdit;
 class QQuickWidget;
@@ -25,7 +26,9 @@ class ChatWidget: public QWidget
 
 
     QQuickWidget * mChatQuickWidget;
-    QQmlContext * mChatContext;
+    QQmlContext * mpChatContext;
+
+    OnlineUsersList * mpOnlineUsers;
 
     void updateUsersList();
 

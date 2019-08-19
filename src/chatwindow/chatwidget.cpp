@@ -17,21 +17,28 @@
 #include <QDockWidget>
 #include <QQuickStyle>
 
+#include "onlineuserslist.h"
+#include "availableusersmodel.h"
+
 ChatWidget::ChatWidget(QWidget *pParent):
     QWidget (pParent),
     mUserName("Unnamed")
 {
+    QQuickWindow::setSceneGraphBackend(QSGRendererInterface::Software);
+    qmlRegisterType<AvailableUsersModel>("AvailableUsers", 1, 0, "AvailableUsersModel");
+
+    mpOnlineUsers = new OnlineUsersList();
+
     QBoxLayout *box = new QBoxLayout(QBoxLayout::BottomToTop, this);
     box->setSpacing(0);
     box->setMargin(0);
 
-    QQuickWindow::setSceneGraphBackend(QSGRendererInterface::Software);
 
     QQuickView * view = new QQuickView();
     view->setResizeMode(QQuickView::SizeRootObjectToView);
     view->setSource(QUrl("qrc:/chat.qml"));
-    mChatContext = view->engine()->rootContext();
-    //mChatContext->setContextProperty(QStringLiteral("something"), &something)
+    mpChatContext = view->engine()->rootContext();
+    mpChatContext->setContextProperty(QStringLiteral("AvailableUsersList"), mpOnlineUsers);
 
     QWidget *container = QWidget::createWindowContainer(view, this);
     container->setContextMenuPolicy(Qt::NoContextMenu);
@@ -44,13 +51,12 @@ ChatWidget::ChatWidget(QWidget *pParent):
     setWindowIcon(QIcon(":/chatelements/res/CONNECTED.png"));
     setWindowTitle(QString("QML chat"));
     setEnabled(false);
-    setMinimumSize(200, 200);
-    setMaximumSize(800, 800);
-
-    setGeometry(100, 100, 800, 800);
+    setMinimumSize(210, 400);
 
     box->addWidget(container);
     setLayout(box);
+
+    hide();
 
     /*
     // creating user list
