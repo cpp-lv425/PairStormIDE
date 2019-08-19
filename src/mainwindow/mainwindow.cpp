@@ -11,6 +11,7 @@
 #include <QFile>
 
 #include "localconnectorgenerator.h"
+#include "settingsconfigurator.h"
 #include "paletteconfigurator.h"
 #include "projectviewerdock.h"
 #include "bottompaneldock.h"
@@ -58,7 +59,7 @@ MainWindow::MainWindow(QWidget *parent) :
     setWindowTitle("PairStorm");
 
     // sets style globally
-    setAppStyle();
+    //setAppStyle();
 
     setupMainMenu();
 
@@ -661,6 +662,8 @@ void MainWindow::onConnectTriggered()
 void MainWindow::onSettingsTriggered()
 {
     MenuOptions * menuOptions = new MenuOptions(this);
+    connect(menuOptions, &MenuOptions::valuesChanged,
+            this, &MainWindow::onSettingsChanged);
     Q_UNUSED(menuOptions)
 }
 
@@ -728,6 +731,17 @@ void MainWindow::onConnectionStatusChanged(bool status)
                 (this,
                  userMessages[UserMessages::ConnectionFailureTitle],
                 userMessages[UserMessages::ConnectionFailureMsg]);
+    }
+}
+
+void MainWindow::onSettingsChanged(std::map<QString, QString> newValues)
+{
+    SettingsConfigurator settingsConfigurator;
+
+    for (const auto& newValue: newValues)
+    {
+        auto functor = settingsConfigurator.getSettingsFunctor(newValue.first);
+        functor(this, newValue.second);
     }
 }
 
@@ -806,13 +820,17 @@ void MainWindow::restoreMainWindowState()
         restoreState(settings.value("mainWindowState").toByteArray());
 }
 
-void MainWindow::setAppStyle()
+void MainWindow::setAppStyle(const QString &styleName)
 {
+    qDebug() << "changing style";
     // fusion style is applied globally
     // if platform does not support fusion, default style is applied
     qApp->setStyle(QStyleFactory::create("Fusion"));
+
     // dark style palette is created & set globally
-    QPalette palette = mpPaletteConfigurator->getPalette("DARK");
+    QPalette palette = mpPaletteConfigurator->getPalette(styleName);
     //QPalette newPal = palette();
     qApp->setPalette(palette);
+
+
 }

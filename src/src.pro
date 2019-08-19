@@ -47,6 +47,7 @@ include($$PWD/logindialog/logindialog.pri)
 include($$PWD/splashscreen/splashscreen.pri)
 include($$PWD/utils/utils.pri)
 include($$PWD/paletteconfigurator/paletteconfigurator.pri)
+include($$PWD/settingsconfigurator/settingsconfigurator.pri)
 
 RESOURCES += \
     globalresources.qrc

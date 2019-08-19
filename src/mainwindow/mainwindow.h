@@ -10,6 +10,7 @@ class MainWindow;
 
 QT_BEGIN_NAMESPACE
 class LocalConnectorInterface;
+class SettingsConfigurator;
 class PaletteConfigurator;
 class ProjectViewerDock;
 class QFileSystemModel;
@@ -56,7 +57,7 @@ private:
 
     void saveMainWindowState();
     void restoreMainWindowState();
-    void setAppStyle();
+    void setAppStyle(const QString &style);
 
 private slots:
     // file menu actions
@@ -102,11 +103,13 @@ public slots:
     void onOpenFileFromProjectViewer(QString fileName);    
     void onCloseWindow(CodeEditor *curDoc);   
     void onConnectionStatusChanged(bool status);
+    void onSettingsChanged(std::map<QString, QString> newValues);
 
 private:
     // creates new doc in MDIArea
     CodeEditor* createNewDoc();
 
+    friend class SettingsConfigurator;
 protected:
     void closeEvent(QCloseEvent *event);
 };
