@@ -3,12 +3,15 @@
 
 #include <QAbstractListModel>
 
-class AvailableUsersModel : public QAbstractListModel
+class OnlineUsersList;
+
+class OnlineUsersModel : public QAbstractListModel
 {
     Q_OBJECT
+    Q_PROPERTY(OnlineUsersList * usersList READ getMpOnlineUsersList WRITE setMpOnlineUsersList)
 
 public:
-    explicit AvailableUsersModel(QObject *parent = nullptr);
+    explicit OnlineUsersModel(QObject *parent = nullptr);
 
     enum {
         NameRole = Qt::UserRole,
@@ -28,7 +31,12 @@ public:
 
     virtual QHash<int, QByteArray> roleNames() const override;
 
+    OnlineUsersList *getMpOnlineUsersList() const;
+    void setMpOnlineUsersList(OnlineUsersList *value);
+
 private:
+
+    OnlineUsersList * mpOnlineUsersList;
 };
 
 #endif // AVAILABLEUSERSMODEL_H

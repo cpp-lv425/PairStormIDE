@@ -2,10 +2,11 @@
 #define USERSBACKEND_H
 
 #include <QObject>
+#include <QVector>
 
 struct OnlineChatUser {
-    bool mConnected;
     QString mUserName;
+    bool mConnected;
 };
 
 class OnlineUsersList : public QObject
@@ -14,9 +15,23 @@ class OnlineUsersList : public QObject
 public:
     explicit OnlineUsersList(QObject *parent = nullptr);
 
+    QVector<OnlineChatUser> users() const;
+
 signals:
+    void preUserAppeared();
+    void postUserAppeared();
+
+    void preUserDisappeared(int index);
+    void postUserDisappeared();
 
 public slots:
+
+    void updateOnlineUsersOnChanges(const QStringList & userNames);
+    void updateConnectedUsersOnChanges(const QStringList & userNames);
+    void connectToUserOnClick();
+
+private:
+    QVector<OnlineChatUser> mOnlineChatUsers;
 };
 
 #endif // USERSBACKEND_H

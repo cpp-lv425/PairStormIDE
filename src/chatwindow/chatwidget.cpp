@@ -18,14 +18,15 @@
 #include <QQuickStyle>
 
 #include "onlineuserslist.h"
-#include "availableusersmodel.h"
+#include "onlineusersmodel.h"
 
 ChatWidget::ChatWidget(QWidget *pParent):
     QWidget (pParent),
     mUserName("Unnamed")
 {
     QQuickWindow::setSceneGraphBackend(QSGRendererInterface::Software);
-    qmlRegisterType<AvailableUsersModel>("AvailableUsers", 1, 0, "AvailableUsersModel");
+    qmlRegisterType<OnlineUsersModel>("AvailableUsers", 1, 0, "AvailableUsersModel");
+    qmlRegisterUncreatableType<OnlineUsersList>("AvailableUsers", 1, 0, "AvailableUsersList", QStringLiteral("AvailableUsersList should not be created in the QML"));
 
     mpOnlineUsers = new OnlineUsersList();
 
@@ -116,19 +117,20 @@ void ChatWidget::updateUsersList()
         mpUsersList->addItem(pItem);
     }
     mpUsersList->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
-
 }
 
 void ChatWidget::setOnlineUsers(const QStringList &onlineUsers)
 {
-    mOnlineUsers = onlineUsers;
-    updateUsersList();
+    mpOnlineUsers->updateOnlineUsersOnChanges(onlineUsers);
+    //mOnlineUsers = onlineUsers;
+    //updateUsersList();
 }
 
 void ChatWidget::setConnectedUsers(const QStringList &connectedUsers)
 {
-    mConnectedUsers = connectedUsers;
-    updateUsersList();
+    mpOnlineUsers->updateConnectedUsersOnChanges(connectedUsers);
+    //mConnectedUsers = connectedUsers;
+    //updateUsersList();
 }
 
 bool ChatWidget::isUserConnected(const QString &userName)

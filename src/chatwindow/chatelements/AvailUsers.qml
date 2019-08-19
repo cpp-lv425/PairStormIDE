@@ -24,7 +24,7 @@ Item {
             anchors.margins: 0
             anchors.topMargin: 3
             anchors.bottomMargin: 7
-            spacing: 1
+            spacing: 0
             clip: true
 
             highlightFollowsCurrentItem: true
@@ -41,9 +41,11 @@ Item {
 
     DelegateModel {
         id: availableUsersModel
-
-        model: AvailableUsersModel {}
-        /*ListModel {
+        model: AvailableUsersModel {
+            //usersList: AvailableUsersList
+        }
+        /*
+        model: ListModel {
             //@disable-check M16
             ListElement { name: "Vasia nickname and something"; connected: true; }
             //@disable-check M16
@@ -63,6 +65,8 @@ Item {
                 id: userElement
 
                 width:  parent.width
+                height: availableUsers.height / 6
+                /*
                 height: {
                     var maximumElementsNum = availableUsersModel.count
                     var possibleElementsNum = 1
@@ -75,10 +79,10 @@ Item {
                         possibleElementsNum += 1
                     }
                     return 25
-                }
+                }*/
 
-                border.width: height * 0.03
-                border.color:"white"
+                //border.width: height * 0.03
+                //border.color:"white"
 
                 color: "lightgrey"
                 gradient: Gradient.SolidStone
@@ -118,14 +122,19 @@ Item {
                         Layout.maximumWidth: 60
 
                         BasicElements.Switch {
+                            id: userSwitch
                             anchors.fill: parent
                             anchors.centerIn: parent
+
+                            state: model.connected? "on" : "off"
 
                             preferredHeight: parent.height
                             preferredWidth:  parent.width
                             widthToHeight:   ChatBase.golden_ratio//1.618034
                             onStateChanged: {
                                 console.log("" + model.name + " has been turned " + state)
+                                model.connected = !model.connected
+                                //AvailableUsersList.connectToUserOnClick()
                             }
                         }
                     }

@@ -45,6 +45,13 @@ Item {
     T.Switch {
         id: switchControl
 
+        checked: {
+            if(switchItem.state === "on")
+                return true;
+            return false;
+        }
+        down: false
+
         anchors.centerIn: parent
         implicitWidth:   switchItem.bodyWidth
         implicitHeight:  switchItem.bodyHeight
