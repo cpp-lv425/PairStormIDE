@@ -58,8 +58,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     setWindowTitle("PairStorm");
 
-    // sets style globally
-    //setAppStyle();
+    // fusion style is applied globally
+    // if platform does not support fusion, default style is applied
+    qApp->setStyle(QStyleFactory::create("Fusion"));
 
     setupMainMenu();
 
@@ -822,11 +823,6 @@ void MainWindow::restoreMainWindowState()
 
 void MainWindow::setAppStyle(const QString &styleName)
 {
-    qDebug() << "changing style";
-    // fusion style is applied globally
-    // if platform does not support fusion, default style is applied
-    qApp->setStyle(QStyleFactory::create("Fusion"));
-
     // dark style palette is created & set globally
     QPalette palette = mpPaletteConfigurator->getPalette(styleName);
     //QPalette newPal = palette();
