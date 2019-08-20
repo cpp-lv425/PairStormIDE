@@ -34,10 +34,13 @@ public:
     void combineDocAreas();
     void closeEmptyDocArea();
     void closeCurrentDocArea();
-    void configureDocument(std::function<void(DocumentManager*, CodeEditor*, const QString&)> functor,
-                           const QString &newValue);    
+
+    // calls passed functor on every opened document
+    void configureDocuments(std::function<void(DocumentManager*, CodeEditor*, const QString&)> functor,
+                           const QString &newValue);
     void setStyle(CodeEditor *doc, const QString &styleName);
-    void setFontFamily(const QString &styleName);
+    void setFontFamily(CodeEditor *doc, const QString &fontFamily);
+    void setFontSize(CodeEditor *doc, const QString &fontSize);
 
 public slots:
     void onSplit(Qt::Orientation orientation);

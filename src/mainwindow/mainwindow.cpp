@@ -732,12 +732,15 @@ void MainWindow::setAppStyle(const QString &styleName)
     std::function<void(DocumentManager*, CodeEditor*, const QString&)> functor
             (&DocumentManager::setStyle);
 
-    mpDocumentManager->configureDocument(functor, styleName);
+    mpDocumentManager->configureDocuments(functor, styleName);
 }
 
 void MainWindow::setDocumentFontFamily(const QString &fontFamily)
 {
-    qDebug() << fontFamily;
+    std::function<void(DocumentManager*, CodeEditor*, const QString&)> functor
+            (&DocumentManager::setFontFamily);
+
+    mpDocumentManager->configureDocuments(functor, fontFamily);
 }
 
 void MainWindow::setDocumentFontSize(const QString &fontSize)

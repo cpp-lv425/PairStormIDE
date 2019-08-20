@@ -555,7 +555,7 @@ void DocumentManager::closeCurrentDocArea()
     }
 }
 
-void DocumentManager::configureDocument(std::function<void(DocumentManager*, CodeEditor*, const QString&)> functor,
+void DocumentManager::configureDocuments(std::function<void(DocumentManager*, CodeEditor*, const QString&)> functor,
                                         const QString &newValue)
 {
     // setting new settings to every opened doc view
@@ -581,9 +581,17 @@ void DocumentManager::setStyle(CodeEditor *doc, const QString &styleName)
     doc->highlighText();
 }
 
-void DocumentManager::setFontFamily(const QString &styleName)
+void DocumentManager::setFontFamily(CodeEditor *doc, const QString &fontFamily)
 {
+    qDebug() << "font family change";
+    doc->setFontStyle(fontFamily);
+    doc->highlighText();
+}
 
+void DocumentManager::setFontSize(CodeEditor *doc, const QString &fontSize)
+{
+    doc->setFontSize(fontSize);
+    doc->highlighText();
 }
 
 bool DocumentManager::saveDocument(CodeEditor *doc)
