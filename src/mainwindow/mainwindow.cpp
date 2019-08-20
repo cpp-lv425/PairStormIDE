@@ -728,5 +728,19 @@ void MainWindow::setAppStyle(const QString &styleName)
     QPalette palette = mpPaletteConfigurator->getPalette(styleName);
     //QPalette newPal = palette();
     qApp->setPalette(palette);
-    mpDocumentManager->setStyle(styleName);
+
+    std::function<void(DocumentManager*, CodeEditor*, const QString&)> functor
+            (&DocumentManager::setStyle);
+
+    mpDocumentManager->configureDocument(functor, styleName);
+}
+
+void MainWindow::setDocumentFontFamily(const QString &fontFamily)
+{
+    qDebug() << fontFamily;
+}
+
+void MainWindow::setDocumentFontSize(const QString &fontSize)
+{
+    qDebug() << fontSize;
 }

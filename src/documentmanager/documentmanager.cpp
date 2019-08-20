@@ -555,24 +555,35 @@ void DocumentManager::closeCurrentDocArea()
     }
 }
 
-void DocumentManager::setStyle(const QString &styleName)
+void DocumentManager::configureDocument(std::function<void(DocumentManager*, CodeEditor*, const QString&)> functor,
+                                        const QString &newValue)
 {
-    // setting new style to every opened doc view
+    // setting new settings to every opened doc view
     for (const auto& area: mDocAreas)
     {
         auto windowsList = area->subWindowList();
 
         std::for_each(windowsList.begin(), windowsList.end(),
-                      [&styleName](const auto& wdw)
+                      [this, &functor, &newValue](const auto& wdw)
         {
             auto doc = qobject_cast<CodeEditor*>(wdw->widget());
             if (doc)
-            {                
-                doc->setIdeType(styleName);
-                doc->highlighText();
+            {
+                functor(this, doc, newValue);
             }
         });
     }
+}
+
+void DocumentManager::setStyle(CodeEditor *doc, const QString &styleName)
+{
+    doc->setIdeType(styleName);
+    doc->highlighText();
+}
+
+void DocumentManager::setFontFamily(const QString &styleName)
+{
+
 }
 
 bool DocumentManager::saveDocument(CodeEditor *doc)

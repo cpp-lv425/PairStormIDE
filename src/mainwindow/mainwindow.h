@@ -53,7 +53,11 @@ private:
     void saveMainWindowState();
     void restoreMainWindowState();
     void setInitialAppStyle();
+
+    // methods for dynamic change of IDE settings
     void setAppStyle(const QString &style);
+    void setDocumentFontFamily(const QString &fontFamily);
+    void setDocumentFontSize(const QString &fontSize);
 
 private slots:
     // file menu actions
@@ -97,7 +101,6 @@ private slots:
     void onReferenceTriggered();
     void onUserGuideTriggered();
     void onCheckUpdatesTriggered();
-
     void onReferenceFromEditor(const QString &keyword);
 
 public slots:
