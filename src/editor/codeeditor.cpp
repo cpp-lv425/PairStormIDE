@@ -78,7 +78,7 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
 
     //completer
     QStringList keywords;
-    keywords <<"SELECT" <<"FROM" <<"WHERE"<<"WHEN";
+    keywords <<"SELECT" <<"FROM" <<"WHERE"<<"WHEN";//for test
     mCompleter = new AutoCodeCompleter(keywords, this);
     mCompleter->setCaseSensitivity(Qt::CaseInsensitive);
     mCompleter->setWidget(this);
@@ -222,6 +222,7 @@ void CodeEditor::resizeEvent(QResizeEvent *e)
 void CodeEditor::specialAreasRepaintEvent(QPaintEvent *event)
 {
     QPainter painter(mLineNumberArea);
+    qDebug()<<"!!!!!!!!!!"<<mConfigParam.textColors.mLineCounterAreaColor;
     painter.fillRect(event->rect(), mConfigParam.textColors.mLineCounterAreaColor);
 
     QTextBlock block = firstVisibleBlock();//area of first numeration block from linecounter
