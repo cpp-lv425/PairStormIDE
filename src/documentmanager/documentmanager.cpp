@@ -567,9 +567,9 @@ void DocumentManager::setStyle(const QString &styleName)
         {
             auto doc = qobject_cast<CodeEditor*>(wdw->widget());
             if (doc)
-            {
-                qDebug() << "changing editor style";
-                //doc->setStyle(styleName);
+            {                
+                doc->setIdeType(styleName);
+                doc->highlighText();
             }
         });
     }

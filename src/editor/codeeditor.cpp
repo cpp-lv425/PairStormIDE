@@ -11,23 +11,18 @@
 #include<iostream>
 #include<QLabel>
 
-#include "eventbuilder.h"
-#include "usermessages.h"
-#include "filemanager.h"
-#include "utils.h"
-
 CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
 {
     setLineWrapMode(QPlainTextEdit::NoWrap);// don't move cursor to the next line where it's out of visible scope
     this->setVerticalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAlwaysOn);
     this->setTabStopDistance(TAB_SPACE * fontMetrics().width(QLatin1Char('0')));//set tab distance
-    mCurrentZoom = 100;//in persents    
+    mCurrentZoom = 100;//in persents
 
     //read settings
     QSettings settings(QApplication::organizationName(), QApplication::applicationName());
-    QString analizerFontSize = {settings.contains("editorFontSize") ? settings.value("editorFontSize").toString() : "12"};
-    QString analizerFontName = {settings.contains("editorFontName") ? settings.value("editorFontName").toString() : "Consolas"};
-    QString analizerStyle = {settings.contains("style") ? settings.value("style").toString() : "WHITE"};
+    QString analizerFontSize = settings.value("editorFontSize").toString();
+    QString analizerFontName = settings.value("editorFontName").toString();
+    QString analizerStyle = settings.value("style").toString();
     mConfigParam.setConfigParams(analizerFontName,analizerFontSize,analizerStyle);
 
     //create objects connected to codeEditor
@@ -52,15 +47,16 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     //If the text is scrolled, rect will cover the entire viewport area.
     //If the text is scrolled vertically, dy carries the amount of pixels the viewport was scrolled.
 
-    connect(this,                         &QPlainTextEdit::updateRequest,                  this, &CodeEditor::updateLineNumberArea);
-    connect(mTimer,                       &QTimer::timeout,                                this, &CodeEditor::saveStateInTheHistory);
-    connect(this,                         &QPlainTextEdit::cursorPositionChanged,          this, &CodeEditor::textChangedInTheOneLine);
-    connect(mAddCommentButton,            &AddCommentButton::addCommentButtonPressed,      this, &CodeEditor::showCommentTextEdit);
-    connect(mCommentWidget->getEditTab(), &AddCommentTextEdit::emptyCommentWasSent,        this, &CodeEditor::emptyCommentWasAdded);
-    connect(mCommentWidget->getEditTab(), &AddCommentTextEdit::notEmptyCommentWasSent,     this, &CodeEditor::notEmptyCommentWasAdded);
-    connect(mCommentWidget->getEditTab(), &AddCommentTextEdit::commentWasDeleted,          this, &CodeEditor::deleteComment);
-    connect(this,                         &CodeEditor::linesCountUpdated,                  this, &CodeEditor::changeCommentButtonsState);
-
+    connect(this,                         &QPlainTextEdit::updateRequest,              this, &CodeEditor::updateLineNumberArea);
+    connect(mTimer,                       &QTimer::timeout,                            this, &CodeEditor::saveStateInTheHistory);
+    connect(this,                         &QPlainTextEdit::cursorPositionChanged,      this, &CodeEditor::textChangedInTheOneLine);
+    connect(mAddCommentButton,            &AddCommentButton::addCommentButtonPressed,  this, &CodeEditor::showCommentTextEdit);
+    connect(mCommentWidget->getEditTab(), &AddCommentTextEdit::emptyCommentWasSent,    this, &CodeEditor::emptyCommentWasAdded);
+    connect(mCommentWidget->getEditTab(), &AddCommentTextEdit::notEmptyCommentWasSent, this, &CodeEditor::notEmptyCommentWasAdded);
+    connect(mCommentWidget->getEditTab(), &AddCommentTextEdit::commentWasDeleted,      this, &CodeEditor::deleteComment);
+    connect(this,                         &CodeEditor::linesCountUpdated,              this, &CodeEditor::changeCommentButtonsState);
+    connect(this,                         &QPlainTextEdit::cursorPositionChanged,      this, &CodeEditor::runLexer);
+    connect(this,                         &QPlainTextEdit::cursorPositionChanged,      this, &CodeEditor::highlighText);
 
     mTimer->start(CHANGE_SAVE_TIME);//save text by this time
     mLinesCountCurrent = 1;
@@ -72,22 +68,62 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
 
     //fonts and colors configurations
     mFont.setPointSize(mConfigParam.mFontSize);
-    mFont.setFamily(mConfigParam.mTextStyle);
+    mFont.setFamily(mConfigParam.mFontStyle);
     mFont.setBold(false);
     mFont.setItalic(false);
     this->setFont(mFont);
 
     //set text highlighting color
-    fmtLiteral.setForeground(Qt::red);
-    fmtKeyword.setForeground(Qt::blue);
-    fmtComment.setForeground(Qt::green);
-    fmtUndefined.setUnderlineStyle(QTextCharFormat::WaveUnderline);
-    fmtUndefined.setUnderlineColor(Qt::red);
-    fmtRegular.setForeground(Qt::black);
-    fmtLiteral.setForeground(mConfigParam.mStringsColor);
-    fmtKeyword.setForeground(mConfigParam.mBasicLiteralsColor);
-    fmtComment.setForeground(mConfigParam.mCommentColor);
-    fmtRegular.setForeground(mConfigParam.mCodeTextColor);
+    setTextColors();
+
+    //completer
+    QStringList keywords;
+    keywords <<"SELECT" <<"FROM" <<"WHERE"<<"WHEN";
+    mCompleter = new AutoCodeCompleter(keywords, this);
+    mCompleter->setCaseSensitivity(Qt::CaseInsensitive);
+    mCompleter->setWidget(this);
+    qDebug()<<"inside list:";
+    for(auto &i:keywords)
+    {
+        qDebug()<<i;
+    }
+}
+
+void CodeEditor::setTextColors()
+{
+    fmtLiteral.setForeground(mConfigParam.textColors.mStringsColor);
+    fmtKeyword.setForeground(mConfigParam.textColors.mBasicLiteralsColor);
+    fmtComment.setForeground(mConfigParam.textColors.mCommentColor);
+    fmtRegular.setForeground(mConfigParam.textColors.mCodeTextColor);
+}
+
+void CodeEditor::setIdeType(const QString &ideType)
+{
+    mConfigParam.setIdeType(ideType);
+    setTextColors();
+}
+
+void CodeEditor::setFontSize(const QString &fontSize)
+{
+    mConfigParam.setFontSize(fontSize);
+    mFont.setPointSize(mConfigParam.mFontSize);
+}
+
+void CodeEditor::setFontStyle(const QString &fontStyle)
+{
+    mConfigParam.setFontStyle(fontStyle);
+    mFont.setFamily(mConfigParam.mFontStyle);
+}
+
+
+ConfigParams CodeEditor::getConfigParam()
+{
+    return mConfigParam;
+}
+
+void CodeEditor::setConfigParam(const ConfigParams &configParam)
+{
+    mConfigParam = configParam;
 }
 
 void CodeEditor::runLexer()
@@ -186,7 +222,7 @@ void CodeEditor::resizeEvent(QResizeEvent *e)
 void CodeEditor::specialAreasRepaintEvent(QPaintEvent *event)
 {
     QPainter painter(mLineNumberArea);
-    painter.fillRect(event->rect(), mConfigParam.mLineCounterAreaColor);
+    painter.fillRect(event->rect(), mConfigParam.textColors.mLineCounterAreaColor);
 
     QTextBlock block = firstVisibleBlock();//area of first numeration block from linecounter
     int blockNumber = block.blockNumber();//get line number (start from 0)
@@ -196,7 +232,7 @@ void CodeEditor::specialAreasRepaintEvent(QPaintEvent *event)
     while (block.isValid())//we have blocks (have lines numbers)
     {
         QString number = QString::number(blockNumber + 1);
-        painter.setPen(mConfigParam.mCodeTextColor);
+        painter.setPen(mConfigParam.textColors.mCodeTextColor);
         painter.drawText(0, top, mLineNumberArea->width(), fontMetrics().height(),//draw line count
                          Qt::AlignCenter, number);
         block = block.next();
@@ -236,7 +272,14 @@ void CodeEditor::saveStateInTheHistory()
 
 void CodeEditor::zoom(int val)
 {
-    val > 0 ?this->zoomIn(val):this->zoomOut(-val);
+    if (val > 0)
+    {
+        this->zoomIn(val);
+    }
+    else
+    {
+        this->zoomOut(-val);
+    }
     mCurrentZoom+=val;
 }
 
@@ -272,7 +315,6 @@ void CodeEditor::setNewAddedButtonSettings(AddCommentButton *commentButton)
 
 void CodeEditor::showCommentTextEdit(int line)
 {
-    mCommentWidget->setWindowTitle("Comment to " + QString::number(line) + " line");
     mCommentWidget->setPosition(this, mAddCommentButton);
     mCommentWidget->setVisible(true);
     mCommentWidget->setCommentButtonGeometry(mAddCommentButton->geometry());
@@ -287,6 +329,24 @@ void CodeEditor::showCommentTextEdit(int line)
     {
         mCommentWidget->getEditTab()->setText("");
     }
+     QSettings settings(QApplication::organizationName(), QApplication::applicationName());
+     mCommentWidget->setWindowTitle("Comment to " + QString::number(line) + " line by " + settings.value("UserName").toString());
+    //for text tokens
+//    qDebug()<<"tokens vector size = "<<mTokens.size();
+//    for (auto &i: mTokens)
+//    {
+//        if (i.mType == State::ID)
+//        {
+//            mLexer.getIdentificatorsList()
+//            qDebug()<<i.mName;
+//        }
+//    }
+    //
+    /*qDebug()<<"vector size = "<<mLexer.getIdentificatorsList().size();
+    for (auto &i: mLexer.getIdentificatorsList())
+    {
+        qDebug()<<i;
+    }*/
 }
 
 void CodeEditor::emptyCommentWasAdded()
@@ -315,6 +375,9 @@ void CodeEditor::notEmptyCommentWasAdded()
         commentButtonNew->setStyleSheet("background-color: #18CD3C");
         commentButtonNew->setText("✔");
         commentButtonNew->setVisible(true);
+
+        QSettings settings(QApplication::organizationName(), QApplication::applicationName());
+        commentButtonNew->setUser(settings.value("UserName").toString());
 
         setNewAddedButtonSettings(commentButtonNew);
 
@@ -505,17 +568,16 @@ void CodeEditor::mouseMoveEvent(QMouseEvent *event)
 }
 
 void CodeEditor::closeEvent(QCloseEvent *event)
-{    
+{
     if (!isChanged())
     {
-        emit closeDocEventOccured(this);
         event->accept();
         return;
     }
     QMessageBox::StandardButton reply = QMessageBox::question
             (this,
-             userMessages[UserMessages::PromptSaveTitle],
-             userMessages[UserMessages::SaveQuestion],
+             "Saving Changes",
+             "Do you want to save changes to opened documents?",
              QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
 
     // if user closes dialog event is ignored
@@ -524,26 +586,13 @@ void CodeEditor::closeEvent(QCloseEvent *event)
         event->ignore();
         return;
     }
-    // if user doesn't want to save changes
+    // if document wasn't modified of user doesn't want to save changes
     if (reply == QMessageBox::No)
     {
-        emit closeDocEventOccured(this);
         event->accept();
         return;
     }
-
-    try
-    {
-        FileManager().writeToFile(getFileName(), toPlainText());
-        setBeginTextState();
-    }
-    catch (const FileOpeningFailure&)
-    {
-        QMessageBox::warning(this, userMessages[UserMessages::ErrorTitle],
-                userMessages[UserMessages::FileOpeningForSavingErrorMsg]);
-        event->ignore();
-        return;
-    }
+    // saving document
     emit closeDocEventOccured(this);
 }
 
@@ -569,9 +618,6 @@ void CodeEditor::highlighText()
             break;
         case(State::COM):
             formating(fmtComment, cursor, i);
-            break;
-        case(State::UNDEF):
-            formating(fmtUndefined, cursor, i);
             break;
         default:
             formating(fmtRegular, cursor, i);
