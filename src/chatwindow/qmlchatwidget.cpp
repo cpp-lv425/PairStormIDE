@@ -33,7 +33,8 @@ QmlChatWidget::QmlChatWidget()
 
 void QmlChatWidget::keyPressEvent(QKeyEvent *event)
 {
-
+    event->key();
+    //pass
 }
 
 void QmlChatWidget::configureOnLogin(const QString &userName)
@@ -68,6 +69,7 @@ void QmlChatWidget::configureOnLogin(const QString &userName)
 
     box->addWidget(container);
     setLayout(box);
+    show();
 }
 
 void QmlChatWidget::updateOnlineUsers(const QStringList &onlineUsers)

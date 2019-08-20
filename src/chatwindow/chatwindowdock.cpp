@@ -11,7 +11,7 @@
 ChatWindowDock::ChatWindowDock(QWidget *pParent): QDockWidget (pParent)
 {
     setWindowTitle("Chat");
-    mpChatWidget = new ChatWidget;
+    mpChatWidget = new QmlChatWidget;// ChatWidget;
 
     connect(mpChatWidget, &ChatWidget::startSharingRequested,
             this,         &ChatWindowDock::onUserToConnectSelected);
@@ -31,6 +31,7 @@ void ChatWindowDock::setUserName(const QString &userName)
 {
     mpChatWidget->configureOnLogin(userName);
     setDisabled(false);
+    show();
 }
 
 void ChatWindowDock::displayMessage(const QString userName, const QString message)
