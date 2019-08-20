@@ -11,8 +11,9 @@
 
 StoreConf::StoreConf(QString userName)
 {
-    mConFile = userName;
-    mConFile += ".json";
+    mConFile                        = userName;
+    mConFile                        += ".json";
+    mFields["pathToConDir"]        = "";
     mFields["applicationName"]      = "Pair Storm";       //  default values used when json file
     mFields["applicationVersion"]   = "0.1";           //      not exist or corrupted
     mFields["organizationName"]     = "Lv-425.C++";
@@ -29,6 +30,8 @@ StoreConf::StoreConf(QString userName)
     mFields["cppCompilers"]         = "";
     mFields["cppLibraryHeaders"]    = "";
     mFields["cppLibraryBinarys"]    = "";
+    mFields["token"]                = "";
+    mFields["tokenHash"]            = "";
     separateList(mFields["cppExtentions"], mCppExtentionsList);
 }
 
@@ -80,9 +83,11 @@ void StoreConf::checkConfDir(QString str)
     if (str == "exe")
     {
         QString pathToConDir = QDir::currentPath();
-        pathToConDir += "/conf";
+        pathToConDir += QDir::separator();
+        pathToConDir += "conf";
         if (!QDir(pathToConDir).exists())
             QDir().mkdir(pathToConDir);
+        mFields["pathToConDir"]        = pathToConDir;
     }
 }
 

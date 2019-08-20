@@ -21,6 +21,7 @@
 #include "newfilewizard.h"
 #include "browserdialog.h"
 #include "usermessages.h"
+#include "startmanager.h"
 #include "logindialog.h"
 #include "filemanager.h"
 #include "menuoptions.h"
@@ -49,6 +50,12 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->setupUi(this);
     {
+        StartManager startManager(this);
+        startManager.start();
+        //connect(&startManager, &StartManager::close, this, &MainWindow::close);
+        connect(&startManager, &StartManager::close, this, &MainWindow::onExitTriggered);
+
+        //StoreConf conf("MarsLviv");
         StoreConf conf;
         conf.restoreConFile();
     }
@@ -672,8 +679,10 @@ void MainWindow::closeEvent(QCloseEvent *event)
 MainWindow::~MainWindow()
 {
     saveMainWindowState();
+
+    //StoreConf conf("MarsLviv");
     StoreConf conf;
-    conf.saveConFile();
+    //conf.saveConFile();
 
     delete ui;
 }

@@ -27,7 +27,7 @@ TabCpp::TabCpp(QWidget *parent)
     }
 
     //      C++ STANDART
-    QVBoxLayout *standartLayout = new QVBoxLayout;//();
+    QVBoxLayout *standartLayout = new QVBoxLayout;
     standartLayout->addStretch(mBasicStretch);
     QLabel *labelCstandart = new QLabel(tr("C++ standart"));
     mpComboStandart = new QComboBox(this);
