@@ -1,10 +1,24 @@
 #include "connection.h"
+#include <QDebug>
 
-
-Connection::Connection(QString path)
+Connection::Connection()
 {
-    mDb = QSqlDatabase::addDatabase(typeDatabase);
-    mDb.setDatabaseName(path);
+     mDb = QSqlDatabase::addDatabase(typeDatabase);
+     qDebug()<<"connection";
+}
+
+Connection::~Connection()
+{
+    mDb.close();
+    qDebug()<<"closed";
+}
+
+void Connection::openDatabase()
+{
+    mDb = QSqlDatabase::database();
+    mDb.setDatabaseName(mPath);
+    if(mDb.open())
+        qDebug()<<"opened";
 }
 
 QSqlDatabase Connection::getDatabase()
@@ -14,18 +28,8 @@ QSqlDatabase Connection::getDatabase()
 
 QString Connection::mPath = "";
 
-void Connection::setpath(QString path)
-{
-    mPath = path;
-}
-
 QString Connection::getPath()
 {
     return mPath;
 }
 
-void Connection::closeDb()
-{
-    mDb.close();
-    mDb.removeDatabase(QSqlDatabase::defaultConnection);
-}

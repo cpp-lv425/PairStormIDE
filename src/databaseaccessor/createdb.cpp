@@ -1,4 +1,5 @@
 #include "createdb.h"
+#include <QDebug>
 
 createDB::createDB() :Accessor ()
 {
@@ -26,14 +27,14 @@ void createDB::addTableFile()
 
 QString createDB::tableUserQuery()
 {
-    return "CREATE TABLE User ("
+    return "CREATE TABLE IF NOT EXISTS User ("
             "id       INTEGER      PRIMARY KEY AUTOINCREMENT UNIQUE ON CONFLICT ROLLBACK, "
             "nickname VARCHAR (39) UNIQUE ON CONFLICT FAIL  NOT NULL )";
 }
 
 QString createDB::tableMessageQuery()
 {
-    return "CREATE TABLE Message ("
+    return "CREATE TABLE IF NOT EXISTS Message ("
             "ID          INTEGER  PRIMARY KEY AUTOINCREMENT, "
             "idUser      INTEGER  REFERENCES User (id) NOT NULL, "
             "messageText STRING, "
@@ -42,7 +43,7 @@ QString createDB::tableMessageQuery()
 
 QString createDB::tableCommentQuery()
 {
-    return "CREATE TABLE Comment ("
+    return "CREATE TABLE IF NOT EXISTS Comment ("
         "line   INT, "
         "idFile          REFERENCES File (ID), "
         "idUser INTEGER  REFERENCES User (id), "
@@ -53,7 +54,7 @@ QString createDB::tableCommentQuery()
 
 QString createDB::tableFileQuery()
 {
-    return "CREATE TABLE File ("
+    return "CREATE TABLE IF NOT EXISTS File ("
         "ID   INTEGER      PRIMARY KEY AUTOINCREMENT, "
         "name VARCHAR (50) UNIQUE)";
 }

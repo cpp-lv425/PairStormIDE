@@ -2,19 +2,23 @@
 #define CONNECTION_H
 #include <QtSql/QSqlDatabase>
 #include <QtSql/QSqlQuery>
+#include <QtSql/QSqlRecord>
 
 class Connection
 {
 public:
-    Connection(QString path);
+
+    ~Connection();
+    void openDatabase();
     QSqlDatabase getDatabase();
-    void setpath(QString path);
     static QString getPath();
-    void closeDb();
+    void close();
 private:
+    Connection();
     static QString mPath;
     QSqlDatabase mDb;
     const QString typeDatabase = "QSQLITE";
+    friend class ConnectionGetter;
 };
 
 #endif // CONNECTION_H

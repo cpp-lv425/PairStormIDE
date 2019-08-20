@@ -2,7 +2,7 @@
 #define CREATEDB_H
 #include "accessor.h"
 
-class createDB: Accessor
+class createDB: public Accessor
 {
 public:
     createDB();

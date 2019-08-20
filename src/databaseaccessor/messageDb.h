@@ -7,10 +7,10 @@ class MessageDb : public Accessor
 {
 public:
     MessageDb();
-    void addMessageToDb(const Message& message);
+    void addMessageToDb(const dbMessage& message);
     void getMessageFromDb(const int messageId);
 private:
-    QString addMessageQuery(const Message& message);
+    QString addMessageQuery(const dbMessage& message);
     QString getMessageQuery(const int messageId);
 };
 

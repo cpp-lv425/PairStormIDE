@@ -5,7 +5,7 @@ FileDb::FileDb() :Accessor ()
 
 }
 
-void FileDb::addFileToDb(const File &file)
+void FileDb::addFileToDb(const dbFile &file)
 {
     execQuery(addFileQuery(file));
 }
@@ -20,7 +20,7 @@ void FileDb::deleteFileFromDb(const QString filename)
     execQuery(deleteFileQuery(filename));
 }
 
-QString FileDb::addFileQuery(const File &file)
+QString FileDb::addFileQuery(const dbFile &file)
 {
     return "INSERT INTO File (name) VALUES ('"
             +file.mName + "')";

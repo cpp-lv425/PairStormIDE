@@ -1,14 +1,17 @@
 #include "accessor.h"
+#include <QDebug>
 
 Accessor::Accessor()
 {
-    database= new Connection(Connection::getPath());
+    database = ConnectionGetter::getDefaultConnection();
+    database->openDatabase();
     setQuery(database->getDatabase());
 }
 
 Accessor::~Accessor()
 {
-    database->closeDb();
+    query.clear();
+    qDebug()<<"clear query";
 }
 
 void Accessor::setQuery(QSqlDatabase db)
@@ -18,6 +21,13 @@ void Accessor::setQuery(QSqlDatabase db)
 
 void Accessor::execQuery(QString queryStr)
 {
-    query.prepare(queryStr);
-    query.exec();
+   query.prepare(queryStr);
+   if(query.exec())
+   {
+       qDebug()<<"executed query";
+   }
+   else
+   {
+        qDebug()<<"not executed query";
+   }
 }

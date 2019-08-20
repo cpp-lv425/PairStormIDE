@@ -1,6 +1,6 @@
 #ifndef ACCESSOR_H
 #define ACCESSOR_H
-#include "connection.h"
+#include "connectiongetter.h"
 
 class Accessor
 {
@@ -12,7 +12,7 @@ protected:
     void execQuery(QString query);
 private:
     QSqlQuery query;
-    Connection* database;
+    Connection *database;
 };
 
 #endif // ACCESSOR_H

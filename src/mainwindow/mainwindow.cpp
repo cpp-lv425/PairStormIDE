@@ -76,7 +76,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // create instance of Bottom Panel
     createButtomPanel();
-
     restoreMainWindowState();
 }
 

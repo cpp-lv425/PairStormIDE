@@ -7,14 +7,14 @@ class CommentDb : public Accessor
 {
 public:
     CommentDb();
-    void addCommentToDb(const Comment& comment);
+    void addCommentToDb(const dbComment& comment);
     void deleteCommentFromDb(const int commentLine, const int commentFile);
-    void updateCommentInDb(const Comment& comment);
+    void updateCommentInDb(const dbComment& comment);
     void getCommentFromDb(const int commentLine, const int commentFile);
 private:
-    QString addCommentQuery(const Comment& comment);
+    QString addCommentQuery(const dbComment& comment);
     QString deleteCommentQuery(const int commentLine, const int commentFile);
-    QString updateCommentQuery(const Comment& comment);
+    QString updateCommentQuery(const dbComment& comment);
     QString getCommentQuery(const int commentLine, const int commentFile);
 };
 

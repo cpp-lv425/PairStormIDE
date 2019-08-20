@@ -1,23 +1,24 @@
 #ifndef STRUCTSFORDB_H
 #define STRUCTSFORDB_H
 #include <QString>
-struct Message
+struct dbMessage
 {
     QString mBody;
     int mIdUser;
+    QString time;
 };
 
-struct User
+struct dbUser
 {
     QString mNickname;
 };
 
-struct File
+struct dbFile
 {
     QString mName;
 };
 
-struct Comment
+struct dbComment
 {
     int mIdFile;
     int mLine;

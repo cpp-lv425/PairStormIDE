@@ -6,5 +6,6 @@
 #include "commentDb.h"
 #include "messageDb.h"
 #include "structsfordb.h"
+#include "createdb.h"
 
 #endif // SQLITEACCESS_H
