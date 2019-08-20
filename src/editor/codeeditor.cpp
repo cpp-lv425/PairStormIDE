@@ -11,6 +11,11 @@
 #include<iostream>
 #include<QLabel>
 
+#include "eventbuilder.h"
+#include "usermessages.h"
+#include "filemanager.h"
+#include "utils.h"
+
 CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
 {
     setLineWrapMode(QPlainTextEdit::NoWrap);// don't move cursor to the next line where it's out of visible scope
@@ -20,9 +25,9 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
 
     //read settings
     QSettings settings(QApplication::organizationName(), QApplication::applicationName());
-    QString analizerFontSize = settings.value("editorFontSize").toString();
-    QString analizerFontName = settings.value("editorFontName").toString();
-    QString analizerStyle = settings.value("style").toString();
+    QString analizerFontSize = {settings.contains("editorFontSize") ? settings.value("editorFontSize").toString() : "12"};
+    QString analizerFontName = {settings.contains("editorFontName") ? settings.value("editorFontName").toString() : "Consolas"};
+    QString analizerStyle = {settings.contains("style") ? settings.value("style").toString() : "WHITE"};
     mConfigParam.setConfigParams(analizerFontName,analizerFontSize,analizerStyle);
 
     //create objects connected to codeEditor
@@ -500,16 +505,17 @@ void CodeEditor::mouseMoveEvent(QMouseEvent *event)
 }
 
 void CodeEditor::closeEvent(QCloseEvent *event)
-{
+{    
     if (!isChanged())
     {
+        emit closeDocEventOccured(this);
         event->accept();
         return;
     }
     QMessageBox::StandardButton reply = QMessageBox::question
             (this,
-             "Saving Changes",
-             "Do you want to save changes to opened documents?",
+             userMessages[UserMessages::PromptSaveTitle],
+             userMessages[UserMessages::SaveQuestion],
              QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
 
     // if user closes dialog event is ignored
@@ -518,13 +524,26 @@ void CodeEditor::closeEvent(QCloseEvent *event)
         event->ignore();
         return;
     }
-    // if document wasn't modified of user doesn't want to save changes
+    // if user doesn't want to save changes
     if (reply == QMessageBox::No)
     {
+        emit closeDocEventOccured(this);
         event->accept();
         return;
     }
-    // saving document
+
+    try
+    {
+        FileManager().writeToFile(getFileName(), toPlainText());
+        setBeginTextState();
+    }
+    catch (const FileOpeningFailure&)
+    {
+        QMessageBox::warning(this, userMessages[UserMessages::ErrorTitle],
+                userMessages[UserMessages::FileOpeningForSavingErrorMsg]);
+        event->ignore();
+        return;
+    }
     emit closeDocEventOccured(this);
 }
 

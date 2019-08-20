@@ -25,7 +25,6 @@ const int TOP_UNUSED_PIXELS_HEIGHT = 4;
 #include<QStatusBar>
 
 
-
 class QPaintEvent;
 class QResizeEvent;
 class QSize;
@@ -56,7 +55,6 @@ public:
     void zoom(int val);
     bool isChanged();
     void setBeginTextState();
-
 
     LastRemoveKey getLastRemomeKey() const;
     void setLastRemomeKey(const LastRemoveKey &value);

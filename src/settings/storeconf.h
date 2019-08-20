@@ -42,7 +42,6 @@ private:
 
     void checkConfDir(QString str = "exe");    //  check existance directory <conf>, create if not exist
                                                //  str = "exe" - directory in same dir as execution file
-    void writeJson2(QString str = "start");     //  on application start: if conf.json not exist - creates it in conf directory
     void writeJson(sessionMode mode = sessionMode::Start);     //  on application start: if conf.json not exist - creates it in conf directory
                                                //  on application quit:  rewrite json with values from QSettings
     void readJson();                //  read configuration file to [loadDoc]. status write to [readStatus]
