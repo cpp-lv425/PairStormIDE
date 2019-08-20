@@ -8,9 +8,11 @@ public:
     UserDb();
     void addUserToDb(const User& user);
     void getUserFromDb(const int idUser);
+    void getUserIdFromDb(const QString username);
 private:
     QString addUserQuery(const User& user);
     QString getUserQuery(const int idUser);
+    QString getUserIdQuery(const QString username);
 };
 
 #endif // USERDB_H

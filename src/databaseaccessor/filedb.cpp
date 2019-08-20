@@ -15,6 +15,11 @@ void FileDb::getFileFromDb(const int idFile)
     execQuery(getFileQuery(idFile));
 }
 
+void FileDb::getFileIdFromDb(const QString filename)
+{
+    execQuery(getFileIdQuery(filename));
+}
+
 void FileDb::deleteFileFromDb(const QString filename)
 {
     execQuery(deleteFileQuery(filename));
@@ -28,8 +33,14 @@ QString FileDb::addFileQuery(const File &file)
 
 QString FileDb::getFileQuery(const int idFile)
 {
-    return "SELECT name from File WHERE id = "
+    return "SELECT name from File WHERE ID = "
             + QString::number(idFile);
+}
+
+QString FileDb::getFileIdQuery(const QString filename)
+{
+    return "SELECT ID FROM File WHERE name = '"
+            + filename + "'";
 }
 
 QString FileDb::deleteFileQuery(const QString filename)

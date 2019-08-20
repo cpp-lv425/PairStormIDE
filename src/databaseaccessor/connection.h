@@ -3,6 +3,7 @@
 #include <QtSql/QSqlDatabase>
 #include <QtSql/QSqlQuery>
 #include <QtSql/QSqlRecord>
+#include <QVariant>
 
 class Connection
 {

@@ -35,7 +35,7 @@ QString createDB::tableUserQuery()
 QString createDB::tableMessageQuery()
 {
     return "CREATE TABLE IF NOT EXISTS Message ("
-            "ID          INTEGER  PRIMARY KEY AUTOINCREMENT, "
+            "id          INTEGER  PRIMARY KEY AUTOINCREMENT, "
             "idUser      INTEGER  REFERENCES User (id) NOT NULL, "
             "messageText STRING, "
             "time        DATETIME DEFAULT (datetime('now')) )";
@@ -55,6 +55,6 @@ QString createDB::tableCommentQuery()
 QString createDB::tableFileQuery()
 {
     return "CREATE TABLE IF NOT EXISTS File ("
-        "ID   INTEGER      PRIMARY KEY AUTOINCREMENT, "
+        "id   INTEGER      PRIMARY KEY AUTOINCREMENT, "
         "name VARCHAR (50) UNIQUE)";
 }

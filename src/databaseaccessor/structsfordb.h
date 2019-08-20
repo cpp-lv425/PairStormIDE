@@ -1,6 +1,7 @@
 #ifndef STRUCTSFORDB_H
 #define STRUCTSFORDB_H
 #include <QString>
+#include <QVector>
 struct Message
 {
     QString mBody;
@@ -20,9 +21,9 @@ struct File
 
 struct Comment
 {
-    int mIdFile;
+    QString mIdFile;
     int mLine;
-    int mIdUser;
+    QString mIdUser;
     QString mText;
 };
 

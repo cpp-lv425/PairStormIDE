@@ -8,14 +8,17 @@ class CommentDb : public Accessor
 public:
     CommentDb();
     void addCommentToDb(const Comment& comment);
-    void deleteCommentFromDb(const int commentLine, const int commentFile);
+    void deleteCommentFromDb(const int commentLine, const QString commentFile);
     void updateCommentInDb(const Comment& comment);
-    void getCommentFromDb(const int commentLine, const int commentFile);
+    QVector <Comment> getAllCommentsFromDB(const QString filename);
+    void getCommentFromDb(const int commentLine, const QString commentFile);
 private:
     QString addCommentQuery(const Comment& comment);
-    QString deleteCommentQuery(const int commentLine, const int commentFile);
+    QString deleteCommentQuery(const int commentLine, const QString commentFile);
     QString updateCommentQuery(const Comment& comment);
-    QString getCommentQuery(const int commentLine, const int commentFile);
+    QString getCommentQuery(const int commentLine, const QString commentFile);
+    void fillStructComment(Comment &comment);
+    QString numberOfCommentInFileQuery(const QString filename);
 };
 
 #endif // COMMENTDB_H

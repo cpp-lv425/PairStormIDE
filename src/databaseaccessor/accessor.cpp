@@ -8,12 +8,6 @@ Accessor::Accessor()
     setQuery(database->getDatabase());
 }
 
-Accessor::~Accessor()
-{
-    query.clear();
-    qDebug()<<"clear query";
-}
-
 void Accessor::setQuery(QSqlDatabase db)
 {
     query = QSqlQuery(db);
