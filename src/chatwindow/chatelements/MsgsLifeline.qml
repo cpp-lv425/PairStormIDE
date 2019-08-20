@@ -103,8 +103,8 @@ Item {
                 Rectangle {
                     id: messageBody
 
-                    width: Math.min(Math.max(messageText.implicitWidth, messageAuthor.contentWidth) + 24,
-                                    listView.width - 70)
+                    width: { return Math.min(Math.max(messageText.implicitWidth, messageAuthor.contentWidth) + 24,
+                                    messagesHistory.width - 70) }
 
                     height: messageText.implicitHeight + 27
                     color: "#263745"
@@ -152,7 +152,6 @@ Item {
                         color: "white"
                     }
                 }
-
                 Control {
                     id: rightToothShape
 

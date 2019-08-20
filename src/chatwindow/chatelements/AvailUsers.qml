@@ -6,7 +6,6 @@ import QtGraphicalEffects 1.12
 
 import "scripts/ChatBase.js" as ChatBase
 import "basicelements" as BasicElements
-
 import AvailableUsers 1.0
 
 

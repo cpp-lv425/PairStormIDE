@@ -109,8 +109,9 @@ Item {
             Image {
                 anchors.fill: sendButton
                 source: "res/SEND.png"
-                smooth: true
-                antialiasing: true
+                fillMode: Image.PreserveAspectFit
+                //sourceSize.width:  300
+                //sourceSize.height: 300
             }
 
             MouseArea {

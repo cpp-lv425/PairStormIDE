@@ -28,6 +28,7 @@ ChatWidget::ChatWidget(QWidget *pParent):
     qmlRegisterType<OnlineUsersModel>("AvailableUsers", 1, 0, "AvailableUsersModel");
     qmlRegisterUncreatableType<OnlineUsersList>("AvailableUsers", 1, 0, "AvailableUsersList", QStringLiteral("AvailableUsersList should not be created in the QML"));
 
+
     mpOnlineUsers = new OnlineUsersList();
 
     QBoxLayout *box = new QBoxLayout(QBoxLayout::BottomToTop, this);
@@ -36,6 +37,11 @@ ChatWidget::ChatWidget(QWidget *pParent):
 
 
     QQuickView * view = new QQuickView();
+
+    QSurfaceFormat format;
+    format.setSamples(16);
+    view->setFormat(format);
+
     view->setResizeMode(QQuickView::SizeRootObjectToView);
     view->setSource(QUrl("qrc:/chat.qml"));
     mpChatContext = view->engine()->rootContext();
