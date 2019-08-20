@@ -718,5 +718,5 @@ void MainWindow::setAppStyle(const QString &styleName)
     //QPalette newPal = palette();
     qApp->setPalette(palette);
 
-
+    mpDocumentManager->setStyle(styleName);
 }

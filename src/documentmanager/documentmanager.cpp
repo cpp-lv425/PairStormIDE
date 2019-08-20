@@ -555,6 +555,26 @@ void DocumentManager::closeCurrentDocArea()
     }
 }
 
+void DocumentManager::setStyle(const QString &styleName)
+{
+    // setting new style to every opened doc view
+    for (const auto& area: mDocAreas)
+    {
+        auto windowsList = area->subWindowList();
+
+        std::for_each(windowsList.begin(), windowsList.end(),
+                      [&styleName](const auto& wdw)
+        {
+            auto doc = qobject_cast<CodeEditor*>(wdw->widget());
+            if (doc)
+            {
+                qDebug() << "changing editor style";
+                //doc->setStyle(styleName);
+            }
+        });
+    }
+}
+
 bool DocumentManager::saveDocument(CodeEditor *doc)
 {
     // if doc wasn't modified - then return
