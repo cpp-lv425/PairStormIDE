@@ -111,7 +111,7 @@ struct ServerData
     }
 };
 
-struct Message
+struct NetworkMessage
 {
     QString mSourceName;
     QString mContent;
@@ -144,7 +144,7 @@ struct Message
 
     void fromJsonQString(QString str)
     {
-        *this = Message();
+        *this = NetworkMessage();
         // Decompose the Json bearer string
         QJsonDocument doc = QJsonDocument::fromJson(str.toUtf8());
         QJsonObject json = doc.object();
