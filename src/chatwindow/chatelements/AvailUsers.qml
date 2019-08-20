@@ -132,7 +132,16 @@ Item {
                             widthToHeight:   ChatBase.golden_ratio//1.618034
                             onStateChanged: {
                                 console.log("" + model.name + " has been turned " + state)
-                                model.connected = !model.connected
+                                if (state === "on")
+                                {
+                                    model.connected = true
+                                }
+                                if (state === "off")
+                                {
+                                    model.connected = false
+                                }
+
+                                //model.connected = !model.connected
                                 //AvailableUsersList.connectToUserOnClick()
                             }
                         }

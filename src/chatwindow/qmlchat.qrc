@@ -11,5 +11,7 @@
         <file>chat.qml</file>
         <file>chatelements/res/SEND.png</file>
         <file>chatelements/res/USER.png</file>
+        <file>chatdisabled.qml</file>
+        <file>chatelements/res/SORRY.png</file>
     </qresource>
 </RCC>

@@ -29,6 +29,28 @@ QmlChatWidget::QmlChatWidget()
     connect(mpUsers, &OnlineUsersModel::stateChangedOff,
             this,          &QmlChatWidget::DisconnectUserOnChangedState,
             Qt::UniqueConnection);
+
+
+    mpBoxLayout = new QBoxLayout(QBoxLayout::BottomToTop, this);
+    mpBoxLayout->setSpacing(0);
+    mpBoxLayout->setMargin(0);
+
+    QQuickView * view = new QQuickView();
+
+    view->setResizeMode(QQuickView::SizeRootObjectToView);
+    view->setSource(QUrl("qrc:/chatdisabled.qml"));
+
+    mpRestrictedChatWidget = QWidget::createWindowContainer(view, this);
+    mpRestrictedChatWidget->setContentsMargins(0, 0, 0, 0);
+
+    mpRestrictedChatWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    mpRestrictedChatWidget->setFocusPolicy(Qt::StrongFocus);
+
+    //setEnabled(false);
+    setMinimumSize(210, 400);
+
+    mpBoxLayout->addWidget(mpRestrictedChatWidget);
+    setLayout(mpBoxLayout);
 }
 
 void QmlChatWidget::keyPressEvent(QKeyEvent *event)
@@ -43,10 +65,6 @@ void QmlChatWidget::configureOnLogin(const QString &userName)
     qmlRegisterType<OnlineUsersModel>("AvailableUsers", 1, 0, "AvailableUsersModel");
 
 
-    QBoxLayout *box = new QBoxLayout(QBoxLayout::BottomToTop, this);
-    box->setSpacing(0);
-    box->setMargin(0);
-
     QQuickView * view = new QQuickView();
 
     QSurfaceFormat format;
@@ -58,18 +76,17 @@ void QmlChatWidget::configureOnLogin(const QString &userName)
     mpChatContext = view->engine()->rootContext();
     mpChatContext->setContextProperty(QStringLiteral("AvailableUsersList"), mpUsers);
 
-    QWidget *container = QWidget::createWindowContainer(view, this);
-    container->setContentsMargins(0, 0, 0, 0);
+    mpAllowedChatWidget = QWidget::createWindowContainer(view, this);
+    mpAllowedChatWidget->setContentsMargins(0, 0, 0, 0);
 
-    container->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    container->setFocusPolicy(Qt::StrongFocus);
+    mpAllowedChatWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    mpAllowedChatWidget->setFocusPolicy(Qt::StrongFocus);
 
     //setEnabled(false);
     setMinimumSize(210, 400);
 
-    box->addWidget(container);
-    setLayout(box);
-    show();
+    mpBoxLayout->removeWidget(mpRestrictedChatWidget);
+    mpBoxLayout->addWidget(mpAllowedChatWidget);
 }
 
 void QmlChatWidget::updateOnlineUsers(const QStringList &onlineUsers)

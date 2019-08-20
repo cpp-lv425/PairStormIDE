@@ -56,11 +56,13 @@ bool OnlineUsersModel::setData(const QModelIndex &index, const QVariant &value, 
     case ConnectedRole:
         if (value.toBool())
         {
+            qDebug() << "connect to user: " << user.mUserName;
             user.mState = ChatUser::State::ConnectedUser;
             emit stateChangedOff(user.mUserName);
         }
         else
         {
+            qDebug() << "disconnect from user: " << user.mUserName;
             user.mState = ChatUser::State::DisconnectedUser;
             emit stateChangedOff(user.mUserName);
         }

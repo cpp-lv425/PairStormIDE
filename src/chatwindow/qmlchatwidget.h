@@ -5,6 +5,8 @@
 #include "onlineusersmodel.h"
 #include <QQmlContext>
 
+#include <QBoxLayout>
+
 class QmlChatWidget : public ChatWidgetInterface
 {
     Q_OBJECT
@@ -32,6 +34,9 @@ private:
 
     OnlineUsersModel * mpUsers;
     QQmlContext      * mpChatContext;
+    QBoxLayout       * mpBoxLayout;
+    QWidget          * mpRestrictedChatWidget;
+    QWidget          * mpAllowedChatWidget;
 
 private slots:
     void ConnectUserOnChangedState   (const QString userName);
