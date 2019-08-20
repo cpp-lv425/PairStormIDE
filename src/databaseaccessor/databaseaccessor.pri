@@ -3,22 +3,22 @@ INCLUDEPATH += $$PWD
 
 HEADERS += \
     $$PWD/accessor.h \
-    $$PWD/commentDb.h \
+    $$PWD/commentdb.h \
     $$PWD/connection.h \
     $$PWD/connectiongetter.h \
     $$PWD/createdb.h \
-    $$PWD/fileDb.h \
-    $$PWD/messageDb.h \
+    $$PWD/filedb.h \
+    $$PWD/messagedb.h \
     $$PWD/sqliteaccess.h \
     $$PWD/structsfordb.h \
-    $$PWD/userDb.h
+    $$PWD/userdb.h
 
 SOURCES += \
     $$PWD/accessor.cpp \
-    $$PWD/commentDb.cpp \
+    $$PWD/commentdb.cpp \
     $$PWD/connection.cpp \
     $$PWD/connectiongetter.cpp \
     $$PWD/createdb.cpp \
-    $$PWD/fileDb.cpp \
-    $$PWD/messageDb.cpp \
-    $$PWD/userDb.cpp
+    $$PWD/filedb.cpp \
+    $$PWD/messagedb.cpp \
+    $$PWD/userdb.cpp

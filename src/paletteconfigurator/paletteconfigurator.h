@@ -12,7 +12,7 @@ class PaletteConfigurator
     QMap<QString, QPalette> palettePrototypes;
 public:
     explicit PaletteConfigurator(const QPalette &defaultPalette);
-    const QPalette& getPalette(const QString& paletteStyle)const;
+    QPalette getPalette(const QString& paletteStyle)const;
 };
 
 #endif // PALETTECONFIGURATOR_H

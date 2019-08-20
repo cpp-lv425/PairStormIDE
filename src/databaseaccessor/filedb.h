@@ -7,11 +7,11 @@ class FileDb : public Accessor
 {
 public:
     FileDb();
-    void addFileToDb(const dbFile& file);
+    void addFileToDb(const File& file);
     void getFileFromDb(const int idFile);
     void deleteFileFromDb(const  QString filename);
 private:
-    QString addFileQuery(const dbFile & file);
+    QString addFileQuery(const File & file);
     QString getFileQuery(const int idFile);
     QString deleteFileQuery(const QString filename);
 };

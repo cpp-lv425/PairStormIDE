@@ -1,11 +1,11 @@
-#include "fileDb.h"
+#include "filedb.h"
 
 FileDb::FileDb() :Accessor ()
 {
 
 }
 
-void FileDb::addFileToDb(const dbFile &file)
+void FileDb::addFileToDb(const File &file)
 {
     execQuery(addFileQuery(file));
 }
@@ -20,7 +20,7 @@ void FileDb::deleteFileFromDb(const QString filename)
     execQuery(deleteFileQuery(filename));
 }
 
-QString FileDb::addFileQuery(const dbFile &file)
+QString FileDb::addFileQuery(const File &file)
 {
     return "INSERT INTO File (name) VALUES ('"
             +file.mName + "')";

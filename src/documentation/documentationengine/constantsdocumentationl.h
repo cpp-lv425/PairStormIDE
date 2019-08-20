@@ -11,6 +11,58 @@ namespace ReferenceUrl
 const std::string mustasheTemplate{R"(<!DOCTYPE html>
                                     <html>
                                         <head>
+                                   <style>
+                                   * {
+                                       text-align: center;
+                                       padding-right: 25%;
+                                       padding-left: 25%;
+                                       font-family: "Courier New", monospace;
+                                   }
+
+                                   table {
+                                       font-size: 18px;
+                                       background: white;
+                                       max-width: 100%;
+                                       border-collapse: collapse;
+                                       text-align: left;
+                                   }
+
+                                   tr:first-child {
+                                       font-weight: normal;
+                                       border-bottom: 2px solid gray;
+                                       padding: 10px 8px;
+                                       text-align: left;
+                                       background-color: white;
+                                   }
+
+                                   tr:last-child {
+                                       font-weight: normal;
+                                       border-bottom: 2px solid gray;
+                                   }
+
+                                   tr:first-child td {
+                                       font-size: 25px;
+                                      color: rgba(0, 0, 0, .8);
+                                      padding: 9px 8px;
+                                      text-align: center;
+                                   }
+
+                                   td {
+                                      color: rgba(0, 0, 0, .5);
+                                      padding: 9px 8px;
+                                      text-align: left;
+                                   }
+
+                                   td a {
+                                       margin-left: -84px;
+                                       color: rgba(0, 0, 0, .6);
+                                       text-decoration: none;
+                                   }
+
+                                   td a:hover {
+                                       color: rgba(0, 0, 0, .9);
+                                   }
+                                   </style>
                                             <title>{{search}}</title>
                                             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
                                             </head>
@@ -22,50 +74,18 @@ const std::string mustasheTemplate{R"(<!DOCTYPE html>
                                                 <table style="width:100%">
                                                     <tbody>
                                                         <tr>
-                                                                 {{#showIcons}}
-
-                                                            <td>&nbsp;</td>
-                                                                 {{/showIcons}}
-
                                                             <td>
-                                                                <strong>Name</strong>
+                                                                <strong>Links</strong>
                                                             </td>
-                                                                 {{#showSize}}
-
-                                                            <td>
-                                                                <strong></strong>
-                                                            </td>
-                                                                 {{/showSize}}
-                                                                 {{#showDetails}}
-
-                                                            <td>
-                                                                <strong></strong>
-                                                            </td>
-                                                                 {{/showDetails}}
 
                                                         </tr>
-                                                                 {{#dirEntryList}}
-
+                                                        {{#dirEntryList}}
                                                         <tr>
-                                                                 {{#showIcons}}
-
-                                                            <td>{{{fileIcon}}}</td>
-                                                                 {{/showIcons}}
-
                                                             <td>
                                                                 <a href="{{fileIndex}}">{{fileName}}</a>
                                                             </td>
-                                                                 {{#showSize}}
-
-                                                            <td>{{fileSize}}</td>
-                                                                 {{/showSize}}
-                                                                 {{#showDetails}}
-
-                                                            <td>{{fileDetails}}</td>
-                                                                 {{/showDetails}}
-
                                                         </tr>
-                                                                 {{/dirEntryList}}
+                                                        {{/dirEntryList}}
 
                                                     </tbody>
                                                 </table>

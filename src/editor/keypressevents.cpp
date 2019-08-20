@@ -216,4 +216,26 @@ void EventSaveChangeInHistory::operator()(CodeEditor *codeEditor, QKeyEvent *e)
     codeEditor->saveStateInTheHistory();
 
 }
+
 EventSaveChangeInHistory::~EventSaveChangeInHistory() = default;
+
+//EventCtrlV
+void EventCtrlV::operator()(CodeEditor *codeEditor, QKeyEvent *e)
+{
+    int lineStart = codeEditor->textCursor().blockNumber() + 1;
+    plainTextPressEvent(codeEditor, e);
+    codeEditor->saveStateInTheHistory();
+
+    int lineEnd = codeEditor->textCursor().blockNumber() + 1;
+    emit(codeEditor->textChangedInLines(lineStart, lineEnd));
+}
+
+EventCtrlV::~EventCtrlV() = default;
+
+void EventRemoveKey::operator()(CodeEditor *codeEditor, QKeyEvent *e)
+{
+    plainTextPressEvent(codeEditor,e);
+    codeEditor->setLastRemomeKey(e->key() == Qt::Key_Backspace ? BACK : DEL);
+}
+
+EventRemoveKey::~EventRemoveKey() = default;

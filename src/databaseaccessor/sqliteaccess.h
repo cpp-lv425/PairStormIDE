@@ -1,10 +1,10 @@
 #ifndef SQLITEACCESS_H
 #define SQLITEACCESS_H
 
-#include "fileDb.h"
-#include "userDb.h"
-#include "commentDb.h"
-#include "messageDb.h"
+#include "filedb.h"
+#include "userdb.h"
+#include "commentdb.h"
+#include "messagedb.h"
 #include "structsfordb.h"
 #include "createdb.h"
 

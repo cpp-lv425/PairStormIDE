@@ -1,11 +1,11 @@
-#include "messageDb.h"
+#include "messagedb.h"
 
 MessageDb::MessageDb(): Accessor()
 {
 
 }
 
-void MessageDb::addMessageToDb(const dbMessage &message)
+void MessageDb::addMessageToDb(const Message &message)
 {
     execQuery(addMessageQuery(message));
 }
@@ -15,7 +15,7 @@ void MessageDb::getMessageFromDb(const int messageId)
     execQuery(getMessageQuery(messageId));
 }
 
-QString MessageDb::addMessageQuery(const dbMessage &message)
+QString MessageDb::addMessageQuery(const Message &message)
 {
     return "INSERT INTO Message (idUser, body) VALUES ('"
             + QString::number(message.mIdUser) + "', '"

@@ -8,7 +8,7 @@ class BrowserDialog;
 }
 
 QT_BEGIN_NAMESPACE
-class MDIArea;
+class DocumentManager;
 class ConnectionManager;
 class DocumentationEngine;
 QT_END_NAMESPACE

@@ -6,10 +6,10 @@ class UserDb : public Accessor
 {
 public:
     UserDb();
-    void addUserToDb(const dbUser& user);
+    void addUserToDb(const User& user);
     void getUserFromDb(const int idUser);
 private:
-    QString addUserQuery(const dbUser& user);
+    QString addUserQuery(const User& user);
     QString getUserQuery(const int idUser);
 };
 

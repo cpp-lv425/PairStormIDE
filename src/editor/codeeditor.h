@@ -8,6 +8,7 @@ const int TOP_UNUSED_PIXELS_HEIGHT = 4;
 #include"ideconfiguration.h"
 #include"changemanager.h"
 #include"addcommentbutton.h"
+#include"addcommenttextedit.h"
 #include"ideconfiguration.h"
 #include"lexercpp.h"
 #include<utility>
@@ -18,6 +19,10 @@ const int TOP_UNUSED_PIXELS_HEIGHT = 4;
 #include<QObject>
 #include<QMouseEvent>
 #include<QLabel>
+#include<commentwidget.h>
+#include<QVector>
+#include<QFont>
+#include<QStatusBar>
 
 class QPaintEvent;
 class QResizeEvent;
@@ -25,13 +30,20 @@ class QSize;
 class QWidget;
 class LineNumberArea;
 
+
+enum LastRemoveKey
+{
+    BACK,
+    DEL
+};
+
 class CodeEditor : public QPlainTextEdit
 {
     Q_OBJECT
-
 public:
     CodeEditor(QWidget *parent = nullptr);
-    void lineNumberAreaPaintEvent(QPaintEvent *event);
+    void specialAreasRepaintEvent(QPaintEvent *event);
+    void repaintButtonsArea(int bottom, int top, int blockNumber);
     int getLineNumberAreaWidth();
     bool isinsidebracket();
     QString& getFileName();
@@ -43,6 +55,21 @@ public:
     bool isChanged();
     void setBeginTextState();
 
+    LastRemoveKey getLastRemomeKey() const;
+    void setLastRemomeKey(const LastRemoveKey &value);
+private:
+    void rewriteButtonsLines( QVector<AddCommentButton*> &commentV, int diff, int startLine);
+    void setAnotherButtonLine(AddCommentButton *comment, int diff);
+    bool isInRangeIncludBoth(int val, int leftMargin, int rightMargin);
+    bool isInRangeIncludLast(int val, int leftMargin, int rightMargin);
+
+    void removeButtonByIndex(QVector<AddCommentButton*> &commentV, int index);
+    void removeButtomByValue(QVector<AddCommentButton*> &commentV, AddCommentButton* commentButton);
+    void removeButtons(QVector<AddCommentButton*> &commentV, int cursorLine, int startLine, int endLine, int diff);
+
+    bool isCommentButtonExist(int line);
+    AddCommentButton* getCommentButtonByIndex(const int line);
+    void setNewAddedButtonSettings(AddCommentButton *commentButton);
 
 protected:
     void resizeEvent(QResizeEvent *event)override;
@@ -54,16 +81,26 @@ private slots:
     void updateLineNumberArea(const QRect &rect, int dy);
     void runLexer();
     void highlighText();
+    //void showCommentLine(int line);
+    void deleteComment();
 
 public slots:
     void keyPressEvent(QKeyEvent *e) override;
     void saveStateInTheHistory();
     void setZoom(int zoomVal);
+    void textChangedInTheOneLine();
+    void showCommentTextEdit(int);
+    void emptyCommentWasAdded();
+    void notEmptyCommentWasAdded();
+    void changeCommentButtonsState();
 
 signals:
     void changesAppeared();
     void sendLexem(QString);
     void closeDocEventOccured(CodeEditor*);
+    void textChangedInLine(int);
+    void textChangedInLines(int, int);
+    void linesCountUpdated();
 
 
 private:
@@ -76,19 +113,27 @@ private:
     QTimer *mTimer;
     LexerCPP mLexer;
     AddCommentButton *mAddCommentButton;
+    CommentWidget *mCommentWidget;
     QLabel *mCurrentCommentLable;
-    int mLinesCount;
+
+    int mLinesCountPrev;
+    int mLinesCountCurrent;
+
     QString mBeginTextState;
+    QVector<AddCommentButton*> mCommentsVector;
 
     QTextCharFormat fmtLiteral;
     QTextCharFormat fmtComment;
     QTextCharFormat fmtKeyword;
     QTextCharFormat fmtRegular;
+    QTextCharFormat fmtUndefined;
+
+    LastRemoveKey lastRemomeKey;
 
 protected:
     int mCurrentZoom;
     QVector<Token> mTokens;
- friend class Event;
+    friend class Event;
 };
 
 #endif // CODEEDITOR_H

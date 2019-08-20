@@ -1,10 +1,10 @@
-#include "commentDb.h"
+#include "commentdb.h"
 
 CommentDb::CommentDb(): Accessor()
 {
 }
 
-void CommentDb::addCommentToDb(const dbComment &comment)
+void CommentDb::addCommentToDb(const Comment &comment)
 {
     execQuery(addCommentQuery(comment));
 }
@@ -14,7 +14,7 @@ void CommentDb::deleteCommentFromDb(const int commentLine, const int commentFile
     execQuery(deleteCommentQuery(commentLine, commentFile));
 }
 
-void CommentDb::updateCommentInDb(const dbComment& comment)
+void CommentDb::updateCommentInDb(const Comment& comment)
 {
     execQuery(updateCommentQuery(comment));
 }
@@ -24,7 +24,7 @@ void CommentDb::getCommentFromDb(const int commentLine, const int commentFile)
     execQuery(getCommentQuery(commentLine, commentFile));
 }
 
-QString CommentDb::addCommentQuery(const dbComment &comment)
+QString CommentDb::addCommentQuery(const Comment &comment)
 {
     return "INSERT INTO Comment (line, idFile, idUser, text) VALUES ('"
             +QString::number(comment.mLine) + "', '"
@@ -41,7 +41,7 @@ QString CommentDb::deleteCommentQuery(const int commentLine, const int commentFi
             QString::number(commentLine);
 }
 
-QString CommentDb::updateCommentQuery(const dbComment& comment)
+QString CommentDb::updateCommentQuery(const Comment& comment)
 {
     return "UPDATE Comment SET idUser = '" + QString::number(comment.mIdUser)
             +"', text = " + comment.mText

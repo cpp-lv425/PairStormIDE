@@ -9,7 +9,7 @@
 #include <QWebEngineView>
 #include <QWebEnginePage>
 
-#include "mdiarea.h"
+#include "documentmanager.h"
 #include "documentationsearch.h"
 #include "connectionmanager.h"
 #include "documentationengine.h"
@@ -37,6 +37,23 @@ BrowserDialog::BrowserDialog(QWidget *parent) :
 BrowserDialog::~BrowserDialog()
 {
     delete ui;
+    delete mConnectionManager;
+
+    QDir dir = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
+
+    bool result = true;
+    result = !dir.cd("PairStorm") ? false : result;
+    result = !dir.cd("temp")      ? false : result;
+
+    if(result)
+    {
+        dir.setNameFilters(QStringList() << "*.html");
+        dir.setFilter(QDir::Files);
+        foreach(QString dirFile, dir.entryList())
+        {
+           dir.remove(dirFile);
+        }
+    }
 }
 
 void BrowserDialog::createNewTab(const QString &keyword)
