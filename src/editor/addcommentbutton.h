@@ -17,6 +17,9 @@ public:
     QString getCommentString() const;
     void setCommentString(const QString &value);
 
+    QString getUser() const;
+    void setUser(const QString &user);
+
 signals:
     void addCommentButtonPressed(int);
 
@@ -26,6 +29,7 @@ protected:
 private:
     int mCurrentLine;
     QString mCommentString;
+    QString mUser;
 };
 
 #endif // ADDCOMMENTBUTTON_H

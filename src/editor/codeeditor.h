@@ -103,8 +103,9 @@ public slots:
     void notEmptyCommentWasAdded();
     void changeCommentButtonsState();
     void setTextColors();
-    void setFontSize();
-    void setFontStyle();
+    void setFontSize(const QString &fontSize);
+    void setFontStyle(const QString &fontStyle);
+    void setIdeType(const QString &ideType);
 
 signals:
     void changesAppeared();

@@ -97,15 +97,24 @@ void CodeEditor::setTextColors()
     fmtRegular.setForeground(mConfigParam.textColors.mCodeTextColor);
 }
 
-void CodeEditor::setFontSize()
+void CodeEditor::setIdeType(const QString &ideType)
 {
+    mConfigParam.setIdeType(ideType);
+    setTextColors();
+}
+
+void CodeEditor::setFontSize(const QString &fontSize)
+{
+    mConfigParam.setFontSize(fontSize);
     mFont.setPointSize(mConfigParam.mFontSize);
 }
 
-void CodeEditor::setFontStyle()
+void CodeEditor::setFontStyle(const QString &fontStyle)
 {
+    mConfigParam.setFontStyle(fontStyle);
     mFont.setFamily(mConfigParam.mFontStyle);
 }
+
 
 ConfigParams CodeEditor::getConfigParam()
 {
@@ -306,7 +315,6 @@ void CodeEditor::setNewAddedButtonSettings(AddCommentButton *commentButton)
 
 void CodeEditor::showCommentTextEdit(int line)
 {
-    mCommentWidget->setWindowTitle("Comment to " + QString::number(line) + " line");
     mCommentWidget->setPosition(this, mAddCommentButton);
     mCommentWidget->setVisible(true);
     mCommentWidget->setCommentButtonGeometry(mAddCommentButton->geometry());
@@ -321,6 +329,8 @@ void CodeEditor::showCommentTextEdit(int line)
     {
         mCommentWidget->getEditTab()->setText("");
     }
+     QSettings settings(QApplication::organizationName(), QApplication::applicationName());
+     mCommentWidget->setWindowTitle("Comment to " + QString::number(line) + " line by " + settings.value("UserName").toString());
     //for text tokens
 //    qDebug()<<"tokens vector size = "<<mTokens.size();
 //    for (auto &i: mTokens)
@@ -365,6 +375,9 @@ void CodeEditor::notEmptyCommentWasAdded()
         commentButtonNew->setStyleSheet("background-color: #18CD3C");
         commentButtonNew->setText("✔");
         commentButtonNew->setVisible(true);
+
+        QSettings settings(QApplication::organizationName(), QApplication::applicationName());
+        commentButtonNew->setUser(settings.value("UserName").toString());
 
         setNewAddedButtonSettings(commentButtonNew);
 
