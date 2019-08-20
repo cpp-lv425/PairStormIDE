@@ -20,13 +20,13 @@
 QmlChatWidget::QmlChatWidget()
 {
     QQuickWindow::setSceneGraphBackend(QSGRendererInterface::Software);
-    mpUsers = std::shared_ptr<OnlineUsersModel>(new OnlineUsersModel());
+    mpUsers = new OnlineUsersModel();
 
-    connect(mpUsers.get(), &OnlineUsersModel::stateChangedOn,
+    connect(mpUsers, &OnlineUsersModel::stateChangedOn,
             this,          &QmlChatWidget::ConnectUserOnChangedState,
             Qt::UniqueConnection);
 
-    connect(mpUsers.get(), &OnlineUsersModel::stateChangedOff,
+    connect(mpUsers, &OnlineUsersModel::stateChangedOff,
             this,          &QmlChatWidget::DisconnectUserOnChangedState,
             Qt::UniqueConnection);
 }
@@ -55,8 +55,8 @@ void QmlChatWidget::configureOnLogin(const QString &userName)
 
     view->setResizeMode(QQuickView::SizeRootObjectToView);
     view->setSource(QUrl("qrc:/chat.qml"));
-    mpChatContext = std::shared_ptr<QQmlContext>(view->engine()->rootContext());
-    mpChatContext->setContextProperty(QStringLiteral("AvailableUsersList"), mpUsers.get());
+    mpChatContext = view->engine()->rootContext();
+    mpChatContext->setContextProperty(QStringLiteral("AvailableUsersList"), mpUsers);
 
     QWidget *container = QWidget::createWindowContainer(view, this);
     container->setContentsMargins(0, 0, 0, 0);

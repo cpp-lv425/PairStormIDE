@@ -41,7 +41,7 @@ signals:
 
 private:
 
-    std::shared_ptr<OnlineUsersList> mpUsersList;
+    OnlineUsersList * mpUsersList;
 
 };
 

@@ -30,8 +30,8 @@ private:
 
     QString mUserName;
 
-    std::shared_ptr<OnlineUsersModel> mpUsers;
-    std::shared_ptr<QQmlContext>      mpChatContext;
+    OnlineUsersModel * mpUsers;
+    QQmlContext      * mpChatContext;
 
 private slots:
     void ConnectUserOnChangedState   (const QString userName);

@@ -6,8 +6,7 @@
 OnlineUsersModel::OnlineUsersModel(QObject *parent)
     : QAbstractListModel(parent)
 {
-    mpUsersList =
-            std::shared_ptr<OnlineUsersList>(new OnlineUsersList());
+    mpUsersList = new OnlineUsersList();
 
 }
 
