@@ -2,6 +2,7 @@
 #define CHATWIDGET_H
 
 #include <QWidget>
+#include "chatwidgetinterface.h"
 
 class OnlineUsersList;
 class QListWidgetItem;
@@ -11,10 +12,34 @@ class QQmlContext;
 class QListWidget;
 class QLineEdit;
 
-class ChatWidget: public QWidget
+
+class ChatWidget: public ChatWidgetInterface
 {
     Q_OBJECT
 
+public:
+    ChatWidget();
+    ChatWidget(ChatWidget const&)             = delete;
+    ChatWidget & operator=(ChatWidget const&) = delete;
+
+    virtual void keyPressEvent(QKeyEvent * event) override;
+
+public slots:
+
+    virtual void configureOnLogin(const QString & userName) override;
+
+    virtual void updateOnlineUsers(const QStringList & onlineUsers) override;
+    virtual void updateConnectedUsers(const QStringList & connectedUsers) override;
+
+    virtual void appendMessage(const QString & messageAuthor,
+                               const QString & messageBody) override;
+
+private slots:
+
+    void connectOrDisconnectOnRequest(QListWidgetItem *item);
+    void onSendCommand();
+
+private:
     QListWidget *mpUsersList;
     QStringList  mOnlineUsers;
     QStringList  mConnectedUsers;
@@ -23,37 +48,7 @@ class ChatWidget: public QWidget
     QPlainTextEdit *mpFeed;
     QLineEdit      *mpEnterLine;
 
-
-
-    QQuickWidget * mChatQuickWidget;
-    QQmlContext * mpChatContext;
-
-    OnlineUsersList * mpOnlineUsers;
-
     void updateUsersList();
-
-public:
-    explicit ChatWidget(QWidget *pParent = nullptr);
-
-    void setOnlineUsers(const QStringList & onlineUsers);
-    void setConnectedUsers(const QStringList & connectedUsers);
-
-    bool isUserConnected(const QString & userName);
-
-    void setCurrentUserName(const QString& userName);
-    void displayMessage(const QString& userName,
-                        const QString& message);
-
-public slots:
-    void onSendCommand();
-
-private slots:
-    void onUserToConnectSelected(QListWidgetItem *item);
-    void updateFeedOnSend();
-
-signals:
-    void userToConnectSelected(QString);
-    void sendMessage(const QString&);
 };
 
 #endif // CHATWIDGET_H

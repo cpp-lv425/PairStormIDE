@@ -1,54 +1,70 @@
 #include "onlineusersmodel.h"
 #include "onlineuserslist.h"
+#include "chatbase.h"
 #include <QDebug>
 
 OnlineUsersModel::OnlineUsersModel(QObject *parent)
     : QAbstractListModel(parent)
 {
-    mpOnlineUsersList = new OnlineUsersList();
+    mpUsersList =
+            std::shared_ptr<OnlineUsersList>(new OnlineUsersList());
+
 }
 
 int OnlineUsersModel::rowCount(const QModelIndex &parent) const
 {
-    // For list models only the root node (an invalid parent) should return the list's size. For all
-    // other (valid) parents, rowCount() should return 0 so that it does not become a tree model.
-    if (parent.isValid() || !mpOnlineUsersList)
+    if (parent.isValid() || !mpUsersList)
+    {
         return 0;
+    }
 
-    qDebug() << "someone gets number of elements";
-    return mpOnlineUsersList->users().size();
+    int rowsNum = mpUsersList->size();
+    return rowsNum;
 }
 
 QVariant OnlineUsersModel::data(const QModelIndex &index, int role) const
 {
-    if (!index.isValid() || !mpOnlineUsersList)
+    if (!index.isValid() || !mpUsersList)
+    {
         return QVariant();
-
-    qDebug() << "someone gets data";
-
-    const OnlineChatUser user = mpOnlineUsersList->users().at(index.row());
-    switch(role) {
-    case ConnectedRole:
-        return QVariant(user.mConnected);
-    case NameRole:
-        return QVariant(user.mUserName);
     }
+
+    int userNum = index.row();
+    const ChatUser currentUser
+            = mpUsersList->at(userNum);
+
+    switch(role)
+    {
+    case Role::NameRole:
+        return QVariant(currentUser.mUserName);
+    case Role::ConnectedRole:
+        return QVariant(currentUser.mState);
+    }
+
     return QVariant();
 }
 
 bool OnlineUsersModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
-    if (!mpOnlineUsersList)
+    if (!mpUsersList)
     {
         return false;
     }
 
-
-    OnlineChatUser user = mpOnlineUsersList->users().at(index.row());
+    ChatUser& user = mpUsersList->at(index.row());
     qDebug() << "somone try to set data on user with index " << index.row();
     switch(role) {
     case ConnectedRole:
-        user.mConnected = value.toBool();
+        if (value.toBool())
+        {
+            user.mState = ChatUser::State::ConnectedUser;
+            emit stateChangedOff(user.mUserName);
+        }
+        else
+        {
+            user.mState = ChatUser::State::DisconnectedUser;
+            emit stateChangedOff(user.mUserName);
+        }
         break;
     case NameRole:
         user.mUserName = value.toString();
@@ -66,24 +82,31 @@ bool OnlineUsersModel::setData(const QModelIndex &index, const QVariant &value, 
 Qt::ItemFlags OnlineUsersModel::flags(const QModelIndex &index) const
 {
     if (!index.isValid())
+    {
         return Qt::NoItemFlags;
+    }
 
-    return Qt::ItemIsEditable; // FIXME: Implement me!
+    return Qt::ItemIsEditable;
+}
+
+void OnlineUsersModel::updateOnlineUsers(const QStringList &userNames)
+{
+    mpUsersList->updateUsers(userNames);
+}
+
+void OnlineUsersModel::updateConnectedUsers(const QStringList &userNames)
+{
+    mpUsersList->connectUsers(userNames);
 }
 
 QHash<int, QByteArray> OnlineUsersModel::roleNames() const
 {
     QHash<int, QByteArray> userNames;
-    userNames[ConnectedRole] = "connected";
-    userNames[NameRole] = "name";
+    userNames[Role::NameRole]      = "name";
+    userNames[Role::ConnectedRole] = "connected";
     return userNames;
 }
-
-OnlineUsersList *OnlineUsersModel::getMpOnlineUsersList() const
-{
-    return mpOnlineUsersList;
-}
-
+/*
 void OnlineUsersModel::setMpOnlineUsersList(OnlineUsersList *value)
 {
     beginResetModel();
@@ -116,3 +139,4 @@ void OnlineUsersModel::setMpOnlineUsersList(OnlineUsersList *value)
     }
     endResetModel();
 }
+*/

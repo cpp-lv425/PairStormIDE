@@ -3,90 +3,86 @@
 
 OnlineUsersList::OnlineUsersList(QObject *parent) : QObject(parent)
 {
-    OnlineChatUser user;
-    user.mConnected = false;
+    ChatUser user;
     user.mUserName = "Bohdan Vasichkin";
-    mOnlineChatUsers.append(user);
+    user.mState = ChatUser::State::DisconnectedUser;
+    mChatUsers.append(user);
 
-    user.mConnected = true;
     user.mUserName = "ValentynFk";
-    mOnlineChatUsers.append(user);
+    user.mState = ChatUser::State::ConnectedUser;
+    mChatUsers.append(user);
 
-    user.mConnected = true;
-    user.mUserName = "ValentynFk";
-    mOnlineChatUsers.append(user);
+    user.mUserName = "PeterLysyk";
+    user.mState = ChatUser::State::DisconnectedUser;
+    mChatUsers.append(user);
 
-    user.mConnected = true;
-    user.mUserName = "ValentynFk";
-    mOnlineChatUsers.append(user);
+    user.mUserName = "PeterLysyk";
+    user.mState = ChatUser::State::ConnectedUser;
+    mChatUsers.append(user);
 
-    user.mConnected = true;
-    user.mUserName = "ValentynFk";
-    mOnlineChatUsers.append(user);
+    user.mUserName = "PeterLysyk";
+    user.mState = ChatUser::State::ConnectedUser;
+    mChatUsers.append(user);
 
-    user.mConnected = true;
-    user.mUserName = "ValentynFk";
-    mOnlineChatUsers.append(user);
-
-    user.mConnected = true;
-    user.mUserName = "ValentynFk";
-    mOnlineChatUsers.append(user);
-
-    user.mConnected = true;
-    user.mUserName = "ValentynFk";
-    mOnlineChatUsers.append(user);
+    user.mUserName = "PeterLysyk";
+    user.mState = ChatUser::State::ConnectedUser;
+    mChatUsers.append(user);
 }
 
-QVector<OnlineChatUser> OnlineUsersList::users() const
+ChatUser & OnlineUsersList::at(const int & index)
 {
-    return mOnlineChatUsers;
+    return mChatUsers[index];
 }
 
-void OnlineUsersList::updateOnlineUsersOnChanges(const QStringList &userNames)
+int OnlineUsersList::size() const
 {
-    // Remove users that are not online if any
-    for (const auto & user : mOnlineChatUsers) {
-        if (!userNames.contains(user.mUserName))
-        {
-            auto pos = std::find_if(mOnlineChatUsers.begin(),
-                                    mOnlineChatUsers.end(),
-                                    [=] (OnlineChatUser onlineUser) {
-                return onlineUser.mUserName == user.mUserName;
-            });
-            if (pos != mOnlineChatUsers.end())
-            {
-                preUserDisappeared(static_cast<int>(std::distance(mOnlineChatUsers.begin(), pos)));
-                mOnlineChatUsers.erase(pos);
-                postUserDisappeared();
-            }
-        }
-    }
+    return mChatUsers.size();
+}
 
-    QStringList oldUserNames;
-    for (const auto & user : mOnlineChatUsers) {
-        oldUserNames.append(user.mUserName);
-    }
-
-    for (const auto & newUserName : userNames)
+void OnlineUsersList::updateUsers(const QStringList & userNames)
+{
+    if (mChatUsers.empty())
     {
-        if(!oldUserNames.contains(newUserName))
-        {
-            preUserAppeared();
-            OnlineChatUser newUser;
-            newUser.mUserName = newUserName;
-            newUser.mConnected = false;
-            mOnlineChatUsers.append(newUser);
-            postUserAppeared();
-        }
+        return;
     }
+    // Remove users, whose names are not in userNames
+    mChatUsers.erase(std::remove_if(mChatUsers.begin(),
+                                    mChatUsers.end(),
+                                    [userNames](ChatUser user)
+                                    {
+                                        return !userNames.contains(user.mUserName);
+                                    }),
+                     mChatUsers.end());
+    // Add users, whose names are not present in mChatUsers
+    QStringList knownUserNames;
+    std::for_each(mChatUsers.cbegin(),
+                  mChatUsers.cend(),
+                  [&knownUserNames](const ChatUser & user)
+                  {
+                      knownUserNames.push_back(user.mUserName);
+                  });
+    std::for_each(userNames.cbegin(),
+                  userNames.cend(),
+                  [knownUserNames, this] (const QString & userName)
+                  {
+                      if (!knownUserNames.contains(userName))
+                      {
+                          ChatUser newUser;
+                          newUser.mUserName = userName;
+                          newUser.mState    = ChatUser::State::DisconnectedUser;
+                          this->mChatUsers.append(newUser);
+                      }
+                  });
 }
 
-void OnlineUsersList::updateConnectedUsersOnChanges(const QStringList &userNames)
+void OnlineUsersList::connectUsers(const QStringList & userNames)
 {
-    // TODO
-}
-
-void OnlineUsersList::connectToUserOnClick()
-{
-    qDebug() << "try to connect to user ";
+    std::for_each(mChatUsers.begin(),
+                  mChatUsers.end(),
+                  [userNames](ChatUser & user)
+                  {
+                      user.mState = (userNames.contains(user.mUserName))?
+                                  ChatUser::State::ConnectedUser   :
+                                  ChatUser::State::DisconnectedUser;
+                  });
 }

@@ -3,35 +3,28 @@
 
 #include <QObject>
 #include <QVector>
-
-struct OnlineChatUser {
-    QString mUserName;
-    bool mConnected;
-};
+#include "chatbase.h"
 
 class OnlineUsersList : public QObject
 {
     Q_OBJECT
+
 public:
+
     explicit OnlineUsersList(QObject *parent = nullptr);
 
-    QVector<OnlineChatUser> users() const;
+    ChatUser & at(const int & index);
+    int size() const;
 
 signals:
-    void preUserAppeared();
-    void postUserAppeared();
-
-    void preUserDisappeared(int index);
-    void postUserDisappeared();
 
 public slots:
 
-    void updateOnlineUsersOnChanges(const QStringList & userNames);
-    void updateConnectedUsersOnChanges(const QStringList & userNames);
-    void connectToUserOnClick();
+    void updateUsers(const QStringList & userNames);
+    void connectUsers(const QStringList & userNames);
 
 private:
-    QVector<OnlineChatUser> mOnlineChatUsers;
+    QVector<ChatUser> mChatUsers;
 };
 
 #endif // USERSBACKEND_H

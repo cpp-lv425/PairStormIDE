@@ -2,6 +2,7 @@
 #define CHATWINDOWDOCK_H
 
 #include <QDockWidget>
+#include "chatwidgetinterface.h"
 
 class ChatWidget;
 
@@ -9,7 +10,9 @@ class ChatWindowDock: public QDockWidget
 {
     Q_OBJECT
 
-    ChatWidget *mpChatWidget;
+    //ChatWidget *mpChatWidget;
+    ChatWidgetInterface * mpChatWidget;
+
 public:
     explicit ChatWindowDock(QWidget *pParent = nullptr);
     void setUserName(const QString& userName);
@@ -24,8 +27,11 @@ signals:
 public slots:
     void updateOnlineUsersOnChange(const QStringList onlineUsers);
     void updateConnectedUsersOnChange(const QStringList connectedUsers);
+
     void onUserToConnectSelected(QString userName);
-    void onSendMessage(const QString & message);
+    void onUserToDisconnectSelected(QString userName);
+
+    void onMessageSent(const QString & message);
 
 protected:
     virtual void keyPressEvent(QKeyEvent *event);
