@@ -62,10 +62,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     setWindowTitle("PairStorm");
 
-    // fusion style is applied globally
-    // if platform does not support fusion, default style is applied
-    qApp->setStyle(QStyleFactory::create("Fusion"));
-
     setupMainMenu();
 
     setCentralWidget(dynamic_cast<QWidget*>(mpDocumentManager->getSplitter()));
@@ -79,6 +75,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // create instance of Bottom Panel
     createButtomPanel();
 
+    setInitialAppStyle();
     restoreMainWindowState();
 }
 
@@ -711,12 +708,25 @@ void MainWindow::restoreMainWindowState()
         restoreState(settings.value("mainWindowState").toByteArray());
 }
 
+void MainWindow::setInitialAppStyle()
+{
+    // fusion style is applied globally
+    // if platform does not support fusion, default style is applied
+    qApp->setStyle(QStyleFactory::create("Fusion"));
+
+    // restores style palette set in previous app session
+    QSettings savedSettings(QApplication::organizationName(), QApplication::applicationName());
+    QString styleName = {savedSettings.contains("style") ?
+                             savedSettings.value("style").toString()
+                             : "WHITE"};
+    setAppStyle(styleName);
+}
+
 void MainWindow::setAppStyle(const QString &styleName)
 {
     // dark style palette is created & set globally
     QPalette palette = mpPaletteConfigurator->getPalette(styleName);
     //QPalette newPal = palette();
     qApp->setPalette(palette);
-
     mpDocumentManager->setStyle(styleName);
 }

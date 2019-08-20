@@ -52,6 +52,7 @@ private:
 
     void saveMainWindowState();
     void restoreMainWindowState();
+    void setInitialAppStyle();
     void setAppStyle(const QString &style);
 
 private slots:
