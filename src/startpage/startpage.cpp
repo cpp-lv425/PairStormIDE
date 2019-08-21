@@ -75,8 +75,7 @@ StartPage::StartPage(QWidget *parent) :
     setupLabels(pOpenDirLbl, lblFont);
 
     QLabel *pSettingsLbl = new QLabel(tr("Configure IDE"));
-    setupLabels(pSettingsLbl, lblFont);
-    pSettingsLbl->setDisabled(true);
+    setupLabels(pSettingsLbl, lblFont);    
 
     QVBoxLayout *pLblLayout = new QVBoxLayout;
     pLblLayout->addWidget(pNewLbl);

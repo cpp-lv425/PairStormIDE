@@ -66,6 +66,7 @@ public:
 
     ConfigParams getConfigParam();
     void setConfigParam(const ConfigParams &configParam);
+    void highlighText();
 
 private:
     void rewriteButtonsLines( QVector<AddCommentButton*> &commentV, int diff, int startLine);
@@ -92,7 +93,6 @@ private slots:
     void updateLineNumberAreaWidth();
     void updateLineNumberArea(const QRect &rect, int dy);
     void runLexer();
-    void highlighText();
     void deleteComment();
 
 public slots:
@@ -151,7 +151,6 @@ protected:
     int mCurrentZoom;
     QVector<Token> mTokens;
     friend class Event;
-
 };
 
 #endif // CODEEDITOR_H

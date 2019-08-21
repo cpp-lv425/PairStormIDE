@@ -12,6 +12,7 @@
 #include <QFile>
 
 #include "localconnectorgenerator.h"
+#include "settingsconfigurator.h"
 #include "paletteconfigurator.h"
 #include "projectviewerdock.h"
 #include "documentmanager.h"
@@ -62,9 +63,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     setWindowTitle("PairStorm");
 
-    // sets style globally
-    setAppStyle();
-
     setupMainMenu();
 
     setCentralWidget(dynamic_cast<QWidget*>(mpDocumentManager->getSplitter()));
@@ -78,6 +76,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // create instance of Bottom Panel
     createButtomPanel();
 
+    setInitialAppStyle();
     restoreMainWindowState();
 }
 
@@ -575,6 +574,8 @@ void MainWindow::onConnectTriggered()
 void MainWindow::onSettingsTriggered()
 {
     MenuOptions * menuOptions = new MenuOptions(this);
+    connect(menuOptions, &MenuOptions::valuesChanged,
+            this, &MainWindow::onSettingsChanged);
     Q_UNUSED(menuOptions)
 }
 
@@ -627,6 +628,17 @@ void MainWindow::onConnectionStatusChanged(bool status)
                 (this,
                  userMessages[UserMessages::ConnectionFailureTitle],
                 userMessages[UserMessages::ConnectionFailureMsg]);
+    }
+}
+
+void MainWindow::onSettingsChanged(std::map<QString, QString> newValues)
+{
+    SettingsConfigurator settingsConfigurator;
+
+    for (const auto& newValue: newValues)
+    {
+        auto functor = settingsConfigurator.getSettingsFunctor(newValue.first);
+        functor(this, newValue.second);
     }
 }
 
@@ -702,13 +714,25 @@ void MainWindow::restoreMainWindowState()
         restoreState(settings.value("mainWindowState").toByteArray());
 }
 
-void MainWindow::setAppStyle()
+void MainWindow::setInitialAppStyle()
 {
     // fusion style is applied globally
     // if platform does not support fusion, default style is applied
     qApp->setStyle(QStyleFactory::create("Fusion"));
+
+    // restores style palette set in previous app session
+    QSettings savedSettings(QApplication::organizationName(), QApplication::applicationName());
+    QString styleName = {savedSettings.contains("style") ?
+                             savedSettings.value("style").toString()
+                             : "WHITE"};
+    setAppStyle(styleName);
+}
+
+void MainWindow::setAppStyle(const QString &styleName)
+{
     // dark style palette is created & set globally
-    QPalette palette = mpPaletteConfigurator->getPalette("DARK");
+    QPalette palette = mpPaletteConfigurator->getPalette(styleName);
     //QPalette newPal = palette();
     qApp->setPalette(palette);
+    mpDocumentManager->setStyle(styleName);
 }

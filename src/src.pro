@@ -48,6 +48,7 @@ include($$PWD/splashscreen/splashscreen.pri)
 include($$PWD/utils/utils.pri)
 include($$PWD/paletteconfigurator/paletteconfigurator.pri)
 include($$PWD/databaseaccessor/databaseaccessor.pri)
+include($$PWD/settingsconfigurator/settingsconfigurator.pri)
 include($$PWD/savefilesdialog/savefilesdialog.pri)
 
 RESOURCES += \

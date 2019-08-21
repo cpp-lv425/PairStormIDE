@@ -38,6 +38,7 @@ private:
     void handleLiteralState(const QChar&);
     void handleCommentState(const QChar&);
     void handleUndefinedState(const QChar&);
+   // QStringList mIdentificatorsList; 
 
 public:
     LexerCPP() = default;
