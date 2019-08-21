@@ -395,25 +395,7 @@ void CodeEditor::notEmptyCommentWasAdded()
     }
     else
     {
-<<<<<<< HEAD
         addButton(mCommentWidget->getCommentLine(), mCommentWidget->getEditTab()->getText());// create new button
-=======
-        AddCommentButton *commentButtonNew = new AddCommentButton(this);
-        commentButtonNew->setGeometry(mCommentWidget->getCommentButtonGeometry());
-        commentButtonNew->setCurrentLine(mCommentWidget->getCommentLine());
-
-        commentButtonNew->setStyleSheet("background-color: #18CD3C");
-        commentButtonNew->setText("✔");
-        commentButtonNew->setVisible(true);
-
-        QSettings settings(QApplication::organizationName(), QApplication::applicationName());
-        commentButtonNew->setUser(settings.value("UserName").toString());
-
-        setNewAddedButtonSettings(commentButtonNew);
-
-        mCommentsVector.push_back(commentButtonNew);
-        connect(mCommentsVector.back(), &AddCommentButton::addCommentButtonPressed, this, &CodeEditor::showCommentTextEdit);
->>>>>>> features/Code-auto-completer
     }
 }
 
