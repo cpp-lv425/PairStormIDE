@@ -533,7 +533,6 @@ void MainWindow::onShowBottomPanel()
 
 void MainWindow::onCombineAreas()
 {
-    qDebug() << "On combine areas";
     mpDocumentManager->combineDocAreas();
 }
 

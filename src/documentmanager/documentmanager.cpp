@@ -300,7 +300,7 @@ QMdiSubWindow* DocumentManager::openedDoc(const QString &fileName)
         openedDocIter = std::find_if(subWdwList.cbegin(), subWdwList.cend(),
                                      [&fileName](const auto& doc)
         {
-            return static_cast<CodeEditor*>(doc->widget())->getFileName() == fileName;
+            return qobject_cast<CodeEditor*>(doc->widget())->getFileName() == fileName;
         });
 
         if (openedDocIter != subWdwList.end())
@@ -316,8 +316,6 @@ QMdiSubWindow* DocumentManager::openedDoc(const QString &fileName)
 
 QMdiArea* DocumentManager::lastAreaInFocus()
 {
-    QList<QMdiSubWindow*>::const_iterator areaInFocusIter;
-
     // if prev document in focus was closed - null is returned to indicate search failure
     if (!mpPrevEditorInFocus)
     {
@@ -327,43 +325,39 @@ QMdiArea* DocumentManager::lastAreaInFocus()
     // search for area which accomodates last doc in focus
     for (const auto& area: mDocAreas)
     {
-        auto subWdwList = area->subWindowList();
+        auto currentWdw = area->currentSubWindow();
 
-        areaInFocusIter = std::find_if(subWdwList.cbegin(), subWdwList.cend(),
-                                       [this](const auto& doc)
+        if (currentWdw)
         {
-            return static_cast<CodeEditor*>(doc->widget()) == mpPrevEditorInFocus;
-        });
-
-        if (areaInFocusIter != subWdwList.end())
-        {
-            return area;
+            auto doc = qobject_cast<CodeEditor*>(currentWdw->widget());
+            if (doc && doc == mpPrevEditorInFocus)
+            {
+                return area;
+            }
         }
     }
 
-    // if document is in focus - ptr to it is returned
+    // if document-to-pointer is equal to pointer to previous document in focus
+    // then pointer to it is returned
     // otherwise null is returned
     return nullptr;
 }
 
-QMdiArea *DocumentManager::areaInFocus()
+QMdiArea* DocumentManager::areaInFocus()
 {
-    QList<QMdiSubWindow*>::const_iterator areaInFocusIter;
-
     // search for area which accomodates current doc in focus
     for (const auto& area: mDocAreas)
     {
-        auto subWdwList = area->subWindowList();
+        auto currentWdw = area->currentSubWindow();
 
-        areaInFocusIter = std::find_if(subWdwList.cbegin(), subWdwList.cend(),
-                                       [](const auto& doc)
+        if (currentWdw)
         {
-            return static_cast<CodeEditor*>(doc->widget())->hasFocus();
-        });
+            auto doc = qobject_cast<CodeEditor*>(currentWdw->widget());
 
-        if (areaInFocusIter != subWdwList.end())
-        {
-            return area;
+            if (doc && doc->hasFocus())
+            {
+                return area;
+            }
         }
     }
 
@@ -383,7 +377,7 @@ QMdiArea* DocumentManager::getArea(CodeEditor *doc)
         areaIter = std::find_if(subWdwList.cbegin(), subWdwList.cend(),
                                 [&doc](const auto& document)
         {
-            return static_cast<CodeEditor*>(document->widget()) == doc;
+            return qobject_cast<CodeEditor*>(document->widget()) == doc;
         });
 
         if (areaIter != subWdwList.end())
@@ -416,7 +410,7 @@ CodeEditor* DocumentManager::getCurrentDocument()
     // receive current sub wdw from area in focus
     // if current sub wdw is null - we return null to indicate search failure
     auto pCurrentDocument = pAreaInFocus->currentSubWindow();
-    return pCurrentDocument ? static_cast<CodeEditor*>(pCurrentDocument->widget()) : nullptr;
+    return pCurrentDocument ? qobject_cast<CodeEditor*>(pCurrentDocument->widget()) : nullptr;
 }
 
 void DocumentManager::closeCurrentDocument()
