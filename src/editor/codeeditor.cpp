@@ -55,8 +55,8 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     connect(mCommentWidget->getEditTab(), &AddCommentTextEdit::notEmptyCommentWasSent, this, &CodeEditor::notEmptyCommentWasAdded);
     connect(mCommentWidget->getEditTab(), &AddCommentTextEdit::commentWasDeleted,      this, &CodeEditor::deleteComment);
     connect(this,                         &CodeEditor::linesCountUpdated,              this, &CodeEditor::changeCommentButtonsState);
-    connect(this,                         &QPlainTextEdit::cursorPositionChanged,      this, &CodeEditor::runLexer);
-    connect(this,                         &QPlainTextEdit::cursorPositionChanged,      this, &CodeEditor::highlighText);
+   // connect(this,                         &QPlainTextEdit::cursorPositionChanged,      this, &CodeEditor::runLexer);
+   // connect(this,                         &QPlainTextEdit::cursorPositionChanged,      this, &CodeEditor::highlighText);
 
     mTimer->start(CHANGE_SAVE_TIME);//save text by this time
     mLinesCountCurrent = 1;
@@ -78,15 +78,15 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
 
     //completer
     QStringList keywords;
-    keywords <<"SELECT" <<"FROM" <<"WHERE"<<"WHEN";//for test
+    keywords <<"SELECT" <<"FROM" <<"WHERE"<<"WHEN"<<"WHILE"<<"int"<<"double"<<"static_cast<>()";//for test
     mCompleter = new AutoCodeCompleter(keywords, this);
     mCompleter->setCaseSensitivity(Qt::CaseInsensitive);
     mCompleter->setWidget(this);
-    qDebug()<<"inside list:";
+   /* qDebug()<<"inside list:";
     for(auto &i:keywords)
     {
         qDebug()<<i;
-    }
+    }*/
 }
 
 void CodeEditor::setTextColors()
@@ -107,12 +107,14 @@ void CodeEditor::setFontSize(const QString &fontSize)
 {
     mConfigParam.setFontSize(fontSize);
     mFont.setPointSize(mConfigParam.mFontSize);
+    this->setFont(mFont);
 }
 
 void CodeEditor::setFontStyle(const QString &fontStyle)
 {
     mConfigParam.setFontStyle(fontStyle);
     mFont.setFamily(mConfigParam.mFontStyle);
+    this->setFont(mFont);
 }
 
 
@@ -222,7 +224,6 @@ void CodeEditor::resizeEvent(QResizeEvent *e)
 void CodeEditor::specialAreasRepaintEvent(QPaintEvent *event)
 {
     QPainter painter(mLineNumberArea);
-    qDebug()<<"!!!!!!!!!!"<<mConfigParam.textColors.mLineCounterAreaColor;
     painter.fillRect(event->rect(), mConfigParam.textColors.mLineCounterAreaColor);
 
     QTextBlock block = firstVisibleBlock();//area of first numeration block from linecounter

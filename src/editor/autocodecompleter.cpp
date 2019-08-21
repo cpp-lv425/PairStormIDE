@@ -1,5 +1,7 @@
 #include "autocodecompleter.h"
 #include<QDebug>
+#include<QThread>
+#include"keypressevents.h"
 
 AutoCodeCompleter::AutoCodeCompleter(const QStringList &completions, QObject *parent):
     QCompleter(completions, parent)
@@ -7,7 +9,7 @@ AutoCodeCompleter::AutoCodeCompleter(const QStringList &completions, QObject *pa
     connect(this, SIGNAL(activated(QString)), this, SLOT(replaceCurrentWord(QString)));
 }
 
-bool AutoCodeCompleter::eventFilter(QObject *object, QEvent *event)
+/*bool AutoCodeCompleter::eventFilter(QObject *object, QEvent *event)
 {
     if (event->type() == QEvent::KeyPress)
     {
@@ -42,6 +44,59 @@ bool AutoCodeCompleter::eventFilter(QObject *object, QEvent *event)
                 return true;
             }
         }
+    }
+    return QCompleter::eventFilter(object, event);
+}*/
+/*
+1) rewrite signal
+2) rewrite function returns
+3) rewrite if/else parts (create special fucntions for that)
+4) rewrite it as keyPress event
+*/
+bool AutoCodeCompleter::eventFilter(QObject *object, QEvent *event)
+{
+    if (event->type() == QEvent::KeyPress)
+    {
+        QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
+
+            if (keyEvent->key() != Qt::Key_Enter && keyEvent->key() != Qt::Key_Return)
+            {
+                if(keyEvent->key() == Qt::Key_Down || keyEvent->key() == Qt::Key_Up)
+                {
+                    return QCompleter::eventFilter(object, event);
+                }
+
+                QPlainTextEdit *textEdit = qobject_cast<QPlainTextEdit*>(widget());
+                QTextCursor textCursor = textEdit->textCursor();
+
+                textCursor.movePosition(QTextCursor::StartOfWord, QTextCursor::KeepAnchor);;
+
+                if (textCursor.selectedText().length() >= getMinCompletionPrefixLength())
+                {
+                    setCompletionPrefix(textCursor.selectedText());
+                    QRect rect = QRect(textEdit->cursorRect().bottomLeft(), QSize(100, 5));
+                    complete(rect);
+                    if (keyEvent->key() == Qt::Key_Space)
+                    {
+                        qDebug()<<"hide";
+                        popup()->hide();
+                        //return true;
+                    }
+                }
+                return QCompleter::eventFilter(object, event);
+            }
+            else
+            {
+                if (popup()->isVisible())
+                {
+                    popup()->hide();
+                    if (popup()->currentIndex().isValid())
+                    {
+                        emit activated(popup()->currentIndex().data(completionRole()).toString());
+                    }
+                    return true;
+                }
+            }
     }
     return QCompleter::eventFilter(object, event);
 }
