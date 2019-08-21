@@ -9,96 +9,96 @@ AutoCodeCompleter::AutoCodeCompleter(const QStringList &completions, QObject *pa
     connect(this, SIGNAL(activated(QString)), this, SLOT(replaceCurrentWord(QString)));
 }
 
+/*
+1) rewrite signal
+2) rewrite function returns
+3) rewrite if/else parts (create special fucntions for that)
+4) rewrite it as key
+*/
+
 /*bool AutoCodeCompleter::eventFilter(QObject *object, QEvent *event)
 {
     if (event->type() == QEvent::KeyPress)
     {
         QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
-        switch (keyEvent->key())
+
+        if (isNotEnterKey(keyEvent))
         {
-        case Qt::Key_Space:
-            if (keyEvent->modifiers().testFlag(Qt::ControlModifier))
+            if (isUpDownKey(keyEvent))
             {
-                QPlainTextEdit *textEdit = qobject_cast<QPlainTextEdit*>(widget());
-                QTextCursor textCursor = textEdit->textCursor();
-                textCursor.movePosition(QTextCursor::StartOfWord, QTextCursor::KeepAnchor);
-                if (textCursor.selectedText().length() >= getMinCompletionPrefixLength())
-                {
-                    setCompletionPrefix(textCursor.selectedText());
-                    QRect rect = QRect(textEdit->cursorRect().bottomLeft(), QSize(100, 5));
-                    complete(rect);
-                }
-                return true;
+                return QCompleter::eventFilter(object, event);
             }
-            break;
-        case Qt::Key_Enter:
-        case Qt::Key_Return:
-        case Qt::Key_Tab:
-            if (popup()->isVisible())
+
+            QPlainTextEdit *textEdit = qobject_cast<QPlainTextEdit*>(widget());
+            QTextCursor textCursor = textEdit->textCursor();
+
+            textCursor.movePosition(QTextCursor::StartOfWord, QTextCursor::KeepAnchor);;
+
+            if (textCursor.selectedText().length() >= getMinCompletionPrefixLength())
             {
-                popup()->hide();
-                if (popup()->currentIndex().isValid())
+                setCompletionPrefix(textCursor.selectedText());
+                QRect rect = QRect(textEdit->cursorRect().bottomLeft(), QSize(100, 5));
+                complete(rect);
+                if (keyEvent->key() == Qt::Key_Space)
                 {
-                    emit activated(popup()->currentIndex().data(completionRole()).toString());
+                    popup()->hide();
                 }
-                return true;
             }
+            return QCompleter::eventFilter(object, event);
+        }
+
+        if (popup()->isVisible())
+        {
+            popup()->hide();
+            if (popup()->currentIndex().isValid())
+            {
+                emit activated(popup()->currentIndex().data(completionRole()).toString());
+            }
+            return true;
         }
     }
     return QCompleter::eventFilter(object, event);
 }*/
-/*
-1) rewrite signal
-2) rewrite function returns
-3) rewrite if/else parts (create special fucntions for that)
-4) rewrite it as keyPress event
-*/
+
 bool AutoCodeCompleter::eventFilter(QObject *object, QEvent *event)
 {
-    if (event->type() == QEvent::KeyPress)
+    if (event->type() != QEvent::KeyPress)
     {
-        QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
-
-            if (keyEvent->key() != Qt::Key_Enter && keyEvent->key() != Qt::Key_Return)
-            {
-                if(keyEvent->key() == Qt::Key_Down || keyEvent->key() == Qt::Key_Up)
-                {
-                    return QCompleter::eventFilter(object, event);
-                }
-
-                QPlainTextEdit *textEdit = qobject_cast<QPlainTextEdit*>(widget());
-                QTextCursor textCursor = textEdit->textCursor();
-
-                textCursor.movePosition(QTextCursor::StartOfWord, QTextCursor::KeepAnchor);;
-
-                if (textCursor.selectedText().length() >= getMinCompletionPrefixLength())
-                {
-                    setCompletionPrefix(textCursor.selectedText());
-                    QRect rect = QRect(textEdit->cursorRect().bottomLeft(), QSize(100, 5));
-                    complete(rect);
-                    if (keyEvent->key() == Qt::Key_Space)
-                    {
-                        qDebug()<<"hide";
-                        popup()->hide();
-                        //return true;
-                    }
-                }
-                return QCompleter::eventFilter(object, event);
-            }
-            else
-            {
-                if (popup()->isVisible())
-                {
-                    popup()->hide();
-                    if (popup()->currentIndex().isValid())
-                    {
-                        emit activated(popup()->currentIndex().data(completionRole()).toString());
-                    }
-                    return true;
-                }
-            }
+        return QCompleter::eventFilter(object, event);
     }
-    return QCompleter::eventFilter(object, event);
+
+    QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
+
+    if (isNotEnterKey(keyEvent))
+    {
+        QPlainTextEdit *textEdit = qobject_cast<QPlainTextEdit*>(widget());
+        QTextCursor textCursor = textEdit->textCursor();
+
+        textCursor.movePosition(QTextCursor::StartOfWord, QTextCursor::KeepAnchor);
+
+        if (textCursor.selectedText().length() >= getMinCompletionPrefixLength()
+                && !isUpDownKey(keyEvent))
+        {
+            setCompletionPrefix(textCursor.selectedText());
+            QRect rect = QRect(textEdit->cursorRect().bottomLeft(), QSize(100, 5));
+            complete(rect);
+            if (keyEvent->key() == Qt::Key_Space)
+            {
+                popup()->hide();
+            }
+        }
+        return QCompleter::eventFilter(object, event);
+    }
+
+    if (popup()->isVisible())
+    {
+        popup()->hide();
+        if (popup()->currentIndex().isValid())
+        {
+            emit activated(popup()->currentIndex().data(completionRole()).toString());
+        }
+    }
+    return true;
 }
 
 void AutoCodeCompleter::setMinCompletionPrefixLength(int minCompletionPrefixLength)
