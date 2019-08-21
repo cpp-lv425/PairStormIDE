@@ -72,8 +72,6 @@ void QmlChatWidget::configureOnLogin(const QString &userName)
     qmlRegisterUncreatableType<ChatMessagesController>("PairStormChat", 1, 0, "MessagesList",
                                                        QStringLiteral("Messages list can be created only in backend"));
 
-
-
     QQuickView * view = new QQuickView();
 
     QSurfaceFormat format;
@@ -81,14 +79,19 @@ void QmlChatWidget::configureOnLogin(const QString &userName)
     view->setFormat(format);
 
     view->setResizeMode(QQuickView::SizeRootObjectToView);
-    view->setSource(QUrl("qrc:/chat.qml"));
+
     mpChatContext = view->engine()->rootContext();
     mpChatContext->setContextProperty(QStringLiteral("AvailableUsersList"), mpUsers);
     mpChatContext->setContextProperty(QStringLiteral("usersList"), mpUsers->getUsersList());
+
     //============================================================================================
     mpChatContext->setContextProperty(QStringLiteral("globalUserName"), mUserName);
+
     mpChatContext->setContextProperty(QStringLiteral("messagesList"),   mpMessagesController);
     //============================================================================================
+
+    view->setSource(QUrl("qrc:/chat.qml"));
+
 
 
     mpAllowedChatWidget = QWidget::createWindowContainer(view, this);

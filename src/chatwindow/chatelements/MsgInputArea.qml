@@ -71,10 +71,9 @@ Item {
                         console.log("message is empty")
                         return
                     }
+                    messagesList.appendMessage(messageInput.text)
                     messageInput.clear()
                     console.log("send message: " + messageInput.text)
-
-                    messagesList.appendMessage(messageInput.text)
                 }
 
                 property string placeholderText: "Type message..."
@@ -132,10 +131,9 @@ Item {
                         console.log("message is empty")
                         return
                     }
+                    messagesList.appendMessage(messageInput.text)
                     messageInput.clear()
                     console.log("send message: " + messageInput.text)
-
-                    chatBody.messagesList.appendMessage(messageInput.text)
                 }
             }
         }

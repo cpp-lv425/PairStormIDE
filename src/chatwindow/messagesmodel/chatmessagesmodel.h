@@ -24,7 +24,6 @@ public:
     QVariant data(const QModelIndex &modelIndex,
                   int role = Qt::DisplayRole) const override;
 
-
     virtual QHash<int, QByteArray> roleNames() const override;
 
     ChatMessagesController * list() const;

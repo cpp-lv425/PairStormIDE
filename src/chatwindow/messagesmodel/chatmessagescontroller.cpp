@@ -1,4 +1,5 @@
 #include "chatmessagescontroller.h"
+#include <QDebug>
 
 ChatMessagesController::ChatMessagesController(const QString & authorName,
                                                QObject *parent) :
@@ -39,6 +40,8 @@ bool ChatMessagesController::appendMessage(const ChatMessage & newMessage)
 
 void ChatMessagesController::appendMessage(const QString & newMessageContent)
 {
+    qDebug() << "ATTENTION";
+    qDebug() << "someone appending message: " << newMessageContent;
     emit preMessageAppended();
 
     ChatMessage newMessage;

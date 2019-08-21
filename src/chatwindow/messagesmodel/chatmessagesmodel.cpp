@@ -11,27 +11,40 @@ int ChatMessagesModel::rowCount(const QModelIndex &modelIndex) const
 {
     if (modelIndex.isValid() || !mpMessagesController)
     {
+        if (!mpMessagesController)
+            qDebug() << "messages controller break row count";
+        else
+            qDebug() << "model indeex is not valid whilecouting rows";
         return 0;
     }
+
+    qDebug() << "someone try to get size of the list";
+    qDebug() << "size is: " << mpMessagesController->messages().size();
 
     return mpMessagesController->messages().size();
 }
 
 QVariant ChatMessagesModel::data(const QModelIndex &modelIndex, int role) const
 {
-    if (modelIndex.isValid() || !mpMessagesController)
+    if (!modelIndex.isValid() || !mpMessagesController)
     {
-        return 0;
+        if (!mpMessagesController)
+            qDebug() << "messages controller break data capturing";
+        else
+            qDebug() << "model indeex is not valid while data capturing";
+        return QVariant();
     }
 
-    const auto messageId = modelIndex.row();
+    qDebug() << "try to get row index";
+    const int messageId = modelIndex.row();
+    qDebug() << "row index is: " << messageId;
+
     const ChatMessage currentChatMessage =
             mpMessagesController->messages().at(messageId);
 
     qDebug() << "try to get message: " << currentChatMessage.mContent;
     qDebug() << "from: " << currentChatMessage.mAuthorName;
     qDebug() << "date: " << currentChatMessage.mPublicationDateTime;
-    qDebug() << "try to get role: " << role;
 
     switch(role)
     {
@@ -82,8 +95,9 @@ ChatMessagesController * ChatMessagesModel::list() const
 }
 
 void ChatMessagesModel::setList(ChatMessagesController * newList)
-
 {
+    qDebug() << "try to set list";
+    qDebug() << "size: " << newList->messages().size();
     beginResetModel();
 
     if (mpMessagesController)

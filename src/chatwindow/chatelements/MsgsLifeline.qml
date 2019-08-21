@@ -42,7 +42,6 @@ Item {
         id: messagesModel
 
         model: MessagesModel {
-            id: messagesModelBody
             list: messagesList
         }
 
