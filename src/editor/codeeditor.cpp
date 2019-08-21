@@ -47,7 +47,12 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     mCommentWidget = new CommentWidget;
     mCommentWidget->setVisible(false);
 
-
+    CommentDb *commentGetter = new CommentDb;
+    QVector<Comment> startComments = commentGetter->getAllCommentsFromFile("main.cpp");
+    for(auto i : startComments){
+        qDebug()<<i.mLine<<" "<<i.mText;
+    }
+    setAllButtons(startComments);
     //This signal is emitted when the text document needs an update of the specified rect.
     //If the text is scrolled, rect will cover the entire viewport area.
     //If the text is scrolled vertically, dy carries the amount of pixels the viewport was scrolled.
@@ -268,6 +273,21 @@ void CodeEditor::setNewAddedButtonSettings(AddCommentButton *commentButton)
     commentButton->setCommentString(mCommentWidget->getEditTab()->getText());
     commentButton->setToolTip(mCommentWidget->getViewTab()->getText());
     mCommentWidget->setVisible(false);
+}
+
+void CodeEditor::setAllButtons(QVector<Comment> comments)
+{
+    for(auto &i : comments)
+    {
+        AddCommentButton *button = new AddCommentButton;
+        button->setCommentString(i.mText);
+        button->setCurrentLine(i.mLine);
+        mCommentsVector.push_back(button);
+    }
+    for(auto i : mCommentsVector)
+    {
+        qDebug()<<i->getCurrentLine();
+    }
 }
 
 void CodeEditor::showCommentTextEdit(int line)

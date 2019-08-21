@@ -28,6 +28,7 @@
 #include "storeconf.h"
 #include "startpage.h"
 #include "utils.h"
+#include "sqliteaccess.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -362,7 +363,12 @@ void MainWindow::onOpenFolderTriggered()
             (this,
              userMessages[UserMessages::OpenDirectoryTitle],
             QDir::homePath());
-
+    Connection *db = ConnectionGetter::getDefaultConnection("C:/Users/Anastasia Antonyk/Desktop/sqlite/storage.db");
+    CreateDB database;
+    database.addTableFile();
+    database.addTableUser();
+    database.addTableComment();
+    database.addTableMessage();
     mpProjectViewerDock->setDir(dirName);
 }
 

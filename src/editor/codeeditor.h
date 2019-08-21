@@ -23,6 +23,7 @@ const int TOP_UNUSED_PIXELS_HEIGHT = 4;
 #include<QVector>
 #include<QFont>
 #include<QStatusBar>
+#include "sqliteaccess.h"
 
 class QPaintEvent;
 class QResizeEvent;
@@ -70,6 +71,7 @@ private:
     bool isCommentButtonExist(int line);
     AddCommentButton* getCommentButtonByIndex(const int line);
     void setNewAddedButtonSettings(AddCommentButton *commentButton);
+    void setAllButtons(QVector<Comment> comments);
 
 protected:
     void resizeEvent(QResizeEvent *event)override;

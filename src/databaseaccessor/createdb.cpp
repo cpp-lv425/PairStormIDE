@@ -1,38 +1,38 @@
 #include "createdb.h"
 #include <QDebug>
 
-createDB::createDB() :Accessor ()
+CreateDB::CreateDB() :Accessor ()
 {
 }
 
-void createDB::addTableUser()
+void CreateDB::addTableUser()
 {
     execQuery(tableUserQuery());
 }
 
-void createDB::addTableMessage()
+void CreateDB::addTableMessage()
 {
     execQuery(tableMessageQuery());
 }
 
-void createDB::addTableComment()
+void CreateDB::addTableComment()
 {
     execQuery(tableCommentQuery());
 }
 
-void createDB::addTableFile()
+void CreateDB::addTableFile()
 {
     execQuery(tableFileQuery());
 }
 
-QString createDB::tableUserQuery()
+QString CreateDB::tableUserQuery()
 {
     return "CREATE TABLE IF NOT EXISTS User ("
             "id       INTEGER      PRIMARY KEY AUTOINCREMENT UNIQUE ON CONFLICT ROLLBACK, "
             "nickname VARCHAR (39) UNIQUE ON CONFLICT FAIL  NOT NULL )";
 }
 
-QString createDB::tableMessageQuery()
+QString CreateDB::tableMessageQuery()
 {
     return "CREATE TABLE IF NOT EXISTS Message ("
             "id          INTEGER  PRIMARY KEY AUTOINCREMENT, "
@@ -41,7 +41,7 @@ QString createDB::tableMessageQuery()
             "time        DATETIME DEFAULT (datetime('now')) )";
 }
 
-QString createDB::tableCommentQuery()
+QString CreateDB::tableCommentQuery()
 {
     return "CREATE TABLE IF NOT EXISTS Comment ("
         "line   INT, "
@@ -52,7 +52,7 @@ QString createDB::tableCommentQuery()
         "PRIMARY KEY (line, idFile))";
 }
 
-QString createDB::tableFileQuery()
+QString CreateDB::tableFileQuery()
 {
     return "CREATE TABLE IF NOT EXISTS File ("
         "id   INTEGER      PRIMARY KEY AUTOINCREMENT, "

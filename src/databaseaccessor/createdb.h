@@ -2,10 +2,10 @@
 #define CREATEDB_H
 #include "accessor.h"
 
-class createDB: public Accessor
+class CreateDB: public Accessor
 {
 public:
-    createDB();
+    CreateDB();
     void addTableUser();
     void addTableMessage();
     void addTableComment();

@@ -1,5 +1,5 @@
 #include "commentdb.h"
-
+#include <QDebug>
 CommentDb::CommentDb(): Accessor()
 {
 }
@@ -25,6 +25,7 @@ void CommentDb::updateCommentInDb(const Comment& comment)
 QVector<Comment> CommentDb::getAllCommentsFromFile(const QString filename)
 {
       execQuery(numberOfCommentInFileQuery(filename));
+      query.first();
       int count_of_messages =query.value(0).toInt();
       QVector<Comment> comments(count_of_messages);
       execQuery(allCommentInFileQuery(filename));
@@ -34,12 +35,16 @@ QVector<Comment> CommentDb::getAllCommentsFromFile(const QString filename)
           counter++;
       }
       query.finish();
+      for(auto i : comments){
+          qDebug()<<i.mLine<<" "<<i.mText;
+      }
       return comments;
 }
 
 Comment CommentDb::getCommentFromDb(const int commentLine, const QString commentFile)
 {
     execQuery(getCommentQuery(commentLine, commentFile));
+    query.first();
     Comment rComment;
     fillStructComment(rComment);
     query.finish();
@@ -94,8 +99,8 @@ QString CommentDb::numberOfCommentInFileQuery(const QString filename)
     return "Select Count(Comment.line) "
            "from Comment inner join User on User.id=Comment.idUser "
             "inner join File on File.id=Comment.idFile "
-            "where Comment.idFile = (Select File.ID from File where file.name = \""
-            + filename + "\"";
+            "where Comment.idFile = (Select File.ID from File where file.name = '"
+            + filename + "')";
 }
 
 QString CommentDb::allCommentInFileQuery(const QString filename)
@@ -103,6 +108,6 @@ QString CommentDb::allCommentInFileQuery(const QString filename)
     return "Select Comment.line, Comment.text, User.nickname, File.name "
            "from Comment inner join User on User.id=Comment.idUser "
             "inner join File on File.id=Comment.idFile "
-            "where Comment.idFile = (Select File.ID from File where file.name = \""
-            + filename + "\"";
+            "where Comment.idFile = (Select File.ID from File where file.name = '"
+            + filename + "')";
 }
