@@ -553,9 +553,8 @@ void MainWindow::onConnectTriggered()
     {
         return;
     }
-    mCurrentUserName = userInput;
     mpChatWindowDock->setUserName(userInput);
-    mplocalConnector->configureOnLogin(mCurrentUserName);
+    mplocalConnector->configureOnLogin(userInput);
 }
 
 void MainWindow::onSettingsTriggered()

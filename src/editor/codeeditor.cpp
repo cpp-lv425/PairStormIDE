@@ -195,6 +195,7 @@ bool CodeEditor::isChanged()
 
 void CodeEditor::setBeginTextState()
 {
+
     mBeginTextState = this->toPlainText();
 }
 

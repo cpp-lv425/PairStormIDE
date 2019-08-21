@@ -184,6 +184,14 @@ void DocumentManager::loadFile(CodeEditor *newView, const QString &fileName)
 
 void DocumentManager::onSplit(Qt::Orientation orientation)
 {
+    // if there is only one doc area -
+    // then new doc area is added & orientation is set according to
+    if (mDocAreas.size() < 2)
+    {
+        mpSplitter->setOrientation(orientation);
+        splitWindow();
+        return;
+    }
     // if current orientation matches passed arg
     // then new doc area is created
     if (orientation == mpSplitter->orientation())
@@ -192,7 +200,7 @@ void DocumentManager::onSplit(Qt::Orientation orientation)
         return;
     }
 
-    // if current orientation doesnt match passed arg
+    // if current orientation doesn't match passed arg
     // orientation is changed
     mpSplitter->setOrientation(orientation);
 }
