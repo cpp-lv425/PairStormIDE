@@ -9,6 +9,8 @@
 #include <QLineEdit>
 #include <QLabel>
 
+#include <QGuiApplication>
+
 #include <QHBoxLayout>
 #include <QQmlComponent>
 #include <QQmlContext>
@@ -62,7 +64,14 @@ void QmlChatWidget::keyPressEvent(QKeyEvent *event)
 void QmlChatWidget::configureOnLogin(const QString &userName)
 {
     mUserName = userName;
+    mpMessagesController = new ChatMessagesController(userName);
+
     qmlRegisterType<OnlineUsersModel>("AvailableUsers", 1, 0, "AvailableUsersModel");
+
+    qmlRegisterType<ChatMessagesModel>("PairStormChat", 1, 0, "MessagesModel");
+    qmlRegisterUncreatableType<ChatMessagesController>("PairStormChat", 1, 0, "MessagesList",
+                                                       QStringLiteral("Messages list can be created only in backend"));
+
 
 
     QQuickView * view = new QQuickView();
@@ -75,6 +84,12 @@ void QmlChatWidget::configureOnLogin(const QString &userName)
     view->setSource(QUrl("qrc:/chat.qml"));
     mpChatContext = view->engine()->rootContext();
     mpChatContext->setContextProperty(QStringLiteral("AvailableUsersList"), mpUsers);
+    mpChatContext->setContextProperty(QStringLiteral("usersList"), mpUsers->getUsersList());
+    //============================================================================================
+    mpChatContext->setContextProperty(QStringLiteral("globalUserName"), mUserName);
+    mpChatContext->setContextProperty(QStringLiteral("messagesList"),   mpMessagesController);
+    //============================================================================================
+
 
     mpAllowedChatWidget = QWidget::createWindowContainer(view, this);
     mpAllowedChatWidget->setContentsMargins(0, 0, 0, 0);
@@ -84,7 +99,10 @@ void QmlChatWidget::configureOnLogin(const QString &userName)
 
     mpBoxLayout->removeWidget(mpRestrictedChatWidget);
     mpRestrictedChatWidget->hide();
+    delete mpRestrictedChatWidget;
     mpBoxLayout->addWidget(mpAllowedChatWidget);
+
+    updateOnlineUsers(QStringList() << "bodia");
 }
 
 void QmlChatWidget::updateOnlineUsers(const QStringList &onlineUsers)

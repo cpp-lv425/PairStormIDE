@@ -34,9 +34,12 @@ public:
     void updateOnlineUsers(const QStringList & userNames);
     void updateConnectedUsers(const QStringList & userNames);
 
+    OnlineUsersList * getUsersList() {
+        return mpUsersList;
+    }
+
 signals:
 
-    void usersChaged();
     void stateChangedOn (const QString userName);
     void stateChangedOff(const QString userName);
 

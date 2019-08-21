@@ -12,10 +12,14 @@ struct ChatUser {
     } mState;
 };
 
+/*
+
 struct ChatMessage {
     QString   mAuthorName;
     QString   mContent;
     QDateTime mDateTime;
 };
+
+*/
 
 #endif // CHATBASE_H

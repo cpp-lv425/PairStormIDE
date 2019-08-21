@@ -2,6 +2,7 @@ import QtQuick 2.7
 import QtQuick.Controls 2.0
 import QtQuick.Layouts 1.3
 import QtQml.Models 2.12
+import PairStormChat 1.0
 
 import "scripts/ChatBase.js" as ChatBase
 
@@ -50,6 +51,9 @@ Item {
                 //text: qsTr("message")
                 //overwriteMode: true
 
+                selectByMouse: true
+                renderType: Text.QtRendering
+
                 color: "darkgrey"
                 selectedTextColor: "black"
                 selectionColor:    "silver"
@@ -69,6 +73,8 @@ Item {
                     }
                     messageInput.clear()
                     console.log("send message: " + messageInput.text)
+
+                    messagesList.appendMessage(messageInput.text)
                 }
 
                 property string placeholderText: "Type message..."
@@ -82,14 +88,15 @@ Item {
                     font.pixelSize: 20
                     font.family: "consolas"
                     color: "#aaa"
-                    visible: !messageInput.text && !messageInput.activeFocus // <----------- ;-)
+                    visible: !messageInput.text && !messageInput.activeFocus
                 }
             }
-/*
+
             MouseArea {
                 anchors.fill: messageInput
                 cursorShape: Qt.IBeamCursor
-            }*/
+                enabled: false
+            }
         }
 
         Rectangle {
@@ -127,6 +134,8 @@ Item {
                     }
                     messageInput.clear()
                     console.log("send message: " + messageInput.text)
+
+                    chatBody.messagesList.appendMessage(messageInput.text)
                 }
             }
         }

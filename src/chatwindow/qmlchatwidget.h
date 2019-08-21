@@ -3,8 +3,11 @@
 
 #include "chatwidgetinterface.h"
 #include "onlineusersmodel.h"
-#include <QQmlContext>
 
+#include "chatmessagesmodel.h"
+#include "chatmessagescontroller.h"
+
+#include <QQmlContext>
 #include <QBoxLayout>
 
 class QmlChatWidget : public ChatWidgetInterface
@@ -33,6 +36,9 @@ private:
     QString mUserName;
 
     OnlineUsersModel * mpUsers;
+
+    ChatMessagesController * mpMessagesController;
+
     QQmlContext      * mpChatContext;
     QBoxLayout       * mpBoxLayout;
     QWidget          * mpRestrictedChatWidget;

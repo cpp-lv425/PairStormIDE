@@ -44,10 +44,12 @@ int OnlineUsersList::size() const
 
 void OnlineUsersList::updateUsers(const QStringList & userNames)
 {
+    /*
     if (mChatUsers.empty())
     {
         return;
     }
+    */
     // Remove users, whose names are not in userNames
     mChatUsers.erase(std::remove_if(mChatUsers.begin(),
                                     mChatUsers.end(),

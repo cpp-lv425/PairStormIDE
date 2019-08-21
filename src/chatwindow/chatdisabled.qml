@@ -14,7 +14,7 @@ Item {
             //spacing: 10
             Control {
                 anchors.horizontalCenter: parent.horizontalCenter
-                width: warningText.implicitWidth + 5
+                width: warningText.implicitWidth + 2
                 height: 30
                 Label {
                     id: warningText

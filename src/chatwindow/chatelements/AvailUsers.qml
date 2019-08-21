@@ -42,10 +42,9 @@ Item {
         id: availableUsersModel
         model: AvailableUsersModel {
             //usersList: AvailableUsersList
-            onUsersChaged: {
-                console.log("usersChanged")
-            }
         }
+
+
         /*
         model: ListModel {
             //@disable-check M16
@@ -88,7 +87,6 @@ Item {
 
                 color: "lightgrey"
                 gradient: Gradient.SolidStone
-
 
                 RowLayout {
                     anchors.fill: parent

@@ -19,5 +19,7 @@ SOURCES += \
     $$PWD/onlineusersmodel.cpp \
     $$PWD/qmlchatwidget.cpp
 
+include($$PWD/messagesmodel/messagesmodel.pri)
+
 RESOURCES += \
     $$PWD/qmlchat.qrc

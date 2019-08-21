@@ -7,7 +7,7 @@ OnlineUsersModel::OnlineUsersModel(QObject *parent)
     : QAbstractListModel(parent)
 {
     mpUsersList = new OnlineUsersList();
-
+    //emit usersChanged();
 }
 
 int OnlineUsersModel::rowCount(const QModelIndex &parent) const
@@ -92,15 +92,29 @@ Qt::ItemFlags OnlineUsersModel::flags(const QModelIndex &index) const
 
 void OnlineUsersModel::updateOnlineUsers(const QStringList &userNames)
 {
+    //beginResetModel();
+
+    //beginRemoveRows(QModelIndex(), 0, mpUsersList->size());
+    //mpUsersList->updateUsers(QStringList());
+    //endRemoveRows();
+
+    beginInsertRows(QModelIndex(), 0, 0);
     mpUsersList->updateUsers(userNames);
+    endInsertRows();
+
     qDebug() << "update online users called";
-    emit usersChaged();
+    qDebug() << userNames;
+    qDebug() << mpUsersList->at(0).mState << " " << mpUsersList->at(0).mUserName;
+    //qDebug() << mpUsersList->at(1).mState << " " << mpUsersList->at(1).mUserName;
+    //emit usersChaged();
+
+    //endResetModel();
 }
 
 void OnlineUsersModel::updateConnectedUsers(const QStringList &userNames)
 {
     mpUsersList->connectUsers(userNames);
-    emit usersChaged();
+    //emit usersChaged();
 }
 
 QHash<int, QByteArray> OnlineUsersModel::roleNames() const

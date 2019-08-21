@@ -5,6 +5,7 @@ import QtQuick.Controls 2.0
 import QtQuick.Layouts 1.3
 import QtQml.Models 2.12
 import "basicelements" as BasicElements
+import PairStormChat 1.0
 
 Item {
     id: messagesHistory
@@ -40,6 +41,12 @@ Item {
     DelegateModel {
         id: messagesModel
 
+        model: MessagesModel {
+            id: messagesModelBody
+            list: messagesList
+        }
+
+        /*
         model: ListModel {
             //@disable-check M16
             ListElement { owns: false; author: "Someone"; message: "hello:)"; timestamp: "7 Jan 14:36" }
@@ -56,11 +63,12 @@ Item {
             //@disable-check M16
             ListElement { owns: true; author: "Someone"; message: "last one"; timestamp: "7 Jan 14:36" }
         }
+        */
 
         delegate: Column {
             id: messageAttributesColumn
 
-            readonly property bool adjustRight: model.owns
+            readonly property bool adjustRight: model.authorName === globalUserName
             anchors.right: messageAttributesColumn.adjustRight ?
                                parent.right : undefined
             anchors.left:  messageAttributesColumn.adjustRight ?
@@ -112,16 +120,26 @@ Item {
                     border.width: 0
                     radius: 14
 
-                    Label {
+                    TextEdit {
                         id: messageText
+
+                        readOnly: true
+                        selectByMouse: true
 
                         anchors.fill: parent
                         anchors.margins: 10
                         anchors.topMargin: 23
                         wrapMode: Label.Wrap
 
-                        text: model.message
+                        text: model.content
                         color: "white"
+
+                        MouseArea {
+                            anchors.fill: parent
+                            enabled: false
+
+                            cursorShape: Qt.IBeamCursor
+                        }
                     }
 
                     Label {
@@ -145,7 +163,7 @@ Item {
                             source: "res/USER.png"
                         }
 
-                        text: qsTr("  " + model.author)
+                        text: qsTr("  " + model.authorName)
                         font.bold: true
                         font.pixelSize: 15
                         font.family: "consolas"
@@ -183,7 +201,7 @@ Item {
                 anchors.left:  messageAttributesColumn.adjustRight ?
                                    undefined    : parent.left
 
-                text: model.timestamp
+                text: Qt.formatDateTime(model.publicationDateTime, "d MMM hh:mm")
                 color: "white"
             }
         }
