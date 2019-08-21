@@ -2,27 +2,27 @@
 
 FileDb::FileDb() :Accessor ()
 {
-
 }
 
 void FileDb::addFileToDb(const File &file)
 {
     execQuery(addFileQuery(file));
+    query.finish();
 }
 
-void FileDb::getFileFromDb(const int idFile)
+File FileDb::getFileFromDb(const int idFile)
 {
     execQuery(getFileQuery(idFile));
-}
-
-void FileDb::getFileIdFromDb(const QString filename)
-{
-    execQuery(getFileIdQuery(filename));
+    File rFile;
+    fillStructureFile(rFile);
+    query.finish();
+    return rFile;
 }
 
 void FileDb::deleteFileFromDb(const QString filename)
 {
     execQuery(deleteFileQuery(filename));
+    query.finish();
 }
 
 QString FileDb::addFileQuery(const File &file)
@@ -37,13 +37,12 @@ QString FileDb::getFileQuery(const int idFile)
             + QString::number(idFile);
 }
 
-QString FileDb::getFileIdQuery(const QString filename)
-{
-    return "SELECT ID FROM File WHERE name = '"
-            + filename + "'";
-}
-
 QString FileDb::deleteFileQuery(const QString filename)
 {
     return "DELETE FROM User WHERE name = '" + filename + "'";
+}
+
+void FileDb::fillStructureFile(File &file)
+{
+    file.mName = query.record().value(0).toString();
 }

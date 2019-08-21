@@ -7,12 +7,11 @@ class UserDb : public Accessor
 public:
     UserDb();
     void addUserToDb(const User& user);
-    void getUserFromDb(const int idUser);
-    void getUserIdFromDb(const QString username);
+    User getUserFromDb(const int idUser);
 private:
     QString addUserQuery(const User& user);
     QString getUserQuery(const int idUser);
-    QString getUserIdQuery(const QString username);
+    void fillStructUser(User &user);
 };
 
 #endif // USERDB_H

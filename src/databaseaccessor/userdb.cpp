@@ -6,16 +6,16 @@ UserDb::UserDb(): Accessor()
 void UserDb::addUserToDb(const User &user)
 {
     execQuery(addUserQuery(user));
+    query.finish();
 }
 
-void UserDb::getUserFromDb(const int idUser)
+User UserDb::getUserFromDb(const int idUser)
 {
     execQuery(getUserQuery(idUser));
-}
-
-void UserDb::getUserIdFromDb(const QString username)
-{
-    execQuery(getUserIdQuery(username));
+    User rUser;
+    fillStructUser(rUser);
+    query.finish();
+    return rUser;
 }
 
 QString UserDb::addUserQuery(const User& user)
@@ -30,8 +30,7 @@ QString UserDb::getUserQuery(const int idUser)
             +QString::number(idUser);
 }
 
-QString UserDb::getUserIdQuery(const QString username)
+void UserDb::fillStructUser(User &user)
 {
-    return "SELECT id FROM User WHERE nickname = '"
-            + username + "'";
+    user.mNickname = query.record().value(0).toString();
 }

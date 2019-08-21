@@ -8,6 +8,7 @@ MessageDb::MessageDb(): Accessor()
 void MessageDb::addMessageToDb(const Message &message)
 {
     execQuery(addMessageQuery(message));
+    query.finish();
 }
 
 QVector<Message> MessageDb::getMessageFromDb(const QString startTime)
