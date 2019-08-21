@@ -3,6 +3,8 @@
 
 OnlineUsersList::OnlineUsersList(QObject *parent) : QObject(parent)
 {
+    mChatUsers = QVector<ChatUser>();
+    /*
     ChatUser user;
     user.mUserName = "Bohdan Vasichkin";
     user.mState = ChatUser::State::DisconnectedUser;
@@ -27,6 +29,7 @@ OnlineUsersList::OnlineUsersList(QObject *parent) : QObject(parent)
     user.mUserName = "PeterLysyk";
     user.mState = ChatUser::State::ConnectedUser;
     mChatUsers.append(user);
+    */
 }
 
 ChatUser & OnlineUsersList::at(const int & index)

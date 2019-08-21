@@ -82,10 +82,8 @@ void QmlChatWidget::configureOnLogin(const QString &userName)
     mpAllowedChatWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     mpAllowedChatWidget->setFocusPolicy(Qt::StrongFocus);
 
-    //setEnabled(false);
-    setMinimumSize(210, 400);
-
     mpBoxLayout->removeWidget(mpRestrictedChatWidget);
+    mpRestrictedChatWidget->hide();
     mpBoxLayout->addWidget(mpAllowedChatWidget);
 }
 

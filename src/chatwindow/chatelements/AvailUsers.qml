@@ -42,6 +42,9 @@ Item {
         id: availableUsersModel
         model: AvailableUsersModel {
             //usersList: AvailableUsersList
+            onUsersChaged: {
+                console.log("usersChanged")
+            }
         }
         /*
         model: ListModel {

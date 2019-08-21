@@ -36,6 +36,7 @@ public:
 
 signals:
 
+    void usersChaged();
     void stateChangedOn (const QString userName);
     void stateChangedOff(const QString userName);
 

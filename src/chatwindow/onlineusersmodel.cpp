@@ -93,11 +93,14 @@ Qt::ItemFlags OnlineUsersModel::flags(const QModelIndex &index) const
 void OnlineUsersModel::updateOnlineUsers(const QStringList &userNames)
 {
     mpUsersList->updateUsers(userNames);
+    qDebug() << "update online users called";
+    emit usersChaged();
 }
 
 void OnlineUsersModel::updateConnectedUsers(const QStringList &userNames)
 {
     mpUsersList->connectUsers(userNames);
+    emit usersChaged();
 }
 
 QHash<int, QByteArray> OnlineUsersModel::roleNames() const
