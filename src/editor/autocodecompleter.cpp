@@ -62,12 +62,11 @@ AutoCodeCompleter::AutoCodeCompleter(const QStringList &completions, QObject *pa
 
 bool AutoCodeCompleter::eventFilter(QObject *object, QEvent *event)
 {
-    if (event->type() != QEvent::KeyPress)
+    QKeyEvent* keyEvent = dynamic_cast<QKeyEvent*>(event);
+    if (!keyEvent)
     {
         return QCompleter::eventFilter(object, event);
     }
-
-    QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
 
     if (isNotEnterKey(keyEvent))
     {
@@ -87,7 +86,7 @@ bool AutoCodeCompleter::eventFilter(QObject *object, QEvent *event)
                 popup()->hide();
             }
         }
-        return QCompleter::eventFilter(object, event);
+        return QCompleter::eventFilter(object, event);;
     }
 
     if (popup()->isVisible())
@@ -97,8 +96,9 @@ bool AutoCodeCompleter::eventFilter(QObject *object, QEvent *event)
         {
             emit activated(popup()->currentIndex().data(completionRole()).toString());
         }
+        return true;
     }
-    return true;
+    return QCompleter::eventFilter(object, event);
 }
 
 void AutoCodeCompleter::setMinCompletionPrefixLength(int minCompletionPrefixLength)
