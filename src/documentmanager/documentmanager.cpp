@@ -48,9 +48,9 @@ void DocumentManager::openDocument(const QString &fileName, bool load)
             if (area->subWindowList().contains(pOpenedDoc))
             {
                 area->setActiveSubWindow(pOpenedDoc);
+                return;
             }
         }
-        return;
     }
 
     // create new view
@@ -525,29 +525,6 @@ void DocumentManager::closeEmptyDocArea()
 
         // area wgt is scheduled for deletion
         rightDocArea->deleteLater();
-    }
-}
-
-void DocumentManager::closeCurrentDocArea()
-{
-    if (mDocAreas.size() < 2)
-    {
-        return;
-    }
-
-    // close area in focus
-    auto pAreaInFocus = areaInFocus();
-
-    if (!pAreaInFocus)
-    {
-        return;
-    }
-
-    auto windowsList = pAreaInFocus->subWindowList();
-
-    for (const auto& wdw: windowsList)
-    {
-        wdw->close();
     }
 }
 

@@ -88,8 +88,7 @@ private slots:
     void onShowChatWindowDockTriggered();
     void onShowBottomPanel();
     void onCombineAreas();
-    void onCloseEmptyDocArea();
-    void onCloseCurrentDocArea();
+    void onCloseEmptyDocArea();   
 
     // tools menu
     void onRefactorTriggered();

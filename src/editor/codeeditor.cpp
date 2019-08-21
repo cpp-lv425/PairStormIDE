@@ -584,7 +584,8 @@ void CodeEditor::closeEvent(QCloseEvent *event)
     QMessageBox::StandardButton reply = QMessageBox::question
             (this,
              userMessages[UserMessages::PromptSaveTitle],
-            userMessages[UserMessages::SaveQuestion],
+            userMessages[UserMessages::SaveQuestion]
+            + getFileName() + "?",
             QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
 
     // if user closes dialog event is ignored

@@ -164,9 +164,8 @@ void MainWindow::setupMainMenu()
                         Qt::CTRL + Qt::Key_E);
     viewMenu->addAction("Split &Vectically", this, &MainWindow::onSplitVerticallyTriggered,
                         Qt::CTRL + Qt::SHIFT + Qt::Key_E);
-    viewMenu->addAction("Combine Document Areas", this, &MainWindow::onCombineAreas, Qt::ALT + Qt::SHIFT + Qt::Key_W);
-    viewMenu->addAction("Close &Empty Document Area", this, &MainWindow::onCloseEmptyDocArea);
-    viewMenu->addAction("Close Cu&rrent Document Area", this, &MainWindow::onCloseCurrentDocArea);
+    viewMenu->addAction("Co&mbine Document Areas", this, &MainWindow::onCombineAreas, Qt::ALT + Qt::SHIFT + Qt::Key_W);
+    viewMenu->addAction("Close &Empty Document Area", this, &MainWindow::onCloseEmptyDocArea);    
 
     viewMenu->addSeparator();
     viewMenu->addAction("Show &Project Viewer", this, &MainWindow::onShowProjectViewerTriggered);
@@ -539,11 +538,6 @@ void MainWindow::onCombineAreas()
 void MainWindow::onCloseEmptyDocArea()
 {
     mpDocumentManager->closeEmptyDocArea();
-}
-
-void MainWindow::onCloseCurrentDocArea()
-{
-    mpDocumentManager->closeCurrentDocArea();
 }
 
 void MainWindow::onRefactorTriggered()

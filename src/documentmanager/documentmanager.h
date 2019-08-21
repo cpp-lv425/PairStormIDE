@@ -32,8 +32,7 @@ public:
     void closeCurrentDocument();
     QVector<CodeEditor*> getChangedDocuments();
     void combineDocAreas();
-    void closeEmptyDocArea();
-    void closeCurrentDocArea();
+    void closeEmptyDocArea();    
 
     // calls passed functor on every opened document
     void configureDocuments(std::function<void(DocumentManager*, CodeEditor*, const QString&)> functor,
