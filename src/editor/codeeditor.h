@@ -64,6 +64,7 @@ private:
     bool isInRangeIncludBoth(int val, int leftMargin, int rightMargin);
     bool isInRangeIncludLast(int val, int leftMargin, int rightMargin);
 
+    void addButton(const int line, const QString &Comment);
     void removeButtonByIndex(QVector<AddCommentButton*> &commentV, int index);
     void removeButtomByValue(QVector<AddCommentButton*> &commentV, AddCommentButton* commentButton);
     void removeButtons(QVector<AddCommentButton*> &commentV, int cursorLine, int startLine, int endLine, int diff);
@@ -71,7 +72,7 @@ private:
     bool isCommentButtonExist(int line);
     AddCommentButton* getCommentButtonByIndex(const int line);
     void setNewAddedButtonSettings(AddCommentButton *commentButton);
-    void setAllButtons(QVector<Comment> comments);
+    void setAllButtonsFromDB(QVector<Comment> comments);
 
 protected:
     void resizeEvent(QResizeEvent *event)override;
@@ -117,6 +118,7 @@ private:
     AddCommentButton *mAddCommentButton;
     CommentWidget *mCommentWidget;
     QLabel *mCurrentCommentLable;
+    QVector<Comment> startComments;
 
     int mLinesCountPrev;
     int mLinesCountCurrent;

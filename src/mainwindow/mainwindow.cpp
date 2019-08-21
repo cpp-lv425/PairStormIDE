@@ -363,7 +363,7 @@ void MainWindow::onOpenFolderTriggered()
             (this,
              userMessages[UserMessages::OpenDirectoryTitle],
             QDir::homePath());
-    Connection *db = ConnectionGetter::getDefaultConnection("C:/Users/Anastasia Antonyk/Desktop/sqlite/storage.db");
+    Connection *db = ConnectionGetter::getDefaultConnection("C:/Users/Petro/Desktop/storage.db");
     CreateDB database;
     database.addTableFile();
     database.addTableUser();
