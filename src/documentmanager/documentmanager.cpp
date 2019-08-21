@@ -558,7 +558,7 @@ void DocumentManager::closeCurrentDocArea()
 void DocumentManager::configureDocuments(std::function<void(DocumentManager*, CodeEditor*, const QString&)> functor,
                                         const QString &newValue)
 {
-    // setting new settings to every opened doc view
+    // applying new settings to every opened doc view
     for (const auto& area: mDocAreas)
     {
         auto windowsList = area->subWindowList();
@@ -583,7 +583,6 @@ void DocumentManager::setStyle(CodeEditor *doc, const QString &styleName)
 
 void DocumentManager::setFontFamily(CodeEditor *doc, const QString &fontFamily)
 {
-    qDebug() << "font family change";
     doc->setFontStyle(fontFamily);
     doc->highlighText();
 }

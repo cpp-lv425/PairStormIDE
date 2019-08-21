@@ -744,6 +744,9 @@ void MainWindow::setDocumentFontFamily(const QString &fontFamily)
 }
 
 void MainWindow::setDocumentFontSize(const QString &fontSize)
-{
-    qDebug() << fontSize;
+{    
+    std::function<void(DocumentManager*, CodeEditor*, const QString&)> functor
+            (&DocumentManager::setFontSize);
+
+    mpDocumentManager->configureDocuments(functor, fontSize);
 }

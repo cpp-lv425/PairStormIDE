@@ -1,6 +1,9 @@
-#include "codeeditor.h"
 #include "linenumberarea.h"
+#include "usermessages.h"
 #include "eventbuilder.h"
+#include "filemanager.h"
+#include "codeeditor.h"
+#include "utils.h"
 #include<QtGui>
 #include<QTextCursor>
 #include<QPainter>
@@ -10,6 +13,7 @@
 #include<QMessageBox>
 #include<iostream>
 #include<QLabel>
+
 
 CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
 {
@@ -107,12 +111,14 @@ void CodeEditor::setFontSize(const QString &fontSize)
 {
     mConfigParam.setFontSize(fontSize);
     mFont.setPointSize(mConfigParam.mFontSize);
+    this->setFont(mFont);
 }
 
 void CodeEditor::setFontStyle(const QString &fontStyle)
-{
+{    
     mConfigParam.setFontStyle(fontStyle);
     mFont.setFamily(mConfigParam.mFontStyle);
+    this->setFont(mFont);
 }
 
 
@@ -329,18 +335,18 @@ void CodeEditor::showCommentTextEdit(int line)
     {
         mCommentWidget->getEditTab()->setText("");
     }
-     QSettings settings(QApplication::organizationName(), QApplication::applicationName());
-     mCommentWidget->setWindowTitle("Comment to " + QString::number(line) + " line by " + settings.value("UserName").toString());
+    QSettings settings(QApplication::organizationName(), QApplication::applicationName());
+    mCommentWidget->setWindowTitle("Comment to " + QString::number(line) + " line by " + settings.value("UserName").toString());
     //for text tokens
-//    qDebug()<<"tokens vector size = "<<mTokens.size();
-//    for (auto &i: mTokens)
-//    {
-//        if (i.mType == State::ID)
-//        {
-//            mLexer.getIdentificatorsList()
-//            qDebug()<<i.mName;
-//        }
-//    }
+    //    qDebug()<<"tokens vector size = "<<mTokens.size();
+    //    for (auto &i: mTokens)
+    //    {
+    //        if (i.mType == State::ID)
+    //        {
+    //            mLexer.getIdentificatorsList()
+    //            qDebug()<<i.mName;
+    //        }
+    //    }
     //
     /*qDebug()<<"vector size = "<<mLexer.getIdentificatorsList().size();
     for (auto &i: mLexer.getIdentificatorsList())
@@ -429,8 +435,8 @@ void CodeEditor::rewriteButtonsLines(QVector<AddCommentButton *> &commentV, cons
         {
             auto cursor = this->textCursor();
             cursor.movePosition(QTextCursor::PreviousCharacter);
-//check if cursor was in the start of comment line.
-//that is the only one situation when we consider this line as the line where we should move comment button
+            //check if cursor was in the start of comment line.
+            //that is the only one situation when we consider this line as the line where we should move comment button
             if (cursor.atBlockStart())
             {
                 setAnotherButtonLine(i, diff);
@@ -466,8 +472,8 @@ void CodeEditor::removeButtonByIndex(QVector<AddCommentButton *> &commentV, int 
 
 void CodeEditor::removeButtomByValue(QVector<AddCommentButton *> &commentV, AddCommentButton *commentButton)
 {
-     commentButton->setVisible(false);
-     mCommentsVector.erase(std::remove(commentV.begin(), commentV.end(), commentButton), commentV.end());
+    commentButton->setVisible(false);
+    mCommentsVector.erase(std::remove(commentV.begin(), commentV.end(), commentButton), commentV.end());
 }
 
 bool CodeEditor::isCommentButtonExist(int line)
@@ -484,38 +490,38 @@ bool CodeEditor::isCommentButtonExist(int line)
 
 void CodeEditor::removeButtons(QVector<AddCommentButton *> &commentV, int cursorLine, int startLine, int endLine, int diff)
 {
-   if (diff > 0)//we shouldn't remove button if the wasn't any removing
-   {
-       return;
-   }
+    if (diff > 0)//we shouldn't remove button if the wasn't any removing
+    {
+        return;
+    }
 
-   for (int i = 0; i < commentV.size(); i++)
-   {
-       //if the last pressed remove button (delete or backspace) was delete we should check one more condition
-       //because cursor position hasn't changed
-       if (lastRemomeKey == LastRemoveKey::DEL)
-       {
-           //this statment happens when we're staying above the line where comment is and pressed Delete.
-           //we havn't moved the cursor position, but diff became -1 therefore we can't check this as usually
-           //using only startLine position
-           if (cursorLine == startLine
-                   && cursorLine != commentV[i]->getCurrentLine())
-           {
-               continue;
-           }
-           if (isInRangeIncludBoth(commentV[i]->getCurrentLine(), startLine, endLine))
-           {
-               removeButtonByIndex(commentV, i);//otherwise delete this button (we delete whole line where comment button was)
-           }
-       }
-       else
-       {
-           if (isInRangeIncludLast(commentV[i]->getCurrentLine(), startLine, endLine))
-           {
-               removeButtonByIndex(commentV, i);//the same deleting here
-           }
-       }
-   }
+    for (int i = 0; i < commentV.size(); i++)
+    {
+        //if the last pressed remove button (delete or backspace) was delete we should check one more condition
+        //because cursor position hasn't changed
+        if (lastRemomeKey == LastRemoveKey::DEL)
+        {
+            //this statment happens when we're staying above the line where comment is and pressed Delete.
+            //we havn't moved the cursor position, but diff became -1 therefore we can't check this as usually
+            //using only startLine position
+            if (cursorLine == startLine
+                && cursorLine != commentV[i]->getCurrentLine())
+            {
+                continue;
+            }
+            if (isInRangeIncludBoth(commentV[i]->getCurrentLine(), startLine, endLine))
+            {
+                removeButtonByIndex(commentV, i);//otherwise delete this button (we delete whole line where comment button was)
+            }
+        }
+        else
+        {
+            if (isInRangeIncludLast(commentV[i]->getCurrentLine(), startLine, endLine))
+            {
+                removeButtonByIndex(commentV, i);//the same deleting here
+            }
+        }
+    }
 }
 
 void CodeEditor::mouseMoveEvent(QMouseEvent *event)
@@ -528,7 +534,7 @@ void CodeEditor::mouseMoveEvent(QMouseEvent *event)
         int bottom = top + static_cast<int>(blockBoundingRect(block).height());
         int side = bottom - top;// size of each side of comment button
 
-       // side of rectancge where our bottom will be. X-0 && Y-0 start from the left top, so (top < bottom)
+        // side of rectancge where our bottom will be. X-0 && Y-0 start from the left top, so (top < bottom)
         const QSize buttonSize = QSize(side, side);
         mAddCommentButton->setFixedSize(buttonSize);
 
@@ -537,8 +543,8 @@ void CodeEditor::mouseMoveEvent(QMouseEvent *event)
         int commentAreaRightMargin = this->width() - this->verticalScrollBar()->width() - getLineNumberAreaWidth();
         int commentAreaLeftMargin = commentAreaRightMargin - side;
 
-       if ((event->x() >= commentAreaLeftMargin) && (event->x() <= commentAreaRightMargin))//mouse inside comment block
-       {
+        if ((event->x() >= commentAreaLeftMargin) && (event->x() <= commentAreaRightMargin))//mouse inside comment block
+        {
             int linesFromTheTop = event->y() / side;
             int currLine = linesFromTheTop + currSliderPos + 1;//because first block = 0
             mAddCommentButton->setCurrentLine(currLine);
@@ -549,7 +555,7 @@ void CodeEditor::mouseMoveEvent(QMouseEvent *event)
                 int commentBottonYpos = linesFromTheTop * side;
 
                 mAddCommentButton->setGeometry(commentBottonXpos, currSliderPos ? commentBottonYpos :
-                                          commentBottonYpos + TOP_UNUSED_PIXELS_HEIGHT , side, side);
+                                                                                  commentBottonYpos + TOP_UNUSED_PIXELS_HEIGHT , side, side);
                 mAddCommentButton->setVisible(true);
                 //label for line showing
                 mCurrentCommentLable->setGeometry(mAddCommentButton->x() - getLineNumberAreaWidth(), mAddCommentButton->y(),
@@ -557,12 +563,12 @@ void CodeEditor::mouseMoveEvent(QMouseEvent *event)
                 mCurrentCommentLable->setText(QString::number(mAddCommentButton->getCurrentLine()));
                 mCurrentCommentLable->setVisible(true);
             }
-       }
-       else
-       {
-           mAddCommentButton->setVisible(false);
-           mCurrentCommentLable->setVisible(false);
-       }
+        }
+        else
+        {
+            mAddCommentButton->setVisible(false);
+            mCurrentCommentLable->setVisible(false);
+        }
     }
     QPlainTextEdit::mouseMoveEvent(event);
 }
@@ -571,14 +577,15 @@ void CodeEditor::closeEvent(QCloseEvent *event)
 {
     if (!isChanged())
     {
+        emit closeDocEventOccured(this);
         event->accept();
         return;
     }
     QMessageBox::StandardButton reply = QMessageBox::question
             (this,
-             "Saving Changes",
-             "Do you want to save changes to opened documents?",
-             QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+             userMessages[UserMessages::PromptSaveTitle],
+            userMessages[UserMessages::SaveQuestion],
+            QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
 
     // if user closes dialog event is ignored
     if (reply == QMessageBox::Cancel)
@@ -586,13 +593,26 @@ void CodeEditor::closeEvent(QCloseEvent *event)
         event->ignore();
         return;
     }
-    // if document wasn't modified of user doesn't want to save changes
+    // if user doesn't want to save changes
     if (reply == QMessageBox::No)
     {
+        emit closeDocEventOccured(this);
         event->accept();
         return;
     }
-    // saving document
+
+    try
+    {
+        FileManager().writeToFile(getFileName(), toPlainText());
+        setBeginTextState();
+    }
+    catch (const FileOpeningFailure&)
+    {
+        QMessageBox::warning(this, userMessages[UserMessages::ErrorTitle],
+                userMessages[UserMessages::FileOpeningForSavingErrorMsg]);
+        event->ignore();
+        return;
+    }
     emit closeDocEventOccured(this);
 }
 
