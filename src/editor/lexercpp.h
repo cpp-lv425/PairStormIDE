@@ -45,6 +45,7 @@ public:
     void lexicalAnalysis(QString) override;
     QVector<Token> getTokens() const;
     void clear();
+    //QStringList getIdentificatorsList() const;
 };
 
 #endif // LEXERCPP_H

@@ -23,7 +23,12 @@ const int TOP_UNUSED_PIXELS_HEIGHT = 4;
 #include<QVector>
 #include<QFont>
 #include<QStatusBar>
-#include "sqliteaccess.h"
+#include"sqliteaccess.h"
+#include<QStringList>
+#include<QCompleter>
+#include"autocodecompleter.h"
+
+
 
 class QPaintEvent;
 class QResizeEvent;
@@ -58,6 +63,10 @@ public:
 
     LastRemoveKey getLastRemomeKey() const;
     void setLastRemomeKey(const LastRemoveKey &value);
+
+    ConfigParams getConfigParam();
+    void setConfigParam(const ConfigParams &configParam);
+
 private:
     void rewriteButtonsLines( QVector<AddCommentButton*> &commentV, int diff, int startLine);
     void setAnotherButtonLine(AddCommentButton *comment, int diff);
@@ -84,7 +93,6 @@ private slots:
     void updateLineNumberArea(const QRect &rect, int dy);
     void runLexer();
     void highlighText();
-    //void showCommentLine(int line);
     void deleteComment();
 
 public slots:
@@ -96,6 +104,10 @@ public slots:
     void emptyCommentWasAdded();
     void notEmptyCommentWasAdded();
     void changeCommentButtonsState();
+    void setTextColors();
+    void setFontSize(const QString &fontSize);
+    void setFontStyle(const QString &fontStyle);
+    void setIdeType(const QString &ideType);
 
 signals:
     void changesAppeared();
@@ -104,7 +116,6 @@ signals:
     void textChangedInLine(int);
     void textChangedInLines(int, int);
     void linesCountUpdated();
-
 
 private:
     QWidget *mLineNumberArea;
@@ -119,6 +130,7 @@ private:
     CommentWidget *mCommentWidget;
     QLabel *mCurrentCommentLable;
     QVector<Comment> startComments;
+    QCompleter *mCompleter;
 
     int mLinesCountPrev;
     int mLinesCountCurrent;
@@ -132,12 +144,14 @@ private:
     QTextCharFormat fmtRegular;
     QTextCharFormat fmtUndefined;
 
+
     LastRemoveKey lastRemomeKey;
 
 protected:
     int mCurrentZoom;
     QVector<Token> mTokens;
     friend class Event;
+
 };
 
 #endif // CODEEDITOR_H

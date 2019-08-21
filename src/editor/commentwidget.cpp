@@ -105,7 +105,7 @@ void CommentWidget::writeSpecialTextPositions(const QRegularExpression &re, cons
             shift += oneSideSymbolsCount * 2;//increase shift by value which is equal to count of deleted special symbols
             specText.endIndex = endOffset - shift;//set end of special text position
 
-            specText.textType = specialSymbolsOneSide == "**"? SpecificTextType::BOLD : SpecificTextType::ITALIC;// set the type of special symbols
+            specText.textType = specialSymbolsOneSide == specialCommentAsterisk? SpecificTextType::BOLD : SpecificTextType::ITALIC;// set the type of special symbols
             mSpecificTextVector.push_back(specText);//write
 
             shiftAllBold(specText, oneSideSymbolsCount);//move all positions of bold

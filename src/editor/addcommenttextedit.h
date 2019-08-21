@@ -6,6 +6,8 @@
 #include<QPushButton>
 #include<QTextCursor>
 #include<QRegularExpression>
+#include<QTextDocument>
+#include<QPlainTextEdit>
 
 namespace Ui
 {
@@ -26,6 +28,7 @@ public:
     QPushButton* getSetBoldButton();
     QPushButton* getSetItalicButton();
     QTextCursor getCursor();
+    QPlainTextEdit* getTextEdit();
     void setCursor(const QTextCursor &cursor);
 
 public
