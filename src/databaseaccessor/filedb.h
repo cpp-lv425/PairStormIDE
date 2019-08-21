@@ -16,6 +16,7 @@ private:
     QString getFileQuery(const int idFile);
     QString getFileIdQuery(const QString filename);
     QString deleteFileQuery(const QString filename);
+    void fillStructureFile(File &file);
 
 };
 
