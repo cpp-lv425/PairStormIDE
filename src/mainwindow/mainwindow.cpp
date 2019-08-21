@@ -379,7 +379,7 @@ void MainWindow::onSaveFileTriggered()
         if (mpDocumentManager->saveDocument())
         {
             statusBar()->showMessage(userMessages[UserMessages::DocumentSavedMsg], 3000);
-        }        
+        }
     }
     catch (const FileOpeningFailure&)
     {
@@ -445,7 +445,7 @@ void MainWindow::onSaveAllFilesTriggered()
         if (mpDocumentManager->saveAllDocuments())
         {
             statusBar()->showMessage(userMessages[UserMessages::DocumentSavedMsg], 3000);
-        }        
+        }
     }
     catch (const FileOpeningFailure&)
     {
@@ -659,8 +659,18 @@ void MainWindow::closeEvent(QCloseEvent *event)
     {
     case QDialogButtonBox::StandardButton::YesToAll:
     {
-        mpDocumentManager->saveAllDocuments();
-        event->accept();
+        try
+        {
+            mpDocumentManager->saveAllDocuments();
+            event->accept();
+        } catch (const FileOpeningFailure&)
+        {
+            // if any of files could not be opened to save changes to
+            // document then user is warned & closeEvent is ignored
+            QMessageBox::warning(this, userMessages[UserMessages::ErrorTitle],
+                    userMessages[UserMessages::FileOpeningForSavingErrorMsg]);
+            event->ignore();
+        }
         return;
     }
     case QDialogButtonBox::StandardButton::NoToAll:
@@ -717,8 +727,8 @@ void MainWindow::setInitialAppStyle()
     // restores style palette set in previous app session
     QSettings savedSettings(QApplication::organizationName(), QApplication::applicationName());
     QString styleName = {savedSettings.contains("style") ?
-                             savedSettings.value("style").toString()
-                             : "WHITE"};
+                         savedSettings.value("style").toString()
+                         : "WHITE"};
     setAppStyle(styleName);
 }
 

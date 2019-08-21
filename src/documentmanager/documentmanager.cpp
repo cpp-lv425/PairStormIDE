@@ -133,6 +133,8 @@ bool DocumentManager::saveAllDocuments()
         {
             try
             {
+                // savedChanges is set to true if at lease one document
+                // was saved
                 savedChanges |= saveDocument(qobject_cast<CodeEditor*>(subWdw->widget()));
             }
             catch (const FileOpeningFailure&)
