@@ -68,6 +68,10 @@ public:
     void setConfigParam(const ConfigParams &configParam);
     void highlighText();
 
+    //DB methods
+    void readAllCommentsFromDB(QVector<Comment> mStartComments);
+    QVector<Comment> getAllCommentsToDB();
+
 private:
     void rewriteButtonsLines( QVector<AddCommentButton*> &commentV, int diff, int startLine);
     void setAnotherButtonLine(AddCommentButton *comment, int diff);
@@ -82,7 +86,6 @@ private:
     bool isCommentButtonExist(int line);
     AddCommentButton* getCommentButtonByIndex(const int line);
     void setNewAddedButtonSettings(AddCommentButton *commentButton);
-    void setAllButtonsFromDB(QVector<Comment> comments);
 
 protected:
     void resizeEvent(QResizeEvent *event)override;
@@ -129,7 +132,7 @@ private:
     AddCommentButton *mAddCommentButton;
     CommentWidget *mCommentWidget;
     QLabel *mCurrentCommentLable;
-    QVector<Comment> startComments;
+    QVector<Comment> mStartComments;
     QCompleter *mCompleter;
 
     int mLinesCountPrev;
