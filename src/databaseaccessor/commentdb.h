@@ -19,6 +19,7 @@ private:
     void fillStructComment(Comment &comment);
     QString numberOfCommentInFileQuery(const QString filename);
     QString allCommentInFileQuery(const QString filename);
+    QString deleteAllCommentsInFileQuery(const QString commentFile);
 };
 
 #endif // COMMENTDB_H
