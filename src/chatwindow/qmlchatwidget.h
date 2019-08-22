@@ -2,10 +2,13 @@
 #define QMLCHATWIDGET_H
 
 #include "chatwidgetinterface.h"
-#include "onlineusersmodel.h"
+//#include "onlineusersmodel.h"
 
 #include "chatmessagesmodel.h"
 #include "chatmessagescontroller.h"
+
+#include "chatusersmodel.h"
+#include "chatuserscontroller.h"
 
 #include <QQmlContext>
 #include <QBoxLayout>
@@ -35,9 +38,10 @@ private:
 
     QString mUserName;
 
-    OnlineUsersModel * mpUsers;
+    //OnlineUsersModel * mpUsers;
 
     ChatMessagesController * mpMessagesController;
+    ChatUsersController    * mpUsersController;
 
     QQmlContext      * mpChatContext;
     QBoxLayout       * mpBoxLayout;

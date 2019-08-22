@@ -41,11 +41,13 @@ void ChatWindowDock::displayMessage(const QString userName, const QString messag
 
 void ChatWindowDock::onUserToConnectSelected(QString userName)
 {
+    qDebug() << "dock transmits connection request to: " << userName;
     emit userToConnectSelected(userName);
 }
 
 void ChatWindowDock::onUserToDisconnectSelected(QString userName)
 {
+    qDebug() << "dock transmits disconnection request to: " << userName;
     emit userToDisconnectSelected(userName);
 }
 

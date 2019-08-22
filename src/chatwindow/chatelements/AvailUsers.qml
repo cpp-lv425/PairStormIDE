@@ -6,7 +6,7 @@ import QtGraphicalEffects 1.12
 
 import "scripts/ChatBase.js" as ChatBase
 import "basicelements" as BasicElements
-import AvailableUsers 1.0
+import PairStormChat 1.0
 
 
 Item {
@@ -40,7 +40,27 @@ Item {
 
     DelegateModel {
         id: availableUsersModel
-        model: AvailableUsersModel {
+
+        model: UsersModel {
+            list: usersList
+
+            onDataChanged: {
+                /*
+                console.log("QML DATA HAS CHANGED");
+
+                if (parent.isUserConnected)
+                {
+                    console.log("QML USER CONNECTED")
+                }
+                else
+                {
+                    console.log("QML USER DISCONNECTED");
+                }*/
+
+                //userSwitch.state = isUserConnected? "on" : "off"
+            }
+
+
             //usersList: AvailableUsersList
         }
 
@@ -67,6 +87,11 @@ Item {
 
                 width:  parent.width
                 height: availableUsers.height / 6
+
+                //model.onDataChanged {
+
+                //}
+
                 /*
                 height: {
                     var maximumElementsNum = availableUsersModel.count
@@ -99,7 +124,7 @@ Item {
                         Layout.fillHeight: true
                         Layout.fillWidth: true
 
-                        text: qsTr(model.name)
+                        text: qsTr(model.userName)
                         font.pixelSize: userElement.height / (ChatBase.golden_ratio)
                         font.family: "consolas"
 
@@ -126,20 +151,31 @@ Item {
                             anchors.fill: parent
                             anchors.centerIn: parent
 
-                            state: model.connected? "on" : "off"
+                            state: model.isUserConnected? "on" : "off"
+
+                            /*states: [
+                                State {
+                                    name: "on"
+                                    when: model.isUserConnected
+                                },
+                                State {
+                                    name: "off"
+                                    when: !model.isUserConnected
+                                }
+                            ]*/
 
                             preferredHeight: parent.height
                             preferredWidth:  parent.width
                             widthToHeight:   ChatBase.golden_ratio//1.618034
                             onStateChanged: {
-                                console.log("" + model.name + " has been turned " + state)
+                                //console.log("" + model.userName + " has been turned " + state)
                                 if (state === "on")
                                 {
-                                    model.connected = true
+                                    model.isUserConnected = true
                                 }
                                 if (state === "off")
                                 {
-                                    model.connected = false
+                                    model.isUserConnected = false
                                 }
 
                                 //model.connected = !model.connected

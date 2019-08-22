@@ -1,112 +1,164 @@
-/*
-#include "chatmessagesmodel.h"
+#include "chatusersmodel.h"
 
 #include <QDebug>
 
-ChatMessagesModel::ChatMessagesModel(QObject *parent)
-    : QAbstractListModel(parent), mpMessagesController(nullptr)
+ChatUsersModel::ChatUsersModel(QObject * parent)
+    : QAbstractListModel(parent), mpUsersController(nullptr)
 {
 }
 
-int ChatMessagesModel::rowCount(const QModelIndex &modelIndex) const
+int ChatUsersModel::rowCount(const QModelIndex & modelIndex) const
 {
-    if (modelIndex.isValid() || !mpMessagesController)
+    if (modelIndex.isValid() || !mpUsersController)
     {
         return 0;
     }
 
-    return mpMessagesController->messages().size();
+    return mpUsersController->users().size();
 }
 
-QVariant ChatMessagesModel::data(const QModelIndex &modelIndex, int role) const
+QVariant ChatUsersModel::data(const QModelIndex & modelIndex, int role) const
 {
-    if (!modelIndex.isValid() || !mpMessagesController)
+    if (!modelIndex.isValid() || !mpUsersController)
     {
         return QVariant();
     }
 
-    const int messageId = modelIndex.row();
+    const int userId = modelIndex.row();
 
-    const ChatMessage currentChatMessage =
-            mpMessagesController->messages().at(messageId);
+    const ChatUser currentChatUser =
+            mpUsersController->users().at(userId);
 
     switch(role)
     {
-    case PublicationDateTimeRole:
-        // Give the publication date & time
-        return QVariant(currentChatMessage.mPublicationDateTime);
-    case AuthorNameRole:
-        // Give the name of the author
-        return QVariant(currentChatMessage.mAuthorName);
-    case ContentRole:
-        // Give the content of the message
-        return QVariant(currentChatMessage.mContent);
-    case TypeRole:
-        // Give the type of the message
-        QString messageType;
-        switch (currentChatMessage.mType)
-        {
-        case ChatMessage::Type::UserMessage:
-            messageType = "ordinary";
-            break;
-        case ChatMessage::Type::SystemMessage:
-            messageType = "service";
-            break;
-        }
-        return QVariant(messageType);
+    case UserNameRole:
+        // Give the name of the user
+        return QVariant(currentChatUser.mUserName);
+    case UserConnectedRole:
+        // Give info about user' connection
+        return QVariant(currentChatUser.mState ==
+                        ChatUser::State::ConnectedUser);
+    case UserOnlineRole:
+        // Give info about user' availability
+        return QVariant(currentChatUser.mState !=
+                        ChatUser::State::OfflineUser);
     }
 
     return QVariant();
 }
 
-QHash<int, QByteArray> ChatMessagesModel::roleNames() const
+
+bool ChatUsersModel::setData(const QModelIndex & modelIndex,
+                             const QVariant & newValue,
+                             int role)
+{
+    if (!modelIndex.isValid() || !mpUsersController)
+    {
+        return false;
+    }
+
+    const int userId = modelIndex.row();
+
+    ChatUser currentUser =
+            mpUsersController->users().at(userId);
+
+    switch(role)
+    {
+    case UserNameRole:
+        // Idle
+        break;
+    case UserConnectedRole:
+        // Try to connect user
+       if (newValue.toBool())
+       {
+           currentUser.mState = ChatUser::State::ConnectedUser;
+           emit mpUsersController->userStateChangedConnected(currentUser.mUserName);
+       }
+       else
+       {
+           currentUser.mState = ChatUser::State::DisconnectedUser;
+           emit mpUsersController->userStateChangedDisconnected(currentUser.mUserName);
+       }
+
+        break;
+    case UserOnlineRole:
+        // Idle
+        break;
+    }
+
+    if (data(modelIndex, role) != newValue) {
+        emit dataChanged(modelIndex, modelIndex, QVector<int>({role}));
+        return true;
+    }
+    return false;
+}
+
+QHash<int, QByteArray> ChatUsersModel::roleNames() const
 
 {
     QHash<int, QByteArray> roleNames;
 
-    roleNames[PublicationDateTimeRole] = "publicationDateTime";
-    roleNames[AuthorNameRole]          = "authorName";
-    roleNames[ContentRole]             = "content";
-    roleNames[TypeRole]                = "type";
+    roleNames[UserConnectedRole] = "isUserConnected";
+    roleNames[UserOnlineRole]    = "isUserOnline";
+    roleNames[UserNameRole]      = "userName";
 
     return roleNames;
 }
 
-ChatMessagesController * ChatMessagesModel::list() const
+ChatUsersController * ChatUsersModel::list() const
 
 {
-    return mpMessagesController;
+    return mpUsersController;
 }
 
-void ChatMessagesModel::setList(ChatMessagesController * newList)
+void ChatUsersModel::setList(ChatUsersController * newList)
 {
     beginResetModel();
 
-    if (mpMessagesController)
+    if (mpUsersController)
     {
-        mpMessagesController->disconnect(this);
+        mpUsersController->disconnect(this);
     }
 
-    mpMessagesController = newList;
-    if (!mpMessagesController)
+    mpUsersController = newList;
+    if (!mpUsersController)
     {
         endResetModel();
         return;
     }
 
-    connect(mpMessagesController, &ChatMessagesController::preMessageAppended,
+    connect(mpUsersController, &ChatUsersController::preUserAppended,
             this, [=]()
             {
-                const int elementRow = mpMessagesController->messages().size();
-                beginInsertRows(QModelIndex(), elementRow, elementRow);
+                const int userRow = mpUsersController->users().size();
+                beginInsertRows(QModelIndex(), userRow, userRow);
             }, Qt::AutoConnection);
 
-    connect(mpMessagesController, &ChatMessagesController::postMessageAppended,
+    connect(mpUsersController, &ChatUsersController::postUserAppended,
             this, [=]()
             {
                 endInsertRows();
             }, Qt::AutoConnection);
 
+    connect(mpUsersController, &ChatUsersController::connectedStateChanged,
+            this, [=](int index, bool isNowConnected)
+            {
+                if(this->setData(this->index(index), isNowConnected, UserConnectedRole))
+                    qDebug() << "data successfully set";
+            }, Qt::AutoConnection);
+
+    connect(mpUsersController, &ChatUsersController::preUserRemoved,
+            this, [=](int index)
+            {
+                beginRemoveRows(QModelIndex(), index, index);
+            }, Qt::AutoConnection);
+
+    connect(mpUsersController, &ChatUsersController::postUserRemoved,
+            this, [=]()
+            {
+                endRemoveRows();
+            }, Qt::AutoConnection);
+
     endResetModel();
 }
-*/
+

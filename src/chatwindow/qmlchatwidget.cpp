@@ -23,6 +23,7 @@
 QmlChatWidget::QmlChatWidget() : mpMessagesController(nullptr)
 {
     QQuickWindow::setSceneGraphBackend(QSGRendererInterface::Software);
+    /*
     mpUsers = new OnlineUsersModel();
 
     connect(mpUsers, &OnlineUsersModel::stateChangedOn,
@@ -33,7 +34,7 @@ QmlChatWidget::QmlChatWidget() : mpMessagesController(nullptr)
             this,          &QmlChatWidget::DisconnectUserOnChangedState,
             Qt::UniqueConnection);
 
-
+*/
 
 
 
@@ -71,10 +72,15 @@ void QmlChatWidget::configureOnLogin(const QString &userName)
     if (mpMessagesController)
     {
         mpMessagesController->sendCanNotLogInTwiceMessage();
+        //mpUsersController->updateOnlineUsers(QStringList() << "lilia" << "petro");
+        updateConnectedUsers(QStringList() << "bodia");
+        updateOnlineUsers(QStringList() << "laila" << "dima");
+
         return;
     }
 
     mUserName = userName;
+
     mpMessagesController = new ChatMessagesController(userName);
     mpMessagesController->sendGreetingsMessage();
 
@@ -82,7 +88,20 @@ void QmlChatWidget::configureOnLogin(const QString &userName)
             this,                 &QmlChatWidget::shareMessageOnSendingMessage,
             Qt::UniqueConnection);
 
-    qmlRegisterType<OnlineUsersModel>("AvailableUsers", 1, 0, "AvailableUsersModel");
+    mpUsersController = new ChatUsersController();
+
+    connect(mpUsersController, &ChatUsersController::userStateChangedConnected,
+            this,              &QmlChatWidget::ConnectUserOnChangedState,
+            Qt::UniqueConnection);
+
+    connect(mpUsersController, &ChatUsersController::userStateChangedDisconnected,
+            this,              &QmlChatWidget::DisconnectUserOnChangedState,
+            Qt::UniqueConnection);
+
+    qmlRegisterType<ChatUsersModel>("PairStormChat", 1, 0, "UsersModel");
+    qmlRegisterUncreatableType<ChatUsersController>("PairStormChat", 1, 0, "UsersList",
+                                                       QStringLiteral("Users list can be created only in backend"));
+
 
     qmlRegisterType<ChatMessagesModel>("PairStormChat", 1, 0, "MessagesModel");
     qmlRegisterUncreatableType<ChatMessagesController>("PairStormChat", 1, 0, "MessagesList",
@@ -102,13 +121,14 @@ void QmlChatWidget::configureOnLogin(const QString &userName)
     view->setResizeMode(QQuickView::SizeRootObjectToView);
 
     mpChatContext = view->engine()->rootContext();
-    mpChatContext->setContextProperty(QStringLiteral("AvailableUsersList"), mpUsers);
-    mpChatContext->setContextProperty(QStringLiteral("usersList"), mpUsers->getUsersList());
+    //mpChatContext->setContextProperty(QStringLiteral("AvailableUsersList"), mpUsers);
+    //mpChatContext->setContextProperty(QStringLiteral("usersList"), mpUsers->getUsersList());
 
     //============================================================================================
     mpChatContext->setContextProperty(QStringLiteral("globalUserName"), mUserName);
 
     mpChatContext->setContextProperty(QStringLiteral("messagesList"),   mpMessagesController);
+    mpChatContext->setContextProperty(QStringLiteral("usersList"),      mpUsersController);
     //============================================================================================
 
     view->setSource(QUrl("qrc:/chat.qml"));
@@ -131,12 +151,14 @@ void QmlChatWidget::configureOnLogin(const QString &userName)
 
 void QmlChatWidget::updateOnlineUsers(const QStringList &onlineUsers)
 {
-    mpUsers->updateOnlineUsers(onlineUsers);
+    //mpUsers->updateOnlineUsers(onlineUsers);
+    mpUsersController->updateOnlineUsers(onlineUsers);
 }
 
 void QmlChatWidget::updateConnectedUsers(const QStringList &connectedUsers)
 {
-    mpUsers->updateConnectedUsers(connectedUsers);
+    //mpUsers->updateConnectedUsers(connectedUsers);
+    mpUsersController->updateConnectedUsers(connectedUsers);
 }
 
 void QmlChatWidget::appendMessage(const QString &messageAuthor,

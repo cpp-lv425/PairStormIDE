@@ -7,6 +7,7 @@
 #include <QJsonObject>
 #include <QJsonDocument>
 
+
 struct ChatUser
 {
     QString mUserName;
@@ -27,24 +28,38 @@ public:
 
     QVector<ChatUser> users() const;
 
-    void sendGreetingsMessage();
-    void sendCanNotLogInTwiceMessage();
 
 signals:
 
-    void sendingMessage(const ChatUser & newMessage);
+    void userStateChangedConnected(const QString & userName);
+    void userStateChangedDisconnected(const QString & userName);
+
+    void connectedStateChanged(int userId, bool newState);
+
     void preUserAppended();
     void postUserAppended();
 
+    void preUserRemoved(int userId);
+    void postUserRemoved();
+
 public slots:
 
-    void appendUser(const ChatUser & newUser);
-
-    void appendMessage(const QString & newMessageContent);
+    void updateOnlineUsers(const QStringList & onlineUsers);
+    void updateConnectedUsers(const QStringList & connectedUsers);
 
 private:
 
     QVector<ChatUser> mChatUsers;
+
+    QStringList onlineUserNames() const;
+    QStringList connectedUserNames() const;
+
+    void appendUserOnDiscovery(const QString & newUser,
+                               ChatUser::State state = ChatUser::State::DisconnectedUser);
+    void removeUserOnOutdation(const QString & outdatedUser);
+
+    void connectUserOnConnection(const QString & connectedUser);
+    void disconnectUserOnDisconnection(const QString & disconnectedUser);
 };
 
 #endif // CHATUSERSCONTROLLER_H

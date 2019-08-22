@@ -68,12 +68,12 @@ Item {
                 onAccepted: {
                     if (messageInput.text === "")
                     {
-                        console.log("message is empty")
+                        //console.log("message is empty")
                         return
                     }
                     messagesList.appendMessage(messageInput.text)
                     messageInput.clear()
-                    console.log("send message: " + messageInput.text)
+                    //console.log("send message: " + messageInput.text)
                 }
 
                 property string placeholderText: "Type message..."
@@ -128,12 +128,12 @@ Item {
                 onClicked: {
                     if (messageInput.text === "")
                     {
-                        console.log("message is empty")
+                        //console.log("message is empty")
                         return
                     }
                     messagesList.appendMessage(messageInput.text)
                     messageInput.clear()
-                    console.log("send message: " + messageInput.text)
+                    //console.log("send message: " + messageInput.text)
                 }
             }
         }

@@ -1,77 +1,186 @@
 #include "chatuserscontroller.h"
 #include <QDebug>
 
-/*
 ChatUsersController::ChatUsersController(QObject *parent) :
     QObject(parent)
 {
 }
 
-QVector<ChatMessage> ChatUsersController::messages() const
+QVector<ChatUser> ChatUsersController::users() const
 {
-    return mChatMessages;
+    return mChatUsers;
 }
 
-void ChatUsersController::sendGreetingsMessage()
+QStringList ChatUsersController::onlineUserNames() const
 {
-    // Send greetings message from the Pair Storm appliction to the user
-    ChatMessage greetingsMessage;
-
-    greetingsMessage.mAuthorName = "PairStorm";
-    greetingsMessage.mContent = "Welcome Pair Storm Application\nTo get help, type \"help\"";
-    greetingsMessage.mPublicationDateTime = QDateTime::currentDateTimeUtc();
-    greetingsMessage.mType = ChatMessage::Type::SystemMessage;
-
-    appendMessage(greetingsMessage);
+    QStringList userNames;
+    std::for_each(mChatUsers.cbegin(),
+                  mChatUsers.cend(),
+                  [&userNames](const ChatUser & chatUser)
+                  {
+                      userNames.push_back(chatUser.mUserName);
+                  });
+    return userNames;
 }
 
-void ChatUsersController::sendCanNotLogInTwiceMessage()
+QStringList ChatUsersController::connectedUserNames() const
 {
-    // Send greetings message from the Pair Storm appliction to the user
-    ChatMessage canNotLogInTwiceMessage;
-
-    canNotLogInTwiceMessage.mAuthorName = "PairStorm";
-    canNotLogInTwiceMessage.mContent = "Sorry, but you can not log in since\nyou are already logged in";
-    canNotLogInTwiceMessage.mPublicationDateTime = QDateTime::currentDateTimeUtc();
-    canNotLogInTwiceMessage.mType = ChatMessage::Type::SystemMessage;
-
-    appendMessage(canNotLogInTwiceMessage);
+    QStringList userNames;
+    std::for_each(mChatUsers.cbegin(),
+                  mChatUsers.cend(),
+                  [&userNames](const ChatUser & chatUser)
+                  {
+                      if (chatUser.mState == ChatUser::State::ConnectedUser)
+                      {
+                          userNames.push_back(chatUser.mUserName);
+                      }
+                  });
+    return userNames;
 }
 
-void ChatUsersController::appendMessage(const ChatMessage & newMessage)
+void ChatUsersController::updateOnlineUsers(const QStringList &onlineUsers)
 {
-    if (newMessage.mType == ChatMessage::Type::UserMessage)
-    {
-        // Only users messages have to be added to the history
-    }
-    // TODO some stuff
-    // if everything is fine, next part of code executes
-
-    // Display message in the chat
-    emit preMessageAppended();
-
-    mChatMessages.append(newMessage);
-    std::sort(mChatMessages.begin(),
-              mChatMessages.end(),
-              [](const ChatMessage & chatMessage1, const ChatMessage & chatMessge2)
-              {
-                  return chatMessage1.mPublicationDateTime < chatMessge2.mPublicationDateTime;
-              });
-
-    emit postMessageAppended();
+    QStringList oldOnlineUsers = onlineUserNames();
+    // Remove disappeared users
+    std::for_each(oldOnlineUsers.cbegin(),
+                  oldOnlineUsers.cend(),
+                  [onlineUsers, this](const QString & userName)
+                  {
+                      if (!onlineUsers.contains(userName))
+                      {
+                          this->removeUserOnOutdation(userName);
+                      }
+                  });
+    // Append new discovered users
+    std::for_each(onlineUsers.cbegin(),
+                  onlineUsers.cend(),
+                  [oldOnlineUsers, this](const QString & userName)
+                  {
+                      if (!oldOnlineUsers.contains(userName))
+                      {
+                          this->appendUserOnDiscovery(userName);
+                      }
+                  });
 }
 
-void ChatUsersController::appendMessage(const QString & newMessageContent)
+void ChatUsersController::updateConnectedUsers(const QStringList &connectedUsers)
 {
-    ChatMessage newMessage;
-
-    newMessage.mPublicationDateTime = QDateTime::currentDateTimeUtc();
-    newMessage.mAuthorName          = this->mAuthorName;
-    newMessage.mContent             = newMessageContent;
-    newMessage.mType                = ChatMessage::Type::UserMessage;
-
-    // Add created message in the backend and share it with others
-    appendMessage(newMessage);
-    emit sendingMessage(newMessage);
+    QStringList oldConnectedUsers = connectedUserNames();
+    // Remove broken connections
+    std::for_each(oldConnectedUsers.cbegin(),
+                  oldConnectedUsers.cend(),
+                  [connectedUsers, this](const QString & userName)
+                  {
+                      if (!connectedUsers.contains(userName))
+                      {
+                          this->disconnectUserOnDisconnection(userName);
+                      }
+                  });
+    // Append new connections
+    std::for_each(connectedUsers.cbegin(),
+                  connectedUsers.cend(),
+                  [oldConnectedUsers, this](const QString & userName)
+                  {
+                      if (!oldConnectedUsers.contains(userName))
+                      {
+                          this->connectUserOnConnection(userName);
+                      }
+                  });
 }
+
+void ChatUsersController::appendUserOnDiscovery(const QString & newUserName, ChatUser::State state)
+{
+    emit preUserAppended();
+
+    ChatUser newUser;
+    newUser.mUserName = newUserName;
+    newUser.mState = state;
+    mChatUsers.append(newUser);
+/*
+    std::stable_sort(mChatUsers.begin(),
+                     mChatUsers.end(),
+                     [](const ChatUser & chatUser1, const ChatUser & chatUser2)
+                     {
+                         bool isConnected1 =
+                                 (chatUser1.mState == ChatUser::State::ConnectedUser);
+                         bool isDisconnected2 =
+                                 (chatUser2.mState == ChatUser::State::DisconnectedUser);
+                         return isConnected1 || isDisconnected2;
+                     });
 */
+    emit postUserAppended();
+}
+
+void ChatUsersController::removeUserOnOutdation(const QString & outdatedUserName)
+{
+    auto userPos =
+            std::find_if(mChatUsers.begin(),
+                         mChatUsers.end(),
+                         [outdatedUserName](const ChatUser & chatUser)
+                         {
+                             return outdatedUserName == chatUser.mUserName;
+                         });
+
+    if (userPos == mChatUsers.end())
+    {
+        return;
+    }
+
+    int userId = static_cast<int>(std::distance(mChatUsers.begin(), userPos));
+
+    emit preUserRemoved(userId);
+
+    mChatUsers.erase(userPos);
+
+    emit postUserRemoved();
+}
+
+void ChatUsersController::connectUserOnConnection(const QString &connectedUser)
+{
+    qDebug() << "connect user";
+    removeUserOnOutdation(connectedUser);
+    appendUserOnDiscovery(connectedUser, ChatUser::State::ConnectedUser);
+    /*
+    auto userPos =
+            std::find_if(mChatUsers.begin(),
+                         mChatUsers.end(),
+                         [connectedUser](const ChatUser & chatUser)
+                         {
+                             return connectedUser == chatUser.mUserName;
+                         });
+
+    if (userPos == mChatUsers.end())
+    {
+        return;
+    }
+
+    int userId = static_cast<int>(std::distance(mChatUsers.begin(), userPos));
+    bool isConnected = true;
+    emit connectedStateChanged(userId, isConnected);
+    */
+}
+
+void ChatUsersController::disconnectUserOnDisconnection(const QString &disconnectedUser)
+{
+    qDebug() << "disconnect user";
+    removeUserOnOutdation(disconnectedUser);
+    appendUserOnDiscovery(disconnectedUser, ChatUser::State::ConnectedUser);
+    /*
+    auto userPos =
+            std::find_if(mChatUsers.begin(),
+                         mChatUsers.end(),
+                         [disconnectedUser](const ChatUser & chatUser)
+                         {
+                             return disconnectedUser == chatUser.mUserName;
+                         });
+
+    if (userPos == mChatUsers.end())
+    {
+        return;
+    }
+
+    int userId = static_cast<int>(std::distance(mChatUsers.begin(), userPos));
+    bool isConnected = false;
+    emit connectedStateChanged(userId, isConnected);
+    */
+}
