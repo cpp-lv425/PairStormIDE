@@ -45,8 +45,10 @@ private:
     QWidget          * mpAllowedChatWidget;
 
 private slots:
-    void ConnectUserOnChangedState   (const QString userName);
-    void DisconnectUserOnChangedState(const QString userName);
+
+    void shareMessageOnSendingMessage (const ChatMessage & message);
+    void ConnectUserOnChangedState    (const QString userName);
+    void DisconnectUserOnChangedState (const QString userName);
 
 };
 

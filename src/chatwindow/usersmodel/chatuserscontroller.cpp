@@ -1,19 +1,18 @@
-#include "chatmessagescontroller.h"
+#include "chatuserscontroller.h"
 #include <QDebug>
 
-ChatMessagesController::ChatMessagesController(const QString & authorName,
-                                               QObject *parent) :
-    QObject(parent),
-    mAuthorName(authorName)
+/*
+ChatUsersController::ChatUsersController(QObject *parent) :
+    QObject(parent)
 {
 }
 
-QVector<ChatMessage> ChatMessagesController::messages() const
+QVector<ChatMessage> ChatUsersController::messages() const
 {
     return mChatMessages;
 }
 
-void ChatMessagesController::sendGreetingsMessage()
+void ChatUsersController::sendGreetingsMessage()
 {
     // Send greetings message from the Pair Storm appliction to the user
     ChatMessage greetingsMessage;
@@ -26,20 +25,20 @@ void ChatMessagesController::sendGreetingsMessage()
     appendMessage(greetingsMessage);
 }
 
-void ChatMessagesController::sendCanNotLogInTwiceMessage()
+void ChatUsersController::sendCanNotLogInTwiceMessage()
 {
     // Send greetings message from the Pair Storm appliction to the user
     ChatMessage canNotLogInTwiceMessage;
 
     canNotLogInTwiceMessage.mAuthorName = "PairStorm";
-    canNotLogInTwiceMessage.mContent = "Sorry, " + mAuthorName + ", but you can not log in since\nyou are already logged in";
+    canNotLogInTwiceMessage.mContent = "Sorry, but you can not log in since\nyou are already logged in";
     canNotLogInTwiceMessage.mPublicationDateTime = QDateTime::currentDateTimeUtc();
     canNotLogInTwiceMessage.mType = ChatMessage::Type::SystemMessage;
 
     appendMessage(canNotLogInTwiceMessage);
 }
 
-void ChatMessagesController::appendMessage(const ChatMessage & newMessage)
+void ChatUsersController::appendMessage(const ChatMessage & newMessage)
 {
     if (newMessage.mType == ChatMessage::Type::UserMessage)
     {
@@ -62,7 +61,7 @@ void ChatMessagesController::appendMessage(const ChatMessage & newMessage)
     emit postMessageAppended();
 }
 
-void ChatMessagesController::appendMessage(const QString & newMessageContent)
+void ChatUsersController::appendMessage(const QString & newMessageContent)
 {
     ChatMessage newMessage;
 
@@ -75,3 +74,4 @@ void ChatMessagesController::appendMessage(const QString & newMessageContent)
     appendMessage(newMessage);
     emit sendingMessage(newMessage);
 }
+*/

@@ -51,6 +51,7 @@ void ChatWindowDock::onUserToDisconnectSelected(QString userName)
 
 void ChatWindowDock::onMessageSent(const QString &message)
 {
+    qDebug() << "dock transmits message: " << message;
     emit sendMessage(message);
 }
 

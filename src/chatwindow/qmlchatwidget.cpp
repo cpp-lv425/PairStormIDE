@@ -18,8 +18,9 @@
 #include <QQuickView>
 #include <QDockWidget>
 #include <QQuickStyle>
+#include <QDebug>
 
-QmlChatWidget::QmlChatWidget()
+QmlChatWidget::QmlChatWidget() : mpMessagesController(nullptr)
 {
     QQuickWindow::setSceneGraphBackend(QSGRendererInterface::Software);
     mpUsers = new OnlineUsersModel();
@@ -31,6 +32,10 @@ QmlChatWidget::QmlChatWidget()
     connect(mpUsers, &OnlineUsersModel::stateChangedOff,
             this,          &QmlChatWidget::DisconnectUserOnChangedState,
             Qt::UniqueConnection);
+
+
+
+
 
 
     mpBoxLayout = new QBoxLayout(QBoxLayout::BottomToTop, this);
@@ -63,14 +68,30 @@ void QmlChatWidget::keyPressEvent(QKeyEvent *event)
 
 void QmlChatWidget::configureOnLogin(const QString &userName)
 {
+    if (mpMessagesController)
+    {
+        mpMessagesController->sendCanNotLogInTwiceMessage();
+        return;
+    }
+
     mUserName = userName;
     mpMessagesController = new ChatMessagesController(userName);
+    mpMessagesController->sendGreetingsMessage();
+
+    connect(mpMessagesController, &ChatMessagesController::sendingMessage,
+            this,                 &QmlChatWidget::shareMessageOnSendingMessage,
+            Qt::UniqueConnection);
 
     qmlRegisterType<OnlineUsersModel>("AvailableUsers", 1, 0, "AvailableUsersModel");
 
     qmlRegisterType<ChatMessagesModel>("PairStormChat", 1, 0, "MessagesModel");
     qmlRegisterUncreatableType<ChatMessagesController>("PairStormChat", 1, 0, "MessagesList",
                                                        QStringLiteral("Messages list can be created only in backend"));
+
+
+
+
+
 
     QQuickView * view = new QQuickView();
 
@@ -121,8 +142,28 @@ void QmlChatWidget::updateConnectedUsers(const QStringList &connectedUsers)
 void QmlChatWidget::appendMessage(const QString &messageAuthor,
                                   const QString &messageBody)
 {
+    if(!mpMessagesController)
+    {
+        return;
+    }
+    // Here we ignore messageAuthor because it is solely needed for back compatibility
+    ChatMessage newMessage;
+    newMessage.fromJsonQString(messageBody);
+    if (newMessage.empty())
+    {
+        return;
+    }
+
     qDebug() << "append message: " << messageBody;
     qDebug() << "author:         " << messageAuthor;
+
+    mpMessagesController->appendMessage(newMessage);
+}
+
+void QmlChatWidget::shareMessageOnSendingMessage(const ChatMessage &message)
+{
+    const QString messageString = message.toJsonQString();
+    emit messageSent(messageString);
 }
 
 void QmlChatWidget::ConnectUserOnChangedState(const QString userName)

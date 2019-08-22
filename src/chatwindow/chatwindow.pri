@@ -20,6 +20,7 @@ SOURCES += \
     $$PWD/qmlchatwidget.cpp
 
 include($$PWD/messagesmodel/messagesmodel.pri)
+include($$PWD/usersmodel/usersmodel.pri)
 
 RESOURCES += \
     $$PWD/qmlchat.qrc

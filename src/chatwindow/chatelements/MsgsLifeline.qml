@@ -36,6 +36,15 @@ Item {
         highlightFollowsCurrentItem: true
 
         model: messagesModel
+
+        boundsBehavior: Flickable.StopAtBounds
+        highlightMoveDuration: 300
+        onCountChanged: {
+            Qt.callLater( listView.positionViewAtEnd )
+        }
+        onHeightChanged: {
+            listView.positionViewAtEnd()
+        }
     }
 
     DelegateModel {
@@ -44,25 +53,6 @@ Item {
         model: MessagesModel {
             list: messagesList
         }
-
-        /*
-        model: ListModel {
-            //@disable-check M16
-            ListElement { owns: false; author: "Someone"; message: "hello:)"; timestamp: "7 Jan 14:36" }
-            //@disable-check M16
-            ListElement { owns: true; author: "Volodya"; message: "hi to you"; timestamp: "7 Jan 14:36" }
-            //@disable-check M16
-            ListElement { owns: true; author: "Bob"; message: "abcd"; timestamp: "7 Jan 14:36" }
-            //@disable-check M16
-            ListElement { owns: false; author: "Someone"; message: "hello again, \nohoho\nI said:)"; timestamp: "7 Jan 14:36" }
-            //@disable-check M16
-            ListElement { owns: true; author: "Eva"; message: "very long message very long message, very long message again and very long message"; timestamp: "7 Jan 14:36" }
-            //@disable-check M16
-            ListElement { owns: false; author: "Max"; message: "other message"; timestamp: "7 Jan 14:36" }
-            //@disable-check M16
-            ListElement { owns: true; author: "Someone"; message: "last one"; timestamp: "7 Jan 14:36" }
-        }
-        */
 
         delegate: Column {
             id: messageAttributesColumn
@@ -84,6 +74,7 @@ Item {
                                    undefined    : parent.left
 
                 spacing: 0
+
 
                 Control {
                     id: leftToothShape
@@ -169,6 +160,7 @@ Item {
                         color: "white"
                     }
                 }
+
                 Control {
                     id: rightToothShape
 
@@ -191,7 +183,6 @@ Item {
                     }
                 }
             }
-
             Label {
                 id: timestampText
 

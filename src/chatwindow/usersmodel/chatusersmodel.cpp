@@ -1,3 +1,4 @@
+/*
 #include "chatmessagesmodel.h"
 
 #include <QDebug>
@@ -108,3 +109,4 @@ void ChatMessagesModel::setList(ChatMessagesController * newList)
 
     endResetModel();
 }
+*/
