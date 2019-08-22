@@ -729,7 +729,7 @@ void MainWindow::setAppStyle(const QString &styleName)
 {
     // dark style palette is created & set globally
     QPalette palette = mpPaletteConfigurator->getPalette(styleName);
-    //QPalette newPal = palette();
+
     qApp->setPalette(palette);
 
     std::function<void(DocumentManager*, CodeEditor*, const QString&)> functor
