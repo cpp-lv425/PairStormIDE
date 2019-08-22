@@ -137,7 +137,6 @@ void ChatUsersController::removeUserOnOutdation(const QString & outdatedUserName
 
 void ChatUsersController::connectUserOnConnection(const QString &connectedUser)
 {
-    qDebug() << "connect user";
     removeUserOnOutdation(connectedUser);
     appendUserOnDiscovery(connectedUser, ChatUser::State::ConnectedUser);
     /*
@@ -162,7 +161,6 @@ void ChatUsersController::connectUserOnConnection(const QString &connectedUser)
 
 void ChatUsersController::disconnectUserOnDisconnection(const QString &disconnectedUser)
 {
-    qDebug() << "disconnect user";
     removeUserOnOutdation(disconnectedUser);
     appendUserOnDiscovery(disconnectedUser, ChatUser::State::ConnectedUser);
     /*
