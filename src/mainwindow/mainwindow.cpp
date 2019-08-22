@@ -717,6 +717,7 @@ void MainWindow::setInitialAppStyle()
     qApp->setStyle(QStyleFactory::create("Fusion"));
 
     // restores style palette set in previous app session
+    // if the app is run for the first time then default style (WHITE) is set
     QSettings savedSettings(QApplication::organizationName(), QApplication::applicationName());
     QString styleName = {savedSettings.contains("style") ?
                          savedSettings.value("style").toString()

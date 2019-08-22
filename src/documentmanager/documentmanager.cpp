@@ -43,7 +43,7 @@ void DocumentManager::openDocument(const QString &fileName, bool load)
     // if doc is already opened - it becomes active
     if (pOpenedDoc)
     {
-        for (auto& area: mDocAreas)
+        for (auto &area: mDocAreas)
         {
             if (area->subWindowList().contains(pOpenedDoc))
             {
@@ -125,11 +125,11 @@ bool DocumentManager::saveAllDocuments()
     bool savedChanges = false;
 
     // saves changes to every doc in every doc area
-    for (const auto& area : mDocAreas)
+    for (const auto &area : mDocAreas)
     {
         auto openedDocs = area->subWindowList();
 
-        for (const auto& subWdw : openedDocs)
+        for (const auto &subWdw : openedDocs)
         {
             try
             {
@@ -184,7 +184,7 @@ void DocumentManager::loadFile(CodeEditor *newView, const QString &fileName)
 
 void DocumentManager::onSplit(Qt::Orientation orientation)
 {
-    // if there is only one doc area -
+    // if number of doc areas is less than 2 -
     // then new doc area is added & orientation is set according to
     if (mDocAreas.size() < 2)
     {
@@ -279,7 +279,7 @@ QMdiArea* DocumentManager::selectAreaForPlacement()
 
     // I. Search for first doc area without opened docs
     auto placementArea = std::find_if(mDocAreas.cbegin(), mDocAreas.cend(),
-                                      [](const auto& area)
+                                      [](const auto &area)
     {
         return !area->subWindowList().size();
     });
@@ -301,14 +301,15 @@ QMdiSubWindow* DocumentManager::openedDoc(const QString &fileName)
     QList<QMdiSubWindow*>::const_iterator openedDocIter;
 
     // search for doc with specified name in every area
-    for (const auto& area: mDocAreas)
+    for (const auto &area: mDocAreas)
     {
         auto subWdwList = area->subWindowList();
 
         openedDocIter = std::find_if(subWdwList.cbegin(), subWdwList.cend(),
-                                     [&fileName](const auto& doc)
+                                     [&fileName](const auto &wdw)
         {
-            return qobject_cast<CodeEditor*>(doc->widget())->getFileName() == fileName;
+            auto doc = qobject_cast<CodeEditor*>(wdw->widget());
+            return doc ? doc->getFileName() == fileName : false;
         });
 
         if (openedDocIter != subWdwList.end())
@@ -331,14 +332,14 @@ QMdiArea* DocumentManager::lastAreaInFocus()
     }
 
     // search for area which accomodates last doc in focus
-    for (const auto& area: mDocAreas)
+    for (const auto &area: mDocAreas)
     {
-        auto currentWdw = area->currentSubWindow();
+        auto currentWindow = area->currentSubWindow();
 
-        if (currentWdw)
+        if (currentWindow)
         {
-            auto doc = qobject_cast<CodeEditor*>(currentWdw->widget());
-            if (doc && doc == mpPrevEditorInFocus)
+            auto doc = qobject_cast<CodeEditor*>(currentWindow->widget());
+            if (doc && (doc == mpPrevEditorInFocus))
             {
                 return area;
             }
@@ -354,13 +355,13 @@ QMdiArea* DocumentManager::lastAreaInFocus()
 QMdiArea* DocumentManager::areaInFocus()
 {
     // search for area which accomodates current doc in focus
-    for (const auto& area: mDocAreas)
+    for (const auto &area: mDocAreas)
     {
-        auto currentWdw = area->currentSubWindow();
+        auto currentWindow = area->currentSubWindow();
 
-        if (currentWdw)
+        if (currentWindow)
         {
-            auto doc = qobject_cast<CodeEditor*>(currentWdw->widget());
+            auto doc = qobject_cast<CodeEditor*>(currentWindow->widget());
 
             if (doc && doc->hasFocus())
             {
@@ -378,14 +379,15 @@ QMdiArea* DocumentManager::getArea(CodeEditor *doc)
 {
     QList<QMdiSubWindow*>::const_iterator areaIter;
     // search for area which accomodates current doc
-    for (const auto& area: mDocAreas)
+    for (const auto &area: mDocAreas)
     {
         auto subWdwList = area->subWindowList();
 
         areaIter = std::find_if(subWdwList.cbegin(), subWdwList.cend(),
-                                [&doc](const auto& document)
+                                [&doc](const auto &document)
         {
-            return qobject_cast<CodeEditor*>(document->widget()) == doc;
+            auto currentDoc = qobject_cast<CodeEditor*>(document->widget());
+            return currentDoc ? (currentDoc == doc) : false;
         });
 
         if (areaIter != subWdwList.end())
@@ -405,8 +407,8 @@ CodeEditor* DocumentManager::getCurrentDocument()
     // if current sub wdw is null - we return null to indicate search failure
     if (mDocAreas.size() < 2)
     {       
-        auto pCurrentWdw = mDocAreas.front()->currentSubWindow();
-        return pCurrentWdw ? qobject_cast<CodeEditor*>(pCurrentWdw->widget()) : nullptr;
+        auto pCurrentWindow = mDocAreas.front()->currentSubWindow();
+        return pCurrentWindow ? qobject_cast<CodeEditor*>(pCurrentWindow->widget()) : nullptr;
     }
 
     // search for area in focus
@@ -446,14 +448,14 @@ QVector<CodeEditor*> DocumentManager::getChangedDocuments()
 
     // searches for modified docs through all doc areas
     // pointers to modified docs are added to container
-    for (const auto& area : mDocAreas)
+    for (const auto &area : mDocAreas)
     {
         auto windowsList = area->subWindowList();
 
         if (windowsList.size())
         {
             std::for_each(windowsList.begin(), windowsList.end(),
-                          [&changedDocuments](const auto& wdw)
+                          [&changedDocuments](const auto &wdw)
             {
                 auto doc = qobject_cast<CodeEditor*>(wdw->widget());
 
@@ -484,7 +486,7 @@ void DocumentManager::combineDocAreas()
 
         if (windowsList.size())
         {
-            for (const auto& wdw: windowsList)
+            for (const auto &wdw: windowsList)
             {
                 // every window is detached from current doc area
                 // & placed on the first doc area
@@ -549,12 +551,12 @@ void DocumentManager::configureDocuments(std::function<void(DocumentManager*, Co
                                         const QString &newValue)
 {
     // applying new settings to every opened doc view
-    for (const auto& area: mDocAreas)
+    for (const auto &area: mDocAreas)
     {
         auto windowsList = area->subWindowList();
 
         std::for_each(windowsList.begin(), windowsList.end(),
-                      [this, &functor, &newValue](const auto& wdw)
+                      [this, &functor, &newValue](const auto &wdw)
         {
             auto doc = qobject_cast<CodeEditor*>(wdw->widget());
             if (doc)
