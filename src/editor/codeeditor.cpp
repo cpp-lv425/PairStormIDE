@@ -190,13 +190,24 @@ void CodeEditor::redo()
 
 bool CodeEditor::isChanged()
 {
-    return mBeginTextState != this->toPlainText();
+    return mBeginTextState != QCryptographicHash::hash(this->toPlainText().toLatin1(), QCryptographicHash::Sha256);
 }
 
 void CodeEditor::setBeginTextState()
 {
+    // when document is opened control sum is generated in order to have an opportunity
+    // to check whether document was modified
+    mBeginTextState = QCryptographicHash::hash(this->toPlainText().toLatin1(), QCryptographicHash::Sha256);
+}
 
-    mBeginTextState = this->toPlainText();
+const QByteArray& CodeEditor::getBeginTextState() const
+{
+    return  mBeginTextState;
+}
+
+void CodeEditor::setTextState(const QByteArray &beginTextState)
+{
+    mBeginTextState = beginTextState;
 }
 
 void CodeEditor::updateLineNumberAreaWidth()

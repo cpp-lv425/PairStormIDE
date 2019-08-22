@@ -492,10 +492,21 @@ void DocumentManager::combineDocAreas()
 
                 if (doc)
                 {
+                    // window is removed from doc area
                     (*areaIter)->removeSubWindow(wdw);
                     QString fileName = doc->getFileName();
+
+                    // new doc view is created
                     CodeEditor *newView = createDoc(fileName);
+
+                    // text from opened document is placed on new document view
                     newView->setPlainText(doc->toPlainText());
+
+                    // initial document state is passed to new view
+                    // in order to keep track of doc modification
+                    newView->setTextState(doc->getBeginTextState());
+
+                    // new view is placed on front doc area
                     mDocAreas.front()->addSubWindow(newView);
                     newView->setWindowState(Qt::WindowMaximized);
 
@@ -503,8 +514,6 @@ void DocumentManager::combineDocAreas()
                     int position = fileName.lastIndexOf(QChar{'/'});
                     newView->setWindowTitle(fileName.mid(position + 1));
 
-                    // doc snaps current content state
-                    newView->setBeginTextState();
                     delete wdw;
                 }
             }
