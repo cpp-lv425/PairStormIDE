@@ -33,6 +33,7 @@ public:
     void combineDocAreas();
     void closeEmptyDocArea();
     void closeCurrentDocArea();
+    void setStyle(const QString &styleName);
 
 public slots:
     void onSplit(Qt::Orientation orientation);
