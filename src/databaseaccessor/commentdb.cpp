@@ -19,6 +19,11 @@ void CommentDb::deleteCommentFromDb(const int commentLine, const QString comment
     query.finish();
 }
 
+void CommentDb::deleteCommentsFromDb(const QString commentFile)
+{
+    execQuery(deleteAllCommentsInFileQuery(commentFile));
+}
+
 QVector<Comment> CommentDb::getAllCommentsFromFile(const QString filename)
 {
       execQuery(numberOfCommentInFileQuery(filename));
@@ -100,4 +105,9 @@ QString CommentDb::allCommentInFileQuery(const QString filename)
             "inner join File on File.id=Comment.idFile "
             "where Comment.idFile = (Select File.ID from File where file.name = '"
             + filename + "')";
+}
+
+QString CommentDb::deleteAllCommentsInFileQuery(const QString filename)
+{
+    return "Delete from Comment where Comment.idFile = (Select id from File where name = '" + filename + "')";
 }
