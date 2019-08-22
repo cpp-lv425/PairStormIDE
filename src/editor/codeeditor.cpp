@@ -224,6 +224,7 @@ void CodeEditor::repaintButtonsArea(int bottom, int top, int blockNumber)
                        (i->getCurrentLine() - this->verticalScrollBar()->sliderPosition() - 1) * height + addedHight,
                        bottom - top,
                        bottom - top);
+        i->setVisible(true);
     }
     if (mLinesCountCurrent != blockNumber)//lines count changed
     {
@@ -279,7 +280,7 @@ void CodeEditor::setAllButtons(QVector<Comment> comments)
 {
     for(auto &i : comments)
     {
-        AddCommentButton *button = new AddCommentButton;
+        AddCommentButton *button = new AddCommentButton(this);
         button->setCommentString(i.mText);
         button->setCurrentLine(i.mLine);
         mCommentsVector.push_back(button);

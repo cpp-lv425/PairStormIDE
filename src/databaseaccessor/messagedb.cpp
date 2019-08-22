@@ -5,10 +5,14 @@ MessageDb::MessageDb(): Accessor()
 
 }
 
+MessageDb::~MessageDb()
+{
+ query.finish();
+}
+
 void MessageDb::addMessageToDb(const Message &message)
 {
     execQuery(addMessageQuery(message));
-    query.finish();
 }
 
 QVector<Message> MessageDb::getMessageFromDb(const QString startTime)
@@ -22,20 +26,19 @@ QVector<Message> MessageDb::getMessageFromDb(const QString startTime)
         fillStructMessage(messages[counter]);
         counter++;
     }
-    query.finish();
     return messages;
 }
 
 QString MessageDb::addMessageQuery(const Message &message)
 {
-    return "INSERT INTO Message (idUser, messageText) VALUES ("
+    return "INSERT INTO Message (idUser, messageText, time) VALUES ("
             "(Select id from User where nickname = '" + message.mUser + "'), '"
-            + message.mBody + "')";
+            + message.mBody + "', '" + message.mTime + "')";
 }
 
 QString MessageDb::getMessageQuery(const QString startTime)
 {
-    return "Select Message.messageText, User.nickname, date(Message.time)"
+    return "Select Message.messageText, User.nickname, datetime(Message.time)"
            " from Message inner join User on Message.idUser = User.id"
            " where date(Message.time) >= '" + startTime +"'";
 }
@@ -44,7 +47,7 @@ QString MessageDb::numberOfMessage(const QString startTime)
 {
     return "Select count(Message.messageText)"
            " from Message inner join User on Message.idUser = User.id"
-           " where date(Message.time) >= '" + startTime +"'";
+           " where datetime(Message.time) >= '" + startTime +"'";
 }
 
 void MessageDb::fillStructMessage(Message message)

@@ -6,7 +6,6 @@ UserDb::UserDb(): Accessor()
 void UserDb::addUserToDb(const User &user)
 {
     execQuery(addUserQuery(user));
-    query.finish();
 }
 
 User UserDb::getUserFromDb(const int idUser)
@@ -14,7 +13,19 @@ User UserDb::getUserFromDb(const int idUser)
     execQuery(getUserQuery(idUser));
     User rUser;
     fillStructUser(rUser);
-    query.finish();
+    return rUser;
+}
+
+QVector<User> UserDb::getAllUsersFromDb()
+{
+    execQuery(numberOfUser());
+    query.first();
+    int count = query.record().value(0).toInt();
+    QVector<User> rUser;
+    for( int i = 0; i< count; i++)
+    {
+        rUser.push_back(getUserFromDb(i));
+    }
     return rUser;
 }
 
@@ -33,4 +44,9 @@ QString UserDb::getUserQuery(const int idUser)
 void UserDb::fillStructUser(User &user)
 {
     user.mNickname = query.record().value(0).toString();
+}
+
+QString UserDb::numberOfUser()
+{
+    return "Select count(user.id) from User";
 }

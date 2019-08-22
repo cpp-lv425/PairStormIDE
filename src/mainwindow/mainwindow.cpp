@@ -363,12 +363,7 @@ void MainWindow::onOpenFolderTriggered()
             (this,
              userMessages[UserMessages::OpenDirectoryTitle],
             QDir::homePath());
-    Connection *db = ConnectionGetter::getDefaultConnection("C:/Users/Anastasia Antonyk/Desktop/sqlite/storage.db");
-    CreateDB database;
-    database.addTableFile();
-    database.addTableUser();
-    database.addTableComment();
-    database.addTableMessage();
+    databaseConnect(dirName);
     mpProjectViewerDock->setDir(dirName);
 }
 
@@ -711,4 +706,20 @@ void MainWindow::setAppStyle()
     QPalette palette = mpPaletteConfigurator->getPalette("DARK");
     //QPalette newPal = palette();
     qApp->setPalette(palette);
+}
+
+
+void MainWindow::databaseConnect(QString directory)
+{
+    db = ConnectionGetter::getDefaultConnection(directory + QDir::separator()+"storage.db");
+    CreateDB database;
+    database.addTableFile();
+    database.addTableUser();
+    database.addTableComment();
+    database.addTableMessage();
+}
+
+void MainWindow::databaseDisconnect()
+{
+    delete db;
 }

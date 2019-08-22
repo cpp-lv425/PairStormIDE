@@ -14,7 +14,7 @@ struct Message
 
     QString mBody;
     QString mUser;
-    QString mTime;  //YYYY-MM-DD
+    QString mTime;  //YYYY-MM-DD hh:mm:ss
 };
 
 struct User

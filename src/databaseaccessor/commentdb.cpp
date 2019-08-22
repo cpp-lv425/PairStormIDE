@@ -4,21 +4,18 @@ CommentDb::CommentDb(): Accessor()
 {
 }
 
-void CommentDb::addCommentToDb(const Comment &comment)
+void CommentDb::addCommentsToDb(const QVector<Comment> &comments)
 {
-    execQuery(addCommentQuery(comment));
+    for (auto &i : comments)
+    {
+        execQuery(addCommentQuery(i));
+    }
     query.finish();
 }
 
 void CommentDb::deleteCommentFromDb(const int commentLine, const QString commentFile)
 {
     execQuery(deleteCommentQuery(commentLine, commentFile));
-    query.finish();
-}
-
-void CommentDb::updateCommentInDb(const Comment& comment)
-{
-    execQuery(updateCommentQuery(comment));
     query.finish();
 }
 
@@ -69,13 +66,6 @@ QString CommentDb::deleteCommentQuery(const int commentLine, const QString comme
             QString::number(commentLine);
 }
 
-QString CommentDb::updateCommentQuery(const Comment& comment)
-{
-    return "UPDATE Comment SET idUser = (SELECT id FROM User WHERE nickname = '" + comment.mUser + "'), "
-            +"text = " + comment.mText
-            + " WHERE line = " + QString::number(comment.mLine)
-            +" AND idFile = (SELECT id FROM File WHERE name = '" + comment.mFile + "')";
-}
 
 QString CommentDb::getCommentQuery(const int commentLine, const QString commentFile)
 {

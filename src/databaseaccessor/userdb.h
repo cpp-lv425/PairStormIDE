@@ -8,10 +8,12 @@ public:
     UserDb();
     void addUserToDb(const User& user);
     User getUserFromDb(const int idUser);
+    QVector<User> getAllUsersFromDb();
 private:
     QString addUserQuery(const User& user);
     QString getUserQuery(const int idUser);
     void fillStructUser(User &user);
+    QString numberOfUser();
 };
 
 #endif // USERDB_H

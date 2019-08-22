@@ -7,6 +7,7 @@ class MessageDb : public Accessor
 {
 public:
     MessageDb();
+    ~MessageDb();
     void addMessageToDb(const Message& message);
     QVector <Message> getMessageFromDb(const QString startTime);
 private:
