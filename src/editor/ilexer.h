@@ -10,13 +10,17 @@ class iLexer
 protected:
     unsigned int mIndex;
     unsigned int mCodeSize;
+    unsigned int mLinesCount;
     unsigned int mCurrentLine;
     QString mCurrentLexem;
 
 public:
-    iLexer() = default;
+    iLexer()
+    {
+        mLinesCount = 1;
+    }
     virtual ~iLexer() = default;
-    virtual void lexicalAnalysis(QTextDocument*, int begin = -1, int end = -1) = 0;
+    virtual void lexicalAnalysis(QString) = 0;
 };
 
 #endif // ILEXER_H

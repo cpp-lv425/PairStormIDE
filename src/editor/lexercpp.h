@@ -46,8 +46,8 @@ private:
 public:
     LexerCPP() = default;
     ~LexerCPP() override = default;
-    void lexicalAnalysis(QTextDocument*, int begin = -1, int end = -1) override;
-    QMap<int, QVector<Token>> getTokens() const;
+    void lexicalAnalysis(QString) override;
+    QVector<Token> getTokens() const;
     void clear();
 };
 

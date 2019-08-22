@@ -84,7 +84,7 @@ private slots:
     void updateLineNumberArea(const QRect &rect, int dy);
     void handleLineChange(int);
     void runLexer();
-    void highlighText();
+    void highlightText();
     //void showCommentLine(int line);
     void deleteComment();
 
@@ -100,6 +100,7 @@ public slots:
 
 signals:
     void changesAppeared();
+    void runHighlighter();
     void sendLexem(QString);
     void closeDocEventOccured(CodeEditor*);
     void textChangedInLine(int);
@@ -122,6 +123,8 @@ private:
 
     int mLinesCountPrev;
     int mLinesCountCurrent;
+
+    unsigned int mLinesCount;
 
     QString mBeginTextState;
     QVector<AddCommentButton*> mCommentsVector;

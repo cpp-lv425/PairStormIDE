@@ -86,7 +86,6 @@ inline void LexerCPP::addLexem()
 {
     --mIndex;
     mTokensOnCurrentLine.append(Token(QString(mCurrentLexem), State(mState), mIndex - mCurrentLexem.size(), mIndex));
-    mTokens[mCurrentLine] = mTokensOnCurrentLine;
     mCurrentLexem.clear();
     mState = State::ST;
 }
@@ -99,15 +98,14 @@ inline void LexerCPP::changeState(State state, QChar sym)
 
 void LexerCPP::clear()
 {
-    mTokens.clear();
-    mTokensOnCurrentLine.clear();
+    mIndex = 0;
     mCurrentLexem.clear();
     mState = State::ST;
 }
 
-QMap<int, QVector<Token>> LexerCPP::getTokens() const
+QVector<Token> LexerCPP::getTokens() const
 {
-    return mTokens;
+    return mTokensOnCurrentLine;
 }
 
 void LexerCPP::handleStartState(const QChar &sym)
@@ -270,33 +268,48 @@ void LexerCPP::handleLiteralState(const QChar &sym)
     }
 }
 
-void LexerCPP::lexicalAnalysis(QTextDocument* code, int begin, int end)
+void LexerCPP::lexicalAnalysis(QString code)
 {
-    mCodeSize = code->toPlainText().size();
-    mCurrentLine = begin;
-    mIndex = 0;
+//    int i;
+//    if(code->isEmpty())
+//    {
+//        return;
+//    }
+
+//    int changedCodeSize = code->toPlainText().size();
+//    int symbolDifference = changedCodeSize - mCodeSize;
+//    mCodeSize = changedCodeSize;
+
+//    mIndex = begin > 0 ? ((mTokens[begin - 1].end() - 1)->mEnd + 1): 0;
+//    mCurrentLine = begin;
+
+//    int changedLinesCount = code->blockCount();
+//    int lineDifference = changedLinesCount - mLinesCount;
+
+//    int end = begin + 1;
+//    if(lineDifference)
+//    {
+//        mCurrentLine = 0;
+//        end = changedLinesCount;
+//        mIndex = 0;
+//        mTokens.clear();
+//    }
+
+//    qDebug() << "Index: " << index << ' ' << "Line: " << begin;
+//    qDebug() << code;
+    mTokensOnCurrentLine.clear();
     QChar sym = 0;
-
-    if(mTokens.contains(begin - 1))
+    mIndex = 0;
+    int end = code.size();
+    while(mIndex < end)
     {
-        mIndex = (mTokens[begin - 1].end() - 1)->mEnd;ijnhidf
-    }
-
-    while(mIndex < mCodeSize)
-    {
-        sym = code->characterAt(mIndex);
+        sym = code[mIndex];
         ++mIndex;
 
         switch(mState)
         {
         case State::ST:
-            if(sym == QChar::ParagraphSeparator)
-            {
-                mTokensOnCurrentLine.clear();
-                ++mCurrentLine;
-                break;
-            }
-            else if(isSpace(sym))
+            if(isSpace(sym))
             {
                 break;
             }
@@ -339,7 +352,33 @@ void LexerCPP::lexicalAnalysis(QTextDocument* code, int begin, int end)
 
     if(mState != State::ST)
     {
+//        qDebug() << "Add last lexem";
         ++mIndex;
         addLexem();
     }
+
+//    for(int j = 0; j < mTokensOnCurrentLine.size(); ++j)
+//    {
+//        qDebug() << mTokensOnCurrentLine[j].mName;
+//    }
+
+//    for(int i = 0; i < mTokens.size(); ++i)
+//    {
+//        for(int j = 0; i < mTokens[i].size(); ++j)
+//        {
+//            qDebug() << mTokens[i][j].mName;
+//        }
+//    }
+
+//    if(mTokens.contains(begin + 1) && !lineDifference)
+//    {
+//        for(int i = begin + 1; i < mTokens.size(); ++i)
+//        {
+//            for(int j = 0; j < mTokens[i].size(); ++j)
+//            {
+//                mTokens[i][j].mBegin += symbolDifference;
+//                mTokens[i][j].mEnd += symbolDifference;
+//            }
+//        }
+//    }
 }
