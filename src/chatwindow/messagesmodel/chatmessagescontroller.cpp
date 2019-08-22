@@ -52,13 +52,14 @@ void ChatMessagesController::appendMessage(const ChatMessage & newMessage)
     emit preMessageAppended();
 
     mChatMessages.append(newMessage);
+    /*
     std::sort(mChatMessages.begin(),
               mChatMessages.end(),
               [](const ChatMessage & chatMessage1, const ChatMessage & chatMessge2)
               {
                   return chatMessage1.mPublicationDateTime < chatMessge2.mPublicationDateTime;
               });
-
+    */
     emit postMessageAppended();
 }
 

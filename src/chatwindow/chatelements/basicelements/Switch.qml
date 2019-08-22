@@ -42,17 +42,6 @@ Item {
         State { name: "on"  }
     ]
 
-    onStateChanged: {
-        if (switchItem.state === "on")
-        {
-            switchControl.state = "on";
-        }
-        if (switchItem.state === "off")
-        {
-            switchControl.state = "off";
-        }
-    }
-
     T.Switch {
         id: switchControl
 
