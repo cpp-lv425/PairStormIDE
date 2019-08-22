@@ -73,8 +73,8 @@ void QmlChatWidget::configureOnLogin(const QString &userName)
     {
         mpMessagesController->sendCanNotLogInTwiceMessage();
         //mpUsersController->updateOnlineUsers(QStringList() << "lilia" << "petro");
-        updateConnectedUsers(QStringList() << "bodia");
-        updateOnlineUsers(QStringList() << "laila" << "dima");
+        //updateConnectedUsers(QStringList() << "bodia");
+        //updateOnlineUsers(QStringList() << "laila" << "dima");
 
         return;
     }
@@ -146,7 +146,7 @@ void QmlChatWidget::configureOnLogin(const QString &userName)
     delete mpRestrictedChatWidget;
     mpBoxLayout->addWidget(mpAllowedChatWidget);
 
-    updateOnlineUsers(QStringList() << "bodia");
+    //updateOnlineUsers(QStringList() << "bodia");
 }
 
 void QmlChatWidget::updateOnlineUsers(const QStringList &onlineUsers)
