@@ -24,7 +24,6 @@ QmlChatWidget::QmlChatWidget()
 {
     QQuickWindow::setSceneGraphBackend(QSGRendererInterface::Software);
     mUserName = QString();
-    updateToFitCurrentTheme();
 
 
 
@@ -50,6 +49,8 @@ QmlChatWidget::QmlChatWidget()
     setLayout(mpCurrentChatLayout);
 
     setMinimumSize(210, 400);
+
+    updateToFitCurrentTheme();
 }
 
 void QmlChatWidget::keyPressEvent(QKeyEvent *event)
