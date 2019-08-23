@@ -9,12 +9,13 @@
 #include "operators.h"
 #include <QVector>
 #include <QMap>
-#include <QTextBlock>
+#include <QPair>
+
 
 class LexerCPP: public iLexer
 {
 private:
-    QMap<int, QVector<Token>> mTokens;
+    QVector<QVector<Token>> mTokens;
     QVector<Token> mTokensOnCurrentLine;
     State mState;
     inline void addLexem();

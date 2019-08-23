@@ -125,6 +125,7 @@ private:
     int mLinesCountCurrent;
 
     unsigned int mLinesCount;
+    QVector<int> mSizeOfLines;
 
     QString mBeginTextState;
     QVector<AddCommentButton*> mCommentsVector;
@@ -139,7 +140,7 @@ private:
 
 protected:
     int mCurrentZoom;
-    QMap<int, QVector<Token>> mTokens;
+    QVector<QVector<Token>> mTokens;
     friend class Event;
 };
 

@@ -11,6 +11,7 @@
 #include<iostream>
 #include<QLabel>
 #include <QDebug>
+#include <QVector>
 
 
 CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
@@ -59,7 +60,7 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     connect(mCommentWidget->getEditTab(), &AddCommentTextEdit::commentWasDeleted,          this, &CodeEditor::deleteComment);
     connect(this,                         &CodeEditor::linesCountUpdated,                  this, &CodeEditor::changeCommentButtonsState);
     connect(this,                         &CodeEditor::textChangedInLine,                  this, &CodeEditor::handleLineChange);
-   // connect(this,                         &CodeEditor::cursorPositionChanged,              this, &CodeEditor::highlightText);
+    connect(this,                         &CodeEditor::cursorPositionChanged,              this, &CodeEditor::highlightText);
 
     mTimer->start(CHANGE_SAVE_TIME);//save text by this time
     mLinesCountCurrent = 1;
@@ -112,39 +113,56 @@ void CodeEditor::handleLineChange(int lastLineWithChange)
     }
 
     QString changedCode;
-    QMap<int, QVector<Token>> updatedTokens;
+    QVector<Token> tokensOnLine;
+    QVector<QVector<Token>> updatedTokens;
 
-    int index = 0;
     for(int i = 0; i < changeStart; ++i)
     {
-        updatedTokens[i] = mTokens[i];
+        updatedTokens.push_back(mTokens[i]);
+    }
+
+    int shift = 0;
+    if(changeStart)
+    {
+        shift = (mTokens[changeStart - 1].end() - 1)->mEnd;
     }
 
     for(int i = changeStart; i <= lastLineWithChange; ++i)
     {
-//        index = i > 0 ? ((mTokens[i - 1].end() - 1)->mEnd + 1): 0;
         changedCode = document()->findBlockByLineNumber(i).text();
+        qDebug() << changedCode.size();
+        mSizeOfLines.push_back(changedCode.size());
         mLcpp->lexicalAnalysis(changedCode);
-        updatedTokens[i] = mLcpp->getTokens();
+        tokensOnLine = mLcpp->getTokens();
+//        for(auto &it: tokensOnLine)
+//        {
+//            it.mBegin += shift;
+//            it.mEnd += shift;
+//        }
+        updatedTokens.push_back(tokensOnLine);
     }
 
     for(int i = lastLineWithChange + 1; i < currentLinesCount; ++i)
     {
-        updatedTokens[i] = mTokens[i - lineDifference];
+//        for(auto &it: mTokens[i - lineDifference])
+//        {
+//            it.mBegin += shift + changedCode.size();
+//            it.mEnd += shift + changedCode.size();
+//        }
+        updatedTokens.push_back(mTokens[i - lineDifference]);
     }
 
     mTokens = updatedTokens;
 
-    for(int i = 0; i < mTokens.size(); ++i)
-    {
-        qDebug() << i;
-        for(int j = 0; j < mTokens[i].size(); ++j)
-        {
-            qDebug() << mTokens[i][j].mName << " " << mTokens[i][j].mBegin << " " << mTokens[i][j].mEnd;
-        }
-    }
-//    emit(runHighlighter());
-
+//    for(int i = 0; i < mTokens.size(); ++i)
+//    {
+//        qDebug() << i << "Size: " << mSizeOfLines[i];
+//        for(int j = 0; j < mTokens[i].size(); ++j)
+//        {
+//            qDebug() << mTokens[i][j].mName << " " << mTokens[i][j].mBegin << " " << mTokens[i][j].mEnd;
+//        }
+//    }
+    emit(runHighlighter());
 }
 
 void CodeEditor::runLexer()
