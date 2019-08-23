@@ -6,6 +6,7 @@ class UserDb : public Accessor
 {
 public:
     UserDb();
+    ~UserDb();
     void addUserToDb(const User& user);
     User getUserFromDb(const int idUser);
     QVector<User> getAllUsersFromDb();

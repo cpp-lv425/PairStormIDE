@@ -8,7 +8,6 @@ class ConnectionGetter
 public:
     static Connection* getDefaultConnection(QString path);
     static Connection* getDefaultConnection();
-
 };
 
 #endif // CONNECTIONGETTER_H

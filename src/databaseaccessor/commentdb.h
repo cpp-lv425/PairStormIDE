@@ -7,9 +7,10 @@ class CommentDb : public Accessor
 {
 public:
     CommentDb();
+    ~CommentDb();
     void addCommentsToDb(const QVector<Comment> &comments);
     void deleteCommentFromDb(const int commentLine, const QString commentFile);
-    void deleteCommentsFromDb(const QString commentFile);
+    void deleteCommentsFromDb(const QString& commentFile);
     QVector <Comment> getAllCommentsFromFile(const QString filename);
     Comment getCommentFromDb(const int commentLine, const QString commentFile);
 private:

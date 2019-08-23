@@ -8,6 +8,6 @@ Connection* ConnectionGetter::getDefaultConnection(QString path)
 
 Connection *ConnectionGetter::getDefaultConnection()
 {
-    static Connection * defaultConn = new Connection();
+    static Connection *defaultConn = new Connection();
     return defaultConn;
 }

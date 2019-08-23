@@ -4,6 +4,11 @@ CommentDb::CommentDb(): Accessor()
 {
 }
 
+CommentDb::~CommentDb()
+{
+    query.finish();
+}
+
 void CommentDb::addCommentsToDb(const QVector<Comment> &comments)
 {
     for (auto &i : comments)
@@ -19,7 +24,7 @@ void CommentDb::deleteCommentFromDb(const int commentLine, const QString comment
     query.finish();
 }
 
-void CommentDb::deleteCommentsFromDb(const QString commentFile)
+void CommentDb::deleteCommentsFromDb(const QString& commentFile)
 {
     execQuery(deleteAllCommentsInFileQuery(commentFile));
 }
@@ -32,14 +37,12 @@ QVector<Comment> CommentDb::getAllCommentsFromFile(const QString filename)
       QVector<Comment> comments(count_of_messages);
       execQuery(allCommentInFileQuery(filename));
       int counter = 0;
-      while (query.next()) {
+      while (query.next())
+      {
           fillStructComment(comments[counter]);
           counter++;
       }
       query.finish();
-      for(auto i : comments){
-          qDebug()<<i.mLine<<" "<<i.mText;
-      }
       return comments;
 }
 

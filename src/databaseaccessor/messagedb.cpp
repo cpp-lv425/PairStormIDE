@@ -2,12 +2,11 @@
 
 MessageDb::MessageDb(): Accessor()
 {
-
 }
 
 MessageDb::~MessageDb()
 {
- query.finish();
+    query.finish();
 }
 
 void MessageDb::addMessageToDb(const Message &message)
@@ -52,7 +51,7 @@ QString MessageDb::numberOfMessage(const QString startTime)
 
 void MessageDb::fillStructMessage(Message message)
 {
-message.mBody = query.record().value(0).toString();
-message.mUser = query.record().value(1).toString();
-message.mTime = query.record().value(2).toString();
+    message.mBody = query.record().value(0).toString();
+    message.mUser = query.record().value(1).toString();
+    message.mTime = query.record().value(2).toString();
 }

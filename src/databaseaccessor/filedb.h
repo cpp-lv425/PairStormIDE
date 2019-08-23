@@ -7,6 +7,7 @@ class FileDb : public Accessor
 {
 public:
     FileDb();
+    ~FileDb();
     void addFileToDb(const File& file);
     File getFileFromDb(const int idFile);
     void deleteFileFromDb(const  QString filename);

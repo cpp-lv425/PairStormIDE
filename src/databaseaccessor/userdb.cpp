@@ -3,6 +3,11 @@ UserDb::UserDb(): Accessor()
 {
 }
 
+UserDb::~UserDb()
+{
+    query.finish();
+}
+
 void UserDb::addUserToDb(const User &user)
 {
     execQuery(addUserQuery(user));
@@ -11,6 +16,7 @@ void UserDb::addUserToDb(const User &user)
 User UserDb::getUserFromDb(const int idUser)
 {
     execQuery(getUserQuery(idUser));
+    query.first();
     User rUser;
     fillStructUser(rUser);
     return rUser;
@@ -22,7 +28,7 @@ QVector<User> UserDb::getAllUsersFromDb()
     query.first();
     int count = query.record().value(0).toInt();
     QVector<User> rUser;
-    for( int i = 0; i< count; i++)
+    for (int i = 0; i< count; i++)
     {
         rUser.push_back(getUserFromDb(i));
     }
