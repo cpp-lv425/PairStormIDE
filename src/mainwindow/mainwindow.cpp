@@ -12,6 +12,7 @@
 #include <QFile>
 
 #include "localconnectorgenerator.h"
+#include "settingsconfigurator.h"
 #include "paletteconfigurator.h"
 #include "projectviewerdock.h"
 #include "documentmanager.h"
@@ -61,9 +62,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     setWindowTitle("PairStorm");
 
-    // sets style globally
-    setAppStyle();
-
     setupMainMenu();
 
     setCentralWidget(dynamic_cast<QWidget*>(mpDocumentManager->getSplitter()));
@@ -77,6 +75,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // create instance of Bottom Panel
     createButtomPanel();
 
+    setInitialAppStyle();
     restoreMainWindowState();
 }
 
@@ -105,14 +104,14 @@ void MainWindow::setupMainMenu()
     pToolbar->setObjectName("pToolbar");
 
     // working with files
-    QAction *pNewFileAction = fileMenu->addAction("&New file", this, &MainWindow::onNewFileTriggered, Qt::CTRL + Qt::Key_N);
+    QAction *pNewFileAction = fileMenu->addAction("&New file...", this, &MainWindow::onNewFileTriggered, Qt::CTRL + Qt::Key_N);
     pNewFileAction->setIcon(QIcon(":/img/NEWFILE.png"));
     pToolbar->addAction(pNewFileAction);
 
     QAction *pOpenFileAction = fileMenu->addAction("&Open file...", this, &MainWindow::onOpenFileTriggered, Qt::CTRL + Qt::Key_O);
     pOpenFileAction->setIcon(QIcon(":/img/OPENFILE.png"));
     pToolbar->addAction(pOpenFileAction);
-    QAction *pOpenFolderAction = fileMenu->addAction("Open &folder...", this, &MainWindow::onOpenFolderTriggered);
+    QAction *pOpenFolderAction = fileMenu->addAction("Open pro&ject...", this, &MainWindow::onOpenFolderTriggered);
     pOpenFolderAction->setIcon(QIcon(":/img/OPENDIR.png"));
     pToolbar->addAction(pOpenFolderAction);
     fileMenu->addSeparator();
@@ -165,9 +164,8 @@ void MainWindow::setupMainMenu()
                         Qt::CTRL + Qt::Key_E);
     viewMenu->addAction("Split &Vectically", this, &MainWindow::onSplitVerticallyTriggered,
                         Qt::CTRL + Qt::SHIFT + Qt::Key_E);
-    viewMenu->addAction("Combine Document Areas", this, &MainWindow::onCombineAreas, Qt::ALT + Qt::SHIFT + Qt::Key_W);
-    viewMenu->addAction("Close &Empty Document Area", this, &MainWindow::onCloseEmptyDocArea);
-    viewMenu->addAction("Close Cu&rrent Document Area", this, &MainWindow::onCloseCurrentDocArea);
+    viewMenu->addAction("Co&mbine Document Areas", this, &MainWindow::onCombineAreas, Qt::ALT + Qt::SHIFT + Qt::Key_W);
+    viewMenu->addAction("Close &Empty Document Area", this, &MainWindow::onCloseEmptyDocArea);    
 
     viewMenu->addSeparator();
     viewMenu->addAction("Show &Project Viewer", this, &MainWindow::onShowProjectViewerTriggered);
@@ -380,7 +378,7 @@ void MainWindow::onSaveFileTriggered()
         if (mpDocumentManager->saveDocument())
         {
             statusBar()->showMessage(userMessages[UserMessages::DocumentSavedMsg], 3000);
-        }        
+        }
     }
     catch (const FileOpeningFailure&)
     {
@@ -446,7 +444,7 @@ void MainWindow::onSaveAllFilesTriggered()
         if (mpDocumentManager->saveAllDocuments())
         {
             statusBar()->showMessage(userMessages[UserMessages::DocumentSavedMsg], 3000);
-        }        
+        }
     }
     catch (const FileOpeningFailure&)
     {
@@ -534,18 +532,12 @@ void MainWindow::onShowBottomPanel()
 
 void MainWindow::onCombineAreas()
 {
-    qDebug() << "On combine areas";
     mpDocumentManager->combineDocAreas();
 }
 
 void MainWindow::onCloseEmptyDocArea()
 {
     mpDocumentManager->closeEmptyDocArea();
-}
-
-void MainWindow::onCloseCurrentDocArea()
-{
-    mpDocumentManager->closeCurrentDocArea();
 }
 
 void MainWindow::onRefactorTriggered()
@@ -561,14 +553,15 @@ void MainWindow::onConnectTriggered()
     {
         return;
     }
-    mCurrentUserName = userInput;
     mpChatWindowDock->setUserName(userInput);
-    mplocalConnector->configureOnLogin(mCurrentUserName);
+    mplocalConnector->configureOnLogin(userInput);
 }
 
 void MainWindow::onSettingsTriggered()
 {
     MenuOptions * menuOptions = new MenuOptions(this);
+    connect(menuOptions, &MenuOptions::valuesChanged,
+            this, &MainWindow::onSettingsChanged);
     Q_UNUSED(menuOptions)
 }
 
@@ -624,6 +617,17 @@ void MainWindow::onConnectionStatusChanged(bool status)
     }
 }
 
+void MainWindow::onSettingsChanged(std::map<QString, QString> newValues)
+{
+    SettingsConfigurator settingsConfigurator;
+
+    for (const auto& newValue: newValues)
+    {
+        auto functor = settingsConfigurator.getSettingsFunctor(newValue.first);
+        functor(this, newValue.second);
+    }
+}
+
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     auto changedDocuments = mpDocumentManager->getChangedDocuments();
@@ -647,8 +651,18 @@ void MainWindow::closeEvent(QCloseEvent *event)
     {
     case QDialogButtonBox::StandardButton::YesToAll:
     {
-        mpDocumentManager->saveAllDocuments();
-        event->accept();
+        try
+        {
+            mpDocumentManager->saveAllDocuments();
+            event->accept();
+        } catch (const FileOpeningFailure&)
+        {
+            // if any of files could not be opened to save changes to
+            // document then user is warned & closeEvent is ignored
+            QMessageBox::warning(this, userMessages[UserMessages::ErrorTitle],
+                    userMessages[UserMessages::FileOpeningForSavingErrorMsg]);
+            event->ignore();
+        }
         return;
     }
     case QDialogButtonBox::StandardButton::NoToAll:
@@ -696,13 +710,48 @@ void MainWindow::restoreMainWindowState()
         restoreState(settings.value("mainWindowState").toByteArray());
 }
 
-void MainWindow::setAppStyle()
+void MainWindow::setInitialAppStyle()
 {
     // fusion style is applied globally
     // if platform does not support fusion, default style is applied
     qApp->setStyle(QStyleFactory::create("Fusion"));
+
+    // restores style palette set in previous app session
+    // if the app is run for the first time then default style (WHITE) is set
+    QSettings savedSettings(QApplication::organizationName(), QApplication::applicationName());
+    QString styleName = {savedSettings.contains("style") ?
+                         savedSettings.value("style").toString()
+                         : "WHITE"};
+    setAppStyle(styleName);
+}
+
+void MainWindow::setAppStyle(const QString &styleName)
+{
     // dark style palette is created & set globally
-    QPalette palette = mpPaletteConfigurator->getPalette("DARK");
-    //QPalette newPal = palette();
+    QPalette palette = mpPaletteConfigurator->getPalette(styleName);
+
     qApp->setPalette(palette);
+
+    std::function<void(DocumentManager*, CodeEditor*, const QString&)> functor
+            (&DocumentManager::setStyle);
+
+    mpDocumentManager->configureDocuments(functor, styleName);
+
+    // call slot updateTheme from chat wdw dock
+}
+
+void MainWindow::setDocumentFontFamily(const QString &fontFamily)
+{
+    std::function<void(DocumentManager*, CodeEditor*, const QString&)> functor
+            (&DocumentManager::setFontFamily);
+
+    mpDocumentManager->configureDocuments(functor, fontFamily);
+}
+
+void MainWindow::setDocumentFontSize(const QString &fontSize)
+{    
+    std::function<void(DocumentManager*, CodeEditor*, const QString&)> functor
+            (&DocumentManager::setFontSize);
+
+    mpDocumentManager->configureDocuments(functor, fontSize);
 }

@@ -53,6 +53,11 @@ QTextCursor AddCommentTextEdit::getCursor()
     return ui->commentTextEdit->textCursor();
 }
 
+QPlainTextEdit *AddCommentTextEdit::getTextEdit()
+{
+    return ui->commentTextEdit;
+}
+
 void AddCommentTextEdit::setCursor(const QTextCursor &cursor)
 {
     ui->commentTextEdit->setTextCursor(cursor);

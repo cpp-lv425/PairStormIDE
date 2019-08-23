@@ -38,6 +38,7 @@ private:
     void handleLiteralState(const QChar&);
     void handleCommentState(const QChar&);
     void handleUndefinedState(const QChar&);
+   // QStringList mIdentificatorsList; 
 
 public:
     LexerCPP() = default;
@@ -45,6 +46,7 @@ public:
     void lexicalAnalysis(QString) override;
     QVector<Token> getTokens() const;
     void clear();
+    //QStringList getIdentificatorsList() const;
 };
 
 #endif // LEXERCPP_H

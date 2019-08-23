@@ -45,7 +45,7 @@ StartPage::StartPage(QWidget *parent) :
                 QIcon(":/img/OPENDIR.png"),
                 iconDimension,
                 maxButtonsWidth,
-                "Open Folder");
+                "Open Project");
     connect(mpOpenDirBtn, &QPushButton::pressed, this, &StartPage::openDirPressed);
 
     // creating & configuring settings call button
@@ -75,8 +75,7 @@ StartPage::StartPage(QWidget *parent) :
     setupLabels(pOpenDirLbl, lblFont);
 
     QLabel *pSettingsLbl = new QLabel(tr("Configure IDE"));
-    setupLabels(pSettingsLbl, lblFont);
-    pSettingsLbl->setDisabled(true);
+    setupLabels(pSettingsLbl, lblFont);    
 
     QVBoxLayout *pLblLayout = new QVBoxLayout;
     pLblLayout->addWidget(pNewLbl);

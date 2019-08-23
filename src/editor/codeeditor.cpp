@@ -1,6 +1,9 @@
-#include "codeeditor.h"
 #include "linenumberarea.h"
+#include "usermessages.h"
 #include "eventbuilder.h"
+#include "filemanager.h"
+#include "codeeditor.h"
+#include "utils.h"
 #include<QtGui>
 #include<QTextCursor>
 #include<QPainter>
@@ -11,23 +14,19 @@
 #include<iostream>
 #include<QLabel>
 
-#include "eventbuilder.h"
-#include "usermessages.h"
-#include "filemanager.h"
-#include "utils.h"
 
 CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
 {
     setLineWrapMode(QPlainTextEdit::NoWrap);// don't move cursor to the next line where it's out of visible scope
     this->setVerticalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAlwaysOn);
     this->setTabStopDistance(TAB_SPACE * fontMetrics().width(QLatin1Char('0')));//set tab distance
-    mCurrentZoom = 100;//in persents    
+    mCurrentZoom = 100;//in persents
 
     //read settings
     QSettings settings(QApplication::organizationName(), QApplication::applicationName());
-    QString analizerFontSize = {settings.contains("editorFontSize") ? settings.value("editorFontSize").toString() : "12"};
-    QString analizerFontName = {settings.contains("editorFontName") ? settings.value("editorFontName").toString() : "Consolas"};
-    QString analizerStyle = {settings.contains("style") ? settings.value("style").toString() : "WHITE"};
+    QString analizerFontSize = settings.value("editorFontSize").toString();
+    QString analizerFontName = settings.value("editorFontName").toString();
+    QString analizerStyle = settings.value("style").toString();
     mConfigParam.setConfigParams(analizerFontName,analizerFontSize,analizerStyle);
 
     //create objects connected to codeEditor
@@ -52,15 +51,16 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     //If the text is scrolled, rect will cover the entire viewport area.
     //If the text is scrolled vertically, dy carries the amount of pixels the viewport was scrolled.
 
-    connect(this,                         &QPlainTextEdit::updateRequest,                  this, &CodeEditor::updateLineNumberArea);
-    connect(mTimer,                       &QTimer::timeout,                                this, &CodeEditor::saveStateInTheHistory);
-    connect(this,                         &QPlainTextEdit::cursorPositionChanged,          this, &CodeEditor::textChangedInTheOneLine);
-    connect(mAddCommentButton,            &AddCommentButton::addCommentButtonPressed,      this, &CodeEditor::showCommentTextEdit);
-    connect(mCommentWidget->getEditTab(), &AddCommentTextEdit::emptyCommentWasSent,        this, &CodeEditor::emptyCommentWasAdded);
-    connect(mCommentWidget->getEditTab(), &AddCommentTextEdit::notEmptyCommentWasSent,     this, &CodeEditor::notEmptyCommentWasAdded);
-    connect(mCommentWidget->getEditTab(), &AddCommentTextEdit::commentWasDeleted,          this, &CodeEditor::deleteComment);
-    connect(this,                         &CodeEditor::linesCountUpdated,                  this, &CodeEditor::changeCommentButtonsState);
-
+    connect(this,                         &QPlainTextEdit::updateRequest,              this, &CodeEditor::updateLineNumberArea);
+    connect(mTimer,                       &QTimer::timeout,                            this, &CodeEditor::saveStateInTheHistory);
+    connect(this,                         &QPlainTextEdit::cursorPositionChanged,      this, &CodeEditor::textChangedInTheOneLine);
+    connect(mAddCommentButton,            &AddCommentButton::addCommentButtonPressed,  this, &CodeEditor::showCommentTextEdit);
+    connect(mCommentWidget->getEditTab(), &AddCommentTextEdit::emptyCommentWasSent,    this, &CodeEditor::emptyCommentWasAdded);
+    connect(mCommentWidget->getEditTab(), &AddCommentTextEdit::notEmptyCommentWasSent, this, &CodeEditor::notEmptyCommentWasAdded);
+    connect(mCommentWidget->getEditTab(), &AddCommentTextEdit::commentWasDeleted,      this, &CodeEditor::deleteComment);
+    connect(this,                         &CodeEditor::linesCountUpdated,              this, &CodeEditor::changeCommentButtonsState);
+    connect(this,                         &QPlainTextEdit::cursorPositionChanged,      this, &CodeEditor::runLexer);
+    connect(this,                         &QPlainTextEdit::cursorPositionChanged,      this, &CodeEditor::highlighText);
 
     mTimer->start(CHANGE_SAVE_TIME);//save text by this time
     mLinesCountCurrent = 1;
@@ -72,22 +72,64 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
 
     //fonts and colors configurations
     mFont.setPointSize(mConfigParam.mFontSize);
-    mFont.setFamily(mConfigParam.mTextStyle);
+    mFont.setFamily(mConfigParam.mFontStyle);
     mFont.setBold(false);
     mFont.setItalic(false);
     this->setFont(mFont);
 
     //set text highlighting color
-    fmtLiteral.setForeground(Qt::red);
-    fmtKeyword.setForeground(Qt::blue);
-    fmtComment.setForeground(Qt::green);
-    fmtUndefined.setUnderlineStyle(QTextCharFormat::WaveUnderline);
-    fmtUndefined.setUnderlineColor(Qt::red);
-    fmtRegular.setForeground(Qt::black);
-    fmtLiteral.setForeground(mConfigParam.mStringsColor);
-    fmtKeyword.setForeground(mConfigParam.mBasicLiteralsColor);
-    fmtComment.setForeground(mConfigParam.mCommentColor);
-    fmtRegular.setForeground(mConfigParam.mCodeTextColor);
+    setTextColors();
+
+    //completer
+    QStringList keywords;
+    keywords <<"SELECT" <<"FROM" <<"WHERE"<<"WHEN";
+    mCompleter = new AutoCodeCompleter(keywords, this);
+    mCompleter->setCaseSensitivity(Qt::CaseInsensitive);
+    mCompleter->setWidget(this);
+    qDebug()<<"inside list:";
+    for(auto &i:keywords)
+    {
+        qDebug()<<i;
+    }
+}
+
+void CodeEditor::setTextColors()
+{
+    fmtLiteral.setForeground(mConfigParam.textColors.mStringsColor);
+    fmtKeyword.setForeground(mConfigParam.textColors.mBasicLiteralsColor);
+    fmtComment.setForeground(mConfigParam.textColors.mCommentColor);
+    fmtRegular.setForeground(mConfigParam.textColors.mCodeTextColor);
+}
+
+void CodeEditor::setIdeType(const QString &ideType)
+{
+    mConfigParam.setIdeType(ideType);
+    setTextColors();
+}
+
+void CodeEditor::setFontSize(const QString &fontSize)
+{
+    mConfigParam.setFontSize(fontSize);
+    mFont.setPointSize(mConfigParam.mFontSize);
+    this->setFont(mFont);
+}
+
+void CodeEditor::setFontStyle(const QString &fontStyle)
+{    
+    mConfigParam.setFontStyle(fontStyle);
+    mFont.setFamily(mConfigParam.mFontStyle);
+    this->setFont(mFont);
+}
+
+
+ConfigParams CodeEditor::getConfigParam()
+{
+    return mConfigParam;
+}
+
+void CodeEditor::setConfigParam(const ConfigParams &configParam)
+{
+    mConfigParam = configParam;
 }
 
 void CodeEditor::runLexer()
@@ -148,12 +190,24 @@ void CodeEditor::redo()
 
 bool CodeEditor::isChanged()
 {
-    return mBeginTextState != this->toPlainText();
+    return mBeginTextState != QCryptographicHash::hash(this->toPlainText().toLatin1(), QCryptographicHash::Sha256);
 }
 
 void CodeEditor::setBeginTextState()
 {
-    mBeginTextState = this->toPlainText();
+    // when document is opened control sum is generated in order to have an opportunity
+    // to check whether document was modified
+    mBeginTextState = QCryptographicHash::hash(this->toPlainText().toLatin1(), QCryptographicHash::Sha256);
+}
+
+const QByteArray& CodeEditor::getBeginTextState() const
+{
+    return  mBeginTextState;
+}
+
+void CodeEditor::setTextState(const QByteArray &beginTextState)
+{
+    mBeginTextState = beginTextState;
 }
 
 void CodeEditor::updateLineNumberAreaWidth()
@@ -186,7 +240,7 @@ void CodeEditor::resizeEvent(QResizeEvent *e)
 void CodeEditor::specialAreasRepaintEvent(QPaintEvent *event)
 {
     QPainter painter(mLineNumberArea);
-    painter.fillRect(event->rect(), mConfigParam.mLineCounterAreaColor);
+    painter.fillRect(event->rect(), mConfigParam.textColors.mLineCounterAreaColor);
 
     QTextBlock block = firstVisibleBlock();//area of first numeration block from linecounter
     int blockNumber = block.blockNumber();//get line number (start from 0)
@@ -196,7 +250,7 @@ void CodeEditor::specialAreasRepaintEvent(QPaintEvent *event)
     while (block.isValid())//we have blocks (have lines numbers)
     {
         QString number = QString::number(blockNumber + 1);
-        painter.setPen(mConfigParam.mCodeTextColor);
+        painter.setPen(mConfigParam.textColors.mCodeTextColor);
         painter.drawText(0, top, mLineNumberArea->width(), fontMetrics().height(),//draw line count
                          Qt::AlignCenter, number);
         block = block.next();
@@ -236,7 +290,14 @@ void CodeEditor::saveStateInTheHistory()
 
 void CodeEditor::zoom(int val)
 {
-    val > 0 ?this->zoomIn(val):this->zoomOut(-val);
+    if (val > 0)
+    {
+        this->zoomIn(val);
+    }
+    else
+    {
+        this->zoomOut(-val);
+    }
     mCurrentZoom+=val;
 }
 
@@ -272,7 +333,6 @@ void CodeEditor::setNewAddedButtonSettings(AddCommentButton *commentButton)
 
 void CodeEditor::showCommentTextEdit(int line)
 {
-    mCommentWidget->setWindowTitle("Comment to " + QString::number(line) + " line");
     mCommentWidget->setPosition(this, mAddCommentButton);
     mCommentWidget->setVisible(true);
     mCommentWidget->setCommentButtonGeometry(mAddCommentButton->geometry());
@@ -287,6 +347,24 @@ void CodeEditor::showCommentTextEdit(int line)
     {
         mCommentWidget->getEditTab()->setText("");
     }
+    QSettings settings(QApplication::organizationName(), QApplication::applicationName());
+    mCommentWidget->setWindowTitle("Comment to " + QString::number(line) + " line by " + settings.value("UserName").toString());
+    //for text tokens
+    //    qDebug()<<"tokens vector size = "<<mTokens.size();
+    //    for (auto &i: mTokens)
+    //    {
+    //        if (i.mType == State::ID)
+    //        {
+    //            mLexer.getIdentificatorsList()
+    //            qDebug()<<i.mName;
+    //        }
+    //    }
+    //
+    /*qDebug()<<"vector size = "<<mLexer.getIdentificatorsList().size();
+    for (auto &i: mLexer.getIdentificatorsList())
+    {
+        qDebug()<<i;
+    }*/
 }
 
 void CodeEditor::emptyCommentWasAdded()
@@ -315,6 +393,9 @@ void CodeEditor::notEmptyCommentWasAdded()
         commentButtonNew->setStyleSheet("background-color: #18CD3C");
         commentButtonNew->setText("✔");
         commentButtonNew->setVisible(true);
+
+        QSettings settings(QApplication::organizationName(), QApplication::applicationName());
+        commentButtonNew->setUser(settings.value("UserName").toString());
 
         setNewAddedButtonSettings(commentButtonNew);
 
@@ -366,8 +447,8 @@ void CodeEditor::rewriteButtonsLines(QVector<AddCommentButton *> &commentV, cons
         {
             auto cursor = this->textCursor();
             cursor.movePosition(QTextCursor::PreviousCharacter);
-//check if cursor was in the start of comment line.
-//that is the only one situation when we consider this line as the line where we should move comment button
+            //check if cursor was in the start of comment line.
+            //that is the only one situation when we consider this line as the line where we should move comment button
             if (cursor.atBlockStart())
             {
                 setAnotherButtonLine(i, diff);
@@ -403,8 +484,8 @@ void CodeEditor::removeButtonByIndex(QVector<AddCommentButton *> &commentV, int 
 
 void CodeEditor::removeButtomByValue(QVector<AddCommentButton *> &commentV, AddCommentButton *commentButton)
 {
-     commentButton->setVisible(false);
-     mCommentsVector.erase(std::remove(commentV.begin(), commentV.end(), commentButton), commentV.end());
+    commentButton->setVisible(false);
+    mCommentsVector.erase(std::remove(commentV.begin(), commentV.end(), commentButton), commentV.end());
 }
 
 bool CodeEditor::isCommentButtonExist(int line)
@@ -421,38 +502,38 @@ bool CodeEditor::isCommentButtonExist(int line)
 
 void CodeEditor::removeButtons(QVector<AddCommentButton *> &commentV, int cursorLine, int startLine, int endLine, int diff)
 {
-   if (diff > 0)//we shouldn't remove button if the wasn't any removing
-   {
-       return;
-   }
+    if (diff > 0)//we shouldn't remove button if the wasn't any removing
+    {
+        return;
+    }
 
-   for (int i = 0; i < commentV.size(); i++)
-   {
-       //if the last pressed remove button (delete or backspace) was delete we should check one more condition
-       //because cursor position hasn't changed
-       if (lastRemomeKey == LastRemoveKey::DEL)
-       {
-           //this statment happens when we're staying above the line where comment is and pressed Delete.
-           //we havn't moved the cursor position, but diff became -1 therefore we can't check this as usually
-           //using only startLine position
-           if (cursorLine == startLine
-                   && cursorLine != commentV[i]->getCurrentLine())
-           {
-               continue;
-           }
-           if (isInRangeIncludBoth(commentV[i]->getCurrentLine(), startLine, endLine))
-           {
-               removeButtonByIndex(commentV, i);//otherwise delete this button (we delete whole line where comment button was)
-           }
-       }
-       else
-       {
-           if (isInRangeIncludLast(commentV[i]->getCurrentLine(), startLine, endLine))
-           {
-               removeButtonByIndex(commentV, i);//the same deleting here
-           }
-       }
-   }
+    for (int i = 0; i < commentV.size(); i++)
+    {
+        //if the last pressed remove button (delete or backspace) was delete we should check one more condition
+        //because cursor position hasn't changed
+        if (lastRemomeKey == LastRemoveKey::DEL)
+        {
+            //this statment happens when we're staying above the line where comment is and pressed Delete.
+            //we havn't moved the cursor position, but diff became -1 therefore we can't check this as usually
+            //using only startLine position
+            if (cursorLine == startLine
+                && cursorLine != commentV[i]->getCurrentLine())
+            {
+                continue;
+            }
+            if (isInRangeIncludBoth(commentV[i]->getCurrentLine(), startLine, endLine))
+            {
+                removeButtonByIndex(commentV, i);//otherwise delete this button (we delete whole line where comment button was)
+            }
+        }
+        else
+        {
+            if (isInRangeIncludLast(commentV[i]->getCurrentLine(), startLine, endLine))
+            {
+                removeButtonByIndex(commentV, i);//the same deleting here
+            }
+        }
+    }
 }
 
 void CodeEditor::mouseMoveEvent(QMouseEvent *event)
@@ -465,7 +546,7 @@ void CodeEditor::mouseMoveEvent(QMouseEvent *event)
         int bottom = top + static_cast<int>(blockBoundingRect(block).height());
         int side = bottom - top;// size of each side of comment button
 
-       // side of rectancge where our bottom will be. X-0 && Y-0 start from the left top, so (top < bottom)
+        // side of rectancge where our bottom will be. X-0 && Y-0 start from the left top, so (top < bottom)
         const QSize buttonSize = QSize(side, side);
         mAddCommentButton->setFixedSize(buttonSize);
 
@@ -474,8 +555,8 @@ void CodeEditor::mouseMoveEvent(QMouseEvent *event)
         int commentAreaRightMargin = this->width() - this->verticalScrollBar()->width() - getLineNumberAreaWidth();
         int commentAreaLeftMargin = commentAreaRightMargin - side;
 
-       if ((event->x() >= commentAreaLeftMargin) && (event->x() <= commentAreaRightMargin))//mouse inside comment block
-       {
+        if ((event->x() >= commentAreaLeftMargin) && (event->x() <= commentAreaRightMargin))//mouse inside comment block
+        {
             int linesFromTheTop = event->y() / side;
             int currLine = linesFromTheTop + currSliderPos + 1;//because first block = 0
             mAddCommentButton->setCurrentLine(currLine);
@@ -486,7 +567,7 @@ void CodeEditor::mouseMoveEvent(QMouseEvent *event)
                 int commentBottonYpos = linesFromTheTop * side;
 
                 mAddCommentButton->setGeometry(commentBottonXpos, currSliderPos ? commentBottonYpos :
-                                          commentBottonYpos + TOP_UNUSED_PIXELS_HEIGHT , side, side);
+                                                                                  commentBottonYpos + TOP_UNUSED_PIXELS_HEIGHT , side, side);
                 mAddCommentButton->setVisible(true);
                 //label for line showing
                 mCurrentCommentLable->setGeometry(mAddCommentButton->x() - getLineNumberAreaWidth(), mAddCommentButton->y(),
@@ -494,18 +575,18 @@ void CodeEditor::mouseMoveEvent(QMouseEvent *event)
                 mCurrentCommentLable->setText(QString::number(mAddCommentButton->getCurrentLine()));
                 mCurrentCommentLable->setVisible(true);
             }
-       }
-       else
-       {
-           mAddCommentButton->setVisible(false);
-           mCurrentCommentLable->setVisible(false);
-       }
+        }
+        else
+        {
+            mAddCommentButton->setVisible(false);
+            mCurrentCommentLable->setVisible(false);
+        }
     }
     QPlainTextEdit::mouseMoveEvent(event);
 }
 
 void CodeEditor::closeEvent(QCloseEvent *event)
-{    
+{
     if (!isChanged())
     {
         emit closeDocEventOccured(this);
@@ -515,8 +596,9 @@ void CodeEditor::closeEvent(QCloseEvent *event)
     QMessageBox::StandardButton reply = QMessageBox::question
             (this,
              userMessages[UserMessages::PromptSaveTitle],
-             userMessages[UserMessages::SaveQuestion],
-             QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+            userMessages[UserMessages::SaveQuestion]
+            + getFileName() + "?",
+            QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
 
     // if user closes dialog event is ignored
     if (reply == QMessageBox::Cancel)
@@ -569,9 +651,6 @@ void CodeEditor::highlighText()
             break;
         case(State::COM):
             formating(fmtComment, cursor, i);
-            break;
-        case(State::UNDEF):
-            formating(fmtUndefined, cursor, i);
             break;
         default:
             formating(fmtRegular, cursor, i);
