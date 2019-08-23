@@ -162,7 +162,7 @@ void ChatUsersController::connectUserOnConnection(const QString &connectedUser)
 void ChatUsersController::disconnectUserOnDisconnection(const QString &disconnectedUser)
 {
     removeUserOnOutdation(disconnectedUser);
-    appendUserOnDiscovery(disconnectedUser, ChatUser::State::ConnectedUser);
+    appendUserOnDiscovery(disconnectedUser, ChatUser::State::DisconnectedUser);
     /*
     auto userPos =
             std::find_if(mChatUsers.begin(),
