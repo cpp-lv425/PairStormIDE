@@ -23,6 +23,9 @@ const int TOP_UNUSED_PIXELS_HEIGHT = 4;
 #include<QVector>
 #include<QFont>
 #include<QStatusBar>
+#include<QStringList>
+#include<QCompleter>
+#include"autocodecompleter.h"
 
 
 class QPaintEvent;
@@ -55,9 +58,16 @@ public:
     void zoom(int val);
     bool isChanged();
     void setBeginTextState();
+    const QByteArray& getBeginTextState()const;
+    void setTextState(const QByteArray &beginTextState);
 
     LastRemoveKey getLastRemomeKey() const;
     void setLastRemomeKey(const LastRemoveKey &value);
+
+    ConfigParams getConfigParam();
+    void setConfigParam(const ConfigParams &configParam);
+    void highlighText();
+
 private:
     void rewriteButtonsLines( QVector<AddCommentButton*> &commentV, int diff, int startLine);
     void setAnotherButtonLine(AddCommentButton *comment, int diff);
@@ -81,8 +91,6 @@ private slots:
     void updateLineNumberAreaWidth();
     void updateLineNumberArea(const QRect &rect, int dy);
     void runLexer();
-    void highlighText();
-    //void showCommentLine(int line);
     void deleteComment();
 
 public slots:
@@ -94,6 +102,10 @@ public slots:
     void emptyCommentWasAdded();
     void notEmptyCommentWasAdded();
     void changeCommentButtonsState();
+    void setTextColors();
+    void setFontSize(const QString &fontSize);
+    void setFontStyle(const QString &fontStyle);
+    void setIdeType(const QString &ideType);
 
 signals:
     void changesAppeared();
@@ -102,7 +114,6 @@ signals:
     void textChangedInLine(int);
     void textChangedInLines(int, int);
     void linesCountUpdated();
-
 
 private:
     QWidget *mLineNumberArea;
@@ -116,11 +127,12 @@ private:
     AddCommentButton *mAddCommentButton;
     CommentWidget *mCommentWidget;
     QLabel *mCurrentCommentLable;
+    QCompleter *mCompleter;
 
     int mLinesCountPrev;
     int mLinesCountCurrent;
 
-    QString mBeginTextState;
+    QByteArray mBeginTextState;
     QVector<AddCommentButton*> mCommentsVector;
 
     QTextCharFormat fmtLiteral;
@@ -128,6 +140,7 @@ private:
     QTextCharFormat fmtKeyword;
     QTextCharFormat fmtRegular;
     QTextCharFormat fmtUndefined;
+
 
     LastRemoveKey lastRemomeKey;
 

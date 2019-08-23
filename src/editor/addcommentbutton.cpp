@@ -22,6 +22,16 @@ void AddCommentButton::mousePressEvent(QMouseEvent *event)
     emit addCommentButtonPressed(mCurrentLine);
 }
 
+QString AddCommentButton::getUser() const
+{
+    return mUser;
+}
+
+void AddCommentButton::setUser(const QString &user)
+{
+    mUser = user;
+}
+
 QString AddCommentButton::getCommentString() const
 {
     return mCommentString;
