@@ -42,7 +42,7 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     mCommentWidget = new CommentWidget;
     mCommentWidget->setVisible(false);
 
-    CommentDb *commentGetter = new CommentDb;
+    commentGetter = new CommentDb;
     mStartComments = commentGetter->getAllCommentsFromFile("main.cpp");
 
     readAllCommentsFromDB(mStartComments);
@@ -91,6 +91,12 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     {
         qDebug()<<i;
     }*/
+}
+
+CodeEditor::~CodeEditor()
+{
+    commentGetter->deleteCommentsFromDb(getFileName());
+    commentGetter->addCommentsToDb(getAllCommentsToDB());
 }
 
 void CodeEditor::setTextColors()
@@ -344,10 +350,12 @@ QVector<Comment> CodeEditor::getAllCommentsToDB()
     for (auto &i : mCommentsVector)
     {
         Comment comment;
-        comment.mFile = getFileName();
+        comment.mFile = "main.cpp"; //getFileName();
+        qDebug()<<comment.mFile;
         comment.mLine = i->getCurrentLine();
         comment.mText = i->getCommentString();
-        comment.mUser = i->getUser();
+        comment.mUser = "unnamed";//i->getUser();
+        qDebug()<<comment.mUser;
         comments.push_back(comment);
     }
     return comments;

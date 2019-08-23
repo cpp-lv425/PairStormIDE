@@ -48,6 +48,7 @@ class CodeEditor : public QPlainTextEdit
     Q_OBJECT
 public:
     CodeEditor(QWidget *parent = nullptr);
+    virtual ~CodeEditor();
     void specialAreasRepaintEvent(QPaintEvent *event);
     void repaintButtonsArea(int bottom, int top, int blockNumber);
     int getLineNumberAreaWidth();
@@ -134,6 +135,7 @@ private:
     QLabel *mCurrentCommentLable;
     QVector<Comment> mStartComments;
     QCompleter *mCompleter;
+    CommentDb *commentGetter;
 
     int mLinesCountPrev;
     int mLinesCountCurrent;
