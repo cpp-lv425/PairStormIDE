@@ -12,5 +12,6 @@
         <file>img/NEWFILE.png</file>
         <file>img/OPENFILE.png</file>
         <file>img/DISCONNECTED.png</file>
+        <file>img/NEWCLASS.png</file>
     </qresource>
 </RCC>

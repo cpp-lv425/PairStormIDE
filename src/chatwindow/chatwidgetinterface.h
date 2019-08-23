@@ -12,7 +12,20 @@ class ChatWidgetInterface : public QWidget
 
 protected:
 
-    explicit ChatWidgetInterface(QWidget *qObject = nullptr) : QWidget(qObject) { }
+    explicit ChatWidgetInterface(QWidget *qObject = nullptr) : QWidget(qObject)
+    {
+        mThemes["WHITE"] = Theme::WhiteTheme;
+        mThemes["BLUE"]  = Theme::BlueTheme;
+        mThemes["DARK"]  = Theme::DarkTheme;
+    }
+
+    enum Theme {
+        DefaultTheme,
+        WhiteTheme,
+        BlueTheme,
+        DarkTheme
+    } mCurrentTheme = Theme::DefaultTheme;
+    QHash<QString, Theme> mThemes;
 
 public:
 
@@ -28,6 +41,8 @@ public slots:
 
     virtual void appendMessage(const QString & messageAuthor,
                                const QString & messageBogy) = 0;
+
+    virtual void updateTheme(const QString & themeName) = 0;
 
 signals:
 

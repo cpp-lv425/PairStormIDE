@@ -34,6 +34,8 @@ public slots:
     virtual void appendMessage(const QString & messageAuthor,
                                const QString & messageBody) override;
 
+    virtual void updateTheme(const QString & themeName) override;
+
 private slots:
 
     void connectOrDisconnectOnRequest(QListWidgetItem *item);

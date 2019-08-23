@@ -10,7 +10,6 @@ class ChatWindowDock: public QDockWidget
 {
     Q_OBJECT
 
-    //ChatWidget *mpChatWidget;
     ChatWidgetInterface * mpChatWidget;
 
 public:
@@ -18,6 +17,8 @@ public:
     void setUserName(const QString& userName);
     void displayMessage(const QString userName,
                         const QString message);
+    void updateTheme(const QString & newThemeName);
+
 signals:
     void userToConnectSelected(const QString);
     void userToDisconnectSelected(const QString);

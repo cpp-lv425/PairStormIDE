@@ -119,6 +119,11 @@ void ChatWidget::appendMessage(const QString & messageAuthor,
     mpFeed->setPlainText(feed);
 }
 
+void ChatWidget::updateTheme(const QString &themeName)
+{
+    // TODO
+}
+
 void ChatWidget::connectOrDisconnectOnRequest(QListWidgetItem *item)
 {
     QString userName = item->text();

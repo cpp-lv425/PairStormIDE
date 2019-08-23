@@ -39,6 +39,11 @@ void ChatWindowDock::displayMessage(const QString userName, const QString messag
     mpChatWidget->appendMessage(userName, message);
 }
 
+void ChatWindowDock::updateTheme(const QString &newThemeName)
+{
+    mpChatWidget->updateTheme(newThemeName);
+}
+
 void ChatWindowDock::onUserToConnectSelected(QString userName)
 {
     emit userToConnectSelected(userName);

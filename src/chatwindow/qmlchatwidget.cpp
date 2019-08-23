@@ -20,45 +20,36 @@
 #include <QQuickStyle>
 #include <QDebug>
 
-QmlChatWidget::QmlChatWidget() : mpMessagesController(nullptr)
+QmlChatWidget::QmlChatWidget()
 {
     QQuickWindow::setSceneGraphBackend(QSGRendererInterface::Software);
-    /*
-    mpUsers = new OnlineUsersModel();
-
-    connect(mpUsers, &OnlineUsersModel::stateChangedOn,
-            this,          &QmlChatWidget::ConnectUserOnChangedState,
-            Qt::UniqueConnection);
-
-    connect(mpUsers, &OnlineUsersModel::stateChangedOff,
-            this,          &QmlChatWidget::DisconnectUserOnChangedState,
-            Qt::UniqueConnection);
-
-*/
+    mUserName = QString();
+    updateToFitCurrentTheme();
 
 
 
-
-    mpBoxLayout = new QBoxLayout(QBoxLayout::BottomToTop, this);
-    mpBoxLayout->setSpacing(0);
-    mpBoxLayout->setMargin(0);
 
     QQuickView * view = new QQuickView();
+
+    mpCurrentChatContext = view->engine()->rootContext();
 
     view->setResizeMode(QQuickView::SizeRootObjectToView);
     view->setSource(QUrl("qrc:/chatdisabled.qml"));
 
-    mpRestrictedChatWidget = QWidget::createWindowContainer(view, this);
-    mpRestrictedChatWidget->setContentsMargins(0, 0, 0, 0);
+    mpCurrentQmlChatWidget = QWidget::createWindowContainer(view, this);
+    mpCurrentQmlChatWidget->setContentsMargins(0, 0, 0, 0);
 
-    mpRestrictedChatWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    mpRestrictedChatWidget->setFocusPolicy(Qt::StrongFocus);
+    mpCurrentQmlChatWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    mpCurrentQmlChatWidget->setFocusPolicy(Qt::StrongFocus);
 
-    //setEnabled(false);
+    mpCurrentChatLayout = new QBoxLayout(QBoxLayout::BottomToTop, this);
+    mpCurrentChatLayout->setSpacing(0);
+    mpCurrentChatLayout->setMargin(0);
+
+    mpCurrentChatLayout->addWidget(mpCurrentQmlChatWidget);
+    setLayout(mpCurrentChatLayout);
+
     setMinimumSize(210, 400);
-
-    mpBoxLayout->addWidget(mpRestrictedChatWidget);
-    setLayout(mpBoxLayout);
 }
 
 void QmlChatWidget::keyPressEvent(QKeyEvent *event)
@@ -69,7 +60,7 @@ void QmlChatWidget::keyPressEvent(QKeyEvent *event)
 
 void QmlChatWidget::configureOnLogin(const QString &userName)
 {
-    if (mpMessagesController)
+    if (mUserName != QString())
     {
         mpMessagesController->sendCanNotLogInTwiceMessage();
         return;
@@ -116,42 +107,48 @@ void QmlChatWidget::configureOnLogin(const QString &userName)
 
     view->setResizeMode(QQuickView::SizeRootObjectToView);
 
-    mpChatContext = view->engine()->rootContext();
+    mpCurrentChatContext = view->engine()->rootContext();
     //mpChatContext->setContextProperty(QStringLiteral("AvailableUsersList"), mpUsers);
     //mpChatContext->setContextProperty(QStringLiteral("usersList"), mpUsers->getUsersList());
 
     //============================================================================================
-    mpChatContext->setContextProperty(QStringLiteral("globalUserName"), mUserName);
+    mpCurrentChatContext->setContextProperty(QStringLiteral("globalUserName"), mUserName);
 
-    mpChatContext->setContextProperty(QStringLiteral("messagesList"),   mpMessagesController);
-    mpChatContext->setContextProperty(QStringLiteral("usersList"),      mpUsersController);
+    mpCurrentChatContext->setContextProperty(QStringLiteral("messagesList"),   mpMessagesController);
+    mpCurrentChatContext->setContextProperty(QStringLiteral("usersList"),      mpUsersController);
     //============================================================================================
 
     view->setSource(QUrl("qrc:/chat.qml"));
 
+    mpCurrentChatLayout->removeWidget(mpCurrentQmlChatWidget);
 
+    mpCurrentQmlChatWidget->hide();
+    delete mpCurrentQmlChatWidget;
 
-    mpAllowedChatWidget = QWidget::createWindowContainer(view, this);
-    mpAllowedChatWidget->setContentsMargins(0, 0, 0, 0);
+    mpCurrentQmlChatWidget = QWidget::createWindowContainer(view, this);
 
-    mpAllowedChatWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    mpAllowedChatWidget->setFocusPolicy(Qt::StrongFocus);
+    mpCurrentQmlChatWidget->setContentsMargins(0, 0, 0, 0);
+    mpCurrentQmlChatWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    mpCurrentQmlChatWidget->setFocusPolicy(Qt::StrongFocus);
 
-    mpBoxLayout->removeWidget(mpRestrictedChatWidget);
-    mpRestrictedChatWidget->hide();
-    delete mpRestrictedChatWidget;
-    mpBoxLayout->addWidget(mpAllowedChatWidget);
+    mpCurrentChatLayout->addWidget(mpCurrentQmlChatWidget);
 }
 
 void QmlChatWidget::updateOnlineUsers(const QStringList &onlineUsers)
 {
-    //mpUsers->updateOnlineUsers(onlineUsers);
+    if(!mpMessagesController)
+    {
+        return;
+    }
     mpUsersController->updateOnlineUsers(onlineUsers);
 }
 
 void QmlChatWidget::updateConnectedUsers(const QStringList &connectedUsers)
 {
-    //mpUsers->updateConnectedUsers(connectedUsers);
+    if(!mpMessagesController)
+    {
+        return;
+    }
     mpUsersController->updateConnectedUsers(connectedUsers);
 }
 
@@ -170,10 +167,14 @@ void QmlChatWidget::appendMessage(const QString &messageAuthor,
         return;
     }
 
-    qDebug() << "append message: " << messageBody;
-    qDebug() << "author:         " << messageAuthor;
-
     mpMessagesController->appendMessage(newMessage);
+}
+
+void QmlChatWidget::updateTheme(const QString &themeName)
+{
+    //This can be called even if user is not logged in
+    mCurrentTheme = mThemes[themeName];
+    updateToFitCurrentTheme();
 }
 
 void QmlChatWidget::shareMessageOnSendingMessage(const ChatMessage &message)
@@ -190,4 +191,27 @@ void QmlChatWidget::ConnectUserOnChangedState(const QString userName)
 void QmlChatWidget::DisconnectUserOnChangedState(const QString userName)
 {
     emit stopSharingRequested(userName);
+}
+
+void QmlChatWidget::updateToFitCurrentTheme()
+{
+    switch(mCurrentTheme)
+    {
+    case Theme::DefaultTheme:
+        mpCurrentChatContext->setContextProperty(QStringLiteral("globalTheme"), "white");
+        qDebug() << "CHAT: theme set to white (default)";
+        break;
+    case Theme::WhiteTheme:
+        mpCurrentChatContext->setContextProperty(QStringLiteral("globalTheme"), "white");
+        qDebug() << "CHAT: theme set to white";
+        break;
+    case Theme::BlueTheme:
+        mpCurrentChatContext->setContextProperty(QStringLiteral("globalTheme"), "blue");
+        qDebug() << "CHAT: theme set to blue";
+        break;
+    case Theme::DarkTheme:
+        mpCurrentChatContext->setContextProperty(QStringLiteral("globalTheme"), "dark");
+        qDebug() << "CHAT: theme set to dark";
+        break;
+    }
 }

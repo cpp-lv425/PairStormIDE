@@ -34,25 +34,26 @@ public slots:
     virtual void appendMessage(const QString & messageAuthor,
                                const QString & messageBody) override;
 
+    virtual void updateTheme(const QString & themeName) override;
+
 private:
 
     QString mUserName;
 
-    //OnlineUsersModel * mpUsers;
-
     ChatMessagesController * mpMessagesController;
     ChatUsersController    * mpUsersController;
 
-    QQmlContext      * mpChatContext;
-    QBoxLayout       * mpBoxLayout;
-    QWidget          * mpRestrictedChatWidget;
-    QWidget          * mpAllowedChatWidget;
+    QQmlContext      * mpCurrentChatContext;
+    QBoxLayout       * mpCurrentChatLayout;
+    QWidget          * mpCurrentQmlChatWidget;
 
 private slots:
 
     void shareMessageOnSendingMessage (const ChatMessage & message);
     void ConnectUserOnChangedState    (const QString userName);
     void DisconnectUserOnChangedState (const QString userName);
+
+    void updateToFitCurrentTheme();
 
 };
 
