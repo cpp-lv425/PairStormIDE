@@ -114,7 +114,11 @@ Item {
 
             Image {
                 anchors.fill: sendButton
-                source: "res/SEND.png"
+                source: "res/SEND.svg"
+
+                mipmap: true
+                sourceSize: Qt.size(width, height)
+
                 fillMode: Image.PreserveAspectFit
                 //sourceSize.width:  300
                 //sourceSize.height: 300

@@ -150,7 +150,20 @@ Item {
                         Image {
                             width:  13
                             height: 13
-                            source: "res/USER.png"
+
+                            mipmap: true
+                            sourceSize: Qt.size(width, height)
+                            fillMode: Image.PreserveAspectFit
+                            source: {
+                                if (model.type === "ordinary")
+                                {
+                                    return "res/USER.svg"
+                                }
+                                if (model.type === "service")
+                                {
+                                    return "res/SYSTEM.svg"
+                                }
+                            }
                         }
 
                         text: qsTr("  " + model.authorName)

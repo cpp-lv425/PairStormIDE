@@ -1,4 +1,4 @@
-import QtQuick 2.0
+import QtQuick 2.8
 import QtQuick.Controls 2.0
 
 Item {
@@ -10,11 +10,13 @@ Item {
 
         Column {
             anchors.centerIn: parent
-            width: unsatisfiedUserImage.width
+            //width: unsatisfiedUserImage.width
             //spacing: 10
             Control {
                 anchors.horizontalCenter: parent.horizontalCenter
+                //anchors.bottom: unsatisfiedUserImage.top
                 width: warningText.implicitWidth + 2
+
                 height: 30
                 Label {
                     id: warningText
@@ -29,9 +31,17 @@ Item {
 
             Image {
                 id: unsatisfiedUserImage
-                width: 100; height: 200
+                //anchors.verticalCenter: parent.verticalCenter
+
+                width: 200
+                height: 300
+
+                mipmap: true
+
+                sourceSize: Qt.size(width, height)
+
                 fillMode: Image.PreserveAspectFit
-                source: "chatelements/res/SORRY.png"
+                source: "chatelements/res/SORRY.svg"
             }
         }
     }

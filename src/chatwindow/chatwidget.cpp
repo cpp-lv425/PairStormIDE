@@ -17,8 +17,8 @@
 #include <QDockWidget>
 #include <QQuickStyle>
 
-#include "onlineuserslist.h"
-#include "onlineusersmodel.h"
+//#include "onlineuserslist.h"
+//#include "onlineusersmodel.h"
 
 ChatWidget::ChatWidget()
 {
