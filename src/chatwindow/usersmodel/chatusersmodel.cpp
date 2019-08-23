@@ -57,6 +57,7 @@ bool ChatUsersModel::setData(const QModelIndex & modelIndex,
         return false;
     }
 
+
     const int userId = modelIndex.row();
 
     ChatUser currentUser =
@@ -71,11 +72,19 @@ bool ChatUsersModel::setData(const QModelIndex & modelIndex,
         // Try to connect user
        if (newValue.toBool())
        {
+           if (currentUser.mState == ChatUser::State::ConnectedUser)
+           {
+               return true;
+           }
            currentUser.mState = ChatUser::State::ConnectedUser;
            emit mpUsersController->userStateChangedConnected(currentUser.mUserName);
        }
        else
        {
+           if (currentUser.mState == ChatUser::State::DisconnectedUser)
+           {
+               return true;
+           }
            currentUser.mState = ChatUser::State::DisconnectedUser;
            emit mpUsersController->userStateChangedDisconnected(currentUser.mUserName);
        }
