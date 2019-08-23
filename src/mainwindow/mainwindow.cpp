@@ -736,6 +736,8 @@ void MainWindow::setAppStyle(const QString &styleName)
             (&DocumentManager::setStyle);
 
     mpDocumentManager->configureDocuments(functor, styleName);
+
+    // call slot updateTheme from chat wdw dock
 }
 
 void MainWindow::setDocumentFontFamily(const QString &fontFamily)
