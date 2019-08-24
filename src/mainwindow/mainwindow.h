@@ -14,6 +14,7 @@ class SettingsConfigurator;
 class PaletteConfigurator;
 class ProjectViewerDock;
 class QFileSystemModel;
+class NewProjectDialog;
 class BottomPanelDock;
 class DocumentManager;
 class QListWidgetItem;

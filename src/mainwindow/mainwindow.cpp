@@ -15,6 +15,7 @@
 #include "settingsconfigurator.h"
 #include "paletteconfigurator.h"
 #include "projectviewerdock.h"
+#include "newprojectwizard.h"
 #include "documentmanager.h"
 #include "bottompaneldock.h"
 #include "savefilesdialog.h"
@@ -374,12 +375,17 @@ void MainWindow::onOpenProjectTriggered()
              userMessages[UserMessages::OpenDirectoryTitle],
             QDir::homePath());
 
+    // check if project exists
+
     mpProjectViewerDock->setDir(dirName);
+    mpDocumentManager->openProject(dirName);
 }
 
 void MainWindow::onCloseProjectTriggered()
 {
     qDebug() << "close project";
+    // disconnect from db
+    mpDocumentManager->closeCurrentProject();
 }
 
 void MainWindow::onOpenStartPage()
@@ -777,4 +783,7 @@ void MainWindow::setDocumentFontSize(const QString &fontSize)
 void MainWindow::onNewProjectTriggered()
 {
     qDebug() << "new project slot";
+    // check if other project is opened
+    NewProjectDialog newProjectDialog;
+    newProjectDialog.exec();
 }

@@ -20,10 +20,13 @@ class DocumentManager: public QObject
     // is used when document loses focus upon user input
     // (e.g. when Project Viewer item is clicked to open another document)
     CodeEditor *mpPrevEditorInFocus;
+    QString currentProject;
 
 public:
     explicit DocumentManager();
     QSplitter* getSplitter();
+    void openProject(const QString &path);
+    void closeCurrentProject();
     void openDocument(const QString &fileName, bool load = false);
     bool saveDocument();
     bool saveAllDocuments();

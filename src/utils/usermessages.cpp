@@ -30,4 +30,5 @@ QMap<UserMessages, QString> userMessages =
     std::pair<UserMessages, const QString>(UserMessages::ConnectionFailureMsg, "Startup Failed"),
     std::pair<UserMessages, const QString>(UserMessages::OpenFileTitle, "Open File"),
     std::pair<UserMessages, const QString>(UserMessages::SaveAllQuestion, "The following documents have been changed. \nWould you like to save changes?"),
+    std::pair<UserMessages, const QString>(UserMessages::NewProjectWizardMsg, "Please specify project name and directory."),
 };

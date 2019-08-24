@@ -36,6 +36,18 @@ QSplitter* DocumentManager::getSplitter()
     return mpSplitter;
 }
 
+void DocumentManager::openProject(const QString &path)
+{
+    qDebug() << "open project";
+    currentProject = path;
+}
+
+void DocumentManager::closeCurrentProject()
+{
+    qDebug() << "close project";
+    currentProject.clear();
+}
+
 void DocumentManager::openDocument(const QString &fileName, bool load)
 {
     // checks if doc is not already opened
