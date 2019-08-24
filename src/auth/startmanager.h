@@ -14,6 +14,9 @@
 
 //#include <QObject>
 #include <QWidget>
+#include <QMap>
+
+class DownloaderWrapper;
 
 //class StartManager : public QObject
 class StartManager : public QWidget
@@ -25,9 +28,15 @@ public:
 
     void start();
     void setPathToConfDir(const QString path);
-private:
+
     enum class userMode {RegisteredUser, NewUser, UnnamedUser, Size};
+    enum class respondStatus {Normal, Error, Corrupted, Size};
+private:
+    DownloaderWrapper *mpDownloader;
+
     userMode mUserMode;
+    respondStatus mRespondStatus;
+
     QString mPathToConfDir;
     QString mUserName;
     QString mToken;
@@ -35,16 +44,24 @@ private:
     bool mIsTokenValid;
     QStringList mListRegisteredUsers;
 
+    QString mUrlToCheckUser = "https://api.github.com/user";
+
     void makeListRegisteredUsers();
     void choiceWindow();
     void validateToken();
     void newUsewWindow();
     void loadConFile();
 
-
+    int mTimeOutWelcomeWindow = 3000; // ms
 signals:
-    void close();
+    void cancel();
+    void cancelNewUserWindow();
+
 public slots:
+    void onChoice(QString userName);
+    void onNewUserChoice();
+    void onNewUserToken(const QString &login, const QString &token);
+
 };
 
 #endif // STARTMANAGER_H

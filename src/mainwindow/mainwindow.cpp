@@ -11,6 +11,7 @@
 #include <QStyle>
 #include <QFile>
 
+//#include "DownloaderGui.h"
 #include "localconnectorgenerator.h"
 #include "paletteconfigurator.h"
 #include "projectviewerdock.h"
@@ -31,7 +32,7 @@
 #include "utils.h"
 
 MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent),
+    QMainWindow(parent), mIsFinished {false},
     ui(new Ui::MainWindow),
     // create instance of Document Manager
     mpDocumentManager(new DocumentManager),
@@ -51,13 +52,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     {
         StartManager startManager(this);
+        connect(&startManager, &StartManager::cancel, this, [&]() {mIsFinished = true;});
         startManager.start();
-        //connect(&startManager, &StartManager::close, this, &MainWindow::close);
-        connect(&startManager, &StartManager::close, this, &MainWindow::onExitTriggered);
-
-        //StoreConf conf("MarsLviv");
-        StoreConf conf;
-        conf.restoreConFile();
     }
 
     // when first started main window is maximized
@@ -680,10 +676,16 @@ MainWindow::~MainWindow()
 {
     saveMainWindowState();
 
-    //StoreConf conf("MarsLviv");
-    StoreConf conf;
-    //conf.saveConFile();
-
+    if (!mIsFinished)    //  application wasn't cancelled. in case of cancellation
+    {                   //      application don't save data from QSettings to configurattion file
+        QSettings s;
+        if (s.contains("userName"))
+        {
+            QString name = s.value("userName").toString();
+            StoreConf conf(name);
+            conf.saveConFile();
+        }
+    }
     delete ui;
 }
 

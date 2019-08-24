@@ -15,17 +15,14 @@ class ChoiceWindow : public QDialog
 {
     Q_OBJECT
 public:
-    ChoiceWindow(QStringList &usersFilesList
-                 , QString &userName
-                 , QString &token
-                 , QWidget *pParent = nullptr);
+    ChoiceWindow(QStringList &usersFilesList, QWidget *pParent = nullptr);
 
 private:
     QLabel *mpLabelAccounts;
     //QStringList mUsersList;
 
-    QPushButton *mpNewUserButton;
-    QPushButton *mpTryModeButton;
+    //QPushButton *mpNewUserButton;
+    //QPushButton *mpTryModeButton;
     QListWidget *mpUsersWidgetList;
 
     QPushButton *mpUnnamedUser;
@@ -45,7 +42,8 @@ private slots:
     void onUnnamedUserClicked();
     void onBtnBoxClicked(QAbstractButton * button);
 signals:
-    void close();
+    void cancel();
+    void choice(QString userName);
 };
 
 #endif // CHOICEWINDOW_H

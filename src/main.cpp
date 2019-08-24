@@ -19,6 +19,11 @@ int main(int argc, char *argv[])
     MainWindow w;
     splashScreen.finish(&w);
 
+    if (w.mIsFinished)
+    {
+        return 0;
+    }
+
     w.show();
     w.showStartPage();
 
