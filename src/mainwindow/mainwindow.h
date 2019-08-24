@@ -62,8 +62,10 @@ private slots:
     // file menu actions
     void onNewProjectTriggered();
     void onNewFileTriggered();
+    void onNewClassTriggered();
     void onOpenFileTriggered();
     void onOpenProjectTriggered();
+    void onCloseProjectTriggered();
     void onOpenStartPage();
     void onSaveFileTriggered();
     void onSaveFileAsTriggered();

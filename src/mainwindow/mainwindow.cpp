@@ -88,9 +88,8 @@ QStringList MainWindow::getFileExtensions() const
 void MainWindow::showStartPage()
 {
     StartPage startPage(this);
-    connect(&startPage, &StartPage::onNewBtnPressed, this, &MainWindow::onNewFileTriggered);
-    connect(&startPage, &StartPage::onOpenBtnPressed, this, &MainWindow::onOpenFileTriggered);
-    connect(&startPage, &StartPage::onOpenDirPressed, this, &MainWindow::onOpenProjectTriggered);
+    connect(&startPage, &StartPage::onNewProjectBtnPressed, this, &MainWindow::onNewProjectTriggered);
+    connect(&startPage, &StartPage::onOpenProjectBtnPressed, this, &MainWindow::onOpenProjectTriggered);
     connect(&startPage, &StartPage::onSettingsBtnPressed, this, &MainWindow::onSettingsTriggered);
     startPage.showStartPage();
 }
@@ -104,9 +103,17 @@ void MainWindow::setupMainMenu()
     pToolbar->setObjectName("pToolbar");
 
     // working with files
-    QAction *pNewFileAction = fileMenu->addAction("&New file...", this, &MainWindow::onNewFileTriggered, Qt::CTRL + Qt::Key_N);
+    QMenu *newSubMenu = new QMenu("&New");
+    newSubMenu->addAction("New &project...", this, &MainWindow::onNewProjectTriggered);
+
+    QAction *pNewFileAction = newSubMenu->addAction("&New file...", this, &MainWindow::onNewFileTriggered, Qt::CTRL + Qt::Key_N);
     pNewFileAction->setIcon(QIcon(":/img/NEWFILE.png"));
     pToolbar->addAction(pNewFileAction);
+
+    QAction *pNewClassAction = newSubMenu->addAction("New &class...", this, &MainWindow::onNewClassTriggered);
+    pNewClassAction->setIcon(QIcon(":/img/NEWFILE.png"));
+
+    fileMenu->addMenu(newSubMenu);
 
     QAction *pOpenFileAction = fileMenu->addAction("&Open file...", this, &MainWindow::onOpenFileTriggered, Qt::CTRL + Qt::Key_O);
     pOpenFileAction->setIcon(QIcon(":/img/OPENFILE.png"));
@@ -129,6 +136,7 @@ void MainWindow::setupMainMenu()
     fileMenu->addSeparator();
 
     // closing docs & exiting the program
+    fileMenu->addAction("Close pro&ject", this, &MainWindow::onCloseProjectTriggered);
     fileMenu->addAction("&Close document", this, &MainWindow::onCloseFileTriggered, Qt::CTRL + Qt::SHIFT + Qt::Key_W);
     fileMenu->addAction("&Exit", this, &MainWindow::onExitTriggered, Qt::ALT + Qt::Key_F4);
 
@@ -343,6 +351,11 @@ void MainWindow::onNewFileTriggered()
     }
 }
 
+void MainWindow::onNewClassTriggered()
+{
+    qDebug() << "new class";
+}
+
 void MainWindow::onOpenFileTriggered()
 {
     QString fileName = QFileDialog::getOpenFileName
@@ -362,6 +375,11 @@ void MainWindow::onOpenProjectTriggered()
             QDir::homePath());
 
     mpProjectViewerDock->setDir(dirName);
+}
+
+void MainWindow::onCloseProjectTriggered()
+{
+    qDebug() << "close project";
 }
 
 void MainWindow::onOpenStartPage()
@@ -754,4 +772,9 @@ void MainWindow::setDocumentFontSize(const QString &fontSize)
             (&DocumentManager::setFontSize);
 
     mpDocumentManager->configureDocuments(functor, fontSize);
+}
+
+void MainWindow::onNewProjectTriggered()
+{
+    qDebug() << "new project slot";
 }

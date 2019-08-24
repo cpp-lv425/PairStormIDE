@@ -20,33 +20,23 @@ StartPage::StartPage(QWidget *parent) :
     QFont lblFont("Segoe UI", 10);
     lblFont.setBold(true);
 
-
     // creating & configuring new file button
-    mpNewBtn = new QPushButton;
-    setupButton(mpNewBtn,
-                QIcon(":/img/NEWFILE.png"),
+    mpNewProjectBtn = new QPushButton;
+    setupButton(mpNewProjectBtn,
+                QIcon(""),
                 iconDimension,
                 maxButtonsWidth,
-                "New File");
-    connect(mpNewBtn, &QPushButton::pressed, this, &StartPage::newBtnPressed);
-
-    // creating & configuring open file button
-    mpOpenBtn = new QPushButton;
-    setupButton(mpOpenBtn,
-                QIcon(":/img/OPENFILE.png"),
-                iconDimension,
-                maxButtonsWidth,
-                "Open File");
-    connect(mpOpenBtn, &QPushButton::pressed, this, &StartPage::openBtnPressed);
+                "New Project");
+    connect(mpNewProjectBtn, &QPushButton::pressed, this, &StartPage::newProjectBtnPressed);
 
     // creating & configuring open folder button
-    mpOpenDirBtn = new QPushButton;
-    setupButton(mpOpenDirBtn,
+    mpOpenProjectBtn = new QPushButton;
+    setupButton(mpOpenProjectBtn,
                 QIcon(":/img/OPENDIR.png"),
                 iconDimension,
                 maxButtonsWidth,
                 "Open Project");
-    connect(mpOpenDirBtn, &QPushButton::pressed, this, &StartPage::openDirPressed);
+    connect(mpOpenProjectBtn, &QPushButton::pressed, this, &StartPage::openProjectBtnPressed);
 
     // creating & configuring settings call button
     mpSettingsBtn = new QPushButton;
@@ -59,19 +49,15 @@ StartPage::StartPage(QWidget *parent) :
 
     // bindong buttons
     QVBoxLayout *pBtnLayout = new QVBoxLayout;
-    pBtnLayout->addWidget(mpNewBtn);
-    pBtnLayout->addWidget(mpOpenBtn);
-    pBtnLayout->addWidget(mpOpenDirBtn);
+    pBtnLayout->addWidget(mpNewProjectBtn);    
+    pBtnLayout->addWidget(mpOpenProjectBtn);
     pBtnLayout->addWidget(mpSettingsBtn);
 
     // creating & laying out labels
-    QLabel *pNewLbl = new QLabel(tr("Create new file"));
-    setupLabels(pNewLbl, lblFont);
+    QLabel *pNewLbl = new QLabel(tr("Create new project"));
+    setupLabels(pNewLbl, lblFont);    
 
-    QLabel *pOpenLbl = new QLabel(tr("Open existing file"));
-    setupLabels(pOpenLbl, lblFont);
-
-    QLabel *pOpenDirLbl = new QLabel(tr("Open existing project directory"));
+    QLabel *pOpenDirLbl = new QLabel(tr("Open existing project"));
     setupLabels(pOpenDirLbl, lblFont);
 
     QLabel *pSettingsLbl = new QLabel(tr("Configure IDE"));
@@ -79,7 +65,6 @@ StartPage::StartPage(QWidget *parent) :
 
     QVBoxLayout *pLblLayout = new QVBoxLayout;
     pLblLayout->addWidget(pNewLbl);
-    pLblLayout->addWidget(pOpenLbl);
     pLblLayout->addWidget(pOpenDirLbl);
     pLblLayout->addWidget(pSettingsLbl);
 
@@ -129,21 +114,15 @@ StartPage::~StartPage()
     delete ui;
 }
 
-void StartPage::newBtnPressed()
+void StartPage::newProjectBtnPressed()
 {
-    emit onNewBtnPressed();
+    emit onNewProjectBtnPressed();
     accept();
 }
 
-void StartPage::openBtnPressed()
+void StartPage::openProjectBtnPressed()
 {
-    emit onOpenBtnPressed();
-    accept();
-}
-
-void StartPage::openDirPressed()
-{
-    emit onOpenDirPressed();
+    emit onOpenProjectBtnPressed();
     accept();
 }
 

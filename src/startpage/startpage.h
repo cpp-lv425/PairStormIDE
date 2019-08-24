@@ -20,21 +20,18 @@ public:
 
 private:
     Ui::StartPage *ui;
-    QPushButton *mpNewBtn;
-    QPushButton *mpOpenBtn;
-    QPushButton *mpOpenDirBtn;
+    QPushButton *mpNewProjectBtn;
+    QPushButton *mpOpenProjectBtn;
     QPushButton *mpSettingsBtn;
 
 private slots:
-    void newBtnPressed();
-    void openBtnPressed();
-    void openDirPressed();
+    void newProjectBtnPressed();
+    void openProjectBtnPressed();
     void settingsBtnPressed();
 
 signals:
-    void onNewBtnPressed();
-    void onOpenBtnPressed();
-    void onOpenDirPressed();
+    void onNewProjectBtnPressed();
+    void onOpenProjectBtnPressed();
     void onSettingsBtnPressed();
 
 private:
