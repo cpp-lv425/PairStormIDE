@@ -90,7 +90,7 @@ void MainWindow::showStartPage()
     StartPage startPage(this);
     connect(&startPage, &StartPage::onNewBtnPressed, this, &MainWindow::onNewFileTriggered);
     connect(&startPage, &StartPage::onOpenBtnPressed, this, &MainWindow::onOpenFileTriggered);
-    connect(&startPage, &StartPage::onOpenDirPressed, this, &MainWindow::onOpenFolderTriggered);
+    connect(&startPage, &StartPage::onOpenDirPressed, this, &MainWindow::onOpenProjectTriggered);
     connect(&startPage, &StartPage::onSettingsBtnPressed, this, &MainWindow::onSettingsTriggered);
     startPage.showStartPage();
 }
@@ -111,7 +111,7 @@ void MainWindow::setupMainMenu()
     QAction *pOpenFileAction = fileMenu->addAction("&Open file...", this, &MainWindow::onOpenFileTriggered, Qt::CTRL + Qt::Key_O);
     pOpenFileAction->setIcon(QIcon(":/img/OPENFILE.png"));
     pToolbar->addAction(pOpenFileAction);
-    QAction *pOpenFolderAction = fileMenu->addAction("Open pro&ject...", this, &MainWindow::onOpenFolderTriggered);
+    QAction *pOpenFolderAction = fileMenu->addAction("Open pro&ject...", this, &MainWindow::onOpenProjectTriggered);
     pOpenFolderAction->setIcon(QIcon(":/img/OPENDIR.png"));
     pToolbar->addAction(pOpenFolderAction);
     fileMenu->addSeparator();
@@ -354,7 +354,7 @@ void MainWindow::onOpenFileTriggered()
     openDoc(fileName);
 }
 
-void MainWindow::onOpenFolderTriggered()
+void MainWindow::onOpenProjectTriggered()
 {
     QString dirName = QFileDialog::getExistingDirectory
             (this,
