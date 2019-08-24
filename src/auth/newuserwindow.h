@@ -46,6 +46,7 @@ signals:
     void cancel();
     void unnamedUser();
     void newUserToken(const QString &login, const QString &token);
+    void newUserPasssword(const QString &login, const QString &passwrd);
 };
 
 #endif // NEWUSERWINDOW_H

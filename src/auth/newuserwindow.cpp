@@ -105,6 +105,7 @@ void NewUserWindow::onBtnBoxClicked(QAbstractButton *button)
         }
         if (mpEditToken->text().size() && mpEditLogin->text().size())      // user typed password
         {
+            emit newUserPasssword(mpEditLogin->text(), mpEditToken->text());
             return;
         }
         //close();

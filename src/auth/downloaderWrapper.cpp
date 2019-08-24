@@ -28,6 +28,11 @@ void DownloaderWrapper::post()
     mpDownloader->downloadPOST(QUrl(strPostLink));
 }
 
+void DownloaderWrapper::post2(const QString &userName, const QUrl &url, const QString &tokenOrPassword, const QByteArray &data)
+{
+    mpDownloader->downloadPOST2(QUrl(url), userName, tokenOrPassword, data);
+}
+
 void DownloaderWrapper::onRespond(const QUrl &url, const QMap<QString, QString> &headersMap, const QMap<QString, QString> &respondMap)
 {
     mRespondUrl = url.toEncoded();

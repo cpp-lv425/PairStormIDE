@@ -22,6 +22,8 @@ public:
     void downloadGET(const QUrl &url, const QString &userName,
                      const QString &tokenOrPassword = "");
     void downloadPOST(const QUrl&);
+    void downloadPOST2(const QUrl &url,                const QString &userName,
+                       const QString &tokenOrPassword, const QByteArray &data);
 
 signals:
     void respond         (const QUrl &url, const QMap<QString, QString> &headersMap, const QMap<QString, QString> &respondMap);

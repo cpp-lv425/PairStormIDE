@@ -40,17 +40,26 @@ private:
     QString mPathToConfDir;
     QString mUserName;
     QString mToken;
+    QString mPassword;
     QString mTokenHash;
+    QString mTokenPrefix    = "PS";
+    QByteArray data;//QByteArray jsonString = "{\"scopes\":[\"repo\",\"user\"],\"note\":\"getting-startedQ\"}";
+
     bool mIsTokenValid;
+    //bool mIsTokenGenerated;
     QStringList mListRegisteredUsers;
 
     QString mUrlToCheckUser = "https://api.github.com/user";
+    QString mUrlToGetToken  = "https://api.github.com/authorizations";
 
     void makeListRegisteredUsers();
     void choiceWindow();
     void validateToken();
+    void generateToken();
     void newUsewWindow();
     void loadConFile();
+
+    void formatTokenName(QString &name);     // formatting token name as name + currentSecsSinceEpoch
 
     int mTimeOutWelcomeWindow = 3000; // ms
 signals:
@@ -59,8 +68,9 @@ signals:
 
 public slots:
     void onChoice(QString userName);
-    void onNewUserChoice();
+    void onUnnamedUserChoice();
     void onNewUserToken(const QString &login, const QString &token);
+    void onNewUserPassword(const QString &login, const QString &pasword);
 
 };
 

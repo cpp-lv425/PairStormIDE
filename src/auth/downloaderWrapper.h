@@ -32,6 +32,8 @@ public:
     void get(const QString &userName, const QString &url,
              const QString &tokenOrPassword = "");
     void post();
+    void post2(const QString &userName,        const QUrl &url,
+               const QString &tokenOrPassword, const QByteArray &data);
 
     QString mRespondUrl;
     QMap<QString, QString> mRespondMap;

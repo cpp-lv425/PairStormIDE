@@ -56,6 +56,36 @@ void Downloader::downloadGET(const QUrl &url, const QString &userName,
     Q_UNUSED(pnr)
 }
 
+void Downloader::downloadPOST2(const QUrl &url, const QString &userName, const QString &tokenOrPassword, const QByteArray &data)
+{   //qDebug() << "Downloader::downloadPOST2";
+    QNetworkRequest request(url);
+
+    request.setRawHeader("User-Agent", "curl/7.58.0");
+    //request.setRawHeader("User-Agent", userName.toLocal8Bit());
+
+    if (tokenOrPassword.size() == 40)       // request via token
+    {
+        QString tokenStr("token " + tokenOrPassword);
+        request.setRawHeader("Authorization", tokenStr.toLocal8Bit());
+    }
+    else                                    // request via userName:password
+    {
+        QString credentials = userName + ":" + tokenOrPassword;
+        QByteArray data = credentials.toLocal8Bit().toBase64();
+        QString headerData = "Basic " + data;
+        request.setRawHeader("Authorization", headerData.toLocal8Bit());
+    }
+
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+
+    QByteArray jsonString = data;
+    QByteArray postDataSize = QByteArray::number(jsonString.size());
+    request.setHeader(QNetworkRequest::ContentLengthHeader, postDataSize);
+
+    QNetworkReply*  pnr = mNam->post(request, jsonString);
+    Q_UNUSED(pnr)
+}
+
 void Downloader::downloadPOST(const QUrl &url)
 {
     QNetworkRequest request(url);
