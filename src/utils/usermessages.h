@@ -43,6 +43,8 @@ enum class UserMessages
     CreatingDirectoryFailureMsg,
     ProjectCreatedTitle,
     ProjectCreatedMsg,
+    ProjectOpenedTitle,
+    ProjectOpenedMsg,
 };
 
 extern QMap<UserMessages, QString> userMessages;

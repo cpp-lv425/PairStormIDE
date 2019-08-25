@@ -38,13 +38,16 @@ QSplitter* DocumentManager::getSplitter()
 
 void DocumentManager::openProject(const QString &path)
 {
-    qDebug() << "open project";
     currentProject = path;
+}
+
+const QString &DocumentManager::getCurrentProjectPath() const
+{
+    return  currentProject;
 }
 
 void DocumentManager::closeCurrentProject()
 {
-    qDebug() << "close project";
     currentProject.clear();
 }
 

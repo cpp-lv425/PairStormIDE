@@ -174,7 +174,7 @@ void MainWindow::setupMainMenu()
     viewMenu->addAction("Split &Vectically", this, &MainWindow::onSplitVerticallyTriggered,
                         Qt::CTRL + Qt::SHIFT + Qt::Key_E);
     viewMenu->addAction("Co&mbine Document Areas", this, &MainWindow::onCombineAreas, Qt::ALT + Qt::SHIFT + Qt::Key_W);
-    viewMenu->addAction("Close &Empty Document Area", this, &MainWindow::onCloseEmptyDocArea);    
+    viewMenu->addAction("Close &Empty Document Area", this, &MainWindow::onCloseEmptyDocArea);
 
     viewMenu->addSeparator();
     viewMenu->addAction("Show &Project Viewer", this, &MainWindow::onShowProjectViewerTriggered);
@@ -384,6 +384,10 @@ void MainWindow::onOpenProjectTriggered()
 void MainWindow::onCloseProjectTriggered()
 {
     qDebug() << "close project";
+    // close all opened docs
+
+    mpDocumentManager->closeCurrentProject();
+
     // disconnect from db
     mpDocumentManager->closeCurrentProject();
 }
@@ -782,8 +786,25 @@ void MainWindow::setDocumentFontSize(const QString &fontSize)
 
 void MainWindow::onNewProjectTriggered()
 {
-    qDebug() << "new project slot";
     // check if other project is opened
+    if (mpDocumentManager->getCurrentProjectPath().size())
+    {
+        QMessageBox::information(this, userMessages[UserMessages::ProjectOpenedTitle], userMessages[UserMessages::ProjectOpenedMsg]);
+        return;
+    }
+
     NewProjectDialog newProjectDialog;
-    newProjectDialog.exec();
+    QString dirName;
+    try
+    {
+        // new project dialog is called
+        // name of newly created project directory is received
+        dirName = newProjectDialog.start();
+    }
+    catch (const QException&)
+    {
+        return;
+    }
+    mpProjectViewerDock->setDir(dirName);
+    mpDocumentManager->openProject(dirName);
 }

@@ -143,7 +143,7 @@ void NewProjectDialog::onCreateProject()
         return;
     }
 
-    QString dirPath = dirName + mpLine->text();
+    QString dirPath = dirName + '/' + mpLine->text();
     qDebug() << "dirPath" << dirPath;
 
     // preventing overwriting existing files
