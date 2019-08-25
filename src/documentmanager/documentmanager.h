@@ -34,6 +34,7 @@ public:
     void saveDocumentAs(CodeEditor *currentDocument, const QString &fileName);
     CodeEditor* getCurrentDocument();
     void closeCurrentDocument();
+    void closeAllDocumentsWithoutSaving();
     QVector<CodeEditor*> getChangedDocuments();
     void combineDocAreas();
     void closeEmptyDocArea();    

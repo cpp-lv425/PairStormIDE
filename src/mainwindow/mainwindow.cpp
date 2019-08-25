@@ -383,13 +383,66 @@ void MainWindow::onOpenProjectTriggered()
 
 void MainWindow::onCloseProjectTriggered()
 {
-    qDebug() << "close project";
-    // close all opened docs
+    // if no project is opened yet
+    if (!mpDocumentManager->getCurrentProjectPath().size())
+    {
+        return;
+    }
 
-    mpDocumentManager->closeCurrentProject();
+    // check if opened documents were modified
+    auto changedDocuments = mpDocumentManager->getChangedDocuments();
 
-    // disconnect from db
+    if (changedDocuments.size())
+    {
+        QStringList changedDocsNames;
+
+        for (const auto& doc: changedDocuments)
+        {
+            changedDocsNames << doc->getFileName();
+        }
+
+        SaveFilesDialog saveFilesDialog(changedDocsNames, this);
+
+        switch (saveFilesDialog.start())
+        {
+        case QDialogButtonBox::StandardButton::YesToAll:
+        {
+            try
+            {
+                // saving changes to opened documents
+                mpDocumentManager->saveAllDocuments();
+            } catch (const FileOpeningFailure&)
+            {
+                // if any of files could not be opened to save changes to
+                // document then user is warned & action is
+                QMessageBox::warning(this, userMessages[UserMessages::ErrorTitle],
+                        userMessages[UserMessages::FileOpeningForSavingErrorMsg]);
+                return;
+            }
+            break;
+        }
+        case QDialogButtonBox::StandardButton::NoToAll:
+        {
+            break;
+        }
+        case QDialogButtonBox::StandardButton::Cancel:
+        {
+            return;
+        }
+        default:
+        {
+            return;
+        }
+        }
+    }
+    // all documents are closed
+    mpDocumentManager->closeAllDocumentsWithoutSaving();
+    // project is closed
     mpDocumentManager->closeCurrentProject();
+    mpProjectViewerDock->setDir(QDir::currentPath());
+    // disconnect from db    
+    QMessageBox::information(this, userMessages[UserMessages::ProjectClosedTitle], userMessages[UserMessages::ProjectClosedMsg]);
+
 }
 
 void MainWindow::onOpenStartPage()
@@ -805,6 +858,9 @@ void MainWindow::onNewProjectTriggered()
     {
         return;
     }
+
+    // connect db
+
     mpProjectViewerDock->setDir(dirName);
     mpDocumentManager->openProject(dirName);
 }

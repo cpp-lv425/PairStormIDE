@@ -10,7 +10,6 @@
 #include <QLineEdit>
 #include <QScreen>
 #include <QLabel>
-#include <QDebug>
 #include <QDir>
 
 #include "usermessages.h"
@@ -119,7 +118,6 @@ void NewProjectDialog::onSelectDirectory()
 void NewProjectDialog::onCreateProject()
 {    
     QString dirName = mpDirLbl->text();
-    qDebug() << "dirName" << dirName;
 
     // check if directory is not empty
     if (dirName.isEmpty())
@@ -144,13 +142,9 @@ void NewProjectDialog::onCreateProject()
     }
 
     QString dirPath = dirName + '/' + mpLine->text();
-    qDebug() << "dirPath" << dirPath;
 
     // preventing overwriting existing files
     QDir dir(dirPath);
-
-    qDebug() << "dirPath exists" << dir.exists();
-
     if (dir.exists())
     {
         QMessageBox::warning(this, userMessages[UserMessages::DirectoryAlreadyExistsTitle],

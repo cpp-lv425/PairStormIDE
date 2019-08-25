@@ -457,6 +457,27 @@ void DocumentManager::closeCurrentDocument()
     }
 }
 
+void DocumentManager::closeAllDocumentsWithoutSaving()
+{
+    // in order to close documents without saving changes
+    // state of documents is set to "not modified"
+    // & closeEvent is called
+    for (const auto &area: mDocAreas)
+    {
+        auto windowsList = area->subWindowList();
+
+        for (const auto &wdw: windowsList)
+        {
+            auto doc = qobject_cast<CodeEditor*>(wdw->widget());
+            if (doc)
+            {
+                doc->setBeginTextState();
+            }
+            wdw->close();
+        }
+    }
+}
+
 QVector<CodeEditor*> DocumentManager::getChangedDocuments()
 {
     QVector<CodeEditor*> changedDocuments;

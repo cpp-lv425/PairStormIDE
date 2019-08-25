@@ -41,4 +41,6 @@ QMap<UserMessages, QString> userMessages =
     std::pair<UserMessages, const QString>(UserMessages::ProjectCreatedMsg, "Project has been successfully created."),
     std::pair<UserMessages, const QString>(UserMessages::ProjectOpenedTitle, "Another project opened."),
     std::pair<UserMessages, const QString>(UserMessages::ProjectOpenedMsg, "Please close current project before opening another."),
+    std::pair<UserMessages, const QString>(UserMessages::ProjectClosedTitle, "Project closed."),
+    std::pair<UserMessages, const QString>(UserMessages::ProjectClosedMsg, "Current project have been closed."),
 };
