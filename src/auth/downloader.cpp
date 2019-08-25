@@ -4,27 +4,9 @@
 
 Downloader::Downloader(QObject* pobj) : QObject(pobj)
 {   //qDebug() << "Downloader";
-    mNam = new QNetworkAccessManager(this);
-    connect(mNam, &QNetworkAccessManager::finished, this,   &Downloader::onFinished);
+    mNetworkAccessManager = new QNetworkAccessManager(this);
+    connect(mNetworkAccessManager, &QNetworkAccessManager::finished, this,   &Downloader::onFinished);
     //qDebug() << "/Downloader";
-}
-
-void Downloader::download(const QUrl& url)
-{   //qDebug() << "download" << url;
-    QNetworkRequest request(url);
-    request.setRawHeader("User-Agent", "curl/7.58.0");
-    //request.setRawHeader("User-Agent", "MarsLviv");
-    request.setRawHeader("Authorization", "token 332b5f9145df8ae30d511ae4c6a92f48491b068b");
-
-    QString username = "MarsLviv";
-    QString password = "220iopMS";
-    QString credentials = username + ":" + password;
-    QByteArray data = credentials.toLocal8Bit().toBase64();
-    QString headerData = "Basic " + data;
-    //request.setRawHeader("Authorization", headerData.toLocal8Bit());
-
-    QNetworkReply*  pnr = mNam->get(request);
-    Q_UNUSED(pnr)
 }
 
 void Downloader::downloadGET(const QUrl &url, const QString &userName,
@@ -52,12 +34,12 @@ void Downloader::downloadGET(const QUrl &url, const QString &userName,
         request.setRawHeader("Authorization", headerData.toLocal8Bit());
     }
 
-    QNetworkReply*  pnr = mNam->get(request);
+    QNetworkReply*  pnr = mNetworkAccessManager->get(request);
     Q_UNUSED(pnr)
 }
 
-void Downloader::downloadPOST2(const QUrl &url, const QString &userName, const QString &tokenOrPassword, const QByteArray &data)
-{   //qDebug() << "Downloader::downloadPOST2";
+void Downloader::downloadPOST(const QUrl &url, const QString &userName, const QString &tokenOrPassword, const QByteArray &data)
+{   //qDebug() << "Downloader::downloadPOST";
     QNetworkRequest request(url);
 
     request.setRawHeader("User-Agent", "curl/7.58.0");
@@ -82,37 +64,8 @@ void Downloader::downloadPOST2(const QUrl &url, const QString &userName, const Q
     QByteArray postDataSize = QByteArray::number(jsonString.size());
     request.setHeader(QNetworkRequest::ContentLengthHeader, postDataSize);
 
-    QNetworkReply*  pnr = mNam->post(request, jsonString);
+    QNetworkReply*  pnr = mNetworkAccessManager->post(request, jsonString);
     Q_UNUSED(pnr)
-}
-
-void Downloader::downloadPOST(const QUrl &url)
-{
-    QNetworkRequest request(url);
-    request.setRawHeader("User-Agent", "curl/7.58.0");
-    //request.setRawHeader(QNetworkRequest::UserAgentHeader, "MarsLviv");
-    //request.setRawHeader("Authorization", "token 332b5f9145df8ae30d511ae4c6a92f48491b068b");
-    // token (above) or credentials (belowe)
-    QString username = "MarsLviv";
-    QString password = "220iopMS";
-    QString credentials = username + ":" + password;
-    QByteArray data = credentials.toLocal8Bit().toBase64();
-    QString headerData = "Basic " + data;
-    request.setRawHeader("Authorization", headerData.toLocal8Bit());
-
-    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-    //request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json; charset=utf-8");
-    //request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
-
-    QByteArray jsonString = "{\"scopes\":[\"repo\",\"user\"],\"note\":\"getting-startedQ\"}";
-    //QByteArray jsonString = "{\"name\":\"blogQ\",\"auto_init\":true,\"private\":true,\"gitignore_template\":\"nanoc\"}";
-    QByteArray postDataSize = QByteArray::number(jsonString.size());
-    request.setHeader(QNetworkRequest::ContentLengthHeader, postDataSize);
-    //qDebug() << "postDataSize():" << postDataSize;
-
-    QNetworkReply*  pnr = mNam->post(request, jsonString);
-    Q_UNUSED(pnr)
-    //QNetworkReply*  pnr = m_pnam->get(request);
 }
 
 void Downloader::onFinished(QNetworkReply* pnr)

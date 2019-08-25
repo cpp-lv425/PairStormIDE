@@ -1,5 +1,4 @@
 #include "choicewindow.h"
-//#include "startmanager.h"       // to use enum class userMode
 #include "downloaderWrapper.h"
 
 #include <QLabel>
@@ -21,12 +20,12 @@ ChoiceWindow::ChoiceWindow(QStringList &usersFilesList, QWidget *pParent)
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addStretch(mBasicStretch);
 
-    mpLabelAccounts = new QLabel("Avalable accounts", this);
+    QLabel *mpLabelAccounts = new QLabel("Avalable accounts", this);
     mainLayout->addWidget(mpLabelAccounts);
 
     mpUsersWidgetList = new QListWidget(this);
     QStringList usersList;
-    for (int i = 0; i < usersFilesList.size(); ++i)
+    for (int i = 0; i < usersFilesList.size(); ++i)// making users list based on configuration files
     {
         QString str(usersFilesList.at(i));
         str.chop(5);
@@ -41,13 +40,13 @@ ChoiceWindow::ChoiceWindow(QStringList &usersFilesList, QWidget *pParent)
     mainLayout->addWidget(mpUsersWidgetList);
     connect(mpUsersWidgetList, &QListWidget::itemDoubleClicked, this, &ChoiceWindow::onListDoubleClicked);
 
-    mpNewUser = new QPushButton("New user", this);
-    mainLayout->addWidget(mpNewUser);
-    connect(mpNewUser, &QPushButton::clicked, this, &ChoiceWindow::onNewUserClicked);
+    mpNewUserButton = new QPushButton("New user", this);
+    mainLayout->addWidget(mpNewUserButton);
+    connect(mpNewUserButton, &QPushButton::clicked, this, &ChoiceWindow::onNewUserClicked);
 
-    mpUnnamedUser = new QPushButton("Try without authorizattion", this);
-    mainLayout->addWidget(mpUnnamedUser);
-    connect(mpUnnamedUser, &QPushButton::clicked, this, &ChoiceWindow::onUnnamedUserClicked);
+    mpUnnamedUserButton = new QPushButton("Try without authorizattion", this);
+    mainLayout->addWidget(mpUnnamedUserButton);
+    connect(mpUnnamedUserButton, &QPushButton::clicked, this, &ChoiceWindow::onUnnamedUserClicked);
 
     mpButtonBox = new QDialogButtonBox(QDialogButtonBox::Cancel, this);
     mainLayout->addWidget(mpButtonBox);
@@ -69,8 +68,6 @@ void ChoiceWindow::onNewUserClicked()
 {
     emit choice("");
     close();
-    //DownloaderGui downloader(this);
-    //downloader.onButtonGET();
 }
 
 void ChoiceWindow::onUnnamedUserClicked()

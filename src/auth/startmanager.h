@@ -43,10 +43,11 @@ private:
     QString mPassword;
     QString mTokenHash;
     QString mTokenPrefix    = "PS";
-    QByteArray data;//QByteArray jsonString = "{\"scopes\":[\"repo\",\"user\"],\"note\":\"getting-startedQ\"}";
+    QByteArray data;
 
     bool mIsTokenValid;
-    //bool mIsTokenGenerated;
+    bool mIsTokenGenerated;
+
     QStringList mListRegisteredUsers;
 
     QString mUrlToCheckUser = "https://api.github.com/user";
@@ -61,13 +62,14 @@ private:
 
     void formatTokenName(QString &name);     // formatting token name as name + currentSecsSinceEpoch
 
-    int mTimeOutWelcomeWindow = 3000; // ms
+    int mTimeOutWelcomeWindow = 3000;        // ms
+
 signals:
-    void cancel();
+    void cancel();                           // cancel mainwindow
     void cancelNewUserWindow();
 
 public slots:
-    void onChoice(QString userName);
+    void onChoice(QString userName);        // set [mUserMode], [mUserName], [mToken] acording to user choise
     void onUnnamedUserChoice();
     void onNewUserToken(const QString &login, const QString &token);
     void onNewUserPassword(const QString &login, const QString &pasword);

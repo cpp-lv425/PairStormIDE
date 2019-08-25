@@ -38,21 +38,12 @@ NewUserWindow::NewUserWindow(QWidget *parent) : QDialog(parent)
     mpEditToken = new QLineEdit(this);
     mpEditToken->setMinimumWidth(mEditWidth);
     mpEditToken->setMaximumWidth(mEditWidth);
-    //mpEditToken->setStyleSheet({"QLineEdit {color: grey; font: italic;}"});
-    mpEditToken->setEchoMode(QLineEdit::Password);//t::PasswordEchoOnEdit ::Normal ::Password
-    QString placeholderText("Sequence with 40 characters treats as token");
-    mpEditToken->setPlaceholderText(placeholderText);
-    mpEditToken->setToolTip(placeholderText);
+    mpEditToken->setEchoMode(QLineEdit::Password);
+    mpEditToken->setPlaceholderText(mPlaceholderText);
+    mpEditToken->setToolTip(mPlaceholderText);
     tokenLayout->addWidget(mpLabelToken);
     tokenLayout->addWidget(mpEditToken);
     mainLayout->addLayout(tokenLayout);
-
-    // separator
-    /*QFrame *line1 = new QFrame(this);
-    line1->setFrameShape(QFrame::HLine);
-    line1->setFrameShadow(QFrame::Sunken);
-    line1->setLineWidth(mSeparatorWidth);
-    mainLayout->addWidget(line1);*/
 
     // DialogButtonBox  parameters
     mpButtonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this);
@@ -61,20 +52,20 @@ NewUserWindow::NewUserWindow(QWidget *parent) : QDialog(parent)
     mainLayout->addWidget(mpButtonBox);
 
     // separator
-    QFrame *line2 = new QFrame(this);
-    line2->setFrameShape(QFrame::HLine);
-    line2->setFrameShadow(QFrame::Sunken);//QFrame::Plain, QFrame::Raised QFrame::Sunken
-    line2->setLineWidth(mSeparatorWidth);
-    mainLayout->addWidget(line2);
+    QFrame *line = new QFrame(this);
+    line->setFrameShape(QFrame::HLine);
+    line->setFrameShadow(QFrame::Sunken);
+    line->setLineWidth(mSeparatorWidth);
+    mainLayout->addWidget(line);
 
     // unnamed user button
     QHBoxLayout *unnamedButtonLayout = new QHBoxLayout;
-    mpUnnamedUser = new QPushButton("Try without authorizattion", this);
-    mpUnnamedUser->setMinimumWidth(mUnnamedUserButtonWidth);
-    mpUnnamedUser->setMaximumWidth(mUnnamedUserButtonWidth);
-    unnamedButtonLayout->addWidget(mpUnnamedUser);
+    mpUnnamedUserButton = new QPushButton("Try without authorizattion", this);
+    mpUnnamedUserButton->setMinimumWidth(mUnnamedUserButtonWidth);
+    mpUnnamedUserButton->setMaximumWidth(mUnnamedUserButtonWidth);
+    unnamedButtonLayout->addWidget(mpUnnamedUserButton);
     mainLayout->addLayout(unnamedButtonLayout);
-    connect(mpUnnamedUser, &QPushButton::clicked, this, [=](){emit unnamedUser();});
+    connect(mpUnnamedUserButton, &QPushButton::clicked, this, [=](){emit unnamedUser();});
     setLayout(mainLayout);
     show();
     move((QApplication::desktop()->width() - this->width()) / 2 ,
@@ -108,6 +99,5 @@ void NewUserWindow::onBtnBoxClicked(QAbstractButton *button)
             emit newUserPasssword(mpEditLogin->text(), mpEditToken->text());
             return;
         }
-        //close();
     }
 }

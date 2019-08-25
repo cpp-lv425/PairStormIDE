@@ -5,13 +5,11 @@
 
 QT_BEGIN_NAMESPACE
 class QDialogButtonBox;
-class QLabel;
-class QLineEdit;
-//class QListWidget;
 class QAbstractButton;
-//class QListWidgetItem;
+class QLineEdit;
+class QString;
+class QLabel;
 QT_END_NAMESPACE
-
 
 class NewUserWindow : public QDialog
 {
@@ -19,20 +17,17 @@ class NewUserWindow : public QDialog
 public:
     explicit NewUserWindow(QWidget *parent = nullptr);
 private:
-    //QLabel *mpLabelTitle;
     QLabel *mpLabelLogin;
     QLabel *mpLabelToken;
     QLineEdit *mpEditLogin;
     QLineEdit *mpEditToken;
+    QString mPlaceholderText {"Sequence with 40 characters treats as token"};
 
-    QPushButton *mpUnnamedUser;
+    QPushButton *mpUnnamedUserButton;
 
     QDialogButtonBox *mpButtonBox;
 
     // design parameters
-    //int mColumnSpasing              = 10;
-    //int mStretchFactor              = 20;
-    //int mStretchFactorMain          = 100;
     int mLabelWidth                 = 130;
     int mEditWidth                  = 320;
     int mBasicStretch               = 1;
@@ -43,10 +38,10 @@ public slots:
     void onBtnBoxClicked(QAbstractButton * button);
 
 signals:
-    void cancel();
-    void unnamedUser();
-    void newUserToken(const QString &login, const QString &token);
-    void newUserPasssword(const QString &login, const QString &passwrd);
+    void cancel();                              // user closed window - termination application
+    void unnamedUser();                                             //  user chose nunamed mode
+    void newUserToken(const QString &login, const QString &token);  //  user typed login and token to registrate
+    void newUserPasssword(const QString &login, const QString &passwrd);//  user typed login and password to registrate
 };
 
 #endif // NEWUSERWINDOW_H

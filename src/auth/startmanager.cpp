@@ -1,20 +1,24 @@
-#include "startmanager.h"
-#include "userslistmaker.h"
-#include "choicewindow.h"
-#include "downloaderWrapper.h"
+/*
+ *
+ * in comments capital A B C D E F G H - lables in UML diagram
+*/
 #include "storeconf.h"
+#include "startmanager.h"
+#include "choicewindow.h"
 #include "newuserwindow.h"
+#include "userslistmaker.h"
+#include "downloaderWrapper.h"
 
 #include <QDir>
 #include <QUrl>
 #include <QTime>
 #include <QDebug>
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QMessageBox>
-#include <QEventLoop>
 #include <QTimer>
 #include <QSettings>
+#include <QEventLoop>
+#include <QJsonObject>
+#include <QMessageBox>
+#include <QJsonDocument>
 
 //StartManager::StartManager(QObject *parent) : QObject(parent)
 StartManager::StartManager(QWidget *parent) : QWidget(parent)
@@ -36,16 +40,23 @@ void StartManager::start()
 {
     //  A
     makeListRegisteredUsers();
-    //  B
-    ChoiceWindow choiceWindow(mListRegisteredUsers, this);
-    connect(&choiceWindow, &ChoiceWindow::cancel, this, [=](){emit cancel();});  // user pressed Cancel button in bottom-right side
-    connect(&choiceWindow, &ChoiceWindow::rejected, this, [=](){emit cancel();});// user pressed Cross button in top-right side
+    if (!mListRegisteredUsers.size()) // switching to newUser window
+    {
+        mUserMode = userMode::NewUser;
+        mUserName = "";
+        mToken = "";
+    }
+    else //  B
+    {
+        ChoiceWindow choiceWindow(mListRegisteredUsers, this);
+        connect(&choiceWindow, &ChoiceWindow::cancel, this, [&](){emit cancel(); mUserMode = userMode::Size;});  // user pressed Cancel button in bottom-right side - termination mainwindow
+        connect(&choiceWindow, &ChoiceWindow::rejected, this, [&](){emit cancel(); mUserMode = userMode::Size;});// user pressed Cross button in top-right side - termination mainwindow
 
-    connect(&choiceWindow, &ChoiceWindow::choice, this, &StartManager::onChoice);
-    connect(&choiceWindow, &ChoiceWindow::choice, &choiceWindow, &ChoiceWindow::accept);// need to terminate choiceWindow after user clicked some button
+        connect(&choiceWindow, &ChoiceWindow::choice, this, &StartManager::onChoice);   // user choose one of three mode: registerdUser, newUser, unnamedUser
+        connect(&choiceWindow, &ChoiceWindow::choice, &choiceWindow, &ChoiceWindow::accept);// need to terminate choiceWindow after user clicked some button
 
-    choiceWindow.exec();
-    qDebug() << "user" << mUserName << "token" << mToken << "mode" << static_cast<int>(mUserMode);
+        choiceWindow.exec();
+    }
 
     //  C
     switch (mUserMode) {
@@ -72,12 +83,12 @@ void StartManager::start()
     {
         //  D
         validateToken();
-        if (!mIsTokenValid)
+        if (mIsTokenValid)
         {
             QEventLoop loop;
             QMessageBox *mbox = new QMessageBox;
             mbox->setWindowTitle(tr("Welcome to Pair Storm!"));
-            QString msg {mUserName + ", your credentials are not volid!"};
+            QString msg {mUserName + ", your credentials are valid!"};
             mbox->setText(msg);
             mbox->setStandardButtons(nullptr);
             mbox->show();
@@ -87,15 +98,13 @@ void StartManager::start()
                 });
             loop.exec();
 
-            emit cancel();
-
             break;
         }
 
         QEventLoop loop;
         QMessageBox *mbox = new QMessageBox;
         mbox->setWindowTitle(tr("Welcome to Pair Storm!"));
-        QString msg {mUserName + ", your credentials are valid!"};
+        QString msg {mUserName + ", your credentials are not volid!"};
         mbox->setText(msg);
         mbox->setStandardButtons(nullptr);
         mbox->show();
@@ -105,7 +114,7 @@ void StartManager::start()
             });
         loop.exec();
 
-        break;
+        //break; //don't need because when token not valid switching to newUser mode
     }
     case userMode::NewUser:
     {   //  E
@@ -114,9 +123,10 @@ void StartManager::start()
         connect(&newUserWindow, &NewUserWindow::cancel, this, [=](){emit cancel();});  // user pressed Cancel button in bottom right side
         connect(&newUserWindow, &NewUserWindow::rejected, this, [=](){emit cancel();});// user pressed Cross button in top right side
 
-        connect(&newUserWindow, &NewUserWindow::unnamedUser, this, &StartManager::onUnnamedUserChoice);
-        connect(&newUserWindow, &NewUserWindow::unnamedUser, &newUserWindow, &NewUserWindow::accept);// need to terminate choiceWindow after user clicked button [Try without authentication]
-        connect(&newUserWindow, &NewUserWindow::unnamedUser, this, [&](){
+        // user clicked button [Try without authentication] - need to do three things:
+        connect(&newUserWindow, &NewUserWindow::unnamedUser, this, &StartManager::onUnnamedUserChoice); // assign [mUserMode], [mUserName], [mToken]
+        connect(&newUserWindow, &NewUserWindow::unnamedUser, &newUserWindow, &NewUserWindow::accept);   // terminate newUserWindow
+        connect(&newUserWindow, &NewUserWindow::unnamedUser, this, [&](){                               // show notification window
             QEventLoop loop;
             QMessageBox *mbox = new QMessageBox;
             mbox->setWindowTitle(tr("Welcome to Pair Storm!"));
@@ -129,9 +139,7 @@ void StartManager::start()
                     mbox->accept();
                 });
             loop.exec();
-                    });// and show welcpme window
-        //connect(&newUserWindow, &NewUserWindow::choice, this, &StartManager::onChoice);
-        //connect(&newUserWindow, &NewUserWindow::choice, &choiceWindow, &ChoiceWindow::accept);// need to terminate choiceWindow after user clicked some button
+                    });
 
         connect(&newUserWindow, &NewUserWindow::newUserToken, this, &StartManager::onNewUserToken);// during registration user typed login and token
         connect(&newUserWindow, &NewUserWindow::newUserPasssword, this, &StartManager::onNewUserPassword);// during registration user typed login and password
@@ -147,10 +155,11 @@ void StartManager::start()
     }
     }
 
+    //  H
     StoreConf conf(mUserName);
     conf.restoreConFile();
-    if (mUserMode == userMode::NewUser)
-    {   //qDebug() << "set token to new user";
+    if (mUserMode == userMode::NewUser)     //  set token to new user
+    {
         conf.setField("token", mToken);
         QSettings s;
         s.setValue("token", mToken);
@@ -194,12 +203,10 @@ void StartManager::validateToken()
             {
                 mIsTokenValid = true;
             }
-            qDebug() << "login" << login;
         }
         if(mpDownloader->mRespondMap.contains("name"))
         {
             QString name = mpDownloader->mRespondMap["name"];
-            qDebug() << "name" << name;
         }
         break;
     }
@@ -209,7 +216,6 @@ void StartManager::validateToken()
                               tr("Error"),
                               tr("An error while authorized is occured")
                              );
-        emit cancel();
         break;
     }
     case respondStatus::Corrupted:
@@ -218,7 +224,6 @@ void StartManager::validateToken()
                               tr("Error"),
                               tr("An error while authorized is occured. Data corrupted")
                              );
-        emit cancel();
         break;
     }
     default:
@@ -248,7 +253,7 @@ void StartManager::generateToken()
     qDebug() << "QString data" << data;
     qDebug() << "QByteArray jsonString" << jsonString;
 
-    mpDownloader->post2(mUserName, mUrlToGetToken, mPassword, jsonString);
+    mpDownloader->post(mUserName, mUrlToGetToken, mPassword, jsonString);
     loop.exec();
 
     // analize answer
@@ -259,7 +264,7 @@ void StartManager::generateToken()
         if(mpDownloader->mRespondMap.contains("token"))
         {
             mToken = mpDownloader->mRespondMap["token"];
-            mIsTokenValid = true;
+            mIsTokenGenerated = true;
             qDebug() << "mToken" << mToken;
         }
         if(mpDownloader->mRespondMap.contains("note"))
@@ -303,7 +308,7 @@ void StartManager::formatTokenName(QString &name)
 
 void StartManager::onChoice(QString userName)
 {
-    if (userName == "unnamed")  // using application without registration
+    if (userName == "unnamed")  // using application without authentication
     {
         mUserMode = userMode::UnnamedUser;
         mUserName = userName;
@@ -326,7 +331,7 @@ void StartManager::onChoice(QString userName)
     if(!readFile.open(QIODevice::ReadOnly)) //  file corrupted - need registration
     {
         mUserMode = userMode::NewUser;
-        // mUserName already set
+        mUserName = userName;
         mToken = "";
         return;
     }
@@ -335,7 +340,7 @@ void StartManager::onChoice(QString userName)
     if(jsonDoc.isNull() || !jsonDoc.isObject() || jsonDoc.isEmpty()) //  QJsonDocument corrupted - need registration
     {
         mUserMode = userMode::NewUser;
-        // mUserName already set
+        mUserName = userName;
         mToken = "";
         return;
     }
@@ -344,14 +349,14 @@ void StartManager::onChoice(QString userName)
     QJsonObject json = jsonDoc.object();
     if (json.contains("token") && json["token"].isString())
     {
-        mToken = json["token"].toString();
         mUserMode = userMode::RegisteredUser;
         mUserName = userName;
+        mToken = json["token"].toString();
     }
     else                    //  not fount field [token] in configuration file
     {                       //  procedure like for new user
         mUserMode = userMode::NewUser;
-        // mUserName already set
+        mUserName = userName;
         mToken = "";
     }
 }
@@ -386,6 +391,7 @@ void StartManager::onNewUserToken(const QString &login, const QString &token)
             });
         loop.exec();
     }
+    // in else case NewUserWindow asking type credentials again
 }
 
 void StartManager::onNewUserPassword(const QString &login, const QString &password)
@@ -394,7 +400,7 @@ void StartManager::onNewUserPassword(const QString &login, const QString &passwo
     mUserName = login;
     mPassword = password;
     generateToken();
-    if (mIsTokenValid)
+    if (mIsTokenGenerated)
     {
         emit cancelNewUserWindow();
 
@@ -411,5 +417,6 @@ void StartManager::onNewUserPassword(const QString &login, const QString &passwo
             });
         loop.exec();
     }
+    // in else case NewUserWindow asking type credentials again
 }
 
