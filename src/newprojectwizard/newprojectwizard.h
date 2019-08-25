@@ -22,7 +22,7 @@ private:
     QString mProjectName;
     QLineEdit *mpDirLbl;
 
-    bool isValidDirName(const QString& fileName);
+    bool isValidDirName(const QString& dirName);
 
 private slots:
     void onSelectDirectory();

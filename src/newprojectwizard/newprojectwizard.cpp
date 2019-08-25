@@ -10,6 +10,7 @@
 #include <QLineEdit>
 #include <QScreen>
 #include <QLabel>
+#include <QDebug>
 #include <QDir>
 
 #include "usermessages.h"
@@ -79,7 +80,7 @@ NewProjectDialog::NewProjectDialog(QWidget *pParent): QDialog (pParent)
 
     // resizing & centring dialog
     resize(screenGeometry.width() / 2,
-           static_cast<int>(screenGeometry.height() * 0.6));
+           static_cast<int>(screenGeometry.height() * 0.4));
     int x = screenGeometry.center().x() - width() / 2;
     int y = screenGeometry.center().y() - height() / 2;
     move(x, y);
@@ -101,9 +102,9 @@ QString NewProjectDialog::start()
     return mProjectName;
 }
 
-bool NewProjectDialog::isValidDirName(const QString &fileName)
+bool NewProjectDialog::isValidDirName(const QString &dirName)
 {
-    return !fileName.contains(QRegExp(R"exp([*/:;|=,\\\[\]])exp"));
+    return !dirName.contains(QRegExp(R"exp([*/:;|=,\\\[\]])exp"));
 }
 
 void NewProjectDialog::onSelectDirectory()
@@ -116,55 +117,61 @@ void NewProjectDialog::onSelectDirectory()
 }
 
 void NewProjectDialog::onCreateProject()
-{
-//    QString fileName = mpLine->text() + mpExtensionsList->currentItem()->text();
-//    QString dirName = mpDirLbl->text();
+{    
+    QString dirName = mpDirLbl->text();
+    qDebug() << "dirName" << dirName;
 
-//    // check if directory is not empty
-//    if (dirName.isEmpty())
-//    {
-//        QMessageBox::warning(this, userMessages[UserMessages::WrongDirectoryTitle],
-//                             userMessages[UserMessages::WrongDirectoryMsg]);
-//        return;
-//    }
+    // check if directory is not empty
+    if (dirName.isEmpty())
+    {
+        QMessageBox::warning(this, userMessages[UserMessages::WrongDirectoryTitle],
+                             userMessages[UserMessages::WrongDirectoryMsg]);
+        return;
+    }
 
-//    // if file name is empty string
-//    if (mpLine->text().isEmpty())
-//    {
-//        QMessageBox::warning(this, userMessages[UserMessages::WrongFileNameTitle],
-//                             userMessages[UserMessages::EmptyFileNameMsg]);
-//        return;
-//    }
-//    if (!isValidDirName(mpLine->text()))
-//    {
-//        QMessageBox::warning(this, userMessages[UserMessages::WrongFileNameTitle],
-//                             userMessages[UserMessages::InvalidFileNameMsg]);
-//        return;
-//    }
+    // if file name is empty string
+    if (mpLine->text().isEmpty())
+    {
+        QMessageBox::warning(this, userMessages[UserMessages::WrongDirectoryTitle],
+                             userMessages[UserMessages::EmptyFileNameMsg]);
+        return;
+    }
+    if (!isValidDirName(mpLine->text()))
+    {
+        QMessageBox::warning(this, userMessages[UserMessages::InvalidDirectoryNameTitle],
+                             userMessages[UserMessages::InvalidDirectoryNameMsg]);
+        return;
+    }
 
-//    // preventing overwriting existing files
-//    QDir dir(dirName);
-//    if (dir.exists(fileName))
-//    {
-//        QMessageBox::warning(this, userMessages[UserMessages::FileAlreadyExistsTitle],
-//                             userMessages[UserMessages::FileAlreadyExistsMsg]);
-//        return;
-//    }
+    QString dirPath = dirName + mpLine->text();
+    qDebug() << "dirPath" << dirPath;
 
-//    // creating new file
-//    try
-//    {
-//        FileManager().createFile(dirName + '/' + fileName);
-//    } catch (const FileOpeningFailure&)
-//    {
-//        QMessageBox::warning(this, userMessages[UserMessages::ErrorTitle],
-//                userMessages[UserMessages::CreatingFileFailureMsg]);
-//        return;
-//    }
-//    QMessageBox::information(this, userMessages[UserMessages::FileCreatedTitle],
-//            userMessages[UserMessages::FileCreatedMsg]);
+    // preventing overwriting existing files
+    QDir dir(dirPath);
 
-//    mProjectName = dirName + '/' + fileName;
+    qDebug() << "dirPath exists" << dir.exists();
 
-//    accept();
+    if (dir.exists())
+    {
+        QMessageBox::warning(this, userMessages[UserMessages::DirectoryAlreadyExistsTitle],
+                             userMessages[UserMessages::DirectoryAlreadyExistsMsg]);
+        return;
+    }
+
+    // creating new directory
+
+    QDir newDir(dirName);
+
+    if (!newDir.mkdir(mpLine->text()))
+    {
+        QMessageBox::warning(this, userMessages[UserMessages::ErrorTitle],
+                userMessages[UserMessages::CreatingDirectoryFailureMsg]);
+        return;
+    }
+    QMessageBox::information(this, userMessages[UserMessages::ProjectCreatedTitle],
+            userMessages[UserMessages::ProjectCreatedMsg]);
+
+    mProjectName = dirPath;
+
+    accept();
 }

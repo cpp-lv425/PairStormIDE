@@ -3,12 +3,12 @@
 QMap<UserMessages, QString> userMessages =
 {
     std::pair<UserMessages, const QString>(UserMessages::WrongDirectoryTitle, "Wrong directory"),
-    std::pair<UserMessages, const QString>(UserMessages::WrongDirectoryMsg, "Please specify correct file directory."),
+    std::pair<UserMessages, const QString>(UserMessages::WrongDirectoryMsg, "Please specify correct directory."),
     std::pair<UserMessages, const QString>(UserMessages::WrongFileNameTitle, "Incorrect name"),
     std::pair<UserMessages, const QString>(UserMessages::EmptyFileNameMsg, "Please enter file name."),
     std::pair<UserMessages, const QString>(UserMessages::InvalidFileNameMsg, "Invalid file name."),
     std::pair<UserMessages, const QString>(UserMessages::FileAlreadyExistsTitle, "File exists"),
-    std::pair<UserMessages, const QString>(UserMessages::FileAlreadyExistsMsg, "File with specified name already exists. Please select other file name."),
+    std::pair<UserMessages, const QString>(UserMessages::FileAlreadyExistsMsg, "File with specified name already exists. Please select another file name."),
     std::pair<UserMessages, const QString>(UserMessages::ErrorTitle, "Error"),
     std::pair<UserMessages, const QString>(UserMessages::CreatingFileFailureMsg, "Unable to create file"),
     std::pair<UserMessages, const QString>(UserMessages::FileCreatedTitle, "File Created"),
@@ -31,4 +31,12 @@ QMap<UserMessages, QString> userMessages =
     std::pair<UserMessages, const QString>(UserMessages::OpenFileTitle, "Open File"),
     std::pair<UserMessages, const QString>(UserMessages::SaveAllQuestion, "The following documents have been changed. \nWould you like to save changes?"),
     std::pair<UserMessages, const QString>(UserMessages::NewProjectWizardMsg, "Please specify project name and directory."),
+    std::pair<UserMessages, const QString>(UserMessages::EmptyDirectoryNameMsg, "Please select directory."),
+    std::pair<UserMessages, const QString>(UserMessages::InvalidDirectoryNameTitle, "Incorrect directory name."),
+    std::pair<UserMessages, const QString>(UserMessages::InvalidDirectoryNameMsg, "Invalid directory name."),
+    std::pair<UserMessages, const QString>(UserMessages::DirectoryAlreadyExistsTitle, "Directory exists."),
+    std::pair<UserMessages, const QString>(UserMessages::DirectoryAlreadyExistsMsg, "Directory with specified name already exists. Please select another directory name."),
+    std::pair<UserMessages, const QString>(UserMessages::CreatingDirectoryFailureMsg, "Unable to create directory."),
+    std::pair<UserMessages, const QString>(UserMessages::ProjectCreatedTitle, "Project created."),
+    std::pair<UserMessages, const QString>(UserMessages::ProjectCreatedMsg, "Project has been successfully created."),
 };

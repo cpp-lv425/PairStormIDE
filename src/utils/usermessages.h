@@ -35,6 +35,14 @@ enum class UserMessages
     OpenFileTitle,
     SaveAllQuestion,
     NewProjectWizardMsg,
+    EmptyDirectoryNameMsg,
+    InvalidDirectoryNameTitle,
+    InvalidDirectoryNameMsg,
+    DirectoryAlreadyExistsTitle,
+    DirectoryAlreadyExistsMsg,
+    CreatingDirectoryFailureMsg,
+    ProjectCreatedTitle,
+    ProjectCreatedMsg,
 };
 
 extern QMap<UserMessages, QString> userMessages;
