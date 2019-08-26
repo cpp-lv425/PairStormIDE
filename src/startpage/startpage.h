@@ -39,8 +39,7 @@ private:
                      QFont &lblFont);
     void setupButton(QPushButton *pButton,
                      QIcon icon,
-                     int iconDimension,
-                     int maxWidth, const QString& text);
+                     int iconDimension);
 };
 
 #endif // STARTPAGE_H

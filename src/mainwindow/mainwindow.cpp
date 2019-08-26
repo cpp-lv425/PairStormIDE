@@ -105,14 +105,17 @@ void MainWindow::setupMainMenu()
 
     // managing projects & files
     QMenu *newSubMenu = new QMenu("&New");
-    newSubMenu->addAction("New &project...", this, &MainWindow::onNewProjectTriggered);
+    QAction *pNewProjectAction = newSubMenu->addAction("New &project...", this, &MainWindow::onNewProjectTriggered);
+    pNewProjectAction->setIcon(QIcon(":/img/NEWPROJECT.png"));
+    pToolbar->addAction(pNewProjectAction);
 
     QAction *pNewFileAction = newSubMenu->addAction("&New file...", this, &MainWindow::onNewFileTriggered, Qt::CTRL + Qt::Key_N);
     pNewFileAction->setIcon(QIcon(":/img/NEWFILE.png"));
     pToolbar->addAction(pNewFileAction);
 
     QAction *pNewClassAction = newSubMenu->addAction("New &class...", this, &MainWindow::onNewClassTriggered);
-    pNewClassAction->setIcon(QIcon(":/img/NEWFILE.png"));
+    pNewClassAction->setIcon(QIcon(":/img/NEWCLASS.png"));
+    pToolbar->addAction(pNewClassAction);
 
     fileMenu->addMenu(newSubMenu);
 

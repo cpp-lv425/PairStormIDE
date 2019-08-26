@@ -12,39 +12,31 @@ StartPage::StartPage(QWidget *parent) :
     ui(new Ui::StartPage)
 {    
     ui->setupUi(this);
-    setWindowTitle("Start Page");
+    setWindowTitle("Start Page");    
+    const int iconDimension = 50;
 
-    const int maxButtonsWidth = 200;
-    const int iconDimension = 32;
-
-    QFont lblFont("Segoe UI", 10);
+    QFont lblFont("Segoe UI", 12);
     lblFont.setBold(true);
 
     // creating & configuring new file button
     mpNewProjectBtn = new QPushButton;
     setupButton(mpNewProjectBtn,
-                QIcon(""),
-                iconDimension,
-                maxButtonsWidth,
-                "New Project");
+                QIcon(":/img/NEWPROJECT.png"),
+                iconDimension);
     connect(mpNewProjectBtn, &QPushButton::pressed, this, &StartPage::newProjectBtnPressed);
 
     // creating & configuring open folder button
     mpOpenProjectBtn = new QPushButton;
     setupButton(mpOpenProjectBtn,
                 QIcon(":/img/OPENDIR.png"),
-                iconDimension,
-                maxButtonsWidth,
-                "Open Project");
+                iconDimension);
     connect(mpOpenProjectBtn, &QPushButton::pressed, this, &StartPage::openProjectBtnPressed);
 
     // creating & configuring settings call button
     mpSettingsBtn = new QPushButton;
     setupButton(mpSettingsBtn,
                 QIcon(":/img/SETTINGS.png"),
-                iconDimension,
-                maxButtonsWidth,
-                "Settings");
+                iconDimension);
     connect(mpSettingsBtn, &QPushButton::pressed, this, &StartPage::settingsBtnPressed);
 
     // bindong buttons
@@ -70,7 +62,7 @@ StartPage::StartPage(QWidget *parent) :
 
     // window lay out
     QHBoxLayout *pWdwLayout = new QHBoxLayout;
-    pWdwLayout->addLayout(pBtnLayout);
+    pWdwLayout->addLayout(pBtnLayout);    
     pWdwLayout->addLayout(pLblLayout);
 
     setLayout(pWdwLayout);
@@ -93,20 +85,12 @@ void StartPage::showStartPage()
 }
 
 void StartPage::setupButton(QPushButton *pButton,
-                            QIcon icon, int iconDimension,
-                            int maxWidth, const QString &text)
+                            QIcon icon, int iconDimension)
 {
     pButton->setIcon(icon);
-    pButton->setIconSize(QSize(iconDimension,iconDimension));
-    pButton->setMaximumWidth(maxWidth);
-    pButton->setSizePolicy(QSizePolicy::Expanding,
-                           QSizePolicy::Expanding);
-    pButton->setStyleSheet("text-align:left;");
-    pButton->setLayout(new QGridLayout);
-    QLabel *textLabel = new QLabel(text);
-    textLabel->setAlignment(Qt::AlignCenter);
-    textLabel->setAttribute(Qt::WA_TransparentForMouseEvents, true);
-    pButton->layout()->addWidget(textLabel);
+    pButton->setIconSize(QSize(iconDimension, iconDimension));
+    pButton->setSizePolicy(QSizePolicy::Minimum,
+                           QSizePolicy::Minimum);
 }
 
 StartPage::~StartPage()
@@ -136,5 +120,7 @@ void StartPage::setupLabels(QLabel *pLabel,
                             QFont &lblFont)
 {
     pLabel->setAlignment(Qt::AlignCenter);
+    pLabel->setSizePolicy(QSizePolicy::Expanding,
+                               QSizePolicy::Expanding);
     pLabel->setFont(lblFont);    
 }
