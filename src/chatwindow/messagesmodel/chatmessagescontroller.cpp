@@ -1,78 +1,65 @@
 #include "chatmessagescontroller.h"
-#include <QDebug>
-
+// ==========================================================================================
+// ==========================================================================================
+//                                                        CONSTRUCTOR: INTIALIZES AUTHOR NAME
 ChatMessagesController::ChatMessagesController(const QString & authorName,
                                                QObject *parent) :
-    QObject(parent),
-    mAuthorName(authorName)
+    QObject(parent), mcAuthorName(authorName)
 {
 }
-
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
+//                                                                       MESSAGES LIST GETTER
 QVector<ChatMessage> ChatMessagesController::messages() const
 {
     return mChatMessages;
 }
-
-void ChatMessagesController::sendGreetingsMessage()
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
+//                                                                  SYSTEM' MESSAGE GENERATOR
+void ChatMessagesController::sendSystemMessage(SystemMessage messageType)
 {
-    // Send greetings message from the Pair Storm appliction to the user
-    ChatMessage greetingsMessage;
+    // Send certain message from Pair Storm appliction to the user
+    ChatMessage systemMessage;
+    systemMessage.mAuthorName = gcSystemName;
+    systemMessage.mContent = gcSystemMessages[messageType];
+    systemMessage.mPublicationDateTime = QDateTime::currentDateTimeUtc();
+    systemMessage.mType = ChatMessage::Type::SystemMessage;
 
-    greetingsMessage.mAuthorName = "PairStorm";
-    greetingsMessage.mContent = "Welcome Pair Storm Application\nTo get help, type \"help\"";
-    greetingsMessage.mPublicationDateTime = QDateTime::currentDateTimeUtc();
-    greetingsMessage.mType = ChatMessage::Type::SystemMessage;
-
-    appendMessage(greetingsMessage);
+    appendMessage(systemMessage);
 }
-
-void ChatMessagesController::sendCanNotLogInTwiceMessage()
-{
-    // Send greetings message from the Pair Storm appliction to the user
-    ChatMessage canNotLogInTwiceMessage;
-
-    canNotLogInTwiceMessage.mAuthorName = "PairStorm";
-    canNotLogInTwiceMessage.mContent = "Sorry, " + mAuthorName + ", but you can not log in since\nyou are already logged in";
-    canNotLogInTwiceMessage.mPublicationDateTime = QDateTime::currentDateTimeUtc();
-    canNotLogInTwiceMessage.mType = ChatMessage::Type::SystemMessage;
-
-    appendMessage(canNotLogInTwiceMessage);
-}
-
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
+//                                              APPEND INGOING MESSAGES TO THE HISTORY & CHAT
 void ChatMessagesController::appendMessage(const ChatMessage & newMessage)
 {
     if (newMessage.mType == ChatMessage::Type::UserMessage)
     {
         // Only users messages have to be added to the history
+        // TODO: add messages to the history in DB
     }
-    // TODO some stuff
-    // if everything is fine, next part of code executes
 
     // Display message in the chat
     emit preMessageAppended();
-
     mChatMessages.append(newMessage);
-    /*
-    std::sort(mChatMessages.begin(),
-              mChatMessages.end(),
-              [](const ChatMessage & chatMessage1, const ChatMessage & chatMessge2)
-              {
-                  return chatMessage1.mPublicationDateTime < chatMessge2.mPublicationDateTime;
-              });
-    */
     emit postMessageAppended();
 }
-
-void ChatMessagesController::appendMessage(const QString & newMessageContent)
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
+//                                          BUILD MESSAGE UPON USER' INPUT, APPEND IT & SHARE
+void ChatMessagesController::appendMessage(const QString & newUserMessageContent)
 {
-    ChatMessage newMessage;
+    ChatMessage newUserMessage;
+    newUserMessage.mPublicationDateTime = QDateTime::currentDateTimeUtc();
+    newUserMessage.mAuthorName          = this->mcAuthorName;
+    newUserMessage.mContent             = newUserMessageContent;
+    newUserMessage.mType                = ChatMessage::Type::UserMessage;
 
-    newMessage.mPublicationDateTime = QDateTime::currentDateTimeUtc();
-    newMessage.mAuthorName          = this->mAuthorName;
-    newMessage.mContent             = newMessageContent;
-    newMessage.mType                = ChatMessage::Type::UserMessage;
-
-    // Add created message in the backend and share it with others
-    appendMessage(newMessage);
-    emit sendingMessage(newMessage);
+    // Append message, created by the user, and share it with others
+    appendMessage(newUserMessage);
+    emit sendingMessage(newUserMessage);
 }

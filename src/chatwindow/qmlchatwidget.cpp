@@ -63,14 +63,14 @@ void QmlChatWidget::configureOnLogin(const QString &userName)
 {
     if (mUserName != QString())
     {
-        mpMessagesController->sendCanNotLogInTwiceMessage();
+        mpMessagesController->sendSystemMessage(SystemMessage::CanNotLogInTwiceMessage);
         return;
     }
 
     mUserName = userName;
 
     mpMessagesController = new ChatMessagesController(userName);
-    mpMessagesController->sendGreetingsMessage();
+    mpMessagesController->sendSystemMessage(SystemMessage::GreetingsMessage);
 
     connect(mpMessagesController, &ChatMessagesController::sendingMessage,
             this,                 &QmlChatWidget::shareMessageOnSendingMessage,

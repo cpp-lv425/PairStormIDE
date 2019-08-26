@@ -1,16 +1,23 @@
 #include "chatuserscontroller.h"
-#include <QDebug>
-
+// ==========================================================================================
+// ==========================================================================================
+//                                                                                CONSTRUCTOR
 ChatUsersController::ChatUsersController(QObject *parent) :
     QObject(parent)
 {
 }
-
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
+//                                                                          USERS LIST GETTER
 QVector<ChatUser> ChatUsersController::users() const
 {
     return mChatUsers;
 }
-
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
+//                                                               ONLINE USERS NAMES GENERATOR
 QStringList ChatUsersController::onlineUserNames() const
 {
     QStringList userNames;
@@ -22,7 +29,10 @@ QStringList ChatUsersController::onlineUserNames() const
                   });
     return userNames;
 }
-
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
+//                                                            CONNECTED USERS NAMES GENERATOR
 QStringList ChatUsersController::connectedUserNames() const
 {
     QStringList userNames;
@@ -37,81 +47,82 @@ QStringList ChatUsersController::connectedUserNames() const
                   });
     return userNames;
 }
-
-void ChatUsersController::updateOnlineUsers(const QStringList &onlineUsers)
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
+//                                                                       UPDATES ONLINE USERS
+void ChatUsersController::updateOnlineUsers(const QStringList &newOnlineUsers)
 {
     QStringList oldOnlineUsers = onlineUserNames();
     // Remove disappeared users
     std::for_each(oldOnlineUsers.cbegin(),
                   oldOnlineUsers.cend(),
-                  [onlineUsers, this](const QString & userName)
+                  [newOnlineUsers, this](const QString & userName)
                   {
-                      if (!onlineUsers.contains(userName))
+                      if (!newOnlineUsers.contains(userName))
                       {
-                          this->removeUserOnOutdation(userName);
+                          this->removeUser(userName);
                       }
                   });
     // Append new discovered users
-    std::for_each(onlineUsers.cbegin(),
-                  onlineUsers.cend(),
+    std::for_each(newOnlineUsers.cbegin(),
+                  newOnlineUsers.cend(),
                   [oldOnlineUsers, this](const QString & userName)
                   {
                       if (!oldOnlineUsers.contains(userName))
                       {
-                          this->appendUserOnDiscovery(userName);
+                          this->appendUser(userName);
                       }
                   });
 }
-
-void ChatUsersController::updateConnectedUsers(const QStringList &connectedUsers)
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
+//                                                                    UPDATES CONNECTED USERS
+void ChatUsersController::updateConnectedUsers(const QStringList &newConnectedUsers)
 {
     QStringList oldConnectedUsers = connectedUserNames();
     // Remove broken connections
     std::for_each(oldConnectedUsers.cbegin(),
                   oldConnectedUsers.cend(),
-                  [connectedUsers, this](const QString & userName)
+                  [newConnectedUsers, this](const QString & userName)
                   {
-                      if (!connectedUsers.contains(userName))
+                      if (!newConnectedUsers.contains(userName))
                       {
-                          this->disconnectUserOnDisconnection(userName);
+                          this->disconnectUser(userName);
                       }
                   });
     // Append new connections
-    std::for_each(connectedUsers.cbegin(),
-                  connectedUsers.cend(),
+    std::for_each(newConnectedUsers.cbegin(),
+                  newConnectedUsers.cend(),
                   [oldConnectedUsers, this](const QString & userName)
                   {
                       if (!oldConnectedUsers.contains(userName))
                       {
-                          this->connectUserOnConnection(userName);
+                          this->connectUser(userName);
                       }
                   });
 }
-
-void ChatUsersController::appendUserOnDiscovery(const QString & newUserName, ChatUser::State state)
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
+//                                                     APPENDS USER WITH SPECIFIED ATTRIBUTES
+void ChatUsersController::appendUser(const QString & newUserName, ChatUser::State state)
 {
-    emit preUserAppended();
-
+    // Append User with given userName and userState
     ChatUser newUser;
     newUser.mUserName = newUserName;
-    newUser.mState = state;
+    newUser.mState    = state;
+
+    emit preUserAppended();
     mChatUsers.append(newUser);
-/*
-    std::stable_sort(mChatUsers.begin(),
-                     mChatUsers.end(),
-                     [](const ChatUser & chatUser1, const ChatUser & chatUser2)
-                     {
-                         bool isConnected1 =
-                                 (chatUser1.mState == ChatUser::State::ConnectedUser);
-                         bool isDisconnected2 =
-                                 (chatUser2.mState == ChatUser::State::DisconnectedUser);
-                         return isConnected1 || isDisconnected2;
-                     });
-*/
     emit postUserAppended();
 }
-
-void ChatUsersController::removeUserOnOutdation(const QString & outdatedUserName)
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
+//                                                                     REMOVES SPECIFIED USER
+void ChatUsersController::removeUser(const QString & outdatedUserName)
 {
     auto userPos =
             std::find_if(mChatUsers.begin(),
@@ -121,64 +132,31 @@ void ChatUsersController::removeUserOnOutdation(const QString & outdatedUserName
                              return outdatedUserName == chatUser.mUserName;
                          });
 
-    if (userPos == mChatUsers.end())
+    if (userPos != mChatUsers.end())
     {
-        return;
+        // Remove user if found
+        int userId = static_cast<int>(std::distance(mChatUsers.begin(), userPos));
+
+        emit preUserRemoved(userId);
+        mChatUsers.erase(userPos);
+        emit postUserRemoved();
     }
-
-    int userId = static_cast<int>(std::distance(mChatUsers.begin(), userPos));
-
-    emit preUserRemoved(userId);
-
-    mChatUsers.erase(userPos);
-
-    emit postUserRemoved();
 }
-
-void ChatUsersController::connectUserOnConnection(const QString &connectedUser)
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
+//                                                 CHANGES SPECIFIED USER' STATE TO CONNECTED
+void ChatUsersController::connectUser(const QString &connectedUser)
 {
-    removeUserOnOutdation(connectedUser);
-    appendUserOnDiscovery(connectedUser, ChatUser::State::ConnectedUser);
-    /*
-    auto userPos =
-            std::find_if(mChatUsers.begin(),
-                         mChatUsers.end(),
-                         [connectedUser](const ChatUser & chatUser)
-                         {
-                             return connectedUser == chatUser.mUserName;
-                         });
-
-    if (userPos == mChatUsers.end())
-    {
-        return;
-    }
-
-    int userId = static_cast<int>(std::distance(mChatUsers.begin(), userPos));
-    bool isConnected = true;
-    emit connectedStateChanged(userId, isConnected);
-    */
+    removeUser(connectedUser);
+    appendUser(connectedUser, ChatUser::State::ConnectedUser);
 }
-
-void ChatUsersController::disconnectUserOnDisconnection(const QString &disconnectedUser)
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
+//                                              CHANGES SPECIFIED USER' STATE TO DISCONNECTED
+void ChatUsersController::disconnectUser(const QString &disconnectedUser)
 {
-    removeUserOnOutdation(disconnectedUser);
-    appendUserOnDiscovery(disconnectedUser, ChatUser::State::DisconnectedUser);
-    /*
-    auto userPos =
-            std::find_if(mChatUsers.begin(),
-                         mChatUsers.end(),
-                         [disconnectedUser](const ChatUser & chatUser)
-                         {
-                             return disconnectedUser == chatUser.mUserName;
-                         });
-
-    if (userPos == mChatUsers.end())
-    {
-        return;
-    }
-
-    int userId = static_cast<int>(std::distance(mChatUsers.begin(), userPos));
-    bool isConnected = false;
-    emit connectedStateChanged(userId, isConnected);
-    */
+    removeUser(disconnectedUser);
+    appendUser(disconnectedUser, ChatUser::State::DisconnectedUser);
 }

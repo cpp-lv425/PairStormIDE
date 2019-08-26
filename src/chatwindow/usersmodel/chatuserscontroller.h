@@ -2,40 +2,29 @@
 #define CHATUSERSCONTROLLER_H
 
 #include <QObject>
-#include <QDateTime>
-#include <QSettings>
-#include <QJsonObject>
-#include <QJsonDocument>
+#include "chatuser.h"
 
-
-struct ChatUser
-{
-    QString mUserName;
-    enum State : int
-    {
-        DisconnectedUser,
-        ConnectedUser,
-        OfflineUser
-    } mState;
-};
-
+// ==========================================================================================
+//                                                                          DEFAULT CONNECTOR
+// ==========================================================================================
 class ChatUsersController : public QObject
 {
     Q_OBJECT
 
 public:
+
     explicit ChatUsersController(QObject *parent = nullptr);
 
+    // Users list getter
     QVector<ChatUser> users() const;
-
 
 signals:
 
+    // Signals that user wants to start or stop sharing
     void userStateChangedConnected(const QString & userName);
     void userStateChangedDisconnected(const QString & userName);
 
-    void connectedStateChanged(int userId, bool newState);
-
+    // Signals to users list model that inform about changes
     void preUserAppended();
     void postUserAppended();
 
@@ -44,22 +33,28 @@ signals:
 
 public slots:
 
+    // Updates list of online users
     void updateOnlineUsers(const QStringList & onlineUsers);
+    // Updates online users "isConnected" attribute
     void updateConnectedUsers(const QStringList & connectedUsers);
 
 private:
 
+    // Bunch of current discovered users
     QVector<ChatUser> mChatUsers;
 
+    // Return lists of online users as well as connected users
     QStringList onlineUserNames() const;
     QStringList connectedUserNames() const;
 
-    void appendUserOnDiscovery(const QString & newUser,
-                               ChatUser::State state = ChatUser::State::DisconnectedUser);
-    void removeUserOnOutdation(const QString & outdatedUser);
+    // Appends and removes user from users list
+    void appendUser(const QString & newUser,
+                    ChatUser::State state = ChatUser::State::DisconnectedUser);
+    void removeUser(const QString & outdatedUser);
 
-    void connectUserOnConnection(const QString & connectedUser);
-    void disconnectUserOnDisconnection(const QString & disconnectedUser);
+    // Connects or disconnects user
+    void connectUser(const QString & connectedUser);
+    void disconnectUser(const QString & disconnectedUser);
 };
 
 #endif // CHATUSERSCONTROLLER_H
