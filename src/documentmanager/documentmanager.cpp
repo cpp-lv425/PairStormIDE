@@ -1,12 +1,14 @@
 #include "documentmanager.h"
 
 #include <QMdiSubWindow>
+#include <QDirIterator>
 #include <QMessageBox>
 #include <QSplitter>
 #include <algorithm>
 #include <QMdiArea>
 #include <QVector>
 #include <QDebug>
+#include <QDir>
 
 #include "usermessages.h"
 #include "filemanager.h"
@@ -583,6 +585,22 @@ void DocumentManager::closeEmptyDocArea()
         // area wgt is scheduled for deletion
         rightDocArea->deleteLater();
     }
+}
+
+bool DocumentManager::fileBelongsToCurrentProject(const QString &fileName) const
+{
+    QDirIterator dirIter(currentProject, QDirIterator::Subdirectories);
+
+    while (dirIter.hasNext())
+    {
+        qDebug() << dirIter.filePath();
+        if (dirIter.filePath() == fileName)
+        {
+            return true;
+        }
+        dirIter.next();
+    }
+    return false;
 }
 
 void DocumentManager::configureDocuments(std::function<void(DocumentManager*, CodeEditor*, const QString&)> functor,

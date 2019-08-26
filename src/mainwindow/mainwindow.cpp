@@ -359,10 +359,17 @@ void MainWindow::onNewClassTriggered()
 
 void MainWindow::onOpenFileTriggered()
 {
+    // check if project is opened
+    if (!mpDocumentManager->getCurrentProjectPath().size())
+    {
+        QMessageBox::information(this, userMessages[UserMessages::ProjectNotOpenedTitle], userMessages[UserMessages::ProjectNotOpenedMsg]);
+        return;
+    }
+
     QString fileName = QFileDialog::getOpenFileName
             (this,
              userMessages[UserMessages::OpenFileTitle],
-            QDir::currentPath(),
+            mpDocumentManager->getCurrentProjectPath(),
             "C++/C files (*.h *.hpp *.cpp *.c) ;; Text Files (*.txt) ;; JSON Files (*.json)");
 
     openDoc(fileName);
@@ -450,7 +457,7 @@ void MainWindow::onCloseProjectTriggered()
     // project is closed
     mpDocumentManager->closeCurrentProject();
     mpProjectViewerDock->setDir(QDir::currentPath());
-    // disconnect from db    
+    // disconnect from db
 
     QMessageBox::information(this, userMessages[UserMessages::ProjectClosedTitle], userMessages[UserMessages::ProjectClosedMsg]);
 }
@@ -693,7 +700,26 @@ void MainWindow::onReferenceFromEditor(const QString &keyword)
 }
 
 void MainWindow::onOpenFileFromProjectViewer(QString fileName)
-{
+{    
+    // check if project is opened
+    if (!mpDocumentManager->getCurrentProjectPath().size())
+    {
+        QMessageBox::information
+                (this,
+                 userMessages[UserMessages::ProjectNotOpenedTitle],
+                userMessages[UserMessages::ProjectNotOpenedMsg]);
+        return;
+    }
+
+    if (!mpDocumentManager->fileBelongsToCurrentProject(fileName))
+    {
+        QMessageBox::information
+                (this,
+                 userMessages[UserMessages::FileDoesNotBelongToProjectTitle],
+                userMessages[UserMessages::FileDoesNotBelongToProjectMsg]);
+        return;
+    }
+
     openDoc(fileName);
 }
 

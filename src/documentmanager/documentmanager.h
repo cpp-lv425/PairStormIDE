@@ -38,6 +38,7 @@ public:
     QVector<CodeEditor*> getChangedDocuments();
     void combineDocAreas();
     void closeEmptyDocArea();    
+    bool fileBelongsToCurrentProject(const QString &fileName)const;
 
     // calls passed functor on every opened document
     void configureDocuments(std::function<void(DocumentManager*, CodeEditor*, const QString&)> functor,
