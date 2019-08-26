@@ -6,7 +6,20 @@ Item {
     visible: true
     Rectangle {
         anchors.fill: chatBody
-        color: "#5a8db8"
+        color: {
+            if (globalTheme === "white")
+            {
+                return "#bde1ff"
+            }
+            if (globalTheme === "blue")
+            {
+                return "#2c8dde"
+            }
+            if (globalTheme === "dark")
+            {
+                return "#41607a"
+            }
+        }
 
         Column {
             anchors.centerIn: parent
@@ -21,6 +34,20 @@ Item {
                 Label {
                     id: warningText
                     text: qsTr("Log in to use chat")
+                    color: {
+                        if (globalTheme === "white")
+                        {
+                            return "#6b3636"
+                        }
+                        if (globalTheme === "blue")
+                        {
+                            return "#6b3636"
+                        }
+                        if (globalTheme === "dark")
+                        {
+                            return "#fad2d2"
+                        }
+                    }
                     font.pixelSize: 23
                     font.family: "arial"
                     font.bold: true

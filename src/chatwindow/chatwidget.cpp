@@ -1,152 +1,163 @@
 #include "chatwidget.h"
-
-#include <QPlainTextEdit>
-#include <QPushButton>
-#include <QListWidget>
-#include <QBoxLayout>
-#include <QQuickView>
-#include <QQuickWidget>
-#include <QLineEdit>
-#include <QLabel>
-
-#include <QHBoxLayout>
-#include <QQmlComponent>
-#include <QQmlContext>
-#include <QQmlEngine>
-#include <QQuickView>
-#include <QDockWidget>
-#include <QQuickStyle>
-
-//#include "onlineuserslist.h"
-//#include "onlineusersmodel.h"
-
+// ==========================================================================================
+// ==========================================================================================
+//                                                                                CONSTRUCTOR
 ChatWidget::ChatWidget()
 {
-    // creating user list
+    // List of online users
     mpUsersList = new QListWidget;
+    mpUsersList->setSizePolicy(QSizePolicy::Maximum,
+                               QSizePolicy::Maximum);
     connect(mpUsersList, &QListWidget::itemDoubleClicked,
-            this,        &ChatWidget::connectOrDisconnectOnRequest,
+            this,        &ChatWidget::shareWithUserOnDoubleClick,
             Qt::AutoConnection);
 
-    mpUsersList->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+    // List of messages & input message area
+    mpMessagesHistory   = new QPlainTextEdit;
+    mpInputMessageField = new QLineEdit;
 
-    // creating chat feed
-    mpFeed = new QPlainTextEdit;
-
-    // creating enter line
-    mpEnterLine = new QLineEdit;
-
-    // creating send button
+    // Send button
     QPushButton *pSendButton = new QPushButton("Send");
-
     pSendButton->setMaximumWidth(30);
     connect(pSendButton, &QPushButton::clicked,
-            this,        &ChatWidget::onSendCommand);
+            this,        &ChatWidget::shareMessageOnSend,
+            Qt::UniqueConnection);
 
-    QHBoxLayout *pLineLayout = new QHBoxLayout;
-    pLineLayout->addWidget(mpEnterLine);
+    // Message input area' layout
+    QHBoxLayout * pLineLayout = new QHBoxLayout;
+    pLineLayout->addWidget(mpInputMessageField);
     pLineLayout->addWidget(pSendButton);
 
-    // laying out window
+    // General layout
     QVBoxLayout *pWindowLayout = new QVBoxLayout;
     pWindowLayout->addWidget(mpUsersList);
-
-    pWindowLayout->addWidget(mpFeed);
+    pWindowLayout->addWidget(mpMessagesHistory);
     pWindowLayout->addLayout(pLineLayout);
 
+
     setLayout(pWindowLayout);
-
-    // Set empty users list
-    updateUsersList();
+    setMinimumSize(150, 300);
+    setDisabled(true);
 }
-
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
+//                                                          DOCKER KEY PRESS EVENTS PROCESSOR
 void ChatWidget::keyPressEvent(QKeyEvent *event)
 {
     if(event->key() == Qt::Key_Enter
        || event->key() == Qt::Key_Return)
     {
-        //ChatWidgetInterface::keyPressEvent(event);
-        onSendCommand();
-        qDebug() << "send message pressed";
+        shareMessageOnSend();
     }
 }
-
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
+//                                                                          CHAT CONFIGURATOR
 void ChatWidget::configureOnLogin(const QString & userName)
 {
     mUserName = userName;
+    setDisabled(false);
 }
-
-void ChatWidget::updateUsersList()
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
+//                                                                 ONLINE USERS LIST RENDERER
+void ChatWidget::redrawUsersList()
 {
-    QListWidgetItem *pItem;
     mpUsersList->clear();
-    for (const QString& userName: mOnlineUsers)
-    {
-        pItem = new QListWidgetItem;
-        pItem->setText("Connect to: " + userName);
-        if (mConnectedUsers.contains(userName))
-        {
-            pItem->setIcon(QIcon(":/img/CONNECTED.png"));
-        }
-        else
-        {
-            pItem->setIcon(QIcon(":/img/DISCONNECTED.png"));
-        }
-        mpUsersList->addItem(pItem);
-    }
-    mpUsersList->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
-}
 
+    QListWidgetItem * pUserItem;
+    for (const QString & userName: mOnlineUsers)
+    {
+        pUserItem = new QListWidgetItem;
+        pUserItem->setText("Connect to: " + userName);
+
+        pUserItem->setIcon(mConnectedUsers.contains(userName) ?
+                               QIcon(":/img/CONNECTED.png")   :
+                               QIcon(":/img/DISCONNECTED.png"));
+
+        mpUsersList->addItem(pUserItem);
+    }
+
+    mpUsersList->setSizePolicy(QSizePolicy::Maximum,
+                               QSizePolicy::Maximum);
+}
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
+//                                                               UPDATE ONLINE USERS & REDRAW
 void ChatWidget::updateOnlineUsers(const QStringList & onlineUsers)
 {
     mOnlineUsers = onlineUsers;
-    updateUsersList();
+    redrawUsersList();
 }
-
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
+//                                                            UPDATE CONNECTED USERS & REDRAW
 void ChatWidget::updateConnectedUsers(const QStringList & connectedUsers)
 {
     mConnectedUsers = connectedUsers;
-    updateUsersList();
+    redrawUsersList();
 }
-
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
+//                                                             APPEND NEW MESSAGE TO THE CHAT
 void ChatWidget::appendMessage(const QString & messageAuthor,
                                const QString & messageBody)
 {
-    QString feed = mpFeed->toPlainText();
-    feed += '\n';
-    QString insertion = "<" + messageAuthor + "> " + messageBody;
-    feed += insertion;
-    mpFeed->setPlainText(feed);
+    QString chatMessage = mpMessagesHistory->toPlainText();
+    chatMessage += '\n';
+    QString content = "[ " + messageAuthor + " ]  " + messageBody;
+    chatMessage += content;
+    mpMessagesHistory->setPlainText(chatMessage);
 }
-
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
+//                                                                          UPDATE CHAT THEME
 void ChatWidget::updateTheme(const QString &themeName)
 {
     // TODO
 }
-
-void ChatWidget::connectOrDisconnectOnRequest(QListWidgetItem *item)
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
+//                                        SHARE MESSAGE WHEN USER INVOKES SEND MESSAGE ACTION
+void ChatWidget::shareMessageOnSend()
 {
-    QString userName = item->text();
+    // Render message in the chat
+    QString chatMessage = mpMessagesHistory->toPlainText();
+    chatMessage += '\n';
+    QString content = "[ " + mUserName + " ]  " + mpInputMessageField->text();
+    chatMessage += content;
+    mpMessagesHistory->setPlainText(chatMessage);
+
+    // Share message with collegues
+    emit messageSent(mpInputMessageField->text());
+
+    // Clear message input field
+    mpInputMessageField->clear();
+}
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
+//                     SEND CONNECT OR DISCONNECT REQUEST WHEN USER DOUBLECLICKS THE NEIGHBOR
+void ChatWidget::shareWithUserOnDoubleClick(QListWidgetItem *userItem)
+{
+    QString userName = userItem->text();
     int position = userName.lastIndexOf(QChar{':'});
     QString bareName = userName.mid(position + 2);
 
     if (mConnectedUsers.contains(bareName))
     {
-        emit startSharingRequested(bareName);
+        emit stopSharingRequested(bareName);
     }
     else
     {
-        emit stopSharingRequested(bareName);
+        emit startSharingRequested(bareName);
     }
-}
-
-void ChatWidget::onSendCommand()
-{
-    emit messageSent(mpEnterLine->text());
-    QString feed = mpFeed->toPlainText();
-    feed += '\n';
-    QString insertion = "<" + mUserName + "> " + mpEnterLine->text();
-    feed += insertion;
-    mpFeed->setPlainText(feed);
-    mpEnterLine->clear();
 }

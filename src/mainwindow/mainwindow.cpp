@@ -288,18 +288,18 @@ void MainWindow::createChatWindow()
             mpChatWindowDock, &ChatWindowDock::updateConnectedUsersOnChange,
             Qt::UniqueConnection);
     // Allow start sharing and stop sharing on user input
-    connect(mpChatWindowDock, &ChatWindowDock::userToConnectSelected,
+    connect(mpChatWindowDock, &ChatWindowDock::startSharingWithUser,
             mplocalConnector, &LocalConnectorInterface::startSharing,
             Qt::UniqueConnection);
-    connect(mpChatWindowDock, &ChatWindowDock::userToDisconnectSelected,
+    connect(mpChatWindowDock, &ChatWindowDock::stopSharingWithUser,
             mplocalConnector, &LocalConnectorInterface::stopSharing,
             Qt::UniqueConnection);
     // Allow sending and displaying messages
-    connect(mpChatWindowDock, &ChatWindowDock::sendMessage,
+    connect(mpChatWindowDock, &ChatWindowDock::shareMessage,
             mplocalConnector, &LocalConnectorInterface::shareMessage,
             Qt::UniqueConnection);
     connect(mplocalConnector, &LocalConnectorInterface::messageReceived,
-            mpChatWindowDock, &ChatWindowDock::displayMessage,
+            mpChatWindowDock, &ChatWindowDock::pushMessageToChat,
             Qt::UniqueConnection);
 
     mpChatWindowDock->setObjectName("mpChatWindowDock");

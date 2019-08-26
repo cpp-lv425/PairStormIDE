@@ -4,38 +4,55 @@
 #include <QDockWidget>
 #include "chatwidgetinterface.h"
 
-class ChatWidget;
-
+// ==========================================================================================
+//                                                                          CHAT DOCKER PROXY
+// ==========================================================================================
 class ChatWindowDock: public QDockWidget
 {
     Q_OBJECT
 
-    ChatWidgetInterface * mpChatWidget;
-
 public:
+
     explicit ChatWindowDock(QWidget *pParent = nullptr);
+
+    // Current user name setter
     void setUserName(const QString& userName);
-    void displayMessage(const QString userName,
-                        const QString message);
-    void updateTheme(const QString & newThemeName);
 
 signals:
-    void userToConnectSelected(const QString);
-    void userToDisconnectSelected(const QString);
 
-    void sendMessage(const QString&);
+    // Signals to GUI that user starts or stops sharing
+    // or shares message
+    void startSharingWithUser(const QString &);
+    void stopSharingWithUser (const QString &);
+
+    void shareMessage(const QString &);
 
 public slots:
-    void updateOnlineUsersOnChange(const QStringList onlineUsers);
+
+    // Slots for processing GUI events
+    void pushMessageToChat(const QString userName,
+                           const QString message);
+    void updateTheme(const QString & newThemeName);
+
+    // Slots for processing Network events
+    void updateOnlineUsersOnChange   (const QStringList onlineUsers);
     void updateConnectedUsersOnChange(const QStringList connectedUsers);
 
-    void onUserToConnectSelected(QString userName);
-    void onUserToDisconnectSelected(QString userName);
+private slots:
 
-    void onMessageSent(const QString & message);
+    // Slots for processing chat events
+    void sendRequestOnStartSharing(const QString & userName);
+    void sendRequestOnStopSharing (const QString & userName);
 
-protected:
-    virtual void keyPressEvent(QKeyEvent *event);
+    void shareMessageOnSend(const QString & message);
+
+private:
+
+    // Chat instance
+    ChatWidgetInterface * mpChatWidget;
+
+    // Set custom behavior to keyPressEvent
+    virtual void keyPressEvent(QKeyEvent *event) override;
 };
 
 #endif // CHATWINDOWDOCK_H
