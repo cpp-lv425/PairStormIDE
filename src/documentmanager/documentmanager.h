@@ -64,7 +64,7 @@ private:
     QMdiArea* getArea(CodeEditor *doc);
     bool saveDocument(CodeEditor *doc);
     void saveDocument(const QString &fileName, const QString &fileContent);
-
+    void setAllDocumentsNotModified();
 };
 
 #endif // MDIAREA_H

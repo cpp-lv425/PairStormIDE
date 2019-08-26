@@ -78,6 +78,7 @@ void DocumentManager::openDocument(const QString &fileName, bool load)
     {
         throw QException();
     }
+
     // doc is added to doc area & unfolded
     placementArea->addSubWindow(newView);
     newView->setWindowState(Qt::WindowMaximized);
@@ -421,7 +422,7 @@ CodeEditor* DocumentManager::getCurrentDocument()
     // if there is only one doc area, we receive current sub wdw from it
     // if current sub wdw is null - we return null to indicate search failure
     if (mDocAreas.size() < 2)
-    {       
+    {
         auto pCurrentWindow = mDocAreas.front()->currentSubWindow();
         return pCurrentWindow ? qobject_cast<CodeEditor*>(pCurrentWindow->widget()) : nullptr;
     }
@@ -452,7 +453,7 @@ void DocumentManager::closeCurrentDocument()
     auto pCurrentSubWdw = qobject_cast<QMdiSubWindow*>(pCurrentDocument->parent());
 
     if (pCurrentSubWdw)
-    {                
+    {
         pCurrentSubWdw->close();
     }
 }
@@ -461,20 +462,21 @@ void DocumentManager::closeAllDocumentsWithoutSaving()
 {
     // in order to close documents without saving changes
     // state of documents is set to "not modified"
-    // & closeEvent is called
-    for (const auto &area: mDocAreas)
-    {
-        auto windowsList = area->subWindowList();
+    setAllDocumentsNotModified();
 
-        for (const auto &wdw: windowsList)
-        {
-            auto doc = qobject_cast<CodeEditor*>(wdw->widget());
-            if (doc)
-            {
-                doc->setBeginTextState();
-            }
-            wdw->close();
-        }
+    // all doc areas but first are closed with all nested documents
+    while (mDocAreas.size() > 1)
+    {
+        auto pDocArea = mDocAreas.back();
+        mDocAreas.pop_back();
+        pDocArea->close();
+    }
+
+    // all windows of the first doc area are closed
+    auto windowsList = mDocAreas.front()->subWindowList();
+    for (const auto &window: windowsList)
+    {
+        window->close();
     }
 }
 
@@ -584,7 +586,7 @@ void DocumentManager::closeEmptyDocArea()
 }
 
 void DocumentManager::configureDocuments(std::function<void(DocumentManager*, CodeEditor*, const QString&)> functor,
-                                        const QString &newValue)
+                                         const QString &newValue)
 {
     // applying new settings to every opened doc view
     for (const auto &area: mDocAreas)
@@ -653,5 +655,21 @@ void DocumentManager::saveDocument(const QString &fileName, const QString &fileC
     catch (const FileOpeningFailure&)
     {
         throw;
+    }
+}
+
+void DocumentManager::setAllDocumentsNotModified()
+{
+    for (auto &area: mDocAreas)
+    {
+        auto windowsList = area->subWindowList();
+        for (auto &window: windowsList)
+        {
+            auto doc = qobject_cast<CodeEditor*>(window->widget());
+            if (doc)
+            {
+                doc->setBeginTextState();
+            }
+        }
     }
 }

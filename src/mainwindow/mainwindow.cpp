@@ -370,6 +370,13 @@ void MainWindow::onOpenFileTriggered()
 
 void MainWindow::onOpenProjectTriggered()
 {
+    // check if other project is opened
+    if (mpDocumentManager->getCurrentProjectPath().size())
+    {
+        QMessageBox::information(this, userMessages[UserMessages::ProjectOpenedTitle], userMessages[UserMessages::ProjectOpenedMsg]);
+        return;
+    }
+
     QString dirName = QFileDialog::getExistingDirectory
             (this,
              userMessages[UserMessages::OpenDirectoryTitle],
@@ -409,6 +416,7 @@ void MainWindow::onCloseProjectTriggered()
         {
             try
             {
+                qDebug() << "yes to all";
                 // saving changes to opened documents
                 mpDocumentManager->saveAllDocuments();
             } catch (const FileOpeningFailure&)
@@ -423,10 +431,12 @@ void MainWindow::onCloseProjectTriggered()
         }
         case QDialogButtonBox::StandardButton::NoToAll:
         {
+            qDebug() << "no to all";
             break;
         }
         case QDialogButtonBox::StandardButton::Cancel:
         {
+            qDebug() << "cancel";
             return;
         }
         default:
@@ -441,8 +451,8 @@ void MainWindow::onCloseProjectTriggered()
     mpDocumentManager->closeCurrentProject();
     mpProjectViewerDock->setDir(QDir::currentPath());
     // disconnect from db    
-    QMessageBox::information(this, userMessages[UserMessages::ProjectClosedTitle], userMessages[UserMessages::ProjectClosedMsg]);
 
+    QMessageBox::information(this, userMessages[UserMessages::ProjectClosedTitle], userMessages[UserMessages::ProjectClosedMsg]);
 }
 
 void MainWindow::onOpenStartPage()
