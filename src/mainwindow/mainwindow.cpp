@@ -370,7 +370,25 @@ void MainWindow::onNewFileTriggered()
 
 void MainWindow::onNewClassTriggered()
 {
+    // check if project is opened
+    if (!mpDocumentManager->getCurrentProjectPath().size())
+    {
+        QMessageBox::warning
+                (this,
+                 userMessages[UserMessages::ProjectNotOpenedTitle],
+                userMessages[UserMessages::ProjectNotOpenedMsg]);
+        return;
+    }
 
+    // get path to opened project
+    QString currentProjectDirectory = mpDocumentManager->getCurrentProjectPath();
+
+    // implementation
+    //
+
+    // use method openDocument(path) to open newly created files
+    //openDocument(headerFileName);
+    //openDocument(implemFileName);
 }
 
 void MainWindow::onOpenFileTriggered()
