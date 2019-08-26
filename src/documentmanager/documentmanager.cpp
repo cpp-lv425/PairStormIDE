@@ -589,7 +589,7 @@ void DocumentManager::closeEmptyDocArea()
 
 bool DocumentManager::fileBelongsToCurrentProject(const QString &fileName) const
 {    
-    QDirIterator dirIter(currentProject, QDir::NoFilter, QDirIterator::Subdirectories);
+    QDirIterator dirIter(currentProject, QDir::Files, QDirIterator::Subdirectories);
 
     while (dirIter.hasNext())
     {
@@ -600,6 +600,66 @@ bool DocumentManager::fileBelongsToCurrentProject(const QString &fileName) const
         }
     }
     return false;
+}
+
+void DocumentManager::undoOnCurrentDocument()
+{
+    auto pCurrentDocument = getCurrentDocument();
+
+    if (pCurrentDocument)
+    {
+        pCurrentDocument->undo();
+    }
+}
+
+void DocumentManager::redoOnCurrentDocument()
+{
+    auto pCurrentDocument = getCurrentDocument();
+
+    if (pCurrentDocument)
+    {
+        pCurrentDocument->redo();
+    }
+}
+
+void DocumentManager::cutOnCurrentDocument()
+{
+    auto pCurrentDocument = getCurrentDocument();
+
+    if (pCurrentDocument)
+    {
+        pCurrentDocument->cut();
+    }
+}
+
+void DocumentManager::copyOnCurrentDocument()
+{
+    auto pCurrentDocument = getCurrentDocument();
+
+    if (pCurrentDocument)
+    {
+        pCurrentDocument->copy();
+    }
+}
+
+void DocumentManager::pasteOnCurrentDocument()
+{
+    auto pCurrentDocument = getCurrentDocument();
+
+    if (pCurrentDocument)
+    {
+        pCurrentDocument->paste();
+    }
+}
+
+void DocumentManager::selectAllOnCurrentDocument()
+{
+    auto pCurrentDocument = getCurrentDocument();
+
+    if (pCurrentDocument)
+    {
+        pCurrentDocument->selectAll();
+    }
 }
 
 void DocumentManager::configureDocuments(std::function<void(DocumentManager*, CodeEditor*, const QString&)> functor,

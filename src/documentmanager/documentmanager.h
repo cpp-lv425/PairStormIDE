@@ -40,6 +40,13 @@ public:
     void closeEmptyDocArea();    
     bool fileBelongsToCurrentProject(const QString &fileName)const;
 
+    void undoOnCurrentDocument();
+    void redoOnCurrentDocument();
+    void cutOnCurrentDocument();
+    void copyOnCurrentDocument();
+    void pasteOnCurrentDocument();
+    void selectAllOnCurrentDocument();
+
     // calls passed functor on every opened document
     void configureDocuments(std::function<void(DocumentManager*, CodeEditor*, const QString&)> functor,
                            const QString &newValue);

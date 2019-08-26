@@ -588,32 +588,32 @@ void MainWindow::onExitTriggered()
 
 void MainWindow::onUndoTriggered()
 {
-    //
+    mpDocumentManager->undoOnCurrentDocument();
 }
 
 void MainWindow::onRedoTriggered()
 {
-    //
+    mpDocumentManager->redoOnCurrentDocument();
 }
 
 void MainWindow::onCutTriggered()
 {
-    //
+    mpDocumentManager->cutOnCurrentDocument();
 }
 
 void MainWindow::onCopyTriggered()
 {
-    //
+    mpDocumentManager->copyOnCurrentDocument();
 }
 
 void MainWindow::onPasteTriggered()
 {
-    //
+    mpDocumentManager->pasteOnCurrentDocument();
 }
 
 void MainWindow::onSelectAllTriggered()
 {    
-    //
+    mpDocumentManager->selectAllOnCurrentDocument();
 }
 
 void MainWindow::onFindTriggered()
