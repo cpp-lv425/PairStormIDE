@@ -372,6 +372,22 @@ void MainWindow::onOpenFileTriggered()
             mpDocumentManager->getCurrentProjectPath(),
             "C++/C files (*.h *.hpp *.cpp *.c) ;; Text Files (*.txt) ;; JSON Files (*.json)");
 
+    // in case user closed dialog without selecting file
+    if (!fileName.size())
+    {
+        return;
+    }
+
+    // checks if selected file belongs to opened project
+    if (!mpDocumentManager->fileBelongsToCurrentProject(fileName))
+    {
+        QMessageBox::information
+                (this,
+                 userMessages[UserMessages::FileDoesNotBelongToProjectTitle],
+                userMessages[UserMessages::FileDoesNotBelongToProjectMsg]);
+        return;
+    }
+
     openDoc(fileName);
 }
 
