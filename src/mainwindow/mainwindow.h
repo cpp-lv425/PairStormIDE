@@ -35,7 +35,7 @@ public:
     ~MainWindow();
 
 private:
-    LocalConnectorInterface * mplocalConnector;
+    LocalConnectorInterface *mplocalConnector;
     Ui::MainWindow *ui;
     ProjectViewerDock *mpProjectViewerDock;
     ChatWindowDock *mpChatWindowDock;
@@ -45,7 +45,7 @@ private:
     QScopedPointer<PaletteConfigurator> mpPaletteConfigurator;
 
     void setupMainMenu();    
-    void openDoc(QString fileName);
+    void openDocument(const QString &fileName);
     void createProjectViewer();
     void createChatWindow();
     void createButtomPanel();

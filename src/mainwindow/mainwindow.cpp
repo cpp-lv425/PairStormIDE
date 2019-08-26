@@ -103,7 +103,7 @@ void MainWindow::setupMainMenu()
     QToolBar *pToolbar = new QToolBar("Main Tool Bar");
     pToolbar->setObjectName("pToolbar");
 
-    // working with files
+    // managing projects & files
     QMenu *newSubMenu = new QMenu("&New");
     newSubMenu->addAction("New &project...", this, &MainWindow::onNewProjectTriggered);
 
@@ -136,8 +136,8 @@ void MainWindow::setupMainMenu()
     fileMenu->addAction("Save A&ll...", this, &MainWindow::onSaveAllFilesTriggered, Qt::CTRL + Qt::SHIFT + Qt::Key_S);
     fileMenu->addSeparator();
 
-    // closing docs & exiting the program
-    fileMenu->addAction("Close pro&ject", this, &MainWindow::onCloseProjectTriggered);
+    // closing docs, project & exiting the program
+    fileMenu->addAction("Close pro&ject", this, &MainWindow::onCloseProjectTriggered, Qt::CTRL + Qt::ALT + Qt::Key_W);
     fileMenu->addAction("&Close document", this, &MainWindow::onCloseFileTriggered, Qt::CTRL + Qt::SHIFT + Qt::Key_W);
     fileMenu->addAction("&Exit", this, &MainWindow::onExitTriggered, Qt::ALT + Qt::Key_F4);
 
@@ -250,7 +250,7 @@ void MainWindow::setupMainMenu()
     addToolBar(Qt::TopToolBarArea, pToolbar);
 }
 
-void MainWindow::openDoc(QString fileName)
+void MainWindow::openDocument(const QString &fileName)
 {
     QString readResult;
 
@@ -398,7 +398,7 @@ void MainWindow::onOpenFileTriggered()
         return;
     }
 
-    openDoc(fileName);
+    openDocument(fileName);
 }
 
 void MainWindow::onOpenProjectTriggered()
@@ -743,7 +743,7 @@ void MainWindow::onOpenFileFromProjectViewer(QString fileName)
         return;
     }
 
-    openDoc(fileName);
+    openDocument(fileName);
 }
 
 void MainWindow::onConnectionStatusChanged(bool status)
@@ -915,6 +915,18 @@ void MainWindow::onNewProjectTriggered()
     }
     catch (const QException&)
     {
+        return;
+    }
+
+    try
+    {
+        FileManager().createProjectFile(dirName);
+    } catch (const FileOpeningFailure&)
+    {
+        QMessageBox::information
+                (this,
+                 userMessages[UserMessages::ErrorTitle],
+                userMessages[UserMessages::ProjectCreationFailureMsg]);
         return;
     }
 

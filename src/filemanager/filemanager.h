@@ -10,6 +10,7 @@ public:
     void createFile(const QString &fileName);
     void writeToFile(const QString &fileName,
                      const QString &content);
+    void createProjectFile(const QString &path);
 };
 
 #endif // FILEMANAGER_H

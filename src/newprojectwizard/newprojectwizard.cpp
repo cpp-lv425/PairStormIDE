@@ -101,7 +101,7 @@ QString NewProjectDialog::start()
     return mProjectName;
 }
 
-bool NewProjectDialog::isValidDirName(const QString &dirName)
+bool NewProjectDialog::isValidProjectName(const QString &dirName)
 {
     return !dirName.contains(QRegExp(R"exp([*/:;|=,\\\[\]])exp"));
 }
@@ -134,10 +134,10 @@ void NewProjectDialog::onCreateProject()
                              userMessages[UserMessages::EmptyFileNameMsg]);
         return;
     }
-    if (!isValidDirName(mpLine->text()))
+    if (!isValidProjectName(mpLine->text()))
     {
-        QMessageBox::warning(this, userMessages[UserMessages::InvalidDirectoryNameTitle],
-                             userMessages[UserMessages::InvalidDirectoryNameMsg]);
+        QMessageBox::warning(this, userMessages[UserMessages::InvalidProjectNameTitle],
+                             userMessages[UserMessages::InvalidProjectNameMsg]);
         return;
     }
 

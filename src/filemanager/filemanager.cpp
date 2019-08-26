@@ -48,3 +48,21 @@ void FileManager::writeToFile(const QString &fileName,
     }
     throw FileOpeningFailure();
 }
+
+void FileManager::createProjectFile(const QString &path)
+{
+    // constructing project file name
+    QString projectFileName = path;
+    int position = path.lastIndexOf(QChar{'/'});
+    projectFileName += '/';
+    projectFileName += path.mid(position + 1);
+    projectFileName += ".psproj";
+
+    try
+    {
+        createFile(projectFileName);
+    } catch (const FileOpeningFailure&)
+    {
+        throw;
+    }
+}

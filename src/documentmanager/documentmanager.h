@@ -52,7 +52,7 @@ public:
                            const QString &newValue);
     void setStyle(CodeEditor *doc, const QString &styleName);
     void setFontFamily(CodeEditor *doc, const QString &fontFamily);
-    void setFontSize(CodeEditor *doc, const QString &fontSize);
+    void setFontSize(CodeEditor *doc, const QString &fontSize);    
 
 public slots:
     void onSplit(Qt::Orientation orientation);
