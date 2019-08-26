@@ -11,6 +11,7 @@
 #include<iostream>
 #include<QLabel>
 #include"classgenerator.h"
+#include<QMenu>
 
 CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
 {
@@ -106,6 +107,32 @@ void CodeEditor::setIdeType(const QString &ideType)
 {
     mConfigParam.setIdeType(ideType);
     setTextColors();
+}
+
+void CodeEditor::testSlot()
+{
+    QTextCursor curs = this->textCursor();
+    qDebug()<<"text by cursor = "<<getTextByCursor(curs);
+    //auto className = getClassNameForMethodDefinition(curs);
+
+    //auto methodName = getMethodNameFromFullDefinition(getTextByCursor(curs));
+    //qDebug()<<"method name = "<<methodName;
+
+    auto parametrsName = getMethodParametrsFromFullDefinition(getTextByCursor(curs));
+    qDebug()<<"parametrs = "<<parametrsName;
+}
+
+void CodeEditor::contextMenuEvent(QContextMenuEvent *event)
+{
+    QMenu *menu = this->createStandardContextMenu();
+    QMenu *refactorItem = menu->addMenu("Refactor");
+
+    QAction *addDefinitionAction = new QAction("Add definition", refactorItem);
+    refactorItem->addAction(addDefinitionAction);
+    connect(refactorItem, &QMenu::aboutToShow, this, &CodeEditor::testSlot);
+    //addDefinitionAction->setEnabled(false);
+    menu->exec(event->globalPos());
+    delete menu;
 }
 
 void CodeEditor::setFontSize(const QString &fontSize)

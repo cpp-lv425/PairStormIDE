@@ -111,6 +111,7 @@ public slots:
     void setFontSize(const QString &fontSize);
     void setFontStyle(const QString &fontStyle);
     void setIdeType(const QString &ideType);
+    void testSlot();
 
 signals:
     void changesAppeared();
@@ -154,6 +155,10 @@ protected:
     int mCurrentZoom;
     QVector<Token> mTokens;
     friend class Event;
+
+    // QWidget interface
+protected:
+    virtual void contextMenuEvent(QContextMenuEvent *event) override;
 };
 
 #endif // CODEEDITOR_H

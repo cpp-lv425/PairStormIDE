@@ -1,7 +1,13 @@
-#ifndef CLASSGENERATOR_H
+﻿#ifndef CLASSGENERATOR_H
 #define CLASSGENERATOR_H
 
+#include "filemanager.h"
 #include <QWidget>
+#include <QTextCursor>
+#include<QPlainTextEdit>
+
+const int indexOfClassNameInLine  = 1;
+const int indexOfMethodNameInLine = 1;
 
 namespace Ui
 {
@@ -24,6 +30,9 @@ public:
 
     QString sourceCodeName() const;
     void setSourceCodeName(const QString &sourceCodeName);
+
+    friend bool definitionExists(QTextCursor &cursor);
+
 private slots:
     void on_OkButton_clicked();
 
@@ -32,17 +41,27 @@ private:
     bool isValidClassName();
     void setAllFieldsFromUi();
     QString createHeaderMacrosName();
-    QString removeExtension(QString str, const int extensionCharacterCount);
     QString createClassBones();
-    QString createMethodDefinitionBones(const QString methodName, const QString methodParams);
     QString createHeaderText();
     QString createSourceText();
 
 private:
     Ui::ClassGenerator *ui;
+    FileManager fileManager;
     QString mClassName;
     QString mHeaderName;
     QString mSourceCodeName;
+
 };
+
+QString removeExtension(QString str, const int extensionCharacterCount);
+QString createMethodDefinitionBones(const QString className, const QString methodName,
+                                    const QString methodParams);
+QString getTextByCursor(QTextCursor &cursor);
+
+QString getMethodNameFromFullDefinition(QString definition);
+QString getMethodParametrsFromFullDefinition(QString definition);
+
+QString getClassNameForMethodDefinition(QTextCursor &cursor);
 
 #endif // CLASSGENERATOR_H

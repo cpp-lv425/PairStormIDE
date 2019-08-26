@@ -3,6 +3,7 @@
 #include <QString>
 
 const QString validClassNameRegex       = "^[a-zA-Z_]+([_]?[a-zA-Z0-9])*$";
+const QString textInsideBracketsRegex   = "(?<=\\().+?(?=\\))";
 const QString successCreationTitle      = "Successful creation";
 const QString successCreationMessage    = "The class was successfully created!";
 const QString nonSuccessCreationTitle   = "Forbidden creation";

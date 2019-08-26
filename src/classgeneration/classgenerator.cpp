@@ -1,11 +1,10 @@
 #include "classgenerator.h"
 #include "ui_classgenerator.h"
 #include "classgenerationliterals.h"
-#include "filemanager.h"
 #include <QRegularExpression>
 #include <QPlainTextEdit>
 #include <QMessageBox>
-
+#include <QDebug>
 
 ClassGenerator::ClassGenerator(QWidget *parent) :
     QWidget(parent),
@@ -75,7 +74,7 @@ QString ClassGenerator::createHeaderMacrosName()
     return (removeExtension(mHeaderName, headerExtension.length()) + "_H").toUpper();
 }
 
-QString ClassGenerator::removeExtension(QString str, const int extensionCharactersCount)
+QString removeExtension(QString str, const int extensionCharactersCount)
 {
     str.chop(extensionCharactersCount);
     return str;
@@ -90,9 +89,10 @@ QString ClassGenerator::createClassBones()
             + "};\n";
 }
 
-QString ClassGenerator::createMethodDefinitionBones(const QString methodName, const QString methodParams)
+QString createMethodDefinitionBones(const QString className, const QString methodName,
+                                    const QString methodParams)
 {
-    return mClassName + "::" + methodName + "(" + methodParams + ")\n" + "{\n" + "\n}";
+    return className + "::" + methodName + "(" + methodParams + ")\n" + "{\n" + "\n}";
 }
 
 QString ClassGenerator::createHeaderText()
@@ -107,7 +107,7 @@ QString ClassGenerator::createHeaderText()
 QString ClassGenerator::createSourceText()
 {
     return "#include " + mHeaderName + "\n"
-            + "\n" + createMethodDefinitionBones(mClassName, "");
+            + "\n" + createMethodDefinitionBones(mClassName, mClassName, "");
 }
 
 void ClassGenerator::on_OkButton_clicked()
@@ -115,10 +115,9 @@ void ClassGenerator::on_OkButton_clicked()
     if (!isValidClassName())
     {
         QMessageBox::warning(this, nonSuccessCreationTitle, nonSuccessCreationMessage);
+        return;
     }
     setAllFieldsFromUi();
-
-    FileManager fileManager;
 
     fileManager.createFile(mHeaderName);
     fileManager.writeToFile(mHeaderName, createHeaderText());
@@ -127,4 +126,51 @@ void ClassGenerator::on_OkButton_clicked()
     fileManager.writeToFile(mSourceCodeName,createSourceText());
 
     QMessageBox::information(this, successCreationTitle, successCreationMessage);
+}
+
+//QTextCursor &textCursor
+bool definitionExists(QTextCursor &cursor)
+{
+    QString line = getTextByCursor(cursor);
+    return true;//rewrite in the future. now it's just valid every time
+}
+
+QString getTextByCursor(QTextCursor &cursor)
+{
+    cursor.select(QTextCursor::LineUnderCursor);
+    return cursor.selectedText();
+}
+
+QString getMethodNameFromFullDefinition(QString definition)
+{
+                qDebug()<<3;
+   QStringList wordsList1 = definition.split('(', QString::SkipEmptyParts);
+   QStringList wordList2 = wordsList1[0].split(' ');
+   QString word2 = wordList2[indexOfMethodNameInLine];
+   qDebug()<<word2;
+   return word2;
+}
+
+QString getMethodParametrsFromFullDefinition(QString definition)
+{
+    QRegularExpressionMatchIterator matchIter = QRegularExpression(textInsideBracketsRegex).
+            globalMatch(definition);
+    qDebug()<<2;
+    return matchIter.hasNext() ? matchIter.next().capturedTexts()[0] : QString();
+}
+
+QString getClassNameForMethodDefinition(QTextCursor &cursor)
+{
+    while (cursor.columnNumber())
+    {
+        QString textInCursorLine = getTextByCursor(cursor);
+        if (textInCursorLine.contains("class")
+           && !textInCursorLine.contains("friend"))
+        {
+            qDebug()<<1;
+            return getTextByCursor(cursor).split(' ')[indexOfClassNameInLine];
+        }
+        cursor.movePosition(QTextCursor::Up);
+    }
+    return QString();
 }
