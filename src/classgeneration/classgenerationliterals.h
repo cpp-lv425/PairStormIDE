@@ -7,5 +7,7 @@ const QString successCreationTitle      = "Successful creation";
 const QString successCreationMessage    = "The class was successfully created!";
 const QString nonSuccessCreationTitle   = "Forbidden creation";
 const QString nonSuccessCreationMessage = "The class name is not correct!";
+const QString headerExtension           = ".h";
+const QString sourceExtension           = ".cpp";
 
 #endif // CLASSGENERATIONLITERALS_H

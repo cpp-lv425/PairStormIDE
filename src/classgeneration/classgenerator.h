@@ -2,7 +2,6 @@
 #define CLASSGENERATOR_H
 
 #include <QWidget>
-#include <QRegularExpression>
 
 namespace Ui
 {
@@ -29,7 +28,7 @@ private slots:
     void on_OkButton_clicked();
 
 private:
-    void setTextToOtherLineEdits();
+    void setFilesNames();
     bool isValidClassName();
     void setAllFieldsFromUi();
     QString createHeaderMacrosName();
