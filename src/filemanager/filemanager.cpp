@@ -1,7 +1,9 @@
 #include "filemanager.h"
 
 #include <QTextStream>
+#include <QDebug>
 #include <QFile>
+#include <QDir>
 
 #include "utils.h"
 
@@ -51,7 +53,7 @@ void FileManager::writeToFile(const QString &fileName,
 
 void FileManager::createProjectFile(const QString &path)
 {
-    // constructing project file name
+    // constructing full path to project file
     QString projectFileName = path;
     int position = path.lastIndexOf(QChar{'/'});
     projectFileName += '/';
@@ -65,4 +67,18 @@ void FileManager::createProjectFile(const QString &path)
     {
         throw;
     }
+}
+
+bool FileManager::projectExists(const QString &path)
+{
+    QDir projectDir(path);
+
+    // construct project file name
+    int position = path.lastIndexOf(QChar{'/'});
+    QString projectFileName = path.mid(position + 1);
+    projectFileName += ".psproj";
+
+    // if project file exists in specified directory
+    // then true is returned
+    return projectDir.exists(projectFileName);
 }

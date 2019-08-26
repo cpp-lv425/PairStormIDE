@@ -11,6 +11,7 @@ public:
     void writeToFile(const QString &fileName,
                      const QString &content);
     void createProjectFile(const QString &path);
+    bool projectExists(const QString &path);
 };
 
 #endif // FILEMANAGER_H

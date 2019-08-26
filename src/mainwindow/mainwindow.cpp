@@ -328,7 +328,10 @@ void MainWindow::onNewFileTriggered()
     // check if project is opened
     if (!mpDocumentManager->getCurrentProjectPath().size())
     {
-        QMessageBox::information(this, userMessages[UserMessages::ProjectNotOpenedTitle], userMessages[UserMessages::ProjectNotOpenedMsg]);
+        QMessageBox::warning
+                (this,
+                 userMessages[UserMessages::ProjectNotOpenedTitle],
+                userMessages[UserMessages::ProjectNotOpenedMsg]);
         return;
     }
 
@@ -355,7 +358,7 @@ void MainWindow::onNewFileTriggered()
     }
     catch (const QException&)
     {
-        QMessageBox::information
+        QMessageBox::warning
                 (this,
                  userMessages[UserMessages::ErrorTitle],
                 userMessages[UserMessages::FileOpeningErrorMsg]);
@@ -372,7 +375,10 @@ void MainWindow::onOpenFileTriggered()
     // check if project is opened
     if (!mpDocumentManager->getCurrentProjectPath().size())
     {
-        QMessageBox::information(this, userMessages[UserMessages::ProjectNotOpenedTitle], userMessages[UserMessages::ProjectNotOpenedMsg]);
+        QMessageBox::warning
+                (this,
+                 userMessages[UserMessages::ProjectNotOpenedTitle],
+                userMessages[UserMessages::ProjectNotOpenedMsg]);
         return;
     }
 
@@ -391,7 +397,7 @@ void MainWindow::onOpenFileTriggered()
     // checks if selected file belongs to opened project
     if (!mpDocumentManager->fileBelongsToCurrentProject(fileName))
     {
-        QMessageBox::information
+        QMessageBox::warning
                 (this,
                  userMessages[UserMessages::FileDoesNotBelongToProjectTitle],
                 userMessages[UserMessages::FileDoesNotBelongToProjectMsg]);
@@ -406,7 +412,10 @@ void MainWindow::onOpenProjectTriggered()
     // check if other project is opened
     if (mpDocumentManager->getCurrentProjectPath().size())
     {
-        QMessageBox::information(this, userMessages[UserMessages::ProjectOpenedTitle], userMessages[UserMessages::ProjectOpenedMsg]);
+        QMessageBox::warning
+                (this,
+                 userMessages[UserMessages::ProjectOpenedTitle],
+                userMessages[UserMessages::ProjectOpenedMsg]);
         return;
     }
 
@@ -416,6 +425,14 @@ void MainWindow::onOpenProjectTriggered()
             QDir::homePath());
 
     // check if project exists
+    if (!FileManager().projectExists(dirName))
+    {
+        QMessageBox::warning
+                (this,
+                 userMessages[UserMessages::ProjectDoesNotExistTitle],
+                userMessages[UserMessages::ProjectDoesNotExistMsg]);
+        return;
+    }
 
     mpProjectViewerDock->setDir(dirName);
     mpDocumentManager->openProject(dirName);
@@ -482,7 +499,10 @@ void MainWindow::onCloseProjectTriggered()
     mpProjectViewerDock->setDir(QDir::currentPath());
     // disconnect from db
 
-    QMessageBox::information(this, userMessages[UserMessages::ProjectClosedTitle], userMessages[UserMessages::ProjectClosedMsg]);
+    QMessageBox::information
+            (this,
+             userMessages[UserMessages::ProjectClosedTitle],
+            userMessages[UserMessages::ProjectClosedMsg]);
 }
 
 void MainWindow::onOpenStartPage()
@@ -901,7 +921,10 @@ void MainWindow::onNewProjectTriggered()
     // check if other project is opened
     if (mpDocumentManager->getCurrentProjectPath().size())
     {
-        QMessageBox::information(this, userMessages[UserMessages::ProjectOpenedTitle], userMessages[UserMessages::ProjectOpenedMsg]);
+        QMessageBox::information
+                (this,
+                 userMessages[UserMessages::ProjectOpenedTitle],
+                userMessages[UserMessages::ProjectOpenedMsg]);
         return;
     }
 
@@ -923,7 +946,7 @@ void MainWindow::onNewProjectTriggered()
         FileManager().createProjectFile(dirName);
     } catch (const FileOpeningFailure&)
     {
-        QMessageBox::information
+        QMessageBox::warning
                 (this,
                  userMessages[UserMessages::ErrorTitle],
                 userMessages[UserMessages::ProjectCreationFailureMsg]);

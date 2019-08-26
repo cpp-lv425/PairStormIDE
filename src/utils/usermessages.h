@@ -55,6 +55,8 @@ enum class UserMessages
     ProjectCreationFailureMsg,
     InvalidProjectNameTitle,
     InvalidProjectNameMsg,
+    ProjectDoesNotExistTitle,
+    ProjectDoesNotExistMsg,
 };
 
 extern QMap<UserMessages, QString> userMessages;

@@ -51,5 +51,6 @@ QMap<UserMessages, QString> userMessages =
     std::pair<UserMessages, const QString>(UserMessages::ProjectCreationFailureMsg, "Unable to create new project."),
     std::pair<UserMessages, const QString>(UserMessages::InvalidProjectNameTitle, "Invalid project name"),
     std::pair<UserMessages, const QString>(UserMessages::InvalidProjectNameMsg, "Please enter valid project name."),
-
+    std::pair<UserMessages, const QString>(UserMessages::ProjectDoesNotExistTitle, "Project does not exist"),
+    std::pair<UserMessages, const QString>(UserMessages::ProjectDoesNotExistMsg, "Project does not exist in specified directory."),
 };
