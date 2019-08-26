@@ -588,14 +588,12 @@ void DocumentManager::closeEmptyDocArea()
 }
 
 bool DocumentManager::fileBelongsToCurrentProject(const QString &fileName) const
-{
-    //qDebug() << "file to find: "<< fileName;
+{    
     QDirIterator dirIter(currentProject, QDir::NoFilter, QDirIterator::Subdirectories);
 
     while (dirIter.hasNext())
     {
-        dirIter.next();
-        //qDebug() << dirIter.filePath();
+        dirIter.next();        
         if (dirIter.filePath() == fileName)
         {
             return true;

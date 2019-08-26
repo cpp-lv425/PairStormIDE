@@ -325,8 +325,18 @@ void MainWindow::createButtomPanel()
 
 void MainWindow::onNewFileTriggered()
 {    
+    // check if project is opened
+    if (!mpDocumentManager->getCurrentProjectPath().size())
+    {
+        QMessageBox::information(this, userMessages[UserMessages::ProjectNotOpenedTitle], userMessages[UserMessages::ProjectNotOpenedMsg]);
+        return;
+    }
+
     QStringList fileExtensions = getFileExtensions();
-    NewFileDialog newFileDialog(fileExtensions, this);
+    NewFileDialog newFileDialog
+            (fileExtensions,
+             mpDocumentManager->getCurrentProjectPath(),
+             this);
     QString newFileName;
     try
     {
@@ -354,7 +364,7 @@ void MainWindow::onNewFileTriggered()
 
 void MainWindow::onNewClassTriggered()
 {
-    qDebug() << "new class";
+
 }
 
 void MainWindow::onOpenFileTriggered()
@@ -438,8 +448,7 @@ void MainWindow::onCloseProjectTriggered()
         case QDialogButtonBox::StandardButton::YesToAll:
         {
             try
-            {
-                qDebug() << "yes to all";
+            {                
                 // saving changes to opened documents
                 mpDocumentManager->saveAllDocuments();
             } catch (const FileOpeningFailure&)
@@ -453,13 +462,11 @@ void MainWindow::onCloseProjectTriggered()
             break;
         }
         case QDialogButtonBox::StandardButton::NoToAll:
-        {
-            qDebug() << "no to all";
+        {           
             break;
         }
         case QDialogButtonBox::StandardButton::Cancel:
-        {
-            qDebug() << "cancel";
+        {            
             return;
         }
         default:

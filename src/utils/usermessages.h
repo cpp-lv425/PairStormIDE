@@ -51,6 +51,7 @@ enum class UserMessages
     ProjectNotOpenedMsg,
     FileDoesNotBelongToProjectTitle,
     FileDoesNotBelongToProjectMsg,
+    DirectoryDoesNotBelongToProjectMsg,
 };
 
 extern QMap<UserMessages, QString> userMessages;

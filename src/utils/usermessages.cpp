@@ -47,4 +47,5 @@ QMap<UserMessages, QString> userMessages =
     std::pair<UserMessages, const QString>(UserMessages::ProjectNotOpenedMsg, "Please open project."),
     std::pair<UserMessages, const QString>(UserMessages::FileDoesNotBelongToProjectTitle, "File does not belong to opened project"),
     std::pair<UserMessages, const QString>(UserMessages::FileDoesNotBelongToProjectMsg, "Please select file which belongs to opened project."),
+    std::pair<UserMessages, const QString>(UserMessages::DirectoryDoesNotBelongToProjectMsg, "Please select directory which belongs to opened project."),
 };
