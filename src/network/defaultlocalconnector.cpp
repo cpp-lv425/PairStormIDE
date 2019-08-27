@@ -2,7 +2,7 @@
 // ==========================================================================================
 // ==========================================================================================
 //                                                             LAUNCH SERVICES ON USER LOG IN
-void DefaultLocalConnector::configureOnLogin(const QString & userName)
+void DefaultLocalConnector::configureOnLogin(const QString &userName)
 {
     if (mpUdpService && mpTcpService)
     {
@@ -90,7 +90,7 @@ void DefaultLocalConnector::clearOutdatedAttributesOnTimerTick()
     mDiscoveredServersAttrib.erase(
                 std::remove_if(mDiscoveredServersAttrib.begin(),
                                mDiscoveredServersAttrib.end(),
-                               [currentMs, &outdatedServerNames] (const ServerData & serverAttributes) -> bool
+                               [currentMs, &outdatedServerNames] (const ServerData &serverAttributes) -> bool
                                {
                                    bool isOutdated = (currentMs - serverAttributes.mDiscoveryMoment) >
                                                       gDefaultOutdatingCycleMs;
@@ -106,7 +106,7 @@ void DefaultLocalConnector::clearOutdatedAttributesOnTimerTick()
     if (!outdatedServerNames.empty())
     {
         bool isAnyConnectedAttributesOutdated = false;
-        for(const auto & serverName : outdatedServerNames)
+        for(const auto &serverName : outdatedServerNames)
         {
             if(!popFromConnectedAttributes(serverName).empty())
             {
@@ -148,7 +148,7 @@ void DefaultLocalConnector::addServerAttributesOnReceive()
     auto pExistentAttributes =
             std::find_if(mDiscoveredServersAttrib.begin(),
                          mDiscoveredServersAttrib.end(),
-                         [curretnAttributes] (const ServerData & inServerData)
+                         [curretnAttributes] (const ServerData &inServerData)
                          {
                              return inServerData.mName ==
                                     curretnAttributes.mName;
@@ -172,7 +172,7 @@ QStringList DefaultLocalConnector::getOnlineUsers() const
 {
     QStringList userNames;
     // Get user names from discovered servers
-    for (const auto & serverAttrib : mDiscoveredServersAttrib)
+    for (const auto &serverAttrib : mDiscoveredServersAttrib)
         userNames.push_back(serverAttrib.mName);
 
     return userNames;
@@ -185,7 +185,7 @@ QStringList DefaultLocalConnector::getConnectedUsers() const
 {
     QStringList userNames;
     // Get user names from connected servers
-    for (const auto & serverAttrib : mConnectedServersAttrib)
+    for (const auto &serverAttrib : mConnectedServersAttrib)
         userNames.push_back(serverAttrib.mName);
 
     return userNames;
@@ -194,13 +194,13 @@ QStringList DefaultLocalConnector::getConnectedUsers() const
 // ==========================================================================================
 // ==========================================================================================
 //                                                             TRY ADDING SERVER TO CONNECTED
-ServerData DefaultLocalConnector::pushToConnectedAttributes(const QString & serverName)
+ServerData DefaultLocalConnector::pushToConnectedAttributes(const QString &serverName)
 {
     ServerData serverAttributes;
     auto pDiscoveredServerAttributes =
             std::find_if(mDiscoveredServersAttrib.begin(),
                          mDiscoveredServersAttrib.end(),
-                         [serverName] (const ServerData & serverData)
+                         [serverName] (const ServerData &serverData)
                          {
                              return serverData.mName == serverName;
                          });
@@ -212,7 +212,7 @@ ServerData DefaultLocalConnector::pushToConnectedAttributes(const QString & serv
     auto pConnectedServerAttributes =
             std::find_if(mConnectedServersAttrib.begin(),
                          mConnectedServersAttrib.end(),
-                         [serverName] (const ServerData & serverData)
+                         [serverName] (const ServerData &serverData)
                          {
                              return serverData.mName == serverName;
                          });
@@ -228,13 +228,13 @@ ServerData DefaultLocalConnector::pushToConnectedAttributes(const QString & serv
 // ==========================================================================================
 // ==========================================================================================
 //                                                         TRY REMOVING SERVER FROM CONNECTED
-ServerData DefaultLocalConnector::popFromConnectedAttributes(const QString & serverName)
+ServerData DefaultLocalConnector::popFromConnectedAttributes(const QString &serverName)
 {
     ServerData serverAttributes;
     auto pServerAttributes =
             std::find_if(mConnectedServersAttrib.begin(),
                          mConnectedServersAttrib.end(),
-                         [serverName] (const ServerData & serverData)
+                         [serverName] (const ServerData &serverData)
                          {
                              return serverData.mName == serverName;
                          });
@@ -304,7 +304,7 @@ void DefaultLocalConnector::shareMessage(const QString messageContent)
     message.mType       = NetworkMessage::Type::ChatMessage;
     message.mSourceName = mpTcpService->getServerAttributes().mName;
     message.mContent    = messageContent;
-    for(const auto & serverAttrib : mConnectedServersAttrib)
+    for(const auto &serverAttrib : mConnectedServersAttrib)
     {
         mpTcpService->sendDataToTcpServer(message.toJsonQString(), serverAttrib);
     }
@@ -324,7 +324,7 @@ void DefaultLocalConnector::shareChange(const QString changeContent)
     message.mType       = NetworkMessage::Type::ChangesMessage;
     message.mSourceName = mpTcpService->getServerAttributes().mName;
     message.mContent    = changeContent;
-    for(const auto & serverAttrib : mConnectedServersAttrib)
+    for(const auto &serverAttrib : mConnectedServersAttrib)
     {
         mpTcpService->sendDataToTcpServer(message.toJsonQString(), serverAttrib);
     }

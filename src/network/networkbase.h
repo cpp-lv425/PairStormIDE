@@ -57,7 +57,7 @@ struct ServerData
         // Fill object with needed values
         jsonAttrib["name"] = mName;
         QJsonArray jsonIpArr;
-        for (const auto & ip : mIps)
+        for (const auto &ip : mIps)
         {
             jsonIpArr.push_back(ip.toString());
         }
@@ -70,7 +70,7 @@ struct ServerData
         return QString(attribData);
     }
 
-    void fromJsonQString(const QString & attribData)
+    void fromJsonQString(const QString &attribData)
     {
         *this = ServerData();
         // Decompose the Json bearer string

@@ -24,7 +24,7 @@ void UdpService::configureSocket()
     mpUdpSocket->bind(mcSocketPortNumber);
 
     // Establish broadcast addresses for each interface
-    for (const auto & availableInt : QNetworkInterface::allInterfaces())
+    for (const auto &availableInt : QNetworkInterface::allInterfaces())
     {
         QNetworkInterface::InterfaceFlags intFlags = availableInt.flags();
         bool isInterfaceRunning(intFlags & QNetworkInterface::IsRunning);
@@ -33,7 +33,7 @@ void UdpService::configureSocket()
         if(!isInterfaceRunning || isInterfaceLoopBack) continue;
 
         // Add all broadcast IPv4 addresses from this interface
-        for (const auto & ipEntry : availableInt.addressEntries())
+        for (const auto &ipEntry : availableInt.addressEntries())
         {
             if(ipEntry.ip().protocol() == QAbstractSocket::IPv4Protocol)
             {
@@ -46,13 +46,13 @@ void UdpService::configureSocket()
 // ==========================================================================================
 // ==========================================================================================
 //                                               BROADCAST GIVEN DATAGRAM FROM ALL INTERFACES
-void UdpService::broadcastDatagram(const QString & data)
+void UdpService::broadcastDatagram(const QString &data)
 {
     QByteArray datagram;
     datagram.append(data);
 
     // Broadcast through all broadcast Ip adresses
-    for (const QHostAddress & broadcastIp : mBroadcastAddresses)
+    for (const QHostAddress &broadcastIp : mBroadcastAddresses)
     {
         // Broadcast datagram bytes
         mpUdpSocket->writeDatagram(datagram, broadcastIp, mcSocketPortNumber);
