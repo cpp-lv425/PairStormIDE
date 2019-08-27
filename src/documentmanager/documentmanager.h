@@ -1,6 +1,7 @@
 #ifndef MDIAREA_H
 #define MDIAREA_H
 
+#include <functional>
 #include <QObject>
 
 class QMdiSubWindow;
@@ -31,9 +32,14 @@ public:
     void closeCurrentDocument();
     QVector<CodeEditor*> getChangedDocuments();
     void combineDocAreas();
-    void closeEmptyDocArea();
-    void closeCurrentDocArea();
-    void setStyle(const QString &styleName);
+    void closeEmptyDocArea();    
+
+    // calls passed functor on every opened document
+    void configureDocuments(std::function<void(DocumentManager*, CodeEditor*, const QString&)> functor,
+                           const QString &newValue);
+    void setStyle(CodeEditor *doc, const QString &styleName);
+    void setFontFamily(CodeEditor *doc, const QString &fontFamily);
+    void setFontSize(CodeEditor *doc, const QString &fontSize);
 
 public slots:
     void onSplit(Qt::Orientation orientation);
@@ -51,7 +57,7 @@ private:
     QMdiArea* lastAreaInFocus();
     QMdiArea* areaInFocus();
     QMdiArea* getArea(CodeEditor *doc);
-    bool saveDocument(CodeEditor* doc);
+    bool saveDocument(CodeEditor *doc);
     void saveDocument(const QString &fileName, const QString &fileContent);
 
 };

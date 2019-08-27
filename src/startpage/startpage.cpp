@@ -45,7 +45,7 @@ StartPage::StartPage(QWidget *parent) :
                 QIcon(":/img/OPENDIR.png"),
                 iconDimension,
                 maxButtonsWidth,
-                "Open Folder");
+                "Open Project");
     connect(mpOpenDirBtn, &QPushButton::pressed, this, &StartPage::openDirPressed);
 
     // creating & configuring settings call button

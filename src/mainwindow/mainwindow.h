@@ -40,8 +40,7 @@ private:
     ProjectViewerDock *mpProjectViewerDock;
     ChatWindowDock *mpChatWindowDock;
     BottomPanelDock *mpBottomPanelDock;
-    QScopedPointer<DocumentManager> mpDocumentManager;
-    QString mCurrentUserName;
+    QScopedPointer<DocumentManager> mpDocumentManager;    
     Browser *mDocumentationBrowser;
     QScopedPointer<PaletteConfigurator> mpPaletteConfigurator;
     Connection *db;
@@ -55,7 +54,11 @@ private:
     void saveMainWindowState();
     void restoreMainWindowState();
     void setInitialAppStyle();
+
+    // methods for dynamic change of IDE settings
     void setAppStyle(const QString &style);
+    void setDocumentFontFamily(const QString &fontFamily);
+    void setDocumentFontSize(const QString &fontSize);
 
     void databaseConnect(QString directory);
     void databaseDisconnect();
@@ -89,8 +92,7 @@ private slots:
     void onShowChatWindowDockTriggered();
     void onShowBottomPanel();
     void onCombineAreas();
-    void onCloseEmptyDocArea();
-    void onCloseCurrentDocArea();
+    void onCloseEmptyDocArea();   
 
     // tools menu
     void onRefactorTriggered();
@@ -102,7 +104,6 @@ private slots:
     void onReferenceTriggered();
     void onUserGuideTriggered();
     void onCheckUpdatesTriggered();
-
     void onReferenceFromEditor(const QString &keyword);
 
 public slots:

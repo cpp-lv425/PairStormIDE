@@ -61,6 +61,8 @@ public:
     void zoom(int val);
     bool isChanged();
     void setBeginTextState();
+    const QByteArray& getBeginTextState()const;
+    void setTextState(const QByteArray &beginTextState);
 
     LastRemoveKey getLastRemomeKey() const;
     void setLastRemomeKey(const LastRemoveKey &value);
@@ -140,7 +142,7 @@ private:
     int mLinesCountPrev;
     int mLinesCountCurrent;
 
-    QString mBeginTextState;
+    QByteArray mBeginTextState;
     QVector<AddCommentButton*> mCommentsVector;
 
     QTextCharFormat fmtLiteral;
