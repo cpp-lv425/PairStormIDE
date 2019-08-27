@@ -79,18 +79,18 @@ struct ServerData
         QJsonObject jsonAttrib = doc.object();
 
         // Verify if the Json object is not corrupted
-        if(jsonAttrib.isEmpty()                 ||
-           !jsonAttrib.keys().contains("app")   ||
-           !jsonAttrib.keys().contains("ips")   ||
-           !jsonAttrib.keys().contains("name")  ||
-           !jsonAttrib.keys().contains("port"))
+        if (jsonAttrib.isEmpty()                 ||
+            !jsonAttrib.keys().contains("app")   ||
+            !jsonAttrib.keys().contains("ips")   ||
+            !jsonAttrib.keys().contains("name")  ||
+            !jsonAttrib.keys().contains("port"))
         {
             return;
         }
         // Check if the API version match
         QSettings applicationSettings;
         QString appLabel = applicationSettings.value("applicationName").toString();
-        if(jsonAttrib.value("app").toString() != appLabel)
+        if (jsonAttrib.value("app").toString() != appLabel)
         {
             return;
         }
@@ -150,18 +150,18 @@ struct NetworkMessage
         QJsonObject json = doc.object();
 
         // Verify if the Json object is not corrupted
-        if(json.isEmpty()                      ||
-           !json.keys().contains("app")        ||
-           !json.keys().contains("sourceName") ||
-           !json.keys().contains("data")       ||
-           !json.keys().contains("type"))
+        if (json.isEmpty()                      ||
+            !json.keys().contains("app")        ||
+            !json.keys().contains("sourceName") ||
+            !json.keys().contains("data")       ||
+            !json.keys().contains("type"))
         {
             return;
         }
         // Check if the API version match
         QSettings applicationSettings;
         QString appLabel = applicationSettings.value("applicationName").toString();
-        if(json.value("app").toString() != appLabel)
+        if (json.value("app").toString() != appLabel)
         {
             return;
         }

@@ -70,12 +70,12 @@ struct ChatMessage
         QJsonObject json = doc.object();
 
         // Verify if the Json object is not corrupted
-        if(json.isEmpty()                      ||
-           !json.keys().contains("app")        ||
-           !json.keys().contains("authorName") ||
-           !json.keys().contains("data")       ||
-           !json.keys().contains("time")       ||
-           !json.keys().contains("type"))
+        if (json.isEmpty()                      ||
+            !json.keys().contains("app")        ||
+            !json.keys().contains("authorName") ||
+            !json.keys().contains("data")       ||
+            !json.keys().contains("time")       ||
+            !json.keys().contains("type"))
         {
             return;
         }
@@ -83,7 +83,7 @@ struct ChatMessage
         QSettings applicationSettings;
         QString appLabel =
                 applicationSettings.value("applicationName").toString();
-        if(json.value("app").toString() != appLabel)
+        if (json.value("app").toString() != appLabel)
         {
             return;
         }

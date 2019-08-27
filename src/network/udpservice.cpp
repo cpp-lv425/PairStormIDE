@@ -30,12 +30,12 @@ void UdpService::configureSocket()
         bool isInterfaceRunning(intFlags & QNetworkInterface::IsRunning);
         bool isInterfaceLoopBack(intFlags & QNetworkInterface::IsLoopBack);
         // Omit interfaces that are LoopBack or are not active
-        if(!isInterfaceRunning || isInterfaceLoopBack) continue;
+        if (!isInterfaceRunning || isInterfaceLoopBack) continue;
 
         // Add all broadcast IPv4 addresses from this interface
         for (const auto &ipEntry : availableInt.addressEntries())
         {
-            if(ipEntry.ip().protocol() == QAbstractSocket::IPv4Protocol)
+            if (ipEntry.ip().protocol() == QAbstractSocket::IPv4Protocol)
             {
                 mBroadcastAddresses.push_back(ipEntry.broadcast());
             }

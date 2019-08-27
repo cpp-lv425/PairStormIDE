@@ -97,12 +97,12 @@ void TcpService::saveServerAttributes()
         bool isInterfaceRunning (intFlags & QNetworkInterface::IsRunning);
         bool isInterfaceLoopBack(intFlags & QNetworkInterface::IsLoopBack);
         // Omit interfaces that are LoopBack or are not active
-        if(!isInterfaceRunning || isInterfaceLoopBack) continue;
+        if (!isInterfaceRunning || isInterfaceLoopBack) continue;
 
         // Add all active IPv4 addresses inside this interface
         for (const auto &ipEntry : availInterface.addressEntries())
         {
-            if(ipEntry.ip().protocol() == QAbstractSocket::IPv4Protocol)
+            if (ipEntry.ip().protocol() == QAbstractSocket::IPv4Protocol)
             {
                 mServerAttributes.mIps.push_back(ipEntry.ip());
             }

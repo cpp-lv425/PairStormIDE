@@ -107,7 +107,7 @@ void QmlChatWidget::configureOnLogin(const QString &userName)
 //                                                          UPDATE ONLINE USERS IN CONTROLLER
 void QmlChatWidget::updateOnlineUsers(const QStringList &onlineUsers)
 {
-    if(mpMessagesController)
+    if (mpMessagesController)
     {
         mpUsersController->updateOnlineUsers(onlineUsers);
     }
@@ -118,7 +118,7 @@ void QmlChatWidget::updateOnlineUsers(const QStringList &onlineUsers)
 //                                                       UPDATE CONNECTED USERS IN CONTROLLER
 void QmlChatWidget::updateConnectedUsers(const QStringList &connectedUsers)
 {
-    if(mpMessagesController)
+    if (mpMessagesController)
     {
         mpUsersController->updateConnectedUsers(connectedUsers);
     }
@@ -131,7 +131,7 @@ void QmlChatWidget::appendMessage(const QString &messageAuthor,
                                   const QString &messageBody)
 {
     // Here we IGNORE messageAuthor because it is solely NEEDED FOR BACK COMPATIBILITY
-    if(!mpMessagesController)
+    if (!mpMessagesController)
     {
         // Hold the damage if it is called before user has logged in
         return;
