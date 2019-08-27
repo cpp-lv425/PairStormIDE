@@ -630,32 +630,38 @@ void MainWindow::onExitTriggered()
 
 void MainWindow::onUndoTriggered()
 {
-    mpDocumentManager->undoOnCurrentDocument();
+    std::function<void(CodeEditor*)> functor = &CodeEditor::undo;
+    mpDocumentManager->applyChangesToCurrentDocument(functor);
 }
 
 void MainWindow::onRedoTriggered()
 {
-    mpDocumentManager->redoOnCurrentDocument();
+    std::function<void(CodeEditor*)> functor = &CodeEditor::redo;
+    mpDocumentManager->applyChangesToCurrentDocument(functor);
 }
 
 void MainWindow::onCutTriggered()
 {
-    mpDocumentManager->cutOnCurrentDocument();
+    std::function<void(CodeEditor*)> functor = &CodeEditor::cut;
+    mpDocumentManager->applyChangesToCurrentDocument(functor);
 }
 
 void MainWindow::onCopyTriggered()
 {
-    mpDocumentManager->copyOnCurrentDocument();
+    std::function<void(CodeEditor*)> functor = &CodeEditor::copy;
+    mpDocumentManager->applyChangesToCurrentDocument(functor);
 }
 
 void MainWindow::onPasteTriggered()
 {
-    mpDocumentManager->pasteOnCurrentDocument();
+    std::function<void(CodeEditor*)> functor = &CodeEditor::paste;
+    mpDocumentManager->applyChangesToCurrentDocument(functor);
 }
 
 void MainWindow::onSelectAllTriggered()
 {    
-    mpDocumentManager->selectAllOnCurrentDocument();
+    std::function<void(CodeEditor*)> functor = &CodeEditor::selectAll;
+    mpDocumentManager->applyChangesToCurrentDocument(functor);
 }
 
 void MainWindow::onFindTriggered()
