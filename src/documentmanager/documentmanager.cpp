@@ -7,7 +7,6 @@
 #include <algorithm>
 #include <QMdiArea>
 #include <QVector>
-#include <QDebug>
 #include <QDir>
 
 #include "usermessages.h"

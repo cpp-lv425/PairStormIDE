@@ -1,6 +1,8 @@
 #ifndef FILEMANAGER_H
 #define FILEMANAGER_H
 
+extern const char *projectFileExtension;
+
 class QString;
 
 class FileManager

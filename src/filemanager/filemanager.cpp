@@ -1,11 +1,13 @@
 #include "filemanager.h"
 
 #include <QTextStream>
-#include <QDebug>
 #include <QFile>
 #include <QDir>
 
 #include "utils.h"
+
+const char *projectFileExtension = ".psproj";
+const char pathSeparator = '/';
 
 QString FileManager::readFromFile(const QString &fileName)
 {
@@ -55,10 +57,10 @@ void FileManager::createProjectFile(const QString &path)
 {
     // constructing full path to project file
     QString projectFileName = path;
-    int position = path.lastIndexOf(QChar{'/'});
-    projectFileName += '/';
+    int position = path.lastIndexOf(QChar{pathSeparator});
+    projectFileName += pathSeparator;
     projectFileName += path.mid(position + 1);
-    projectFileName += ".psproj";
+    projectFileName += projectFileExtension;
 
     try
     {
@@ -74,9 +76,9 @@ bool FileManager::projectExists(const QString &path)
     QDir projectDir(path);
 
     // construct project file name
-    int position = path.lastIndexOf(QChar{'/'});
+    int position = path.lastIndexOf(QChar{pathSeparator});
     QString projectFileName = path.mid(position + 1);
-    projectFileName += ".psproj";
+    projectFileName += projectFileExtension;
 
     // if project file exists in specified directory
     // then true is returned
