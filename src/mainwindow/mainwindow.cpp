@@ -29,6 +29,7 @@
 #include "storeconf.h"
 #include "startpage.h"
 #include "utils.h"
+#include "sqliteaccess.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -360,7 +361,7 @@ void MainWindow::onOpenFolderTriggered()
             (this,
              userMessages[UserMessages::OpenDirectoryTitle],
             QDir::homePath());
-
+    databaseConnect(dirName);
     mpProjectViewerDock->setDir(dirName);
 }
 
@@ -754,4 +755,20 @@ void MainWindow::setDocumentFontSize(const QString &fontSize)
             (&DocumentManager::setFontSize);
 
     mpDocumentManager->configureDocuments(functor, fontSize);
+}
+
+
+void MainWindow::databaseConnect(QString directory)
+{
+    db = ConnectionGetter::getDefaultConnection(directory + QDir::separator()+"storage.db");
+    CreateDB database;
+    database.addTableFile();
+    database.addTableUser();
+    database.addTableComment();
+    database.addTableMessage();
+}
+
+void MainWindow::databaseDisconnect()
+{
+    delete db;
 }

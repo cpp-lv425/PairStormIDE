@@ -23,9 +23,11 @@ const int TOP_UNUSED_PIXELS_HEIGHT = 4;
 #include<QVector>
 #include<QFont>
 #include<QStatusBar>
+#include"sqliteaccess.h"
 #include<QStringList>
 #include<QCompleter>
 #include"autocodecompleter.h"
+
 
 
 class QPaintEvent;
@@ -46,6 +48,7 @@ class CodeEditor : public QPlainTextEdit
     Q_OBJECT
 public:
     CodeEditor(QWidget *parent = nullptr);
+    virtual ~CodeEditor();
     void specialAreasRepaintEvent(QPaintEvent *event);
     void repaintButtonsArea(int bottom, int top, int blockNumber);
     int getLineNumberAreaWidth();
@@ -68,12 +71,17 @@ public:
     void setConfigParam(const ConfigParams &configParam);
     void highlighText();
 
+    //DB methods
+    void readAllCommentsFromDB(QVector<Comment> mStartComments);
+    QVector<Comment> getAllCommentsToDB();
+
 private:
     void rewriteButtonsLines( QVector<AddCommentButton*> &commentV, int diff, int startLine);
     void setAnotherButtonLine(AddCommentButton *comment, int diff);
     bool isInRangeIncludBoth(int val, int leftMargin, int rightMargin);
     bool isInRangeIncludLast(int val, int leftMargin, int rightMargin);
 
+    void addButton(const int line, const QString &Comment);
     void removeButtonByIndex(QVector<AddCommentButton*> &commentV, int index);
     void removeButtomByValue(QVector<AddCommentButton*> &commentV, AddCommentButton* commentButton);
     void removeButtons(QVector<AddCommentButton*> &commentV, int cursorLine, int startLine, int endLine, int diff);
@@ -127,7 +135,9 @@ private:
     AddCommentButton *mAddCommentButton;
     CommentWidget *mCommentWidget;
     QLabel *mCurrentCommentLable;
+    QVector<Comment> mStartComments;
     QCompleter *mCompleter;
+    CommentDb *commentGetter;
 
     int mLinesCountPrev;
     int mLinesCountCurrent;
