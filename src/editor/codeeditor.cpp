@@ -372,8 +372,8 @@ void CodeEditor::notEmptyCommentWasAdded()
         commentButtonNew->setGeometry(mCommentWidget->getCommentButtonGeometry());
         commentButtonNew->setCurrentLine(mCommentWidget->getCommentLine());
 
-        commentButtonNew->setStyleSheet("background-color: red");
-        commentButtonNew->setText("卐");
+        commentButtonNew->setStyleSheet("background-color: #18CD3C");
+        commentButtonNew->setText("✔");
         commentButtonNew->setVisible(true);
 
         setNewAddedButtonSettings(commentButtonNew);
