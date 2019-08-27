@@ -111,7 +111,8 @@ public slots:
     void setFontSize(const QString &fontSize);
     void setFontStyle(const QString &fontStyle);
     void setIdeType(const QString &ideType);
-    void testSlot();
+    void calculateRefactorItemEnabled();
+    void writeDefinitionToSource();
 
 signals:
     void changesAppeared();

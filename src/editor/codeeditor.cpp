@@ -12,6 +12,7 @@
 #include<iostream>
 #include<QLabel>
 #include"classgenerator.h"
+#include"methodspartsdefinitiongetters.h"
 #include<QMenu>
 
 CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
@@ -110,13 +111,33 @@ void CodeEditor::setIdeType(const QString &ideType)
     setTextColors();
 }
 
-void CodeEditor::testSlot()
+
+void CodeEditor::calculateRefactorItemEnabled()
 {
     QTextCursor curs = this->textCursor();
-   // if (definitionExists(curs)//IDK
+    qDebug()<<"textCursor = "<<getTextByCursor(curs);
+    if (!definitionExists(curs))//IDK
     {
-
+        qDebug()<<"NOT EXISTS!";
+        return;
     }
+    qDebug()<<" EXISTS!";
+    auto className = getClassNameForMethodDefinition(curs);
+    auto methodName = getMethodNameFromFullDefinition(getTextByCursor(curs));
+    auto parametrsName = getMethodParametrsFromFullDefinition(getTextByCursor(curs));
+
+    QString definitonTest = createMethodDefinitionBones(methodName.first,
+                                                        className,
+                                                        methodName.second,
+                                                        parametrsName);
+    curs.movePosition(QTextCursor::End);
+    this->setTextCursor(curs);
+    this->textCursor().insertText("\n" + definitonTest);//here it's for test. Should add to the source code file
+}
+
+void CodeEditor::writeDefinitionToSource()
+{
+    QTextCursor curs = this->textCursor();
 
     auto className = getClassNameForMethodDefinition(curs);
     auto methodName = getMethodNameFromFullDefinition(getTextByCursor(curs));
@@ -126,7 +147,6 @@ void CodeEditor::testSlot()
                                                         className,
                                                         methodName.second,
                                                         parametrsName);
-    qDebug()<<"def text ="<<definitonTest;
     curs.movePosition(QTextCursor::End);
     this->setTextCursor(curs);
     this->textCursor().insertText("\n" + definitonTest);//here it's for test. Should add to the source code file
@@ -139,8 +159,9 @@ void CodeEditor::contextMenuEvent(QContextMenuEvent *event)
 
     QAction *addDefinitionAction = new QAction("Add definition", refactorItem);
     refactorItem->addAction(addDefinitionAction);
-    connect(refactorItem, &QMenu::aboutToShow, this, &CodeEditor::testSlot);
-    //addDefinitionAction->setEnabled(false);
+    //connect(refactorItem, &QMenu::aboutToShow, this, &CodeEditor::calculateRefactorItemEnabled);
+    addDefinitionAction->setEnabled(definitionExists(this->textCursor()));
+    connect(addDefinitionAction, SIGNAL(triggered()), this, SLOT(writeDefinitionToSource()));
     menu->exec(event->globalPos());
     delete menu;
 }
