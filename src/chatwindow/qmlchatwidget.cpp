@@ -65,7 +65,7 @@ void QmlChatWidget::configureOnLogin(const QString &userName)
                                                        "Messages list can be created only in backend");
 
     // Create & connect chat users controller
-    mpUsersController = new ChatUsersController();
+    mpUsersController = new ChatUsersController(mUserName);
     connect(mpUsersController, &ChatUsersController::userStateChangedConnected,
             this,              &QmlChatWidget::ConnectUserOnSwitchOn,
             Qt::UniqueConnection);

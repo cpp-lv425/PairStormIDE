@@ -14,7 +14,7 @@ class ChatUsersController : public QObject
 
 public:
 
-    explicit ChatUsersController(QObject *parent = nullptr);
+    explicit ChatUsersController(const QString &userName, QObject *parent = nullptr);
 
     // Users list getter
     QVector<ChatUser> users() const;

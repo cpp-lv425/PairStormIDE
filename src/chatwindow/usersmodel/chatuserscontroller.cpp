@@ -2,10 +2,11 @@
 // ==========================================================================================
 // ==========================================================================================
 //                                                                                CONSTRUCTOR
-ChatUsersController::ChatUsersController(QObject *parent) :
+ChatUsersController::ChatUsersController(const QString &userName, QObject *parent) :
     QObject(parent), mDatabaseUsers()
 {
     QVector<User> superUsers = mDatabaseUsers.getAllUsersFromDb();
+    mDatabaseUsers.addUserToDb(userName);
     // TODO fill chat users & implement additional states behavior
 }
 // ==========================================================================================
