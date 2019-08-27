@@ -6,8 +6,10 @@
 #include <QTextCursor>
 #include<QPlainTextEdit>
 
-const int indexOfClassNameInLine  = 1;
-const int indexOfMethodNameInLine = 1;
+const int indexOfClassNameInLine    = 1;
+const int indexOfMethodTypeInLine   = 0;
+const int indexOfMethodNameInLine   = 1;
+const int leftPartOfDefinitionIndex = 0;
 
 namespace Ui
 {
@@ -31,7 +33,7 @@ public:
     QString sourceCodeName() const;
     void setSourceCodeName(const QString &sourceCodeName);
 
-    friend bool definitionExists(QTextCursor &cursor);
+    friend bool definitionExists(QTextCursor cursor);
 
 private slots:
     void on_OkButton_clicked();
@@ -55,13 +57,13 @@ private:
 };
 
 QString removeExtension(QString str, const int extensionCharacterCount);
-QString createMethodDefinitionBones(const QString className, const QString methodName,
-                                    const QString methodParams);
-QString getTextByCursor(QTextCursor &cursor);
+QString createMethodDefinitionBones(const QString &dataType,  const QString &className,
+                                    const QString &methodName,const QString &methodParams);
+QString getTextByCursor(QTextCursor cursor);
 
-QString getMethodNameFromFullDefinition(QString definition);
+QPair<QString, QString> getMethodNameFromFullDefinition(QString definition);
 QString getMethodParametrsFromFullDefinition(QString definition);
 
-QString getClassNameForMethodDefinition(QTextCursor &cursor);
+QString getClassNameForMethodDefinition(QTextCursor cursor);
 
 #endif // CLASSGENERATOR_H

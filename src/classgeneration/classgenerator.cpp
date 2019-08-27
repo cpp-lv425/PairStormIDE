@@ -89,10 +89,11 @@ QString ClassGenerator::createClassBones()
             + "};\n";
 }
 
-QString createMethodDefinitionBones(const QString className, const QString methodName,
-                                    const QString methodParams)
+QString createMethodDefinitionBones(const QString &dataType,const QString &className,
+                                    const QString &methodName, const QString &methodParams)
 {
-    return className + "::" + methodName + "(" + methodParams + ")\n" + "{\n" + "\n}";
+    return dataType + (dataType.isEmpty() ? QString() : " ") + className + "::" +
+            methodName + "(" + methodParams + ")\n" + "{\n" + "\n}";
 }
 
 QString ClassGenerator::createHeaderText()
@@ -107,7 +108,7 @@ QString ClassGenerator::createHeaderText()
 QString ClassGenerator::createSourceText()
 {
     return "#include " + mHeaderName + "\n"
-            + "\n" + createMethodDefinitionBones(mClassName, mClassName, "");
+            + "\n" + createMethodDefinitionBones(QString(), mClassName, mClassName, QString());
 }
 
 void ClassGenerator::on_OkButton_clicked()
@@ -128,46 +129,44 @@ void ClassGenerator::on_OkButton_clicked()
     QMessageBox::information(this, successCreationTitle, successCreationMessage);
 }
 
-//QTextCursor &textCursor
-bool definitionExists(QTextCursor &cursor)
+bool definitionExists(QTextCursor cursor)
 {
     QString line = getTextByCursor(cursor);
     return true;//rewrite in the future. now it's just valid every time
 }
 
-QString getTextByCursor(QTextCursor &cursor)
+QString getTextByCursor(QTextCursor cursor)
 {
     cursor.select(QTextCursor::LineUnderCursor);
     return cursor.selectedText();
 }
 
-QString getMethodNameFromFullDefinition(QString definition)
+QPair<QString, QString> getMethodNameFromFullDefinition(QString definition)
 {
-                qDebug()<<3;
-   QStringList wordsList1 = definition.split('(', QString::SkipEmptyParts);
-   QStringList wordList2 = wordsList1[0].split(' ');
-   QString word2 = wordList2[indexOfMethodNameInLine];
-   qDebug()<<word2;
-   return word2;
+   QStringList listSplitedByBracket = definition.split('(', QString::SkipEmptyParts);
+   QStringList listSplitedBySpace = listSplitedByBracket[leftPartOfDefinitionIndex].
+           split(' ', QString::SkipEmptyParts);
+
+   return qMakePair(listSplitedBySpace[indexOfMethodTypeInLine].simplified(),
+                    listSplitedBySpace[indexOfMethodNameInLine]);
 }
 
 QString getMethodParametrsFromFullDefinition(QString definition)
 {
     QRegularExpressionMatchIterator matchIter = QRegularExpression(textInsideBracketsRegex).
             globalMatch(definition);
-    qDebug()<<2;
     return matchIter.hasNext() ? matchIter.next().capturedTexts()[0] : QString();
 }
 
-QString getClassNameForMethodDefinition(QTextCursor &cursor)
+QString getClassNameForMethodDefinition(QTextCursor cursor)
 {
+    //before it we should be sure that method bone exists(type name(parametrs). in other way, don't show add definition menu)
     while (cursor.columnNumber())
     {
         QString textInCursorLine = getTextByCursor(cursor);
         if (textInCursorLine.contains("class")
            && !textInCursorLine.contains("friend"))
         {
-            qDebug()<<1;
             return getTextByCursor(cursor).split(' ')[indexOfClassNameInLine];
         }
         cursor.movePosition(QTextCursor::Up);

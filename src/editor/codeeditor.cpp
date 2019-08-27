@@ -7,6 +7,7 @@
 #include<QTextCharFormat>
 #include<QFontDatabase>
 #include<QScrollBar>
+#include<QLineEdit>
 #include<QMessageBox>
 #include<iostream>
 #include<QLabel>
@@ -112,14 +113,23 @@ void CodeEditor::setIdeType(const QString &ideType)
 void CodeEditor::testSlot()
 {
     QTextCursor curs = this->textCursor();
-    qDebug()<<"text by cursor = "<<getTextByCursor(curs);
-    //auto className = getClassNameForMethodDefinition(curs);
+   // if (definitionExists(curs)//IDK
+    {
 
-    //auto methodName = getMethodNameFromFullDefinition(getTextByCursor(curs));
-    //qDebug()<<"method name = "<<methodName;
+    }
 
+    auto className = getClassNameForMethodDefinition(curs);
+    auto methodName = getMethodNameFromFullDefinition(getTextByCursor(curs));
     auto parametrsName = getMethodParametrsFromFullDefinition(getTextByCursor(curs));
-    qDebug()<<"parametrs = "<<parametrsName;
+
+    QString definitonTest = createMethodDefinitionBones(methodName.first,
+                                                        className,
+                                                        methodName.second,
+                                                        parametrsName);
+    qDebug()<<"def text ="<<definitonTest;
+    curs.movePosition(QTextCursor::End);
+    this->setTextCursor(curs);
+    this->textCursor().insertText("\n" + definitonTest);//here it's for test. Should add to the source code file
 }
 
 void CodeEditor::contextMenuEvent(QContextMenuEvent *event)
