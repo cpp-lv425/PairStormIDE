@@ -329,7 +329,7 @@ void MainWindow::createButtomPanel()
 void MainWindow::onNewFileTriggered()
 {    
     // check if project is opened
-    if (!mpDocumentManager->getCurrentProjectPath().size())
+    if (!mpDocumentManager->projectOpened())
     {
         QMessageBox::warning
                 (this,
@@ -343,6 +343,7 @@ void MainWindow::onNewFileTriggered()
             (fileExtensions,
              mpDocumentManager->getCurrentProjectPath(),
              this);
+
     QString newFileName;
     try
     {
@@ -354,7 +355,7 @@ void MainWindow::onNewFileTriggered()
     {
         return;
     }
-    // opening doc with selected name
+
     try
     {
         mpDocumentManager->openDocument(newFileName);
@@ -371,7 +372,7 @@ void MainWindow::onNewFileTriggered()
 void MainWindow::onNewClassTriggered()
 {
     // check if project is opened
-    if (!mpDocumentManager->getCurrentProjectPath().size())
+    if (!mpDocumentManager->projectOpened())
     {
         QMessageBox::warning
                 (this,
@@ -394,7 +395,7 @@ void MainWindow::onNewClassTriggered()
 void MainWindow::onOpenFileTriggered()
 {
     // check if project is opened
-    if (!mpDocumentManager->getCurrentProjectPath().size())
+    if (!mpDocumentManager->projectOpened())
     {
         QMessageBox::warning
                 (this,
@@ -431,7 +432,7 @@ void MainWindow::onOpenFileTriggered()
 void MainWindow::onOpenProjectTriggered()
 {
     // check if other project is opened
-    if (mpDocumentManager->getCurrentProjectPath().size())
+    if (mpDocumentManager->projectOpened())
     {
         QMessageBox::warning
                 (this,
@@ -461,8 +462,8 @@ void MainWindow::onOpenProjectTriggered()
 
 void MainWindow::onCloseProjectTriggered()
 {
-    // if no project is opened yet
-    if (!mpDocumentManager->getCurrentProjectPath().size())
+    // if no project is opened
+    if (!mpDocumentManager->projectOpened())
     {
         return;
     }
@@ -481,6 +482,7 @@ void MainWindow::onCloseProjectTriggered()
 
         SaveFilesDialog saveFilesDialog(changedDocsNames, this);
 
+        // prompt user if changes to docs have to be saved
         switch (saveFilesDialog.start())
         {
         case QDialogButtonBox::StandardButton::YesToAll:
@@ -492,7 +494,7 @@ void MainWindow::onCloseProjectTriggered()
             } catch (const FileOpeningFailure&)
             {
                 // if any of files could not be opened to save changes to
-                // document then user is warned & action is
+                // document then user is warned & action is interrupted
                 QMessageBox::warning(this, userMessages[UserMessages::ErrorTitle],
                         userMessages[UserMessages::FileOpeningForSavingErrorMsg]);
                 return;
@@ -518,7 +520,10 @@ void MainWindow::onCloseProjectTriggered()
     // project is closed
     mpDocumentManager->closeCurrentProject();
     mpProjectViewerDock->setDir(QDir::currentPath());
+
     // disconnect from db
+    //
+    //
 
     QMessageBox::information
             (this,
@@ -936,7 +941,7 @@ void MainWindow::setDocumentFontSize(const QString &fontSize)
 void MainWindow::onNewProjectTriggered()
 {
     // check if other project is opened
-    if (mpDocumentManager->getCurrentProjectPath().size())
+    if (mpDocumentManager->projectOpened())
     {
         QMessageBox::information
                 (this,
@@ -950,7 +955,7 @@ void MainWindow::onNewProjectTriggered()
     try
     {
         // new project dialog is called
-        // name of newly created project directory is received
+        // name & location of new project directory is received
         dirName = newProjectDialog.start();
     }
     catch (const QException&)
@@ -958,6 +963,7 @@ void MainWindow::onNewProjectTriggered()
         return;
     }
 
+    // project file is created
     try
     {
         FileManager().createProjectFile(dirName);
@@ -971,7 +977,12 @@ void MainWindow::onNewProjectTriggered()
     }
 
     // connect db
+    //
+    //
 
-    mpProjectViewerDock->setDir(dirName);
+    // document manager is sent a message about new project
     mpDocumentManager->openProject(dirName);
+
+    // project is displayed on project viewer
+    mpProjectViewerDock->setDir(dirName);
 }

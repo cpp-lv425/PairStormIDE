@@ -602,6 +602,12 @@ bool DocumentManager::fileBelongsToCurrentProject(const QString &fileName) const
     return false;
 }
 
+bool DocumentManager::projectOpened()
+{
+    // if project name is written then project is opened
+    return currentProject.size();
+}
+
 void DocumentManager::undoOnCurrentDocument()
 {
     auto pCurrentDocument = getCurrentDocument();

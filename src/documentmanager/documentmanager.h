@@ -39,6 +39,7 @@ public:
     void combineDocAreas();
     void closeEmptyDocArea();    
     bool fileBelongsToCurrentProject(const QString &fileName)const;
+    bool projectOpened();
 
     void undoOnCurrentDocument();
     void redoOnCurrentDocument();
