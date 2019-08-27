@@ -11,3 +11,7 @@ IncorrectUserInput::IncorrectUserInput():  QException()
 FileOpeningFailure::FileOpeningFailure(): QException()
 {
 }
+
+DocumentPlacementFailure::DocumentPlacementFailure(): QException()
+{
+}

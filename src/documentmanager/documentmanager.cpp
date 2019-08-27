@@ -42,7 +42,7 @@ void DocumentManager::openProject(const QString &path)
     currentProject = path;
 }
 
-const QString &DocumentManager::getCurrentProjectPath() const
+const QString& DocumentManager::getCurrentProjectPath() const
 {
     return  currentProject;
 }
@@ -77,7 +77,7 @@ void DocumentManager::openDocument(const QString &fileName, bool load)
 
     if (!placementArea)
     {
-        throw QException();
+        throw DocumentPlacementFailure();
     }
 
     // doc is added to doc area & unfolded
@@ -90,7 +90,7 @@ void DocumentManager::openDocument(const QString &fileName, bool load)
         try
         {
             loadFile(newView, fileName);
-        } catch (const QException&)
+        } catch (const FileOpeningFailure&)
         {
             throw;
         }
@@ -191,7 +191,7 @@ void DocumentManager::loadFile(CodeEditor *newView, const QString &fileName)
     {
         readResult = FileManager().readFromFile(fileName);
     }
-    catch (const QException&)
+    catch (const FileOpeningFailure&)
     {
         throw;
     }
