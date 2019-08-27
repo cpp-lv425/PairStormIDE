@@ -34,6 +34,8 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     mTimer = new QTimer;
     mLcpp = new LexerCPP();
     mTimer = new QTimer;
+    QVector<Token> firstLine;
+    mTokensList.append(firstLine);
     mChangeManager = new ChangeManager(this->toPlainText().toUtf8().constData());
     //comment button
     mAddCommentButton = new AddCommentButton(this);
@@ -53,14 +55,14 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
 
     connect(this,                         &QPlainTextEdit::updateRequest,                  this, &CodeEditor::updateLineNumberArea);
     connect(mTimer,                       &QTimer::timeout,                                this, &CodeEditor::saveStateInTheHistory);
-    connect(this,                         SIGNAL(textChanged()),                        this, SLOT(textChangedInTheOneLine()));
+    connect(this,                         &CodeEditor::textChanged,                        this, &CodeEditor::textChangedInTheOneLine);
     connect(mAddCommentButton,            &AddCommentButton::addCommentButtonPressed,      this, &CodeEditor::showCommentTextEdit);
     connect(mCommentWidget->getEditTab(), &AddCommentTextEdit::emptyCommentWasSent,        this, &CodeEditor::emptyCommentWasAdded);
     connect(mCommentWidget->getEditTab(), &AddCommentTextEdit::notEmptyCommentWasSent,     this, &CodeEditor::notEmptyCommentWasAdded);
     connect(mCommentWidget->getEditTab(), &AddCommentTextEdit::commentWasDeleted,          this, &CodeEditor::deleteComment);
     connect(this,                         &CodeEditor::linesCountUpdated,                  this, &CodeEditor::changeCommentButtonsState);
     connect(this,                         &CodeEditor::textChangedInLine,                  this, &CodeEditor::handleLineChange);
-    connect(this,                         &CodeEditor::cursorPositionChanged,              this, &CodeEditor::highlightText);
+    connect(this,                         &CodeEditor::runHighlighter,                        this, &CodeEditor::highlightText);
 
     mTimer->start(CHANGE_SAVE_TIME);//save text by this time
     mLinesCountCurrent = 1;
@@ -90,79 +92,64 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     fmtRegular.setForeground(Qt::white);
 }
 
-void formating(QTextCharFormat fmt, QTextCursor cursor,  Token token)
-{
-    cursor.setPosition(token.mBegin, QTextCursor::MoveAnchor);
-    cursor.setPosition(token.mEnd, QTextCursor::KeepAnchor);
-    cursor.setCharFormat(fmt);
-}
-
 void CodeEditor::handleLineChange(int lastLineWithChange)
 {
     mLcpp->clear();
 
+    QString changedCode;
+    int changeStart;
     int currentLinesCount = document()->lineCount();
     int lineDifference = currentLinesCount - mLinesCount;
     mLinesCount = currentLinesCount;
 
-    int changeStart = lastLineWithChange;
-
-    if(lastLineWithChange > 0)
+    if(lineDifference > 0)
     {
         changeStart = lastLineWithChange - lineDifference;
+        mTokensList.removeAt(changeStart);
     }
-
-    QString changedCode;
-    QVector<Token> tokensOnLine;
-    QVector<QVector<Token>> updatedTokens;
-
-    for(int i = 0; i < changeStart; ++i)
+    else if(lineDifference == 0)
     {
-        updatedTokens.push_back(mTokens[i]);
-    }
-
-    int shift = 0;
-    if(changeStart)
-    {
-        shift = (mTokens[changeStart - 1].end() - 1)->mEnd;
+        changeStart = lastLineWithChange;
     }
 
     for(int i = changeStart; i <= lastLineWithChange; ++i)
     {
         changedCode = document()->findBlockByLineNumber(i).text();
-        qDebug() << changedCode.size();
-        mSizeOfLines.push_back(changedCode.size());
+        mLinesSizes[i] = changedCode.size() + 1;
         mLcpp->lexicalAnalysis(changedCode);
-        tokensOnLine = mLcpp->getTokens();
-//        for(auto &it: tokensOnLine)
-//        {
-//            it.mBegin += shift;
-//            it.mEnd += shift;
-//        }
-        updatedTokens.push_back(tokensOnLine);
+        if(lineDifference)
+        {
+            mTokensList.insert(i, mLcpp->getTokens());
+        }
+        else
+        {
+            mTokensList[i] = mLcpp->getTokens();
+        }
     }
 
-    for(int i = lastLineWithChange + 1; i < currentLinesCount; ++i)
+    if(lineDifference < 0)
     {
-//        for(auto &it: mTokens[i - lineDifference])
-//        {
-//            it.mBegin += shift + changedCode.size();
-//            it.mEnd += shift + changedCode.size();
-//        }
-        updatedTokens.push_back(mTokens[i - lineDifference]);
+        lineDifference = -lineDifference;
+        changedCode = document()->findBlockByLineNumber(lastLineWithChange).text();
+        mLcpp->lexicalAnalysis(changedCode);
+        mTokensList[lastLineWithChange] = mLcpp->getTokens();
+        for(int i = lastLineWithChange + 1; i < lastLineWithChange + lineDifference + 1; ++i)
+        {
+            mTokensList.removeAt(i);
+        }
     }
 
-    mTokens = updatedTokens;
+//    emit(runHighlighter());
 
-//    for(int i = 0; i < mTokens.size(); ++i)
+//    qDebug() << "======================";
+//    for(int i = 0; i < mTokensList.size(); ++i)
 //    {
-//        qDebug() << i << "Size: " << mSizeOfLines[i];
-//        for(int j = 0; j < mTokens[i].size(); ++j)
+//        qDebug() << i;
+//        for(int j = 0; j < mTokensList[i].size(); ++j)
 //        {
-//            qDebug() << mTokens[i][j].mName << " " << mTokens[i][j].mBegin << " " << mTokens[i][j].mEnd;
+//            qDebug() << mTokensList[i][j].mName << " " << mTokensList[i][j].mBegin << " " << mTokensList[i][j].mEnd;
 //        }
 //    }
-    emit(runHighlighter());
 }
 
 void CodeEditor::runLexer()
@@ -606,31 +593,42 @@ void CodeEditor::closeEvent(QCloseEvent *event)
     emit closeDocEventOccured(this);
 }
 
+void formating(QTextCharFormat fmt, QTextCursor &cursor, Token token)
+{
+    cursor.select(QTextCursor::LineUnderCursor);
+    int start = cursor.selectionStart();
+    cursor.setPosition(start + token.mBegin, QTextCursor::MoveAnchor);
+    cursor.setPosition(start + token.mEnd, QTextCursor::KeepAnchor);
+    cursor.setCharFormat(fmt);
+}
+
 void CodeEditor::highlightText()
 {
     QTextCursor cursor = textCursor();
-    for(int i = 0; i < mTokens.size(); ++i)
-        for(int j = 0; j < mTokens[i].size(); ++j)
+    for(int i = 0; i < mTokensList.size(); ++i)
+    {
+        for(int j = 0; j < mTokensList[i].size(); ++j)
         {
-            switch(mTokens[i][j].mType)
+            switch(mTokensList[i][j].mType)
             {
             case(State::KW):
-                formating(fmtKeyword, cursor, mTokens[i][j]);
+                formating(fmtKeyword, cursor, mTokensList[i][j]);
                 break;
             case(State::LIT):
-                formating(fmtLiteral, cursor, mTokens[i][j]);
+                formating(fmtLiteral, cursor, mTokensList[i][j]);
                 break;
             case(State::COM):
-                formating(fmtComment, cursor, mTokens[i][j]);
+                formating(fmtComment, cursor, mTokensList[i][j]);
                 break;
             case(State::UNDEF):
-                formating(fmtUndefined, cursor, mTokens[i][j]);
+                formating(fmtUndefined, cursor, mTokensList[i][j]);
                 break;
             default:
-                formating(fmtRegular, cursor, mTokens[i][j]);
+                formating(fmtRegular, cursor, mTokensList[i][j]);
                 break;
             }
         }
+    }
 }
 
 void CodeEditor::keyPressEvent(QKeyEvent *e)

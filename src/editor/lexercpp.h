@@ -8,8 +8,6 @@
 #include "spaces.h"
 #include "operators.h"
 #include <QVector>
-#include <QMap>
-#include <QPair>
 
 
 class LexerCPP: public iLexer

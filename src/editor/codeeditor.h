@@ -23,7 +23,8 @@ const int TOP_UNUSED_PIXELS_HEIGHT = 4;
 #include<QVector>
 #include<QFont>
 #include<QStatusBar>
-
+#include <QPair>
+#include <QList>
 
 
 class QPaintEvent;
@@ -125,7 +126,7 @@ private:
     int mLinesCountCurrent;
 
     unsigned int mLinesCount;
-    QVector<int> mSizeOfLines;
+    unsigned int mCodeSize;
 
     QString mBeginTextState;
     QVector<AddCommentButton*> mCommentsVector;
@@ -140,7 +141,8 @@ private:
 
 protected:
     int mCurrentZoom;
-    QVector<QVector<Token>> mTokens;
+    QList<QVector<Token>> mTokensList;
+    QMap<int, int> mLinesSizes;
     friend class Event;
 };
 
