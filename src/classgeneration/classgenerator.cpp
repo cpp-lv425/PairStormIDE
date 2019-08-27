@@ -98,8 +98,9 @@ QString ClassGenerator::createClassBones()
 QString createMethodDefinitionBones(const QString &dataType,const QString &className,
                                     const QString &methodName, const QString &methodParams)
 {
-    return dataType + (dataType.isEmpty() ? QString() : " ") + className + "::" +
-            methodName + "(" + methodParams + ")\n" + "{\n" + "\n}";
+    return dataType + (dataType.isEmpty() ? QString() : " ") + className
+            + (className.isEmpty() ? QString() :  "::")
+            + methodName + "(" + methodParams + ")\n" + "{\n" + "\n}";
 }
 
 QString ClassGenerator::createHeaderText()
@@ -113,7 +114,7 @@ QString ClassGenerator::createHeaderText()
 
 QString ClassGenerator::createSourceText()
 {
-    return "#include " + mHeaderName + "\n"
+    return "#include "  + QString('"')+ mHeaderName +'"'+ "\n"
             + "\n" + createMethodDefinitionBones(QString(), mClassName, mClassName, QString());
 }
 

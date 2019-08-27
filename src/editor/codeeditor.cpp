@@ -16,6 +16,7 @@
 #include<QLabel>
 #include"classgenerator.h"
 #include"methodspartsdefinitiongetters.h"
+#include"classgenerationliterals.h"
 #include<QMenu>
 
 
@@ -115,22 +116,30 @@ void CodeEditor::setIdeType(const QString &ideType)
     setTextColors();
 }
 
-
-
 void CodeEditor::writeDefinitionToSource()
 {
+    if (!isFileWithExtension(getFileName(),"h"))
+    {
+        return;
+    }
     QTextCursor curs = this->textCursor();
-
     auto definePattern = getMethodDefinitionPattern(getTextByCursor(curs));
-
     auto className = getClassNameForMethodDefinition(curs);
-//    auto methodName = getMethodNameFromFullDefinition(getTextByCursor(curs));
-//    auto parametrsName = getMethodParametrsFromFullDefinition(getTextByCursor(curs));
-
     QString definitonTest = createMethodDefinitionBones(definePattern.functionDataType,
                                                         className,
                                                         definePattern.fucntionName,
                                                         definePattern.functionParametrs);
+    FileManager fileManager;
+    if (fileManager.sourceFileByTheSameNameExists(getFileName()))
+    {
+        auto sourceFileName = removeExtension(getFileName(), headerExtension.length())
+                .append(sourceExtension);
+        auto sourceFileText = fileManager.readFromFile(sourceFileName);
+        if (definitionExists(sourceFileText, this->textCursor()))
+        {
+            //to do
+        }
+    }
     curs.movePosition(QTextCursor::End);
     this->setTextCursor(curs);
     this->textCursor().insertText("\n" + definitonTest);//here it's for test. Should add to the source code file
@@ -143,9 +152,9 @@ void CodeEditor::contextMenuEvent(QContextMenuEvent *event)
 
     QAction *addDefinitionAction = new QAction("Add definition", refactorItem);
     refactorItem->addAction(addDefinitionAction);
-    //connect(refactorItem, &QMenu::aboutToShow, this, &CodeEditor::calculateRefactorItemEnabled);
+
     addDefinitionAction->setEnabled(isValidMethodInitialization(this->textCursor()));
-    connect(addDefinitionAction, SIGNAL(triggered()), this, SLOT(writeDefinitionToSource()));
+    connect(addDefinitionAction, &QAction::triggered, this, &CodeEditor::writeDefinitionToSource);
     menu->exec(event->globalPos());
     delete menu;
 }
@@ -442,7 +451,7 @@ void CodeEditor::emptyCommentWasAdded()
 
 void CodeEditor::notEmptyCommentWasAdded()
 {
-    if (isCommentButtonExist(mCommentWidget->getCommentLine()))//if button was existing, just reset text
+    if (commentButtonExists(mCommentWidget->getCommentLine()))//if button was existing, just reset text
     {
         auto commentButonExisted = getCommentButtonByIndex(mCommentWidget->getCommentLine());
         setNewAddedButtonSettings(commentButonExisted);
@@ -550,19 +559,19 @@ void CodeEditor::addButton(const int line, const QString &comment)
     connect(mCommentsVector.back(), &AddCommentButton::addCommentButtonPressed, this, &CodeEditor::showCommentTextEdit);
 }
 
-void CodeEditor::removeButtonByIndex(QVector<AddCommentButton *> &commentV, int index)
+void CodeEditor::removeButtonByIndex(QVector<AddCommentButton*> &commentV, int index)
 {
     commentV[index]->setVisible(false);
     commentV.erase(commentV.begin() + index);
 }
 
-void CodeEditor::removeButtomByValue(QVector<AddCommentButton *> &commentV, AddCommentButton *commentButton)
+void CodeEditor::removeButtomByValue(QVector<AddCommentButton*> &commentV, AddCommentButton *commentButton)
 {
     commentButton->setVisible(false);
     mCommentsVector.erase(std::remove(commentV.begin(), commentV.end(), commentButton), commentV.end());
 }
 
-bool CodeEditor::isCommentButtonExist(int line)
+bool CodeEditor::commentButtonExists(int line)
 {
     for (auto &i : mCommentsVector)
     {

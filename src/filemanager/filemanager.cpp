@@ -3,6 +3,8 @@
 #include <QTextStream>
 #include <QFile>
 #include <QDir>
+#include "methodspartsdefinitiongetters.h"
+#include<QDebug>
 
 #include "utils.h"
 
@@ -83,4 +85,9 @@ bool FileManager::projectExists(const QString &path)
     // if project file exists in specified directory
     // then true is returned
     return projectDir.exists(projectFileName);
+}
+
+bool FileManager::sourceFileByTheSameNameExists(const QString &headerName)
+{
+    return (QFileInfo::exists(removeExtension(headerName,2).append(".cpp")));
 }

@@ -387,11 +387,11 @@ void MainWindow::onNewClassTriggered()
     QString currentProjectDirectory = mpDocumentManager->getCurrentProjectPath();
 
     // implementation
-
     ClassGenerator *classGenerator = new ClassGenerator(currentProjectDirectory);
     classGenerator->show();
     connect(classGenerator, &ClassGenerator::filesWereCreated, this, &MainWindow::openCreatedClassFiles);
-    // use method openDocument(path) to open newly created files
+
+
 }
 
 void MainWindow::onOpenFileTriggered()

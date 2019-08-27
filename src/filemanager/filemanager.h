@@ -14,6 +14,7 @@ public:
                      const QString &content);
     void createProjectFile(const QString &path);
     bool projectExists(const QString &path);
+    bool sourceFileByTheSameNameExists(const QString &headerName);
 };
 
 #endif // FILEMANAGER_H
