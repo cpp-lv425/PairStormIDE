@@ -106,7 +106,7 @@ void DefaultLocalConnector::clearOutdatedAttributesOnTimerTick()
     if (!outdatedServerNames.empty())
     {
         bool isAnyConnectedAttributesOutdated = false;
-        for(const auto &serverName : outdatedServerNames)
+        for (const auto &serverName : outdatedServerNames)
         {
             if (!popFromConnectedAttributes(serverName).empty())
             {
@@ -304,7 +304,7 @@ void DefaultLocalConnector::shareMessage(const QString messageContent)
     message.mType       = NetworkMessage::Type::ChatMessage;
     message.mSourceName = mpTcpService->getServerAttributes().mName;
     message.mContent    = messageContent;
-    for(const auto &serverAttrib : mConnectedServersAttrib)
+    for (const auto &serverAttrib : mConnectedServersAttrib)
     {
         mpTcpService->sendDataToTcpServer(message.toJsonQString(), serverAttrib);
     }
@@ -324,7 +324,7 @@ void DefaultLocalConnector::shareChange(const QString changeContent)
     message.mType       = NetworkMessage::Type::ChangesMessage;
     message.mSourceName = mpTcpService->getServerAttributes().mName;
     message.mContent    = changeContent;
-    for(const auto &serverAttrib : mConnectedServersAttrib)
+    for (const auto &serverAttrib : mConnectedServersAttrib)
     {
         mpTcpService->sendDataToTcpServer(message.toJsonQString(), serverAttrib);
     }

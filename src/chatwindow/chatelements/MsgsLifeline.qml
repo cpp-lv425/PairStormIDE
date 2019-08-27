@@ -73,9 +73,12 @@ Item {
                 anchors.left:  messageAttributesColumn.adjustRight ?
                                    undefined    : parent.left
 
+                //color: "transparent"
+                clip: true
                 spacing: 0
 
 
+                /*
                 Control {
                     id: leftToothShape
 
@@ -97,7 +100,7 @@ Item {
                         }
                     }
                 }
-
+*/
                 Rectangle {
                     id: messageBody
 
@@ -173,7 +176,7 @@ Item {
                         color: "white"
                     }
                 }
-
+/*
                 Control {
                     id: rightToothShape
 
@@ -195,6 +198,7 @@ Item {
                         }
                     }
                 }
+            */
             }
             Label {
                 id: timestampText
