@@ -12,16 +12,17 @@ struct MethodDefinitionPattern
 };
 
 QString removeExtension(QString str, const int extensionCharacterCount);
+
 QString createMethodDefinitionBones(const QString &dataType,  const QString &className,
                                     const QString &methodName,const QString &methodParams);
 QString getTextByCursor(QTextCursor cursor);
 
-//QPair<QString, QString> getMethodNameFromFullDefinition(QString definition);
-//QString getMethodParametrsFromFullDefinition(QString definition);
-
 QString getClassNameForMethodDefinition(QTextCursor cursor);
 
-bool definitionExists(QTextCursor cursor);
+bool isValidMethodInitialization(QTextCursor cursor);
 
-MethodDefinitionPattern getMethodDefinitionPatter(QString difinition);
+MethodDefinitionPattern getMethodDefinitionPattern(const QString &difinition);
+
+QString createFilePath(const QString &rootPath, const QString &file);
+
 #endif // METHODSPARTSDEFINITIONGETTERS_H

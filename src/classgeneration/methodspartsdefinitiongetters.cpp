@@ -10,23 +10,6 @@ QString getTextByCursor(QTextCursor cursor)
     return cursor.selectedText();
 }
 
-//QPair<QString, QString> getMethodNameFromFullDefinition(QString definition)
-//{
-//   QStringList listSplitedByBracket = definition.split('(', QString::SkipEmptyParts);
-//   QStringList listSplitedBySpace = listSplitedByBracket[leftPartOfDefinitionIndex].
-//           split(' ', QString::SkipEmptyParts);
-
-//   return qMakePair(listSplitedBySpace[indexOfMethodTypeInLine].simplified(),
-//                    listSplitedBySpace[indexOfMethodNameInLine]);
-//}
-
-//QString getMethodParametrsFromFullDefinition(QString definition)
-//{
-//    QRegularExpressionMatchIterator matchIter = QRegularExpression(textInsideBracketsRegex).
-//            globalMatch(definition);
-//    return matchIter.hasNext() ? matchIter.next().capturedTexts()[0] : QString();
-//}
-
 QString getClassNameForMethodDefinition(QTextCursor cursor)
 {
     while (cursor.blockNumber())
@@ -42,32 +25,42 @@ QString getClassNameForMethodDefinition(QTextCursor cursor)
     return QString();
 }
 
-bool definitionExists(QTextCursor cursor)
+bool isValidMethodInitialization(QTextCursor cursor)
 {
-
     QString line = getTextByCursor(cursor);
     QRegularExpressionMatchIterator matchIter = QRegularExpression(validFucntionDefinition).
             globalMatch(line);
     return matchIter.hasNext();//rewrite in the future. now it's just valid every time
 }
 
-MethodDefinitionPattern getMethodDefinitionPatter(QString difinition)
+MethodDefinitionPattern getMethodDefinitionPattern(const QString &difinition)
 {
-    MethodDefinitionPattern rMethodDefinitionPattern;
     QRegularExpressionMatchIterator matchIter = QRegularExpression(validFucntionDefinition).
             globalMatch(difinition);
-    if(!matchIter.hasNext())
-    {
-        return {QString(), QString(), QString()};
-    }
-        QRegularExpressionMatch match = matchIter.next();// get match
-    rMethodDefinitionPattern.functionDataType = match.captured(1);
-    qDebug()<<"type = "<<match.captured(1);
-
-    rMethodDefinitionPattern.fucntionName = match.captured(2);
-    qDebug()<<"name = "<<match.captured(2);
-
-    rMethodDefinitionPattern.functionParametrs = match.captured(3);
-     qDebug()<<"parametrs = "<<match.captured(3);
-    return rMethodDefinitionPattern;
+    QRegularExpressionMatch match = matchIter.next();// get match
+    return MethodDefinitionPattern {match.captured(1), match.captured(2), match.captured(3)};
 }
+
+QString createFilePath(const QString &rootPath, const QString &file)
+{
+    return rootPath + '/' + file;
+}
+
+bool definitionExists(const QString &documentText, QTextCursor cursor)
+{
+    QString methodFullName = getMethodFullName(getTextByCursor(cursor));
+}
+
+QString getMethodFullName(QTextCursor cursor)
+{
+    auto declarationParts = getMethodDefinitionPattern(getTextByCursor(cursor));
+    auto className = getClassNameForMethodDefinition(cursor);
+    return className + "::" + declarationParts.fucntionName;
+}
+/*struct MethodDefinitionPattern
+{
+    QString functionDataType;
+    QString fucntionName;
+    QString functionParametrs;
+};
+*/

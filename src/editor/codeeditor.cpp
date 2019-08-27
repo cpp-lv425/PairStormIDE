@@ -121,7 +121,7 @@ void CodeEditor::writeDefinitionToSource()
 {
     QTextCursor curs = this->textCursor();
 
-    auto definePattern = getMethodDefinitionPatter(getTextByCursor(curs));
+    auto definePattern = getMethodDefinitionPattern(getTextByCursor(curs));
 
     auto className = getClassNameForMethodDefinition(curs);
 //    auto methodName = getMethodNameFromFullDefinition(getTextByCursor(curs));
@@ -144,7 +144,7 @@ void CodeEditor::contextMenuEvent(QContextMenuEvent *event)
     QAction *addDefinitionAction = new QAction("Add definition", refactorItem);
     refactorItem->addAction(addDefinitionAction);
     //connect(refactorItem, &QMenu::aboutToShow, this, &CodeEditor::calculateRefactorItemEnabled);
-    addDefinitionAction->setEnabled(definitionExists(this->textCursor()));
+    addDefinitionAction->setEnabled(isValidMethodInitialization(this->textCursor()));
     connect(addDefinitionAction, SIGNAL(triggered()), this, SLOT(writeDefinitionToSource()));
     menu->exec(event->globalPos());
     delete menu;
