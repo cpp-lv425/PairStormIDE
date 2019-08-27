@@ -2,6 +2,7 @@
 #define CHATMESSAGESCONTROLLER_H
 
 #include <QObject>
+#include "messagedb.h"
 #include "chatmessage.h"
 
 // ==========================================================================================
@@ -43,6 +44,8 @@ private:
     // Name of the User and bunch of current messages in the chat
     const QString        mcAuthorName;
     QVector<ChatMessage> mChatMessages;
+
+    MessageDb            mDatabaseMessages;
 };
 
 #endif // CHATMESSAGESCONTROLLER_H
