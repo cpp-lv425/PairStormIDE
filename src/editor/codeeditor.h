@@ -60,6 +60,8 @@ public:
     void zoom(int val);
     bool isChanged();
     void setBeginTextState();
+    const QByteArray& getBeginTextState()const;
+    void setTextState(const QByteArray &beginTextState);
 
     LastRemoveKey getLastRemomeKey() const;
     void setLastRemomeKey(const LastRemoveKey &value);
@@ -111,7 +113,6 @@ public slots:
     void setFontSize(const QString &fontSize);
     void setFontStyle(const QString &fontStyle);
     void setIdeType(const QString &ideType);
-    void calculateRefactorItemEnabled();
     void writeDefinitionToSource();
 
 signals:
@@ -140,7 +141,7 @@ private:
     int mLinesCountPrev;
     int mLinesCountCurrent;
 
-    QString mBeginTextState;
+    QByteArray mBeginTextState;
     QVector<AddCommentButton*> mCommentsVector;
 
     QTextCharFormat fmtLiteral;

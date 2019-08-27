@@ -4,15 +4,21 @@
 #include "methodspartsdefinitiongetters.h"
 #include <QRegularExpression>
 #include <QPlainTextEdit>
+#include"filemanager.h"
+#include"mainwindow.h"
 #include <QMessageBox>
 #include <QDebug>
 
-ClassGenerator::ClassGenerator(QWidget *parent) :
+ClassGenerator::ClassGenerator(QString projectPath, QWidget *parent) :
     QWidget(parent),
+    mProjectPath(projectPath),
     ui(new Ui::ClassGenerator)
 {
     ui->setupUi(this);
     connect(ui->InputClassName, &QLineEdit::textChanged, this, &ClassGenerator::setFilesNames);
+    QPixmap picture(":/img/binary.jpg");
+    //ui->label_5->setPixmap(picture.scaled(this->width()/2, this->height() + 200, Qt::KeepAspectRatio));
+    this->layout()->setSizeConstraint(QLayout::SetFixedSize);
 }
 
 ClassGenerator::~ClassGenerator()
@@ -112,6 +118,17 @@ QString ClassGenerator::createSourceText()
             + "\n" + createMethodDefinitionBones(QString(), mClassName, mClassName, QString());
 }
 
+void ClassGenerator::createFiles()
+{
+    QString headerFilePath = mProjectPath + '/' + mHeaderName;
+    fileManager.createFile(headerFilePath);
+    fileManager.writeToFile(headerFilePath, createHeaderText());
+
+    QString sourceFilePath = mProjectPath + '/' + mSourceCodeName;
+    fileManager.createFile(sourceFilePath);
+    fileManager.writeToFile(sourceFilePath,createSourceText());
+}
+
 void ClassGenerator::on_OkButton_clicked()
 {
     if (!isValidClassName())
@@ -120,14 +137,12 @@ void ClassGenerator::on_OkButton_clicked()
         return;
     }
     setAllFieldsFromUi();
-
-    fileManager.createFile(mHeaderName);
-    fileManager.writeToFile(mHeaderName, createHeaderText());
-
-    fileManager.createFile(mSourceCodeName);
-    fileManager.writeToFile(mSourceCodeName,createSourceText());
+    createFiles();
 
     QMessageBox::information(this, successCreationTitle, successCreationMessage);
+
+    hide();
+    emit filesWereCreated(mProjectPath + '/' + mHeaderName, mProjectPath + '/' + mSourceCodeName);
 }
 
 

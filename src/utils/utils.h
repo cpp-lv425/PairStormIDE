@@ -21,4 +21,10 @@ public:
     FileOpeningFailure();
 };
 
+class DocumentPlacementFailure: public QException
+{
+public:
+    DocumentPlacementFailure();
+};
+
 #endif // UTILS_H

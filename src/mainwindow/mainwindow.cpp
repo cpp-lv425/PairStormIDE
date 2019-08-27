@@ -15,9 +15,11 @@
 #include "settingsconfigurator.h"
 #include "paletteconfigurator.h"
 #include "projectviewerdock.h"
+#include "newprojectwizard.h"
 #include "documentmanager.h"
 #include "bottompaneldock.h"
 #include "savefilesdialog.h"
+#include "classgenerator.h"
 #include "chatwindowdock.h"
 #include "newfilewizard.h"
 #include "browserdialog.h"
@@ -89,9 +91,8 @@ QStringList MainWindow::getFileExtensions() const
 void MainWindow::showStartPage()
 {
     StartPage startPage(this);
-    connect(&startPage, &StartPage::onNewBtnPressed, this, &MainWindow::onNewFileTriggered);
-    connect(&startPage, &StartPage::onOpenBtnPressed, this, &MainWindow::onOpenFileTriggered);
-    connect(&startPage, &StartPage::onOpenDirPressed, this, &MainWindow::onOpenFolderTriggered);
+    connect(&startPage, &StartPage::onNewProjectBtnPressed, this, &MainWindow::onNewProjectTriggered);
+    connect(&startPage, &StartPage::onOpenProjectBtnPressed, this, &MainWindow::onOpenProjectTriggered);
     connect(&startPage, &StartPage::onSettingsBtnPressed, this, &MainWindow::onSettingsTriggered);
     startPage.showStartPage();
 }
@@ -104,15 +105,26 @@ void MainWindow::setupMainMenu()
     QToolBar *pToolbar = new QToolBar("Main Tool Bar");
     pToolbar->setObjectName("pToolbar");
 
-    // working with files
-    QAction *pNewFileAction = fileMenu->addAction("&New file", this, &MainWindow::onNewFileTriggered, Qt::CTRL + Qt::Key_N);
+    // managing projects & files
+    QMenu *newSubMenu = new QMenu("&New");
+    QAction *pNewProjectAction = newSubMenu->addAction("New &project...", this, &MainWindow::onNewProjectTriggered);
+    pNewProjectAction->setIcon(QIcon(":/img/NEWPROJECT.png"));
+    pToolbar->addAction(pNewProjectAction);
+
+    QAction *pNewFileAction = newSubMenu->addAction("&New file...", this, &MainWindow::onNewFileTriggered, Qt::CTRL + Qt::Key_N);
     pNewFileAction->setIcon(QIcon(":/img/NEWFILE.png"));
     pToolbar->addAction(pNewFileAction);
+
+    QAction *pNewClassAction = newSubMenu->addAction("New &class...", this, &MainWindow::onNewClassTriggered);
+    pNewClassAction->setIcon(QIcon(":/img/NEWCLASS.png"));
+    pToolbar->addAction(pNewClassAction);
+
+    fileMenu->addMenu(newSubMenu);
 
     QAction *pOpenFileAction = fileMenu->addAction("&Open file...", this, &MainWindow::onOpenFileTriggered, Qt::CTRL + Qt::Key_O);
     pOpenFileAction->setIcon(QIcon(":/img/OPENFILE.png"));
     pToolbar->addAction(pOpenFileAction);
-    QAction *pOpenFolderAction = fileMenu->addAction("Open &folder...", this, &MainWindow::onOpenFolderTriggered);
+    QAction *pOpenFolderAction = fileMenu->addAction("Open pro&ject...", this, &MainWindow::onOpenProjectTriggered);
     pOpenFolderAction->setIcon(QIcon(":/img/OPENDIR.png"));
     pToolbar->addAction(pOpenFolderAction);
     fileMenu->addSeparator();
@@ -129,7 +141,8 @@ void MainWindow::setupMainMenu()
     fileMenu->addAction("Save A&ll...", this, &MainWindow::onSaveAllFilesTriggered, Qt::CTRL + Qt::SHIFT + Qt::Key_S);
     fileMenu->addSeparator();
 
-    // closing docs & exiting the program
+    // closing docs, project & exiting the program
+    fileMenu->addAction("Close pro&ject", this, &MainWindow::onCloseProjectTriggered, Qt::CTRL + Qt::ALT + Qt::Key_W);
     fileMenu->addAction("&Close document", this, &MainWindow::onCloseFileTriggered, Qt::CTRL + Qt::SHIFT + Qt::Key_W);
     fileMenu->addAction("&Exit", this, &MainWindow::onExitTriggered, Qt::ALT + Qt::Key_F4);
 
@@ -165,9 +178,8 @@ void MainWindow::setupMainMenu()
                         Qt::CTRL + Qt::Key_E);
     viewMenu->addAction("Split &Vectically", this, &MainWindow::onSplitVerticallyTriggered,
                         Qt::CTRL + Qt::SHIFT + Qt::Key_E);
-    viewMenu->addAction("Combine Document Areas", this, &MainWindow::onCombineAreas, Qt::ALT + Qt::SHIFT + Qt::Key_W);
+    viewMenu->addAction("Co&mbine Document Areas", this, &MainWindow::onCombineAreas, Qt::ALT + Qt::SHIFT + Qt::Key_W);
     viewMenu->addAction("Close &Empty Document Area", this, &MainWindow::onCloseEmptyDocArea);
-    viewMenu->addAction("Close Cu&rrent Document Area", this, &MainWindow::onCloseCurrentDocArea);
 
     viewMenu->addSeparator();
     viewMenu->addAction("Show &Project Viewer", this, &MainWindow::onShowProjectViewerTriggered);
@@ -243,7 +255,7 @@ void MainWindow::setupMainMenu()
     addToolBar(Qt::TopToolBarArea, pToolbar);
 }
 
-void MainWindow::openDoc(QString fileName)
+void MainWindow::openDocument(const QString &fileName)
 {
     QString readResult;
 
@@ -318,8 +330,22 @@ void MainWindow::createButtomPanel()
 
 void MainWindow::onNewFileTriggered()
 {    
+    // check if project is opened
+    if (!mpDocumentManager->projectOpened())
+    {
+        QMessageBox::warning
+                (this,
+                 userMessages[UserMessages::ProjectNotOpenedTitle],
+                userMessages[UserMessages::ProjectNotOpenedMsg]);
+        return;
+    }
+
     QStringList fileExtensions = getFileExtensions();
-    NewFileDialog newFileDialog(fileExtensions, this);
+    NewFileDialog newFileDialog
+            (fileExtensions,
+             mpDocumentManager->getCurrentProjectPath(),
+             this);
+
     QString newFileName;
     try
     {
@@ -331,44 +357,188 @@ void MainWindow::onNewFileTriggered()
     {
         return;
     }
-    // opening doc with selected name
+
     try
     {
         mpDocumentManager->openDocument(newFileName);
     }
     catch (const QException&)
     {
-        QMessageBox::information
+        QMessageBox::warning
                 (this,
                  userMessages[UserMessages::ErrorTitle],
                 userMessages[UserMessages::FileOpeningErrorMsg]);
     }
 }
 
+void MainWindow::onNewClassTriggered()
+{
+    // check if project is opened
+    if (!mpDocumentManager->projectOpened())
+    {
+        QMessageBox::warning
+                (this,
+                 userMessages[UserMessages::ProjectNotOpenedTitle],
+                userMessages[UserMessages::ProjectNotOpenedMsg]);
+        return;
+    }
+
+    // get path to opened project
+    QString currentProjectDirectory = mpDocumentManager->getCurrentProjectPath();
+
+    // implementation
+
+    ClassGenerator *classGenerator = new ClassGenerator(currentProjectDirectory);
+    classGenerator->show();
+    connect(classGenerator, &ClassGenerator::filesWereCreated, this, &MainWindow::openCreatedClassFiles);
+    // use method openDocument(path) to open newly created files
+}
+
 void MainWindow::onOpenFileTriggered()
 {
+
+    // check if project is opened
+    if (!mpDocumentManager->projectOpened())
+    {
+        QMessageBox::warning
+                (this,
+                 userMessages[UserMessages::ProjectNotOpenedTitle],
+                userMessages[UserMessages::ProjectNotOpenedMsg]);
+        return;
+    }
+
     QString fileName = QFileDialog::getOpenFileName
             (this,
              userMessages[UserMessages::OpenFileTitle],
-            QDir::currentPath(),
+            mpDocumentManager->getCurrentProjectPath(),
             "C++/C files (*.h *.hpp *.cpp *.c) ;; Text Files (*.txt) ;; JSON Files (*.json)");
 
-    openDoc(fileName);
+    // in case user closed dialog without selecting file
+    if (!fileName.size())
+    {
+        return;
+    }
+
+    // checks if selected file belongs to opened project
+    if (!mpDocumentManager->fileBelongsToCurrentProject(fileName))
+    {
+        QMessageBox::warning
+                (this,
+                 userMessages[UserMessages::FileDoesNotBelongToProjectTitle],
+                userMessages[UserMessages::FileDoesNotBelongToProjectMsg]);
+        return;
+    }
+
+    openDocument(fileName);
 }
 
-void MainWindow::onOpenFolderTriggered()
+void MainWindow::onOpenProjectTriggered()
 {
+    // check if other project is opened
+    if (mpDocumentManager->projectOpened())
+    {
+        QMessageBox::warning
+                (this,
+                 userMessages[UserMessages::ProjectOpenedTitle],
+                userMessages[UserMessages::ProjectOpenedMsg]);
+        return;
+    }
+
     QString dirName = QFileDialog::getExistingDirectory
             (this,
              userMessages[UserMessages::OpenDirectoryTitle],
             QDir::homePath());
-    Connection *db = ConnectionGetter::getDefaultConnection("C:/Users/Petro/Desktop/storage.db");
+
+   /* Connection *db = ConnectionGetter::getDefaultConnection("C:/Users/Petro/Desktop/storage.db");
     CreateDB database;
     database.addTableFile();
     database.addTableUser();
     database.addTableComment();
-    database.addTableMessage();
+    database.addTableMessage();*/
+
+    // check if project exists
+    if (!FileManager().projectExists(dirName))
+    {
+        QMessageBox::warning
+                (this,
+                 userMessages[UserMessages::ProjectDoesNotExistTitle],
+                userMessages[UserMessages::ProjectDoesNotExistMsg]);
+        return;
+    }
+
     mpProjectViewerDock->setDir(dirName);
+    mpDocumentManager->openProject(dirName);
+}
+
+void MainWindow::onCloseProjectTriggered()
+{
+    // if no project is opened
+    if (!mpDocumentManager->projectOpened())
+    {
+        return;
+    }
+
+    // check if opened documents were modified
+    auto changedDocuments = mpDocumentManager->getChangedDocuments();
+
+    if (changedDocuments.size())
+    {
+        QStringList changedDocsNames;
+
+        for (const auto& doc: changedDocuments)
+        {
+            changedDocsNames << doc->getFileName();
+        }
+
+        SaveFilesDialog saveFilesDialog(changedDocsNames, this);
+
+        // prompt user if changes to docs have to be saved
+        switch (saveFilesDialog.start())
+        {
+        case QDialogButtonBox::StandardButton::YesToAll:
+        {
+            try
+            {                
+                // saving changes to opened documents
+                mpDocumentManager->saveAllDocuments();
+            } catch (const FileOpeningFailure&)
+            {
+                // if any of files could not be opened to save changes to
+                // document then user is warned & action is interrupted
+                QMessageBox::warning(this, userMessages[UserMessages::ErrorTitle],
+                        userMessages[UserMessages::FileOpeningForSavingErrorMsg]);
+                return;
+            }
+            break;
+        }
+        case QDialogButtonBox::StandardButton::NoToAll:
+        {           
+            break;
+        }
+        case QDialogButtonBox::StandardButton::Cancel:
+        {            
+            return;
+        }
+        default:
+        {
+            return;
+        }
+        }
+    }
+    // all documents are closed
+    mpDocumentManager->closeAllDocumentsWithoutSaving();
+    // project is closed
+    mpDocumentManager->closeCurrentProject();
+    mpProjectViewerDock->setDir(QDir::currentPath());
+
+    // disconnect from db
+    //
+    //
+
+    QMessageBox::information
+            (this,
+             userMessages[UserMessages::ProjectClosedTitle],
+            userMessages[UserMessages::ProjectClosedMsg]);
 }
 
 void MainWindow::onOpenStartPage()
@@ -385,7 +555,7 @@ void MainWindow::onSaveFileTriggered()
         if (mpDocumentManager->saveDocument())
         {
             statusBar()->showMessage(userMessages[UserMessages::DocumentSavedMsg], 3000);
-        }        
+        }
     }
     catch (const FileOpeningFailure&)
     {
@@ -403,11 +573,7 @@ void MainWindow::onSaveFileAsTriggered()
 
     // if there are no opened documents
     if (!pCurrentDocument)
-    {
-        QMessageBox::information
-                (this,
-                 userMessages[UserMessages::SaveTitle],
-                userMessages[UserMessages::NoFilesToSaveMsg]);
+    {        
         return;
     }
 
@@ -451,7 +617,7 @@ void MainWindow::onSaveAllFilesTriggered()
         if (mpDocumentManager->saveAllDocuments())
         {
             statusBar()->showMessage(userMessages[UserMessages::DocumentSavedMsg], 3000);
-        }        
+        }
     }
     catch (const FileOpeningFailure&)
     {
@@ -474,32 +640,32 @@ void MainWindow::onExitTriggered()
 
 void MainWindow::onUndoTriggered()
 {
-    //
+    mpDocumentManager->undoOnCurrentDocument();
 }
 
 void MainWindow::onRedoTriggered()
 {
-    //
+    mpDocumentManager->redoOnCurrentDocument();
 }
 
 void MainWindow::onCutTriggered()
 {
-    //
+    mpDocumentManager->cutOnCurrentDocument();
 }
 
 void MainWindow::onCopyTriggered()
 {
-    //
+    mpDocumentManager->copyOnCurrentDocument();
 }
 
 void MainWindow::onPasteTriggered()
 {
-    //
+    mpDocumentManager->pasteOnCurrentDocument();
 }
 
 void MainWindow::onSelectAllTriggered()
 {    
-    //
+    mpDocumentManager->selectAllOnCurrentDocument();
 }
 
 void MainWindow::onFindTriggered()
@@ -539,18 +705,12 @@ void MainWindow::onShowBottomPanel()
 
 void MainWindow::onCombineAreas()
 {
-    qDebug() << "On combine areas";
     mpDocumentManager->combineDocAreas();
 }
 
 void MainWindow::onCloseEmptyDocArea()
 {
     mpDocumentManager->closeEmptyDocArea();
-}
-
-void MainWindow::onCloseCurrentDocArea()
-{
-    mpDocumentManager->closeCurrentDocArea();
 }
 
 void MainWindow::onRefactorTriggered()
@@ -566,9 +726,8 @@ void MainWindow::onConnectTriggered()
     {
         return;
     }
-    mCurrentUserName = userInput;
     mpChatWindowDock->setUserName(userInput);
-    mplocalConnector->configureOnLogin(mCurrentUserName);
+    mplocalConnector->configureOnLogin(userInput);
 }
 
 void MainWindow::onSettingsTriggered()
@@ -616,8 +775,27 @@ void MainWindow::onReferenceFromEditor(const QString &keyword)
 }
 
 void MainWindow::onOpenFileFromProjectViewer(QString fileName)
-{
-    openDoc(fileName);
+{    
+    // check if project is opened
+    if (!mpDocumentManager->getCurrentProjectPath().size())
+    {
+        QMessageBox::information
+                (this,
+                 userMessages[UserMessages::ProjectNotOpenedTitle],
+                userMessages[UserMessages::ProjectNotOpenedMsg]);
+        return;
+    }
+
+    if (!mpDocumentManager->fileBelongsToCurrentProject(fileName))
+    {
+        QMessageBox::information
+                (this,
+                 userMessages[UserMessages::FileDoesNotBelongToProjectTitle],
+                userMessages[UserMessages::FileDoesNotBelongToProjectMsg]);
+        return;
+    }
+
+    openDocument(fileName);
 }
 
 void MainWindow::onConnectionStatusChanged(bool status)
@@ -640,6 +818,12 @@ void MainWindow::onSettingsChanged(std::map<QString, QString> newValues)
         auto functor = settingsConfigurator.getSettingsFunctor(newValue.first);
         functor(this, newValue.second);
     }
+}
+
+void MainWindow::openCreatedClassFiles(QString headerFile, QString sourceFile)
+{
+    openDocument(headerFile);
+    openDocument(sourceFile);
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
@@ -665,8 +849,18 @@ void MainWindow::closeEvent(QCloseEvent *event)
     {
     case QDialogButtonBox::StandardButton::YesToAll:
     {
-        mpDocumentManager->saveAllDocuments();
-        event->accept();
+        try
+        {
+            mpDocumentManager->saveAllDocuments();
+            event->accept();
+        } catch (const FileOpeningFailure&)
+        {
+            // if any of files could not be opened to save changes to
+            // document then user is warned & closeEvent is ignored
+            QMessageBox::warning(this, userMessages[UserMessages::ErrorTitle],
+                    userMessages[UserMessages::FileOpeningForSavingErrorMsg]);
+            event->ignore();
+        }
         return;
     }
     case QDialogButtonBox::StandardButton::NoToAll:
@@ -721,10 +915,11 @@ void MainWindow::setInitialAppStyle()
     qApp->setStyle(QStyleFactory::create("Fusion"));
 
     // restores style palette set in previous app session
+    // if the app is run for the first time then default style (WHITE) is set
     QSettings savedSettings(QApplication::organizationName(), QApplication::applicationName());
     QString styleName = {savedSettings.contains("style") ?
-                             savedSettings.value("style").toString()
-                             : "WHITE"};
+                         savedSettings.value("style").toString()
+                         : "WHITE"};
     setAppStyle(styleName);
 }
 
@@ -732,7 +927,78 @@ void MainWindow::setAppStyle(const QString &styleName)
 {
     // dark style palette is created & set globally
     QPalette palette = mpPaletteConfigurator->getPalette(styleName);
-    //QPalette newPal = palette();
+
     qApp->setPalette(palette);
-    mpDocumentManager->setStyle(styleName);
+
+    std::function<void(DocumentManager*, CodeEditor*, const QString&)> functor
+            (&DocumentManager::setStyle);
+
+    mpDocumentManager->configureDocuments(functor, styleName);
+
+    // call slot updateTheme from chat wdw dock
+}
+
+void MainWindow::setDocumentFontFamily(const QString &fontFamily)
+{
+    std::function<void(DocumentManager*, CodeEditor*, const QString&)> functor
+            (&DocumentManager::setFontFamily);
+
+    mpDocumentManager->configureDocuments(functor, fontFamily);
+}
+
+void MainWindow::setDocumentFontSize(const QString &fontSize)
+{    
+    std::function<void(DocumentManager*, CodeEditor*, const QString&)> functor
+            (&DocumentManager::setFontSize);
+
+    mpDocumentManager->configureDocuments(functor, fontSize);
+}
+
+void MainWindow::onNewProjectTriggered()
+{
+    // check if other project is opened
+    if (mpDocumentManager->projectOpened())
+    {
+        QMessageBox::information
+                (this,
+                 userMessages[UserMessages::ProjectOpenedTitle],
+                userMessages[UserMessages::ProjectOpenedMsg]);
+        return;
+    }
+
+    NewProjectDialog newProjectDialog;
+    QString dirName;
+    try
+    {
+        // new project dialog is called
+        // name & location of new project directory is received
+        dirName = newProjectDialog.start();
+    }
+    catch (const QException&)
+    {
+        return;
+    }
+
+    // project file is created
+    try
+    {
+        FileManager().createProjectFile(dirName);
+    } catch (const FileOpeningFailure&)
+    {
+        QMessageBox::warning
+                (this,
+                 userMessages[UserMessages::ErrorTitle],
+                userMessages[UserMessages::ProjectCreationFailureMsg]);
+        return;
+    }
+
+    // connect db
+    //
+    //
+
+    // document manager is sent a message about new project
+    mpDocumentManager->openProject(dirName);
+
+    // project is displayed on project viewer
+    mpProjectViewerDock->setDir(dirName);
 }

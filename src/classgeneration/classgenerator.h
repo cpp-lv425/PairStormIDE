@@ -17,7 +17,7 @@ class ClassGenerator : public QWidget
     Q_OBJECT
 
 public:
-    explicit ClassGenerator(QWidget *parent = nullptr);
+    explicit ClassGenerator(QString projectPath, QWidget *parent = nullptr);
     ~ClassGenerator();
 
     QString className() const;
@@ -28,6 +28,10 @@ public:
 
     QString sourceCodeName() const;
     void setSourceCodeName(const QString &sourceCodeName);
+
+    void createFiles();
+signals:
+    void filesWereCreated(QString, QString);
 
 private slots:
     void on_OkButton_clicked();
@@ -47,6 +51,8 @@ private:
     QString mClassName;
     QString mHeaderName;
     QString mSourceCodeName;
+    QString mProjectPath;
+
 };
 
 
