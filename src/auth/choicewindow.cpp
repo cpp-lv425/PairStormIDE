@@ -5,18 +5,17 @@
 #include <QListWidget>
 #include <QVBoxLayout>
 #include <QDialogButtonBox>
-#include <QAbstractButton>
 #include <QPushButton>
 #include <QDebug>
 #include <QApplication>
 #include <QDesktopWidget>
 
-ChoiceWindow::ChoiceWindow(QStringList &usersFilesList, QWidget *pParent)
+ChoiceWindow::ChoiceWindow(const QStringList &usersFilesList, QWidget *pParent)
     : QDialog (pParent)
 {
-    window()->setFixedSize( window()->sizeHint() );
+    //window()->setFixedSize( window()->sizeHint() );
     setModal(true);
-    setWindowTitle("Sign in, please");
+    setWindowTitle(mTitle);
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addStretch(mBasicStretch);
 

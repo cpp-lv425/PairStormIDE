@@ -18,13 +18,18 @@ private:
 public:
     Downloader(QObject* pobj = nullptr);
 
-    void downloadGET( const QUrl &url,                const QString &userName,
+    void downloadGET( const QUrl &url,
+                      const QString &userName,
                       const QString &tokenOrPassword = "");
-    void downloadPOST(const QUrl &url,                const QString &userName,
-                      const QString &tokenOrPassword, const QByteArray &data);
+    void downloadPOST(const QUrl &url,
+                      const QString &userName,
+                      const QString &tokenOrPassword,
+                      const QByteArray &data);
 
 signals:
-    void respond       (const QUrl &url, const QMap<QString, QString> &headersMap, const QMap<QString, QString> &respondMap);
+    void respond       (const QUrl &url,
+                        const QMap<QString, QString> &headersMap,
+                        const QMap<QString, QString> &respondMap);
     void error         (const QString &message);
     void corrupted     (const QString &message);
 

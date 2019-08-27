@@ -26,6 +26,7 @@ StartManager::StartManager(QWidget *parent) : QWidget(parent)
   , mUserName {"unnamed"}
   , mToken {40, '0'}
   , mIsTokenValid {false}
+  , mIsTokenGenerated {false}
 {
     mpDownloader = new DownloaderWrapper(this);
 
@@ -40,7 +41,7 @@ void StartManager::start()
 {
     //  A
     makeListRegisteredUsers();
-    if (!mListRegisteredUsers.size()) // switching to newUser window
+    if (mListRegisteredUsers.isEmpty()) // switching to newUser window
     {
         mUserMode = userMode::NewUser;
         mUserName = "";
@@ -49,34 +50,27 @@ void StartManager::start()
     else //  B
     {
         ChoiceWindow choiceWindow(mListRegisteredUsers, this);
-        connect(&choiceWindow, &ChoiceWindow::cancel, this, [&](){emit cancel(); mUserMode = userMode::Size;});  // user pressed Cancel button in bottom-right side - termination mainwindow
-        connect(&choiceWindow, &ChoiceWindow::rejected, this, [&](){emit cancel(); mUserMode = userMode::Size;});// user pressed Cross button in top-right side - termination mainwindow
+        connect(&choiceWindow, &ChoiceWindow::cancel, this, [&](){
+                    mUserMode = userMode::Size;
+                    emit cancel();
+                });  // user pressed Cancel button in bottom-right side - termination mainwindow
+        connect(&choiceWindow, &ChoiceWindow::rejected, this, [&](){
+                    mUserMode = userMode::Size;
+                    emit cancel();
+                });// user pressed Cross button in top-right side - termination mainwindow
 
         connect(&choiceWindow, &ChoiceWindow::choice, this, &StartManager::onChoice);   // user choose one of three mode: registerdUser, newUser, unnamedUser
         connect(&choiceWindow, &ChoiceWindow::choice, &choiceWindow, &ChoiceWindow::accept);// need to terminate choiceWindow after user clicked some button
 
         choiceWindow.exec();
     }
-
+    //qDebug() << "mUserMode" << static_cast<int>(mUserMode);
     //  C
     switch (mUserMode) {
     case userMode::UnnamedUser:
     {
         // fields [mUserName], [mToken] already set - nothing to do
-
-        QEventLoop loop;
-        QMessageBox *mbox = new QMessageBox;
-        mbox->setWindowTitle(tr("Welcome to Pair Storm!"));
-        QString msg {"You entering in unauthenticated mode"};
-        mbox->setText(msg);
-        mbox->setStandardButtons(nullptr);
-        mbox->show();
-        QTimer::singleShot(mTimeOutWelcomeWindow, this, [&](){
-                loop.exit();
-                mbox->accept();
-            });
-        loop.exec();
-
+        messageWindow("Welcome to Pair Storm!", "You entering in unauthenticated mode", mTimeOutWelcomeWindow);
         break;
     }
     case userMode::RegisteredUser:
@@ -85,35 +79,11 @@ void StartManager::start()
         validateToken();
         if (mIsTokenValid)
         {
-            QEventLoop loop;
-            QMessageBox *mbox = new QMessageBox;
-            mbox->setWindowTitle(tr("Welcome to Pair Storm!"));
-            QString msg {mUserName + ", your credentials are valid!"};
-            mbox->setText(msg);
-            mbox->setStandardButtons(nullptr);
-            mbox->show();
-            QTimer::singleShot(mTimeOutWelcomeWindow, this, [&](){
-                    loop.exit();
-                    mbox->accept();
-                });
-            loop.exec();
-
+            messageWindow("Welcome to Pair Storm!", QString {mUserName + ", your credentials are valid!"}, mTimeOutWelcomeWindow);
             break;
         }
 
-        QEventLoop loop;
-        QMessageBox *mbox = new QMessageBox;
-        mbox->setWindowTitle(tr("Welcome to Pair Storm!"));
-        QString msg {mUserName + ", your credentials are not volid!"};
-        mbox->setText(msg);
-        mbox->setStandardButtons(nullptr);
-        mbox->show();
-        QTimer::singleShot(mTimeOutWelcomeWindow, this, [&](){
-                loop.exit();
-                mbox->accept();
-            });
-        loop.exec();
-
+        messageWindow("Welcome to Pair Storm!", QString {mUserName + ", your credentials are not valid!"}, mTimeOutWelcomeWindow);
         //break; //don't need because when token not valid switching to newUser mode
     }
     case userMode::NewUser:
@@ -127,18 +97,7 @@ void StartManager::start()
         connect(&newUserWindow, &NewUserWindow::unnamedUser, this, &StartManager::onUnnamedUserChoice); // assign [mUserMode], [mUserName], [mToken]
         connect(&newUserWindow, &NewUserWindow::unnamedUser, &newUserWindow, &NewUserWindow::accept);   // terminate newUserWindow
         connect(&newUserWindow, &NewUserWindow::unnamedUser, this, [&](){                               // show notification window
-            QEventLoop loop;
-            QMessageBox *mbox = new QMessageBox;
-            mbox->setWindowTitle(tr("Welcome to Pair Storm!"));
-            QString msg {"You entering in unauthenticated mode"};
-            mbox->setText(msg);
-            mbox->setStandardButtons(nullptr);
-            mbox->show();
-            QTimer::singleShot(mTimeOutWelcomeWindow, this, [&](){
-                    loop.exit();
-                    mbox->accept();
-                });
-            loop.exec();
+            messageWindow("Welcome to Pair Storm!", "You entering in unauthenticated mode", mTimeOutWelcomeWindow);
                     });
 
         connect(&newUserWindow, &NewUserWindow::newUserToken, this, &StartManager::onNewUserToken);// during registration user typed login and token
@@ -150,7 +109,10 @@ void StartManager::start()
         break;
     }
     default:
-    {
+    {   qDebug() << "default";
+        mUserMode = userMode::UnnamedUser;
+        mUserName = "unnamed";
+        mToken = QString(40, '0');
         break;
     }
     }
@@ -163,6 +125,12 @@ void StartManager::start()
         conf.setField("token", mToken);
         QSettings s;
         s.setValue("token", mToken);
+    }
+    else if (mUserMode == userMode::UnnamedUser) //  set token to unnamed user
+    {
+        conf.setField("token", QString(40, '0'));
+        QSettings s;
+        s.setValue("token", QString(40, '0'));
     }
 }
 
@@ -191,6 +159,21 @@ void StartManager::validateToken()
     mpDownloader->get(mUserName, mUrlToCheckUser, mToken);
     loop.exec();
 
+    // output
+    qDebug() << "mRespondStatus" << static_cast<int>(mRespondStatus);
+    qDebug() << "<Respond>";
+    foreach (QString key, mpDownloader->mRespondMap.keys()) {
+        auto value=mpDownloader->mRespondMap.value(key);
+        qDebug() << key << ":" << value;
+    }
+    qDebug() << "</Respond>";
+    qDebug() << "<Headers>";
+    foreach (QString key, mpDownloader->mHeadersMap.keys()) {
+        auto value=mpDownloader->mHeadersMap.value(key);
+        qDebug() << key << ":" << value;
+    }
+    qDebug() << "</Headers>";
+    // output
     // analize answer
     switch (mRespondStatus)
     {
@@ -246,15 +229,17 @@ void StartManager::generateToken()
                     });
 
     formatTokenName(mTokenPrefix);
-    QString data = "{\"scopes\":[\"repo\",\"user\"],\"note\":\"" + mTokenPrefix + "\"}";
-    QByteArray jsonString = "{\"scopes\":[\"repo\",\"user\"],\"note\":\"" + mTokenPrefix.toUtf8() + "\"}";
+    //QString mData = "{\"scopes\":[\"repo\",\"user\"],\"note\":\"" + mTokenPrefix + "\"}";
+    QByteArray mData = "{\"scopes\":[\"repo\",\"user\"],\"note\":\"" + mTokenPrefix.toUtf8() + "\"}";
     //QByteArray jsonString = "{\"scopes\":[\"repo\",\"user\"],\"note\":\"getting-startedQ\"}";
     qDebug() << "mTokenPrefix" << mTokenPrefix;
-    qDebug() << "QString data" << data;
-    qDebug() << "QByteArray jsonString" << jsonString;
+    //qDebug() << "QString mData" << mData;
+    //qDebug() << "QByteArray mData" << mData;
 
-    mpDownloader->post(mUserName, mUrlToGetToken, mPassword, jsonString);
+    mpDownloader->post(mUserName, mUrlToGetToken, mPassword, mData);
     loop.exec();
+
+    qDebug() << "mRespondStatus" << static_cast<int>(mRespondStatus);
 
     // analize answer
     switch (mRespondStatus)
@@ -280,7 +265,8 @@ void StartManager::generateToken()
                               tr("Error"),
                               tr("An error while token generation is occured")
                              );
-        emit cancel();
+
+        //emit cancel();
         break;
     }
     case respondStatus::Corrupted:
@@ -304,6 +290,22 @@ void StartManager::formatTokenName(QString &name)
 {
     auto epoch = QDateTime::currentSecsSinceEpoch();
     name += QString::number(epoch);
+}
+
+void StartManager::messageWindow(const QString &title, const QString &message, int timeOut)
+{
+    QEventLoop loop;
+    QMessageBox *mbox = new QMessageBox;
+    mbox->setWindowTitle(title);
+    QString msg {message};
+    mbox->setText(msg);
+    mbox->setStandardButtons(nullptr);
+    mbox->show();
+    QTimer::singleShot(timeOut, this, [&](){
+            loop.exit();
+            mbox->accept();
+        });
+    loop.exec();
 }
 
 void StartManager::onChoice(QString userName)
@@ -369,7 +371,7 @@ void StartManager::onUnnamedUserChoice()
 }
 
 void StartManager::onNewUserToken(const QString &login, const QString &token)
-{
+{   qDebug() << "onNewUserToken";
     //  F
     mUserName = login;
     mToken = token;
@@ -378,24 +380,18 @@ void StartManager::onNewUserToken(const QString &login, const QString &token)
     {
         emit cancelNewUserWindow();
 
-        QEventLoop loop;
-        QMessageBox *mbox = new QMessageBox;
-        mbox->setWindowTitle(tr("Welcome to Pair Storm!"));
-        QString msg {mUserName + ", you are successfully registered!"};
-        mbox->setText(msg);
-        mbox->setStandardButtons(nullptr);
-        mbox->show();
-        QTimer::singleShot(mTimeOutWelcomeWindow, this, [&](){
-                loop.exit();
-                mbox->accept();
-            });
-        loop.exec();
+        messageWindow("Welcome to Pair Storm!", QString {mUserName + ", you are successfully registered!"}, mTimeOutWelcomeWindow);
     }
-    // in else case NewUserWindow asking type credentials again
+    else // in else case NewUserWindow asking to type credentials again
+    {   // set all parameters for unnamedd user in case user will click cancel
+        mUserMode = userMode::UnnamedUser;
+        mUserName = "unnamed";
+        mToken = QString(40, '0');
+    }
 }
 
 void StartManager::onNewUserPassword(const QString &login, const QString &password)
-{
+{   qDebug() << "onNewUserPassword";
     //  G
     mUserName = login;
     mPassword = password;
@@ -404,19 +400,13 @@ void StartManager::onNewUserPassword(const QString &login, const QString &passwo
     {
         emit cancelNewUserWindow();
 
-        QEventLoop loop;
-        QMessageBox *mbox = new QMessageBox;
-        mbox->setWindowTitle(tr("Welcome to Pair Storm!"));
-        QString msg {mUserName + ", you are successfully registered!"};
-        mbox->setText(msg);
-        mbox->setStandardButtons(nullptr);
-        mbox->show();
-        QTimer::singleShot(mTimeOutWelcomeWindow, this, [&](){
-                loop.exit();
-                mbox->accept();
-            });
-        loop.exec();
+        messageWindow("Welcome to Pair Storm!", QString {mUserName + ", you are successfully registered!"}, mTimeOutWelcomeWindow);
     }
-    // in else case NewUserWindow asking type credentials again
+    else // in else case NewUserWindow asking to type credentials again
+    {   // set all parameters for unnamedd user in case user will click cancel
+        mUserMode = userMode::UnnamedUser;
+        mUserName = "unnamed";
+        mToken = QString(40, '0');
+    }
 }
 

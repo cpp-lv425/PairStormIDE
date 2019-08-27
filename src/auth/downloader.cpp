@@ -2,14 +2,15 @@
 
 #include <QtNetwork>
 
-Downloader::Downloader(QObject* pobj) : QObject(pobj)
+Downloader::Downloader(QObject *pobj) : QObject(pobj)
 {   //qDebug() << "Downloader";
     mNetworkAccessManager = new QNetworkAccessManager(this);
     connect(mNetworkAccessManager, &QNetworkAccessManager::finished, this,   &Downloader::onFinished);
     //qDebug() << "/Downloader";
 }
 
-void Downloader::downloadGET(const QUrl &url, const QString &userName,
+void Downloader::downloadGET(const QUrl &url,
+                             const QString &userName,
                              const QString &tokenOrPassword)
 {   //qDebug() << "Downloader::downloadGET";
     QNetworkRequest request(url);
@@ -34,11 +35,14 @@ void Downloader::downloadGET(const QUrl &url, const QString &userName,
         request.setRawHeader("Authorization", headerData.toLocal8Bit());
     }
 
-    QNetworkReply*  pnr = mNetworkAccessManager->get(request);
+    QNetworkReply *pnr = mNetworkAccessManager->get(request);
     Q_UNUSED(pnr)
 }
 
-void Downloader::downloadPOST(const QUrl &url, const QString &userName, const QString &tokenOrPassword, const QByteArray &data)
+void Downloader::downloadPOST(const QUrl &url,
+                              const QString &userName,
+                              const QString &tokenOrPassword,
+                              const QByteArray &data)
 {   //qDebug() << "Downloader::downloadPOST";
     QNetworkRequest request(url);
 
@@ -68,7 +72,7 @@ void Downloader::downloadPOST(const QUrl &url, const QString &userName, const QS
     Q_UNUSED(pnr)
 }
 
-void Downloader::onFinished(QNetworkReply* pnr)
+void Downloader::onFinished(QNetworkReply *pnr)
 {   //qDebug() << "Downloader::onFinished";
     if (pnr->error() != QNetworkReply::NoError)
     {

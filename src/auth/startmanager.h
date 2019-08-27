@@ -43,7 +43,7 @@ private:
     QString mPassword;
     QString mTokenHash;
     QString mTokenPrefix    = "PS";
-    QByteArray data;
+    QByteArray mData;
 
     bool mIsTokenValid;
     bool mIsTokenGenerated;
@@ -63,6 +63,7 @@ private:
     void formatTokenName(QString &name);     // formatting token name as name + currentSecsSinceEpoch
 
     int mTimeOutWelcomeWindow = 3000;        // ms
+    void messageWindow(const QString &title, const QString &message, int timeOut);
 
 signals:
     void cancel();                           // cancel mainwindow

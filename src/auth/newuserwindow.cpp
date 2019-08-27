@@ -8,12 +8,11 @@
 #include <QDialogButtonBox>
 #include <QPushButton>
 #include <QDebug>
-#include <QToolTip>
 
 NewUserWindow::NewUserWindow(QWidget *parent) : QDialog(parent)
 {
     setModal(true);
-    window()->setFixedSize( window()->sizeHint() );
+    //window()->setFixedSize( window()->sizeHint() );
     setWindowTitle("Create new account");
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addStretch(mBasicStretch);
@@ -91,11 +90,13 @@ void NewUserWindow::onBtnBoxClicked(QAbstractButton *button)
         }
         if (mpEditToken->text().size() == 40 && mpEditLogin->text().size())// user typed token
         {
+            mpButtonBox->setEnabled(false);
             emit newUserToken(mpEditLogin->text(), mpEditToken->text());
             return;
         }
         if (mpEditToken->text().size() && mpEditLogin->text().size())      // user typed password
         {
+            mpButtonBox->setEnabled(false);
             emit newUserPasssword(mpEditLogin->text(), mpEditToken->text());
             return;
         }

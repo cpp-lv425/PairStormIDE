@@ -15,7 +15,7 @@ class ChoiceWindow : public QDialog
 {
     Q_OBJECT
 public:
-    ChoiceWindow(QStringList &usersFilesList, QWidget *pParent = nullptr);
+    ChoiceWindow(const QStringList &usersFilesList, QWidget *pParent = nullptr);
 
 private:
     QListWidget *mpUsersWidgetList;
@@ -25,14 +25,16 @@ private:
 
     QDialogButtonBox *mpButtonBox;
 
+    const QString mTitle {"Sign in, please"};
+
     // design parameters
     int mBasicStretch               = 1;
 
 private slots:
-    void onListDoubleClicked(QListWidgetItem * item);
+    void onListDoubleClicked(QListWidgetItem *item);
     void onNewUserClicked();
     void onUnnamedUserClicked();
-    void onBtnBoxClicked(QAbstractButton * button);
+    void onBtnBoxClicked(QAbstractButton *button);
 
 signals:
     void cancel();
