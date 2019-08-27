@@ -33,28 +33,28 @@ protected:
 public:
 
     //======================= Docker key events processor ====================
-    virtual void keyPressEvent(QKeyEvent * event) = 0;
+    virtual void keyPressEvent(QKeyEvent *event) = 0;
 
 public slots:
 
     //======================= Slots for GUI events ===========================
-    virtual void configureOnLogin(const QString & userName)  = 0;
-    virtual void updateTheme     (const QString & themeName) = 0;
+    virtual void configureOnLogin(const QString &userName)  = 0;
+    virtual void updateTheme     (const QString &themeName) = 0;
 
     //======================= Slots for Network events ========================
-    virtual void updateOnlineUsers   (const QStringList & onlineUserNames)    = 0;
-    virtual void updateConnectedUsers(const QStringList & connectedUserNames) = 0;
+    virtual void updateOnlineUsers   (const QStringList &onlineUserNames)    = 0;
+    virtual void updateConnectedUsers(const QStringList &connectedUserNames) = 0;
 
-    virtual void appendMessage(const QString & messageAuthor,
-                               const QString & messageBogy) = 0;
+    virtual void appendMessage(const QString &messageAuthor,
+                               const QString &messageBogy) = 0;
 
 signals:
 
     //======================= Signals to Network =============================
-    void startSharingRequested(const QString & userName);
-    void stopSharingRequested (const QString & userName);
+    void startSharingRequested(const QString &);
+    void stopSharingRequested (const QString &);
 
-    void messageSent(const QString & messageBody);
+    void messageSent(const QString &);
 };
 
 #endif // CHATWIDGETINTERFACE_H

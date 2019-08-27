@@ -4,7 +4,7 @@
 // ==========================================================================================
 // ==========================================================================================
 //                                                                                CONSTRUCTOR
-ChatWindowDock::ChatWindowDock(QWidget * pParent) :
+ChatWindowDock::ChatWindowDock(QWidget *pParent) :
     QDockWidget (pParent)
 {
     // Build chat widget & connect it to the dock
@@ -53,7 +53,7 @@ void ChatWindowDock::updateTheme(const QString &newThemeName)
 // ==========================================================================================
 // ==========================================================================================
 //                                                   START SHARING WHEN USER INTENDS TO SHARE
-void ChatWindowDock::sendRequestOnStartSharing(const QString & userName)
+void ChatWindowDock::sendRequestOnStartSharing(const QString &userName)
 {
     emit startSharingWithUser(userName);
 }
@@ -61,7 +61,7 @@ void ChatWindowDock::sendRequestOnStartSharing(const QString & userName)
 // ==========================================================================================
 // ==========================================================================================
 //                                               STOP SHARING WHEN USER WANTS TO STOP SHARING
-void ChatWindowDock::sendRequestOnStopSharing(const QString & userName)
+void ChatWindowDock::sendRequestOnStopSharing(const QString &userName)
 {
     emit stopSharingWithUser(userName);
 }

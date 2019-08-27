@@ -13,7 +13,7 @@ class ChatMessagesController : public QObject
 
 public:
 
-    explicit ChatMessagesController(const QString & authorName,
+    explicit ChatMessagesController(const QString &authorName,
                                     QObject *parent = nullptr);
 
     // Messages collection getter
@@ -25,7 +25,7 @@ public:
 signals:
 
     // Signal that user try to send message
-    void sendingMessage(const ChatMessage & newMessage);
+    void sendingMessage(const ChatMessage &);
 
     // Signals to messages list model that inform about changes
     void preMessageAppended();
@@ -34,9 +34,9 @@ signals:
 public slots:
 
     // Appends incoming messages
-    void appendMessage(const ChatMessage & newMessage);
+    void appendMessage(const ChatMessage &newMessage);
     // Generates & appends incomming message based on author input
-    void appendMessage(const QString & newMessageContent);
+    void appendMessage(const QString &newUserMessageContent);
 
 private:
 

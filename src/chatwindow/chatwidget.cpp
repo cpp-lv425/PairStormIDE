@@ -24,7 +24,7 @@ ChatWidget::ChatWidget()
             Qt::UniqueConnection);
 
     // Message input area' layout
-    QHBoxLayout * pLineLayout = new QHBoxLayout;
+    QHBoxLayout *pLineLayout = new QHBoxLayout;
     pLineLayout->addWidget(mpInputMessageField);
     pLineLayout->addWidget(pSendButton);
 
@@ -55,7 +55,7 @@ void ChatWidget::keyPressEvent(QKeyEvent *event)
 // ==========================================================================================
 // ==========================================================================================
 //                                                                          CHAT CONFIGURATOR
-void ChatWidget::configureOnLogin(const QString & userName)
+void ChatWidget::configureOnLogin(const QString &userName)
 {
     mUserName = userName;
     setDisabled(false);
@@ -68,8 +68,8 @@ void ChatWidget::redrawUsersList()
 {
     mpUsersList->clear();
 
-    QListWidgetItem * pUserItem;
-    for (const QString & userName: mOnlineUsers)
+    QListWidgetItem *pUserItem;
+    for (const QString &userName: mOnlineUsers)
     {
         pUserItem = new QListWidgetItem;
         pUserItem->setText("Connect to: " + userName);
@@ -88,7 +88,7 @@ void ChatWidget::redrawUsersList()
 // ==========================================================================================
 // ==========================================================================================
 //                                                               UPDATE ONLINE USERS & REDRAW
-void ChatWidget::updateOnlineUsers(const QStringList & onlineUsers)
+void ChatWidget::updateOnlineUsers(const QStringList &onlineUsers)
 {
     mOnlineUsers = onlineUsers;
     redrawUsersList();
@@ -97,7 +97,7 @@ void ChatWidget::updateOnlineUsers(const QStringList & onlineUsers)
 // ==========================================================================================
 // ==========================================================================================
 //                                                            UPDATE CONNECTED USERS & REDRAW
-void ChatWidget::updateConnectedUsers(const QStringList & connectedUsers)
+void ChatWidget::updateConnectedUsers(const QStringList &connectedUsers)
 {
     mConnectedUsers = connectedUsers;
     redrawUsersList();
@@ -106,8 +106,8 @@ void ChatWidget::updateConnectedUsers(const QStringList & connectedUsers)
 // ==========================================================================================
 // ==========================================================================================
 //                                                             APPEND NEW MESSAGE TO THE CHAT
-void ChatWidget::appendMessage(const QString & messageAuthor,
-                               const QString & messageBody)
+void ChatWidget::appendMessage(const QString &messageAuthor,
+                               const QString &messageBody)
 {
     QString chatMessage = mpMessagesHistory->toPlainText();
     chatMessage += '\n';

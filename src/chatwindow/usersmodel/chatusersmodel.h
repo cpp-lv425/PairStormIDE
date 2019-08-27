@@ -22,16 +22,16 @@ public:
                   int role = Qt::DisplayRole) const override;
 
     // Users' attributes setter for the qml
-    bool setData(const QModelIndex &index,
-                 const QVariant &value,
+    bool setData(const QModelIndex &modelIndex,
+                 const QVariant &newValue,
                  int role = Qt::EditRole) override;
 
     // Attribute names getter
     virtual QHash<int, QByteArray> roleNames() const override;
 
     // Local messages controller getter & setter
-    ChatUsersController * list() const;
-    void setList(ChatUsersController * newList);
+    ChatUsersController* list() const;
+    void setList(ChatUsersController *newController);
 
 private:
 
@@ -42,7 +42,7 @@ private:
         UserOnlineRole
     };
     // Local users controller used by model
-    ChatUsersController * mpUsersController;
+    ChatUsersController *mpUsersController;
 };
 
 #endif // CHATUSERSMODEL_H

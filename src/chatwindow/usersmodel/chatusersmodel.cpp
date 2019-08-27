@@ -2,7 +2,7 @@
 // ==========================================================================================
 // ==========================================================================================
 //                                                                                CONSTRUCTOR
-ChatUsersModel::ChatUsersModel(QObject * parent)
+ChatUsersModel::ChatUsersModel(QObject *parent)
     : QAbstractListModel(parent), mpUsersController(nullptr)
 {
 }
@@ -10,7 +10,7 @@ ChatUsersModel::ChatUsersModel(QObject * parent)
 // ==========================================================================================
 // ==========================================================================================
 //                                                                    USERS LIST' SIZE GETTER
-int ChatUsersModel::rowCount(const QModelIndex & modelIndex) const
+int ChatUsersModel::rowCount(const QModelIndex &modelIndex) const
 {
     if (modelIndex.isValid() || !mpUsersController)
     {
@@ -24,7 +24,7 @@ int ChatUsersModel::rowCount(const QModelIndex & modelIndex) const
 // ==========================================================================================
 // ==========================================================================================
 //                                                           SEPARATE USERS ATTRIBUTES GETTER
-QVariant ChatUsersModel::data(const QModelIndex & modelIndex, int role) const
+QVariant ChatUsersModel::data(const QModelIndex &modelIndex, int role) const
 {
     if (!modelIndex.isValid() || !mpUsersController)
     {
@@ -59,8 +59,8 @@ QVariant ChatUsersModel::data(const QModelIndex & modelIndex, int role) const
 // ==========================================================================================
 // ==========================================================================================
 //                                                           SEPARATE USERS ATTRIBUTES SETTER
-bool ChatUsersModel::setData(const QModelIndex & modelIndex,
-                             const QVariant & newValue,
+bool ChatUsersModel::setData(const QModelIndex &modelIndex,
+                             const QVariant &newValue,
                              int role)
 {
     if (!modelIndex.isValid() || !mpUsersController)
@@ -133,7 +133,7 @@ QHash<int, QByteArray> ChatUsersModel::roleNames() const
 // ==========================================================================================
 // ==========================================================================================
 //                                                              LOCAL USERS CONTROLLER GETTER
-ChatUsersController * ChatUsersModel::list() const
+ChatUsersController* ChatUsersModel::list() const
 {
     return mpUsersController;
 }
@@ -141,7 +141,7 @@ ChatUsersController * ChatUsersModel::list() const
 // ==========================================================================================
 // ==========================================================================================
 //                                                              LOCAL USERS CONTROLLER SETTER
-void ChatUsersModel::setList(ChatUsersController * newController)
+void ChatUsersModel::setList(ChatUsersController *newController)
 {
     beginResetModel();
 

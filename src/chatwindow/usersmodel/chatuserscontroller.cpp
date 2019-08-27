@@ -23,7 +23,7 @@ QStringList ChatUsersController::onlineUserNames() const
     QStringList userNames;
     std::for_each(mChatUsers.cbegin(),
                   mChatUsers.cend(),
-                  [&userNames](const ChatUser & chatUser)
+                  [&userNames](const ChatUser &chatUser)
                   {
                       userNames.push_back(chatUser.mUserName);
                   });
@@ -38,7 +38,7 @@ QStringList ChatUsersController::connectedUserNames() const
     QStringList userNames;
     std::for_each(mChatUsers.cbegin(),
                   mChatUsers.cend(),
-                  [&userNames](const ChatUser & chatUser)
+                  [&userNames](const ChatUser &chatUser)
                   {
                       if (chatUser.mState == ChatUser::State::ConnectedUser)
                       {
@@ -57,7 +57,7 @@ void ChatUsersController::updateOnlineUsers(const QStringList &newOnlineUsers)
     // Remove disappeared users
     std::for_each(oldOnlineUsers.cbegin(),
                   oldOnlineUsers.cend(),
-                  [newOnlineUsers, this](const QString & userName)
+                  [newOnlineUsers, this](const QString &userName)
                   {
                       if (!newOnlineUsers.contains(userName))
                       {
@@ -67,7 +67,7 @@ void ChatUsersController::updateOnlineUsers(const QStringList &newOnlineUsers)
     // Append new discovered users
     std::for_each(newOnlineUsers.cbegin(),
                   newOnlineUsers.cend(),
-                  [oldOnlineUsers, this](const QString & userName)
+                  [oldOnlineUsers, this](const QString &userName)
                   {
                       if (!oldOnlineUsers.contains(userName))
                       {
@@ -85,7 +85,7 @@ void ChatUsersController::updateConnectedUsers(const QStringList &newConnectedUs
     // Remove broken connections
     std::for_each(oldConnectedUsers.cbegin(),
                   oldConnectedUsers.cend(),
-                  [newConnectedUsers, this](const QString & userName)
+                  [newConnectedUsers, this](const QString &userName)
                   {
                       if (!newConnectedUsers.contains(userName))
                       {
@@ -95,7 +95,7 @@ void ChatUsersController::updateConnectedUsers(const QStringList &newConnectedUs
     // Append new connections
     std::for_each(newConnectedUsers.cbegin(),
                   newConnectedUsers.cend(),
-                  [oldConnectedUsers, this](const QString & userName)
+                  [oldConnectedUsers, this](const QString &userName)
                   {
                       if (!oldConnectedUsers.contains(userName))
                       {
@@ -107,7 +107,7 @@ void ChatUsersController::updateConnectedUsers(const QStringList &newConnectedUs
 // ==========================================================================================
 // ==========================================================================================
 //                                                     APPENDS USER WITH SPECIFIED ATTRIBUTES
-void ChatUsersController::appendUser(const QString & newUserName, ChatUser::State state)
+void ChatUsersController::appendUser(const QString &newUserName, ChatUser::State state)
 {
     // Append User with given userName and userState
     ChatUser newUser;
@@ -122,12 +122,12 @@ void ChatUsersController::appendUser(const QString & newUserName, ChatUser::Stat
 // ==========================================================================================
 // ==========================================================================================
 //                                                                     REMOVES SPECIFIED USER
-void ChatUsersController::removeUser(const QString & outdatedUserName)
+void ChatUsersController::removeUser(const QString &outdatedUserName)
 {
     auto userPos =
             std::find_if(mChatUsers.begin(),
                          mChatUsers.end(),
-                         [outdatedUserName](const ChatUser & chatUser)
+                         [outdatedUserName](const ChatUser &chatUser)
                          {
                              return outdatedUserName == chatUser.mUserName;
                          });

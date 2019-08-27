@@ -85,7 +85,7 @@ QHash<int, QByteArray> ChatMessagesModel::roleNames() const
 // ==========================================================================================
 // ==========================================================================================
 //                                                           LOCAL MESSAGES CONTROLLER GETTER
-ChatMessagesController * ChatMessagesModel::list() const
+ChatMessagesController* ChatMessagesModel::list() const
 {
     return mpMessagesController;
 }
@@ -93,7 +93,7 @@ ChatMessagesController * ChatMessagesModel::list() const
 // ==========================================================================================
 // ==========================================================================================
 //                                                           LOCAL MESSAGES CONTROLLER SETTER
-void ChatMessagesModel::setList(ChatMessagesController * newController)
+void ChatMessagesModel::setList(ChatMessagesController *newController)
 {
     beginResetModel();
 

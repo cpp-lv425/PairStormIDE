@@ -27,18 +27,18 @@ public:
     QmlChatWidget(QmlChatWidget const&)             = delete;
     QmlChatWidget& operator=(QmlChatWidget const &) = delete;
 
-    virtual void keyPressEvent(QKeyEvent * event)                         override;
+    virtual void keyPressEvent(QKeyEvent *event)                         override;
 
 public slots:
 
-    virtual void configureOnLogin(const QString & userName)               override;
-    virtual void updateTheme     (const QString & themeName)              override;
+    virtual void configureOnLogin(const QString &userName)               override;
+    virtual void updateTheme     (const QString &themeName)              override;
 
-    virtual void updateOnlineUsers   (const QStringList & onlineUsers)    override;
-    virtual void updateConnectedUsers(const QStringList & connectedUsers) override;
+    virtual void updateOnlineUsers   (const QStringList &onlineUsers)    override;
+    virtual void updateConnectedUsers(const QStringList &connectedUsers) override;
 
-    virtual void appendMessage(const QString & messageAuthor,
-                               const QString & messageBody)               override;
+    virtual void appendMessage(const QString &messageAuthor,
+                               const QString &messageBody)               override;
 
 private:
 
@@ -46,20 +46,20 @@ private:
     QString mUserName;
 
     // Messages & Users controllers
-    ChatMessagesController * mpMessagesController;
-    ChatUsersController    * mpUsersController;
+    ChatMessagesController *mpMessagesController;
+    ChatUsersController    *mpUsersController;
 
     // Qml scene context, current layout and widget
-    QQmlContext      * mpCurrentChatContext;
-    QBoxLayout       * mpCurrentChatLayout;
-    QWidget          * mpCurrentQmlChatWidget;
+    QQmlContext      *mpCurrentChatContext;
+    QBoxLayout       *mpCurrentChatLayout;
+    QWidget          *mpCurrentQmlChatWidget;
 
 private slots:
 
-    void shareMessageOnSendingMessage (const ChatMessage & message);
+    void shareMessageOnSendingMessage (const ChatMessage &message);
 
-    void ConnectUserOnSwitchOn     (const QString userName);
-    void DisconnectUserOnSwitchOff (const QString userName);
+    void ConnectUserOnSwitchOn     (const QString &userName);
+    void DisconnectUserOnSwitchOff (const QString &userName);
 };
 
 #endif // QMLCHATWIDGET_H

@@ -2,7 +2,7 @@
 // ==========================================================================================
 // ==========================================================================================
 //                                                        CONSTRUCTOR: INTIALIZES AUTHOR NAME
-ChatMessagesController::ChatMessagesController(const QString & authorName,
+ChatMessagesController::ChatMessagesController(const QString &authorName,
                                                QObject *parent) :
     QObject(parent), mcAuthorName(authorName)
 {
@@ -34,7 +34,7 @@ void ChatMessagesController::sendSystemMessage(SystemMessage messageType)
 // ==========================================================================================
 // ==========================================================================================
 //                                              APPEND INGOING MESSAGES TO THE HISTORY & CHAT
-void ChatMessagesController::appendMessage(const ChatMessage & newMessage)
+void ChatMessagesController::appendMessage(const ChatMessage &newMessage)
 {
     if (newMessage.mType == ChatMessage::Type::UserMessage)
     {
@@ -51,7 +51,7 @@ void ChatMessagesController::appendMessage(const ChatMessage & newMessage)
 // ==========================================================================================
 // ==========================================================================================
 //                                          BUILD MESSAGE UPON USER' INPUT, APPEND IT & SHARE
-void ChatMessagesController::appendMessage(const QString & newUserMessageContent)
+void ChatMessagesController::appendMessage(const QString &newUserMessageContent)
 {
     ChatMessage newUserMessage;
     newUserMessage.mPublicationDateTime = QDateTime::currentDateTimeUtc();

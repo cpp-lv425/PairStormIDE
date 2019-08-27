@@ -25,8 +25,8 @@ public:
     virtual QHash<int, QByteArray> roleNames() const override;
 
     // Local messages controller getter & setter
-    ChatMessagesController * list() const;
-    void setList(ChatMessagesController * newList);
+    ChatMessagesController* list() const;
+    void setList(ChatMessagesController *newController);
 
 private:
 
@@ -38,7 +38,7 @@ private:
         TypeRole
     };
     // Local messages controller used by model
-    ChatMessagesController * mpMessagesController;
+    ChatMessagesController *mpMessagesController;
 };
 
 #endif // CHATMESSAGESMODEL_H

@@ -16,7 +16,7 @@ public:
     explicit ChatWindowDock(QWidget *pParent = nullptr);
 
     // Current user name setter
-    void setUserName(const QString& userName);
+    void setUserName(const QString &userName);
 
 signals:
 
@@ -32,7 +32,7 @@ public slots:
     // Slots for processing GUI events
     void pushMessageToChat(const QString userName,
                            const QString message);
-    void updateTheme(const QString & newThemeName);
+    void updateTheme(const QString &newThemeName);
 
     // Slots for processing Network events
     void updateOnlineUsersOnChange   (const QStringList onlineUsers);
@@ -41,15 +41,15 @@ public slots:
 private slots:
 
     // Slots for processing chat events
-    void sendRequestOnStartSharing(const QString & userName);
-    void sendRequestOnStopSharing (const QString & userName);
+    void sendRequestOnStartSharing(const QString &userName);
+    void sendRequestOnStopSharing (const QString &userName);
 
-    void shareMessageOnSend(const QString & message);
+    void shareMessageOnSend(const QString &message);
 
 private:
 
     // Chat instance
-    ChatWidgetInterface * mpChatWidget;
+    ChatWidgetInterface *mpChatWidget;
 
     // Set custom behavior to keyPressEvent
     virtual void keyPressEvent(QKeyEvent *event) override;

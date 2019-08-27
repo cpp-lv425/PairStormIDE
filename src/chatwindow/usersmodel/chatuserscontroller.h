@@ -21,22 +21,22 @@ public:
 signals:
 
     // Signals that user wants to start or stop sharing
-    void userStateChangedConnected(const QString & userName);
-    void userStateChangedDisconnected(const QString & userName);
+    void userStateChangedConnected(const QString &);
+    void userStateChangedDisconnected(const QString &);
 
     // Signals to users list model that inform about changes
     void preUserAppended();
     void postUserAppended();
 
-    void preUserRemoved(int userId);
+    void preUserRemoved(int);
     void postUserRemoved();
 
 public slots:
 
     // Updates list of online users
-    void updateOnlineUsers(const QStringList & onlineUsers);
+    void updateOnlineUsers(const QStringList &newOnlineUsers);
     // Updates online users "isConnected" attribute
-    void updateConnectedUsers(const QStringList & connectedUsers);
+    void updateConnectedUsers(const QStringList &newConnectedUsers);
 
 private:
 
@@ -48,13 +48,13 @@ private:
     QStringList connectedUserNames() const;
 
     // Appends and removes user from users list
-    void appendUser(const QString & newUser,
+    void appendUser(const QString &newUserName,
                     ChatUser::State state = ChatUser::State::DisconnectedUser);
-    void removeUser(const QString & outdatedUser);
+    void removeUser(const QString &outdatedUserName);
 
     // Connects or disconnects user
-    void connectUser(const QString & connectedUser);
-    void disconnectUser(const QString & disconnectedUser);
+    void connectUser(const QString &connectedUser);
+    void disconnectUser(const QString &disconnectedUser);
 };
 
 #endif // CHATUSERSCONTROLLER_H

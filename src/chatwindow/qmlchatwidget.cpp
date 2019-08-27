@@ -7,7 +7,7 @@ QmlChatWidget::QmlChatWidget()
     // Set default user name
     mUserName = QString();
 
-    QQuickView * tmpView = new QQuickView();
+    QQuickView *tmpView = new QQuickView();
 
     mpCurrentChatContext = tmpView->engine()->rootContext();
     mpCurrentChatContext->setContextProperty("globalTheme", "white");
@@ -42,7 +42,7 @@ void QmlChatWidget::keyPressEvent(QKeyEvent *event)
 // ==========================================================================================
 // ==========================================================================================
 //                                                                          CHAT CONFIGURATOR
-void QmlChatWidget::configureOnLogin(const QString & userName)
+void QmlChatWidget::configureOnLogin(const QString &userName)
 {
     if (mUserName != QString())
     {
@@ -78,7 +78,7 @@ void QmlChatWidget::configureOnLogin(const QString & userName)
                                                     "Users list can be created only in backend");
 
 
-    QQuickView * tmpView = new QQuickView();
+    QQuickView *tmpView = new QQuickView();
 
     mpCurrentChatContext = tmpView->engine()->rootContext();
     mpCurrentChatContext->setContextProperty("globalTheme",   "white");
@@ -151,7 +151,7 @@ void QmlChatWidget::appendMessage(const QString &messageAuthor,
 // ==========================================================================================
 // ==========================================================================================
 //                                                                          UPDATE CHAT THEME
-void QmlChatWidget::updateTheme(const QString & themeName)
+void QmlChatWidget::updateTheme(const QString &themeName)
 {
     Theme newTheme = mThemes[themeName];
     switch(newTheme)
@@ -183,7 +183,7 @@ void QmlChatWidget::shareMessageOnSendingMessage(const ChatMessage &message)
 // ==========================================================================================
 // ==========================================================================================
 //                                         SEND CONNECT REQUEST WHEN USER TRUNS ON THE SWITCH
-void QmlChatWidget::ConnectUserOnSwitchOn(const QString userName)
+void QmlChatWidget::ConnectUserOnSwitchOn(const QString &userName)
 {
     emit startSharingRequested(userName);
 }
@@ -191,7 +191,7 @@ void QmlChatWidget::ConnectUserOnSwitchOn(const QString userName)
 // ==========================================================================================
 // ==========================================================================================
 //                                     SEND DISCONNECT REQUEST WHEN USER TRUNS OFF THE SWITCH
-void QmlChatWidget::DisconnectUserOnSwitchOff(const QString userName)
+void QmlChatWidget::DisconnectUserOnSwitchOff(const QString &userName)
 {
     emit stopSharingRequested(userName);
 }
