@@ -48,11 +48,13 @@ private slots:
 
 private:
 
-    // Chat instance
+    // Chat instance & chat title
     ChatWidgetInterface *mpChatWidget;
+    static const QString mscChatTitle;
 
     // Set custom behavior to keyPressEvent
     virtual void keyPressEvent(QKeyEvent *event) override;
+
 };
 
 #endif // CHATWINDOWDOCK_H

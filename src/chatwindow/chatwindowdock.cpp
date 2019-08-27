@@ -22,7 +22,7 @@ ChatWindowDock::ChatWindowDock(QWidget *pParent) :
             this,         &ChatWindowDock::shareMessageOnSend,
             Qt::UniqueConnection);
 
-    setWindowTitle("Chat");
+    setWindowTitle(mscChatTitle);
     setWidget(mpChatWidget);
 }
 // ==========================================================================================
@@ -98,3 +98,5 @@ void ChatWindowDock::keyPressEvent(QKeyEvent *event)
     mpChatWidget->keyPressEvent(event);
     QDockWidget::keyPressEvent(event);
 }
+
+const QString ChatWindowDock::mscChatTitle = QString("chat");

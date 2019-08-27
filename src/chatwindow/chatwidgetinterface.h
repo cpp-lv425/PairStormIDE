@@ -15,7 +15,7 @@ protected:
     explicit ChatWidgetInterface(QWidget *qObject = nullptr) : QWidget(qObject) {}
 
     // Possible chat themes & current theme variable
-    enum Theme {
+    enum Theme : int {
         DefaultTheme,
         WhiteTheme,
         BlueTheme,
