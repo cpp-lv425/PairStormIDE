@@ -3,8 +3,10 @@
 // ==========================================================================================
 //                                                                                CONSTRUCTOR
 ChatUsersController::ChatUsersController(QObject *parent) :
-    QObject(parent)
+    QObject(parent), mDatabaseUsers()
 {
+    QVector<User> superUsers = mDatabaseUsers.getAllUsersFromDb();
+    // TODO fill chat users & implement additional states behavior
 }
 // ==========================================================================================
 // ==========================================================================================
@@ -117,6 +119,10 @@ void ChatUsersController::appendUser(const QString &newUserName, ChatUser::State
     emit preUserAppended();
     mChatUsers.append(newUser);
     emit postUserAppended();
+
+    // Append User with given userName to database
+    User newDBUser(newUserName);
+    mDatabaseUsers.addUserToDb(newDBUser);
 }
 // ==========================================================================================
 // ==========================================================================================

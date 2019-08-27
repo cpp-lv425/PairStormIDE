@@ -54,6 +54,11 @@ void ChatMessagesController::sendSystemMessage(SystemMessage messageType)
 //                                              APPEND INGOING MESSAGES TO THE HISTORY & CHAT
 void ChatMessagesController::appendMessage(const ChatMessage &newMessage)
 {
+    // Display message in the chat
+    emit preMessageAppended();
+    mChatMessages.append(newMessage);
+    emit postMessageAppended();
+
     if (newMessage.mType == ChatMessage::Type::UserMessage)
     {
         // Only users messages have to be added to the history
@@ -63,11 +68,6 @@ void ChatMessagesController::appendMessage(const ChatMessage &newMessage)
 
         mDatabaseMessages.addMessageToDb(newDBMessage);
     }
-
-    // Display message in the chat
-    emit preMessageAppended();
-    mChatMessages.append(newMessage);
-    emit postMessageAppended();
 }
 // ==========================================================================================
 // ==========================================================================================

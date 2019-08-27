@@ -2,6 +2,7 @@
 #define CHATUSERSCONTROLLER_H
 
 #include <QObject>
+#include "userdb.h"
 #include "chatuser.h"
 
 // ==========================================================================================
@@ -42,6 +43,8 @@ private:
 
     // Bunch of current discovered users
     QVector<ChatUser> mChatUsers;
+
+    UserDb            mDatabaseUsers;
 
     // Return lists of online users as well as connected users
     QStringList onlineUserNames() const;
