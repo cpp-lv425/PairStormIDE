@@ -156,6 +156,8 @@ private:
     QByteArray mBeginTextState;
     QVector<AddCommentButton*> mCommentsVector;
 
+    int mZalupa;
+
     QTextCharFormat fmtLiteral;
     QTextCharFormat fmtComment;
     QTextCharFormat fmtKeyword;
