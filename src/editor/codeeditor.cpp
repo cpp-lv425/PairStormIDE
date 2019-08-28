@@ -387,7 +387,7 @@ void CodeEditor::setNewAddedButtonSettings(AddCommentButton *commentButton)
     mCommentWidget->setVisible(false);
 }
 
-CodeEditor *CodeEditor::getOpenedDocument(const QString &fileName)
+CodeEditor* CodeEditor::getOpenedDocument(const QString &fileName)
 {
     auto allWidgets = QApplication::allWidgets();
     for (auto widget: allWidgets)
