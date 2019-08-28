@@ -12,7 +12,6 @@
 #include<QLabel>
 #include <QVector>
 
-
 CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
 {
     setLineWrapMode(QPlainTextEdit::NoWrap);// don't move cursor to the next line where it's out of visible scope
@@ -88,24 +87,23 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     fmtKeyword.setForeground(mConfigParam.mBasicLiteralsColor);
     fmtComment.setForeground(mConfigParam.mCommentColor);
     fmtRegular.setForeground(mConfigParam.mCodeTextColor);
-    fmtRegular.setForeground(Qt::white);
 }
 
 void CodeEditor::handleLinesAddition(int changeStart, int lastLineWithChange, int lineDifference)
 {
     QString changedCode;
 
-    if(lineDifference > 0)
+    if (lineDifference > 0)
     {
         changeStart = lastLineWithChange - lineDifference;
         mTokensList.removeAt(changeStart);
     }
 
-    for(int i = changeStart; i <= lastLineWithChange; ++i)
+    for (int i = changeStart; i <= lastLineWithChange; ++i)
     {
         changedCode = document()->findBlockByLineNumber(i).text();
         mLcpp->lexicalAnalysis(changedCode);
-        if(lineDifference)
+        if (lineDifference)
         {
             mTokensList.insert(i, mLcpp->getTokens());
         }
@@ -119,16 +117,13 @@ void CodeEditor::handleLinesAddition(int changeStart, int lastLineWithChange, in
 void CodeEditor::handleLinesDelition(int changeStart, int lastLineWithChange, int lineDifference)
 {
     QString changedCode;
-    if(lineDifference < 0)
+    lineDifference = -lineDifference;
+    changedCode = document()->findBlockByLineNumber(lastLineWithChange).text();
+    mLcpp->lexicalAnalysis(changedCode);
+    mTokensList[lastLineWithChange] = mLcpp->getTokens();
+    for (int i = lastLineWithChange + 1; i < lastLineWithChange + lineDifference + 1; ++i)
     {
-        lineDifference = -lineDifference;
-        changedCode = document()->findBlockByLineNumber(lastLineWithChange).text();
-        mLcpp->lexicalAnalysis(changedCode);
-        mTokensList[lastLineWithChange] = mLcpp->getTokens();
-        for(int i = lastLineWithChange + 1; i < lastLineWithChange + lineDifference + 1; ++i)
-        {
-            mTokensList.removeAt(i);
-        }
+        mTokensList.removeAt(i);
     }
 }
 
@@ -142,7 +137,7 @@ void CodeEditor::handleLineChange(int lastLineWithChange)
     int lineDifference = currentLinesCount - mLinesCount;
     mLinesCount = currentLinesCount;
 
-    if(lineDifference >= 0)
+    if (lineDifference >= 0)
     {
         handleLinesAddition(changeStart, lastLineWithChange, lineDifference);
     }

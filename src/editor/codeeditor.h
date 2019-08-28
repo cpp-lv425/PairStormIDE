@@ -87,7 +87,6 @@ private slots:
     void updateLineNumberAreaWidth();
     void updateLineNumberArea(const QRect &rect, int dy);
     void handleLineChange(int);
-    void runLexer();
     void highlightText();
     //void showCommentLine(int line);
     void deleteComment();
