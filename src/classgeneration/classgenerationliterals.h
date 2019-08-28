@@ -13,6 +13,7 @@ const QString successCreationMessage    = "The class was successfully created!";
 const QString nonSuccessCreationTitle   = "Forbidden creation";
 const QString nonSuccessCreationMessage = "The class name is not correct!";
 const QString definitionExistsTitle     = "Cannot add definition";
+const QString successDefinCreateTitle   = "Successfull creation";
 const QString successDefinCreateMessage = "Definition was successfully created!";
 const QString definitionExistsMessage   = "Definition already exists!";
 const QString headerExtension           = ".h";

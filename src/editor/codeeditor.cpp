@@ -139,13 +139,15 @@ void CodeEditor::writeDefinitionToSource()
                auto fileContent = fileManager.readFromFile(sourceFileName);
                fileManager.writeToFile(sourceFileName, fileContent + "\n" + definitonTest);
                emit openDocument(sourceFileName);
+               QMessageBox::information(this, successDefinCreateTitle, successDefinCreateMessage);
+               return;
            }
            sourceDocument->setPlainText(sourceDocument->toPlainText() + "\n" + definitonTest);
-           QMessageBox::information(this, definitionExistsTitle, definitionExistsMessage);
+           QMessageBox::information(this, successDefinCreateTitle, successDefinCreateMessage);
         }
         else
         {
-            QMessageBox::information(this, successCreationTitle, successDefinCreateMessage);
+             QMessageBox::information(this, definitionExistsTitle, definitionExistsMessage);
         }
     }
 }
