@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <QMdiArea>
 #include <QVector>
+#include <QDebug>
 #include <QDir>
 
 #include "usermessages.h"
@@ -267,6 +268,12 @@ void DocumentManager::onCloseDocument(CodeEditor *doc)
     placementArea->deleteLater();
 }
 
+void DocumentManager::onOpenDocument(const QString &fileName)
+{
+    qDebug() << "open doc slot";
+    openDocument(fileName, true);
+}
+
 QMdiArea* DocumentManager::createMdiArea()
 {
     // creating new doc area
@@ -281,6 +288,7 @@ CodeEditor* DocumentManager::createDoc(const QString &fileName)
     // create new view
     CodeEditor *newView = new CodeEditor;
     connect(newView, &CodeEditor::closeDocEventOccured, this, &DocumentManager::onCloseDocument);
+    connect(newView, &CodeEditor::openDocument, this, &DocumentManager::onOpenDocument);
     newView->setFileName(fileName);
     newView->setFocusPolicy(Qt::StrongFocus);
     return newView;

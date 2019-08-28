@@ -136,14 +136,16 @@ void CodeEditor::writeDefinitionToSource()
            auto sourceDocument =  getOpenedDocument(sourceFileName);
            if (!sourceDocument)
            {
-               return;
+               auto fileContent = fileManager.readFromFile(sourceFileName);
+               fileManager.writeToFile(sourceFileName, fileContent + "\n" + definitonTest);
+               emit openDocument(sourceFileName);
            }
            sourceDocument->setPlainText(sourceDocument->toPlainText() + "\n" + definitonTest);
            QMessageBox::information(this, definitionExistsTitle, definitionExistsMessage);
         }
         else
         {
-            QMessageBox::warning(this, successCreationTitle, successDefinCreateMessage);
+            QMessageBox::information(this, successCreationTitle, successDefinCreateMessage);
         }
     }
 }
