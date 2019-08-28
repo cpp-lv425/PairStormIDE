@@ -23,9 +23,11 @@ const int TOP_UNUSED_PIXELS_HEIGHT = 4;
 #include<QVector>
 #include<QFont>
 #include<QStatusBar>
-#include <QPair>
 #include <QList>
-
+#include"sqliteaccess.h"
+#include<QStringList>
+#include<QCompleter>
+#include"autocodecompleter.h"
 
 class QPaintEvent;
 class QResizeEvent;
@@ -45,6 +47,7 @@ class CodeEditor : public QPlainTextEdit
     Q_OBJECT
 public:
     CodeEditor(QWidget *parent = nullptr);
+    virtual ~CodeEditor();
     void specialAreasRepaintEvent(QPaintEvent *event);
     void repaintButtonsArea(int bottom, int top, int blockNumber);
     int getLineNumberAreaWidth();
@@ -57,10 +60,20 @@ public:
     void zoom(int val);
     bool isChanged();
     void setBeginTextState();
-
+    const QByteArray& getBeginTextState()const;
+    void setTextState(const QByteArray &beginTextState);
 
     LastRemoveKey getLastRemomeKey() const;
     void setLastRemomeKey(const LastRemoveKey &value);
+
+    ConfigParams getConfigParam();
+    void setConfigParam(const ConfigParams &configParam);
+    void highlighText();
+
+    //DB methods
+    void readAllCommentsFromDB(QVector<Comment> mStartComments);
+    QVector<Comment> getAllCommentsToDB();
+
 private:
     void rewriteButtonsLines( QVector<AddCommentButton*> &commentV, int diff, int startLine);
     void setAnotherButtonLine(AddCommentButton *comment, int diff);
@@ -70,6 +83,7 @@ private:
     void handleLinesAddition(int, int, int);
     void handleLinesDelition(int, int, int);
 
+    void addButton(const int line, const QString &Comment);
     void removeButtonByIndex(QVector<AddCommentButton*> &commentV, int index);
     void removeButtomByValue(QVector<AddCommentButton*> &commentV, AddCommentButton* commentButton);
     void removeButtons(QVector<AddCommentButton*> &commentV, int cursorLine, int startLine, int endLine, int diff);
@@ -88,7 +102,6 @@ private slots:
     void updateLineNumberArea(const QRect &rect, int dy);
     void handleLineChange(int);
     void highlightText();
-    //void showCommentLine(int line);
     void deleteComment();
 
 public slots:
@@ -100,6 +113,10 @@ public slots:
     void emptyCommentWasAdded();
     void notEmptyCommentWasAdded();
     void changeCommentButtonsState();
+    void setTextColors();
+    void setFontSize(const QString &fontSize);
+    void setFontStyle(const QString &fontStyle);
+    void setIdeType(const QString &ideType);
 
 signals:
     void changesAppeared();
@@ -122,6 +139,9 @@ private:
     AddCommentButton *mAddCommentButton;
     CommentWidget *mCommentWidget;
     QLabel *mCurrentCommentLable;
+    QVector<Comment> mStartComments;
+    QCompleter *mCompleter;
+    CommentDb *commentGetter;
 
     int mLinesCountPrev;
     int mLinesCountCurrent;
@@ -130,6 +150,7 @@ private:
     unsigned int mCodeSize;
 
     QString mBeginTextState;
+    QByteArray mBeginTextState;
     QVector<AddCommentButton*> mCommentsVector;
 
     QTextCharFormat fmtLiteral;

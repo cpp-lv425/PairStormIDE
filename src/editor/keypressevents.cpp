@@ -243,3 +243,13 @@ void EventRemoveKey::operator()(CodeEditor *codeEditor, QKeyEvent *e)
 }
 
 EventRemoveKey::~EventRemoveKey() = default;
+
+bool isNotEnterKey(QKeyEvent *e)
+{
+    return e->key() != Qt::Key_Enter && e->key() != Qt::Key_Return;
+}
+
+bool isUpDownKey(QKeyEvent *e)
+{
+    return e->key() == Qt::Key_Down || e->key() == Qt::Key_Up;
+}

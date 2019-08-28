@@ -16,8 +16,8 @@ ChatWindowDock::ChatWindowDock(QWidget *pParent): QDockWidget (pParent)
     connect(mpChatWidget, &ChatWidget::sendMessage,
             this, &ChatWindowDock::onSendMessage);
 
-    setWidget(mpChatWidget);
-    setMinimumWidth(200);
+    mpChatWidget->setMinimumWidth(pParent->width() / 2);
+    setWidget(mpChatWidget);    
 }
 
 void ChatWindowDock::setUserName(const QString &userName)

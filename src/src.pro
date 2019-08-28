@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui webenginewidgets network
+QT       += core gui webenginewidgets network sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -34,7 +34,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 include($$PWD/mainwindow/mainwindow.pri)
 include($$PWD/network/network.pri)
 include($$PWD/chatwindow/chatwindow.pri)
-include($$PWD/mdiarea/mdiarea.pri)
+include($$PWD/documentmanager/documentmanager.pri)
 include($$PWD/filemanager/filemanager.pri)
 include($$PWD/editor/editor.pri)
 include($$PWD/bottompanel/bottompanel.pri)
@@ -47,6 +47,9 @@ include($$PWD/logindialog/logindialog.pri)
 include($$PWD/splashscreen/splashscreen.pri)
 include($$PWD/utils/utils.pri)
 include($$PWD/paletteconfigurator/paletteconfigurator.pri)
+include($$PWD/databaseaccessor/databaseaccessor.pri)
+include($$PWD/settingsconfigurator/settingsconfigurator.pri)
+include($$PWD/savefilesdialog/savefilesdialog.pri)
 
 RESOURCES += \
     globalresources.qrc

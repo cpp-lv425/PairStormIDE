@@ -2,7 +2,6 @@
 
 #include "projectviewermodel.h"
 #include <QKeyEvent>
-#include <QDebug>
 
 ProjectTreeView::ProjectTreeView(QWidget *parent)
     : QTreeView(parent)
@@ -40,8 +39,7 @@ void ProjectTreeView::keyPressEvent(QKeyEvent *event)
 {
     QFileInfo info = (mProjectModel->fileInfo(selectedIndexes().at(0)));
     if(((event->key() == Qt::Key_Enter) || (event->key() == Qt::Key_Return)) && selectedIndexes().size() != 0 && info.isFile())
-    {
-        qDebug()<<info.filePath();
+    {        
         emit codeFileSelected(info.filePath());
     }
     QTreeView::keyPressEvent(event);
@@ -52,8 +50,7 @@ void ProjectTreeView::mouseDoubleClickEvent(QMouseEvent *event)
     QFileInfo info = (mProjectModel->fileInfo(selectedIndexes().at(0)));
     if(selectedIndexes().size() != 0 && info.isFile())
     {        
-        emit codeFileSelected(info.filePath());
-        qDebug()<<info.filePath();
+        emit codeFileSelected(info.filePath());        
     }
     QTreeView::mouseDoubleClickEvent(event);
 }

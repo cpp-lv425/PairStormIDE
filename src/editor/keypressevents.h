@@ -149,4 +149,8 @@ public:
     ~EventRemoveKey() override;
 };
 
+bool isNotEnterKey(QKeyEvent *e);
+
+bool isUpDownKey(QKeyEvent *e);
+
 #endif // CODEEDITOREVENTS_H
