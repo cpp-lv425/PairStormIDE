@@ -35,7 +35,7 @@ QVector<User> UserDb::getAllUsersFromDb()
     return rUser;
 }
 
-QString UserDb::addUserQuery(const User& user)
+QString UserDb::addUserQuery(const User &user)
 {
     return "INSERT INTO User (nickname) VALUES ('"
             +user.mNickname +"')";

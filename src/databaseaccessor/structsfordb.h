@@ -2,6 +2,7 @@
 #define STRUCTSFORDB_H
 #include <QString>
 #include <QVector>
+
 struct Message
 {
     Message() = default;

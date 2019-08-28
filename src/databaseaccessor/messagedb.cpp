@@ -16,7 +16,7 @@ void MessageDb::addMessageToDb(const Message &message)
 
 QVector<Message> MessageDb::getMessageFromDb(const QString startTime)
 {
-    execQuery(numberOfMessage(startTime));
+    execQuery(numberOfMessages(startTime));
     int count_of_messages =query.value(0).toInt();
     QVector<Message> messages(count_of_messages);
     execQuery(getMessageQuery(startTime));
@@ -42,7 +42,7 @@ QString MessageDb::getMessageQuery(const QString startTime)
            " where date(Message.time) >= '" + startTime +"'";
 }
 
-QString MessageDb::numberOfMessage(const QString startTime)
+QString MessageDb::numberOfMessages(const QString startTime)
 {
     return "Select count(Message.messageText)"
            " from Message inner join User on Message.idUser = User.id"

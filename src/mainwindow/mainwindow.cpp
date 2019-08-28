@@ -760,7 +760,7 @@ void MainWindow::setDocumentFontSize(const QString &fontSize)
 
 void MainWindow::databaseConnect(QString directory)
 {
-    db = ConnectionGetter::getDefaultConnection(directory + QDir::separator()+"storage.db");
+    db = ConnectionGetter::getDefaultConnection(directory + QDir::separator() + "storage.db");
     CreateDB database;
     database.addTableFile();
     database.addTableUser();

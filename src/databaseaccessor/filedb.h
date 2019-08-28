@@ -8,11 +8,11 @@ class FileDb : public Accessor
 public:
     FileDb();
     ~FileDb();
-    void addFileToDb(const File& file);
+    void addFileToDb(const File &file);
     File getFileFromDb(const int idFile);
     void deleteFileFromDb(const  QString filename);
 private:
-    QString addFileQuery(const File & file);
+    QString addFileQuery(const File &file);
     QString getFileQuery(const int idFile);
     QString deleteFileQuery(const QString filename);
     void fillStructureFile(File &file);
