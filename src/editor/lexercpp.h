@@ -44,8 +44,12 @@ private:
    // QStringList mIdentificatorsList; 
 
 public:
-    LexerCPP() = default;
+    LexerCPP()
+    {
+        wasRunning = false;
+    }
     ~LexerCPP() override = default;
+    bool wasRunning;
     void lexicalAnalysis(QString) override;
     QVector<Token> getTokens() const;
     void clear();

@@ -190,6 +190,12 @@ void CodeEditor::handleLineChange(int lastLineWithChange)
     int lineDifference = currentLinesCount - mLinesCount;
     mLinesCount = currentLinesCount;
 
+    if(!mLcpp->wasRunning)
+    {
+        qDebug() << "Was Running";
+        lastLineWithChange += lineDifference;
+    }
+
     if (lineDifference >= 0)
     {
         handleLinesAddition(changeStart, lastLineWithChange, lineDifference);
@@ -197,15 +203,6 @@ void CodeEditor::handleLineChange(int lastLineWithChange)
     else
     {
         handleLinesDelition(changeStart, lastLineWithChange, lineDifference);
-    }
-
-    for(int i = 0; i < mTokensList.size(); ++i)
-    {
-        qDebug() << i;
-        for(int j = 0; j < mTokensList[i].size(); ++j)
-        {
-            qDebug() << mTokensList[i][j].mName;
-        }
     }
 }
 

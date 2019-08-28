@@ -269,6 +269,7 @@ void LexerCPP::handleLiteralState(const QChar &sym)
 
 void LexerCPP::lexicalAnalysis(QString code)
 {
+    wasRunning = true;
     mTokensOnCurrentLine.clear();
     QChar sym = 0;
     mIndex = 0;
