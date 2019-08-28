@@ -387,6 +387,21 @@ void CodeEditor::setNewAddedButtonSettings(AddCommentButton *commentButton)
     mCommentWidget->setVisible(false);
 }
 
+CodeEditor *CodeEditor::getOpenedDocument(const QString &fileName)
+{
+    auto allWidgets = QApplication::allWidgets();
+    for (auto widget: allWidgets)
+    {
+        auto doc = qobject_cast<CodeEditor*>(widget);
+
+        if (doc && doc->getFileName() == fileName)
+        {
+            return doc;
+        }
+    }
+    return  nullptr;
+}
+
 void CodeEditor::readAllCommentsFromDB(QVector<Comment> comments)
 {
     for(auto &i : comments)//go through all vector's elements from the DB
