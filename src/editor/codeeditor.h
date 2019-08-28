@@ -121,6 +121,7 @@ public slots:
 signals:
     void changesAppeared();
     void sendLexem(QString);
+    void runHighlighter();
     void closeDocEventOccured(CodeEditor*);
     void textChangedInLine(int);
     void textChangedInLines(int, int);
@@ -148,6 +149,8 @@ private:
     unsigned int mLinesCount;
     unsigned int mCodeSize;
 
+    unsigned int mHighlightingStart;
+
     QByteArray mBeginTextState;
     QVector<AddCommentButton*> mCommentsVector;
 
@@ -162,6 +165,7 @@ private:
 protected:
     int mCurrentZoom;
     QList<QVector<Token>> mTokensList;
+    QList<Token> mIdentifiersList;
     friend class Event;
 };
 

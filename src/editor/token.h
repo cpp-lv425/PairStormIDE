@@ -12,6 +12,13 @@ struct Token
     int mEnd;
     Token(QString name, State type, unsigned int begin, unsigned int end):
           mName(name), mType(type), mBegin(begin), mEnd(end) {}
+    bool operator== (Token argument)
+    {
+        return mName == argument.mName
+               && mType == argument.mType
+               && mBegin == argument.mBegin
+               && mEnd == argument.mEnd;
+    }
 };
 
 #endif // TOKEN_H

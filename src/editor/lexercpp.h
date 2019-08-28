@@ -13,7 +13,6 @@
 class LexerCPP: public iLexer
 {
 private:
-    QVector<QVector<Token>> mTokens;
     QVector<Token> mTokensOnCurrentLine;
     State mState;
     inline void addLexem();
@@ -53,7 +52,6 @@ public:
     void lexicalAnalysis(QString) override;
     QVector<Token> getTokens() const;
     void clear();
-    //QStringList getIdentificatorsList() const;
 };
 
 #endif // LEXERCPP_H
