@@ -110,7 +110,6 @@ signals:
     void textChangedInLines(int, int);
     void linesCountUpdated();
 
-
 private:
     QWidget *mLineNumberArea;
     ConfigParams mConfigParam;
