@@ -14,6 +14,7 @@ class SettingsConfigurator;
 class PaletteConfigurator;
 class ProjectViewerDock;
 class QFileSystemModel;
+class NewProjectDialog;
 class BottomPanelDock;
 class DocumentManager;
 class QListWidgetItem;
@@ -35,7 +36,7 @@ public:
     ~MainWindow();
 
 private:
-    LocalConnectorInterface * mplocalConnector;
+    LocalConnectorInterface *mplocalConnector;
     Ui::MainWindow *ui;
     ProjectViewerDock *mpProjectViewerDock;
     ChatWindowDock *mpChatWindowDock;
@@ -46,7 +47,7 @@ private:
     Connection *db;
 
     void setupMainMenu();    
-    void openDoc(QString fileName);
+    void openDocument(const QString &fileName);
     void createProjectViewer();
     void createChatWindow();
     void createButtomPanel();
@@ -65,9 +66,12 @@ private:
 
 private slots:
     // file menu actions
+    void onNewProjectTriggered();
     void onNewFileTriggered();
+    void onNewClassTriggered();
     void onOpenFileTriggered();
-    void onOpenFolderTriggered();
+    void onOpenProjectTriggered();
+    void onCloseProjectTriggered();
     void onOpenStartPage();
     void onSaveFileTriggered();
     void onSaveFileAsTriggered();

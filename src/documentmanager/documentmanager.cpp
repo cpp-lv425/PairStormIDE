@@ -1,12 +1,14 @@
 #include "documentmanager.h"
 
 #include <QMdiSubWindow>
+#include <QDirIterator>
 #include <QMessageBox>
 #include <QSplitter>
 #include <algorithm>
 #include <QMdiArea>
 #include <QVector>
 #include <QDebug>
+#include <QDir>
 
 #include "usermessages.h"
 #include "filemanager.h"
@@ -36,6 +38,21 @@ QSplitter* DocumentManager::getSplitter()
     return mpSplitter;
 }
 
+void DocumentManager::openProject(const QString &path)
+{
+    currentProject = path;
+}
+
+const QString& DocumentManager::getCurrentProjectPath() const
+{
+    return  currentProject;
+}
+
+void DocumentManager::closeCurrentProject()
+{
+    currentProject.clear();
+}
+
 void DocumentManager::openDocument(const QString &fileName, bool load)
 {
     // checks if doc is not already opened
@@ -61,8 +78,9 @@ void DocumentManager::openDocument(const QString &fileName, bool load)
 
     if (!placementArea)
     {
-        throw QException();
+        throw DocumentPlacementFailure();
     }
+
     // doc is added to doc area & unfolded
     placementArea->addSubWindow(newView);
     newView->setWindowState(Qt::WindowMaximized);
@@ -73,7 +91,7 @@ void DocumentManager::openDocument(const QString &fileName, bool load)
         try
         {
             loadFile(newView, fileName);
-        } catch (const QException&)
+        } catch (const FileOpeningFailure&)
         {
             throw;
         }
@@ -174,7 +192,7 @@ void DocumentManager::loadFile(CodeEditor *newView, const QString &fileName)
     {
         readResult = FileManager().readFromFile(fileName);
     }
-    catch (const QException&)
+    catch (const FileOpeningFailure&)
     {
         throw;
     }
@@ -406,7 +424,7 @@ CodeEditor* DocumentManager::getCurrentDocument()
     // if there is only one doc area, we receive current sub wdw from it
     // if current sub wdw is null - we return null to indicate search failure
     if (mDocAreas.size() < 2)
-    {       
+    {
         auto pCurrentWindow = mDocAreas.front()->currentSubWindow();
         return pCurrentWindow ? qobject_cast<CodeEditor*>(pCurrentWindow->widget()) : nullptr;
     }
@@ -437,8 +455,30 @@ void DocumentManager::closeCurrentDocument()
     auto pCurrentSubWdw = qobject_cast<QMdiSubWindow*>(pCurrentDocument->parent());
 
     if (pCurrentSubWdw)
-    {                
+    {
         pCurrentSubWdw->close();
+    }
+}
+
+void DocumentManager::closeAllDocumentsWithoutSaving()
+{
+    // in order to close documents without saving changes
+    // state of documents is set to "not modified"
+    setAllDocumentsNotModified();
+
+    // all doc areas but first are closed with all nested documents
+    while (mDocAreas.size() > 1)
+    {
+        auto pDocArea = mDocAreas.back();
+        mDocAreas.pop_back();
+        pDocArea->close();
+    }
+
+    // all windows of the first doc area are closed
+    auto windowsList = mDocAreas.front()->subWindowList();
+    for (const auto &window: windowsList)
+    {
+        window->close();
     }
 }
 
@@ -547,8 +587,39 @@ void DocumentManager::closeEmptyDocArea()
     }
 }
 
+bool DocumentManager::fileBelongsToCurrentProject(const QString &fileName) const
+{    
+    QDirIterator dirIter(currentProject, QDir::Files, QDirIterator::Subdirectories);
+
+    while (dirIter.hasNext())
+    {
+        dirIter.next();        
+        if (dirIter.filePath() == fileName)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool DocumentManager::projectOpened()
+{
+    // if project name is written then project is opened
+    return currentProject.size();
+}
+
+void DocumentManager::applyChangesToCurrentDocument(std::function<void (CodeEditor*)> functor)
+{
+    auto pCurrentDocument = getCurrentDocument();
+
+    if (pCurrentDocument)
+    {
+        functor(pCurrentDocument);
+    }
+}
+
 void DocumentManager::configureDocuments(std::function<void(DocumentManager*, CodeEditor*, const QString&)> functor,
-                                        const QString &newValue)
+                                         const QString &newValue)
 {
     // applying new settings to every opened doc view
     for (const auto &area: mDocAreas)
@@ -614,5 +685,21 @@ void DocumentManager::saveDocument(const QString &fileName, const QString &fileC
     catch (const FileOpeningFailure&)
     {
         throw;
+    }
+}
+
+void DocumentManager::setAllDocumentsNotModified()
+{
+    for (auto &area: mDocAreas)
+    {
+        auto windowsList = area->subWindowList();
+        for (auto &window: windowsList)
+        {
+            auto doc = qobject_cast<CodeEditor*>(window->widget());
+            if (doc)
+            {
+                doc->setBeginTextState();
+            }
+        }
     }
 }
