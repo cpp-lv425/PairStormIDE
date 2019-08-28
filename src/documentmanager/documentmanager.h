@@ -59,6 +59,7 @@ public slots:
     void onSplit(Qt::Orientation orientation);
     void onFocusChanged(QWidget *old, QWidget *now);
     void onCloseDocument(CodeEditor *doc);
+    void onOpenDocument(const QString &fileName);
 
 private:
     void splitWindow();

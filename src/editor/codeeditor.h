@@ -123,6 +123,7 @@ signals:
     void textChangedInLine(int);
     void textChangedInLines(int, int);
     void linesCountUpdated();
+    void openDocument(const QString &);
 
 private:
     QWidget *mLineNumberArea;
