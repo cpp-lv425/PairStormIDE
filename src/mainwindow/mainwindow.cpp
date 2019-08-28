@@ -962,7 +962,7 @@ void MainWindow::onNewProjectTriggered()
     {
         // new project dialog is called
         // name & location of new project directory is received
-        dirName = newProjectDialog.start();
+        dirName = newProjectDialog.promptProjectNameFromUser();
     }
     catch (const QException&)
     {

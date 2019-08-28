@@ -27,4 +27,6 @@ public:
     DocumentPlacementFailure();
 };
 
+extern const char* invalidFileOrDirNameRegex;
+
 #endif // UTILS_H

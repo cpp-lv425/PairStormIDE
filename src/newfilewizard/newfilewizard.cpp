@@ -118,7 +118,7 @@ QString NewFileDialog::start()
 
 bool NewFileDialog::isValidFilename(const QString &fileName)
 {
-    return !fileName.contains(QRegExp(R"exp([*/:;|=,\\\[\]])exp"));
+    return !fileName.contains(QRegExp(invalidFileOrDirNameRegex));
 }
 
 bool NewFileDialog::directoryBelongsToProject(QString dirPath)
