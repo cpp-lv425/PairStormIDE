@@ -3,11 +3,7 @@
 #include "classgenerationliterals.h"
 #include "methodspartsdefinitiongetters.h"
 #include <QRegularExpression>
-#include <QPlainTextEdit>
-#include"filemanager.h"
-#include"mainwindow.h"
 #include <QMessageBox>
-#include <QDebug>
 
 ClassGenerator::ClassGenerator(QString projectPath, QWidget *parent) :
     QWidget(parent),
@@ -57,14 +53,13 @@ void ClassGenerator::setSourceCodeName(const QString &sourceCodeName)
 
 void ClassGenerator::setFilesNames()
 {
-    ui->HeaderName->setText(ui->InputClassName->text() + headerExtension);
-    ui->CodeSourceName->setText(ui->InputClassName->text() + sourceExtension);
+    ui->HeaderName->setText(ui->InputClassName->text().append(headerExtension));
+    ui->SourceCodeName->setText(ui->InputClassName->text().append(sourceExtension));
 }
 
 bool ClassGenerator::isValidClassName()
 {
-    QRegularExpressionMatchIterator matchIter = QRegularExpression(validClassNameRegex).
-            globalMatch(ui->InputClassName->text());
+    auto matchIter = QRegularExpression(validClassNameRegex).globalMatch(ui->InputClassName->text());
     return matchIter.hasNext();
 }
 
@@ -72,7 +67,7 @@ void ClassGenerator::setAllFieldsFromUi()
 {
     setClassName(ui->InputClassName->text());
     setHeaderName(ui->HeaderName->text());
-    setSourceCodeName(ui->CodeSourceName->text());
+    setSourceCodeName(ui->SourceCodeName->text());
 }
 
 QString ClassGenerator::createHeaderMacrosName()
@@ -121,12 +116,12 @@ QString ClassGenerator::createSourceText()
 void ClassGenerator::createFiles()
 {
     QString headerFilePath = createFilePath(mProjectPath, mHeaderName);
-    fileManager.createFile(headerFilePath);
-    fileManager.writeToFile(headerFilePath, createHeaderText());
+    mFileManager.createFile(headerFilePath);
+    mFileManager.writeToFile(headerFilePath, createHeaderText());
 
     QString sourceFilePath = createFilePath(mProjectPath, mSourceCodeName);
-    fileManager.createFile(sourceFilePath);
-    fileManager.writeToFile(sourceFilePath,createSourceText());
+    mFileManager.createFile(sourceFilePath);
+    mFileManager.writeToFile(sourceFilePath, createSourceText());
 }
 
 void ClassGenerator::on_OkButton_clicked()
@@ -140,8 +135,7 @@ void ClassGenerator::on_OkButton_clicked()
     createFiles();
 
     QMessageBox::information(this, successCreationTitle, successCreationMessage);
-
-    hide();
+    this->hide();
     emit filesWereCreated(createFilePath(mProjectPath, mHeaderName),
                           createFilePath(mProjectPath, mSourceCodeName));
 }

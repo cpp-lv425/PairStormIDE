@@ -90,16 +90,10 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     setTextColors();
 
     //completer
-    QStringList keywords;
-    keywords <<"SELECT" <<"FROM" <<"WHERE"<<"WHEN"<<"WHILE"<<"int"<<"double"<<"static_cast<>()";//for test
-    mCompleter = new AutoCodeCompleter(keywords, this);
+    completerKeywords <<"SELECT" <<"FROM" <<"WHERE"<<"WHEN"<<"WHILE"<<"int"<<"double"<<"static_cast<>()";//for test
+    mCompleter = new AutoCodeCompleter(completerKeywords, this);
     mCompleter->setCaseSensitivity(Qt::CaseInsensitive);
     mCompleter->setWidget(this);
-   /* qDebug()<<"inside list:";
-    for(auto &i:keywords)
-    {
-        qDebug()<<i;
-    }*/
 }
 
 void CodeEditor::setTextColors()
@@ -118,17 +112,17 @@ void CodeEditor::setIdeType(const QString &ideType)
 
 void CodeEditor::writeDefinitionToSource()
 {
-    if (!isFileWithExtension(getFileName(),"h"))
+    if (!isFileWithExtension(getFileName(),"h"))//if current file is not header, we can't define fucntion
     {
         return;
     }
     QTextCursor curs = this->textCursor();
-    auto definePattern = getMethodDefinitionPattern(getTextByCursor(curs));
+    auto definePattern = getMethodDefinitionPattern(getTextByCursor(curs));//
     auto className = getClassNameForMethodDefinition(curs);
-    QString definitonTest = createMethodDefinitionBones(definePattern.functionDataType,
+    QString definitonTest = createMethodDefinitionBones(definePattern.mFunctionDataType,
                                                         className,
-                                                        definePattern.fucntionName,
-                                                        definePattern.functionParametrs);
+                                                        definePattern.mFucntionName,
+                                                        definePattern.mFunctionParametrs);
     FileManager fileManager;
     if (fileManager.sourceFileByTheSameNameExists(getFileName()))
     {

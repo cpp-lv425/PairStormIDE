@@ -4,8 +4,6 @@
 #include "filemanager.h"
 #include <QWidget>
 #include <QTextCursor>
-#include<QPlainTextEdit>
-
 
 namespace Ui
 {
@@ -47,12 +45,11 @@ private:
 
 private:
     Ui::ClassGenerator *ui;
-    FileManager fileManager;
+    FileManager mFileManager;
     QString mClassName;
     QString mHeaderName;
     QString mSourceCodeName;
     QString mProjectPath;
-
 };
 
 

@@ -6,9 +6,9 @@
 
 struct MethodDefinitionPattern
 {
-    QString functionDataType;
-    QString fucntionName;
-    QString functionParametrs;
+    QString mFunctionDataType;
+    QString mFucntionName;
+    QString mFunctionParametrs;
 };
 
 QString removeExtension(QString str, const int extensionCharacterCount);
@@ -18,7 +18,9 @@ QString createFilePath(const QString &rootPath, const QString &file);
 
 QString getTextByCursor(QTextCursor cursor);
 QString getClassNameForMethodDefinition(QTextCursor cursor);
-MethodDefinitionPattern getMethodDefinitionPattern(const QString &difinition);
+MethodDefinitionPattern getMethodDefinitionPattern(const QString &funcDefinition);
+QString getParametrsFromMethodDefinition(const QString &funcDefinition);
+QString getRowParametrsInsideBrackets(QString textInsideBrackets);
 
 bool isValidMethodInitialization(QTextCursor cursor);
 bool definitionExists(const QString documentText, QTextCursor cursor);

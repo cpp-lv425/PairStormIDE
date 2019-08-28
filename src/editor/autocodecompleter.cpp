@@ -5,19 +5,23 @@
 AutoCodeCompleter::AutoCodeCompleter(const QStringList &completions, QObject *parent):
     QCompleter(completions, parent)
 {
+    mMinCompletionPrefixLength = 1;// we will see completetion menu if we pressed more that 1 character
     connect(this, SIGNAL(activated(QString)), this, SLOT(replaceCurrentWord(QString)));
 }
+
+AutoCodeCompleter::~AutoCodeCompleter() = default;
 
 void AutoCodeCompleter::createCompletionMenu(QTextCursor &textCursor,
                                              QPlainTextEdit *textEdit,
                                              QKeyEvent *event)
 {
     if (textCursor.selectedText().length() < getMinCompletionPrefixLength())// if min length hasn't inputed
+    {
         return;
-
+    }
     setCompletionPrefix(textCursor.selectedText());
     QRect rect = QRect(textEdit->cursorRect().bottomLeft(),//create rectangle with possible words
-                       QSize(COMPLETION_MENU_WIDTH, COMPLETION_MANU_HEIGHT));
+                       QSize(COMPLETION_MENU_WIDTH, COMPLETION_MENU_HIGHT));
     complete(rect);
     //qt considers space as nothing when we're select start of word (see int eventFilter function)
     //so if we inserted text and pressed space the fucntion textCursor.movePosition(QTextCursor::StartOfWord, QTextCursor::KeepAnchor)
@@ -66,18 +70,18 @@ bool AutoCodeCompleter::eventFilter(QObject *object, QEvent *event)
     return QCompleter::eventFilter(object, event);// handle not key event
 }
 
-void AutoCodeCompleter::setMinCompletionPrefixLength(int minCompletionPrefixLength)
+void AutoCodeCompleter::setMinCompletionPrefixLength(const int minCompletionPrefixLength)
 {
     mMinCompletionPrefixLength = minCompletionPrefixLength;
 }
 
-void AutoCodeCompleter::replaceCurrentWord(QString text)
+void AutoCodeCompleter::replaceCurrentWord(QString word)
 {
     QPlainTextEdit *textEdit = qobject_cast<QPlainTextEdit*>(widget());
     QTextCursor textCursor = textEdit->textCursor();
     textCursor.movePosition(QTextCursor::StartOfWord);
     textCursor.movePosition(QTextCursor::EndOfWord, QTextCursor::KeepAnchor);
-    textCursor.insertText(text);
+    textCursor.insertText(word);
     textEdit->setTextCursor(textCursor);
 }
 
@@ -85,6 +89,3 @@ int AutoCodeCompleter::getMinCompletionPrefixLength() const
 {
     return mMinCompletionPrefixLength;
 }
-
-AutoCodeCompleter::~AutoCodeCompleter() = default;
-

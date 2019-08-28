@@ -13,31 +13,34 @@ QString getTextByCursor(QTextCursor cursor)
 
 QString getClassNameForMethodDefinition(QTextCursor cursor)
 {
-    while (cursor.blockNumber())
+    while (cursor.blockNumber())// if it's first code line
     {
-        QString textInCursorLine = getTextByCursor(cursor);
+        QString textInCursorLine = getTextByCursor(cursor);//get line string
         if (textInCursorLine.contains("class")
            && !textInCursorLine.contains("friend"))
         {
-            return getTextByCursor(cursor).split(' ')[indexOfClassNameInLine];//rewrite to regex
+            auto matchIter =
+                    QRegularExpression(classFindingRegex).globalMatch(getTextByCursor(cursor));
+            auto match = matchIter.next();
+            return match.captured(1);
         }
-        cursor.movePosition(QTextCursor::Up);
+        cursor.movePosition(QTextCursor::Up);//move up
     }
-    return QString();
+    return QString();//if nothing found, return empty string
 }
 
 bool isValidMethodInitialization(QTextCursor cursor)
 {
-    QRegularExpressionMatchIterator matchIter = QRegularExpression(validFucntionDefinition).
-            globalMatch(getTextByCursor(cursor));
-    return matchIter.hasNext();//rewrite in the future. now it's just valid every time
+    auto matchIter =
+            QRegularExpression(validFucntionDefinition).globalMatch(getTextByCursor(cursor));
+    return matchIter.hasNext();
 }
 
-MethodDefinitionPattern getMethodDefinitionPattern(const QString &difinition)
+MethodDefinitionPattern getMethodDefinitionPattern(const QString &funcDefinition)
 {
-    QRegularExpressionMatchIterator matchIter = QRegularExpression(validFucntionDefinition).
-            globalMatch(difinition);
-    QRegularExpressionMatch match = matchIter.next();
+    auto matchIter = QRegularExpression(validFucntionDefinition).globalMatch(funcDefinition);
+    auto match = matchIter.next();
+    // 1 is dataType  2 is methodName 3 is parametrs
     return MethodDefinitionPattern {match.captured(1), match.captured(2), match.captured(3)};
 }
 
@@ -46,12 +49,12 @@ QString createFilePath(const QString &rootPath, const QString &file)
     return rootPath + '/' + file;
 }
 
-QString getMethodDefinitionName(QTextCursor cursor)
+QString getMethodDefinitionName(QTextCursor cursor)// return className::fucnName or funcName is class dosn't exist
 {
     auto declarationParts = getMethodDefinitionPattern(getTextByCursor(cursor));
     auto className = getClassNameForMethodDefinition(cursor);
-    return declarationParts.functionDataType + " " + className +
-            (className.isEmpty() ? QString() : "::") + declarationParts.fucntionName;
+    return declarationParts.mFunctionDataType + " " + className +
+            (className.isEmpty() ? QString() : "::") + declarationParts.mFucntionName;
 }
 
 bool definitionExists(const QString documentText, QTextCursor cursor)
@@ -63,26 +66,34 @@ bool definitionExists(const QString documentText, QTextCursor cursor)
     {
         if (line.contains(methodFullName))
         {
-            qDebug()<<"kek";
+            auto par1 = getRowParametrsInsideBrackets(
+                        getParametrsFromMethodDefinition(getTextByCursor(cursor)));
+
+            auto par2 = getRowParametrsInsideBrackets(getParametrsFromMethodDefinition(line));
         }
     }
     return true;
 }
-/*struct MethodDefinitionPattern
-{
-    QString functionDataType;
-    QString fucntionName;
-    QString functionParametrs;
-};
-*/
 
 bool isFileWithExtension(const QString &fileName, const QString &extenion)
 {
     QString rFileName(fileName);
     auto splitList = rFileName.split('.');
-    if (splitList.size() == 1)
+    if (splitList.size() <= 1)// if file doesn't have the extension
     {
         return false;
     }
-    return splitList[1] == extenion;
+    return splitList[1] == extenion;// if splited second part == given in the parametrextension
+}
+
+QString getParametrsFromMethodDefinition(const QString &funcDefinition)
+{
+    auto matchIter =  QRegularExpression(textInsideBracketsRegex).globalMatch(funcDefinition);
+    auto match = matchIter.next();
+    return match.hasMatch() ? match.capturedTexts()[indexOfInsideBracketsCapture] : QString();
+}
+
+QString getRowParametrsInsideBrackets(QString textInsideBrackets)
+{
+    return QString()
 }

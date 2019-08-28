@@ -137,6 +137,7 @@ private:
     QLabel *mCurrentCommentLable;
     QVector<Comment> mStartComments;
     QCompleter *mCompleter;
+    QStringList completerKeywords;
 
     int mLinesCountPrev;
     int mLinesCountCurrent;

@@ -6,6 +6,7 @@ const QString validClassNameRegex       = "^[a-zA-Z_]+([_]?[a-zA-Z0-9])*$";
 const QString validFucntionDefinition   = "^(?:[ \t])*((?:[^ \t\n])+)(?:[ \t\n])+((?:[^ \t\n])+)(?:[ \t\n])*"
                                           "\\({1}((?:[^)])*)\\){1}(?:[ \t\n])*;{1}(?:[ \t])*$";
 const QString textInsideBracketsRegex   = "(?<=\\().+?(?=\\))";
+const QString classFindingRegex         = "^(?:.|[ \t])*(?:class){1} +([a-zA-Z]{1}[a-zA-Z0-9]*)(?:.|[ \t])*$";
 const QString successCreationTitle      = "Successful creation";
 const QString successCreationMessage    = "The class was successfully created!";
 const QString nonSuccessCreationTitle   = "Forbidden creation";
