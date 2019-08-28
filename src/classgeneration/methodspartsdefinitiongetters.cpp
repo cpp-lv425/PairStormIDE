@@ -60,7 +60,7 @@ QString getMethodDefinitionName(QTextCursor cursor)// return className::fucnName
 bool definitionExists(const QString documentText, QTextCursor cursor)
 {
     //SAVE SOMEHOW
-    qDebug()<<"here!";
+   // qDebug()<<"here!";
     QString methodFullName = getMethodDefinitionName(cursor);
     auto linesStringList = documentText.split(QRegularExpression("[\n]"), QString::SkipEmptyParts);
     for (auto &line : linesStringList)
@@ -69,13 +69,16 @@ bool definitionExists(const QString documentText, QTextCursor cursor)
         {
             auto par1 = getRowParametrsInsideBrackets(
                         getParametrsFromMethodDefinition(getTextByCursor(cursor)));
-            qDebug()<<"par 1 = "<<par1;
 
             auto par2 = getRowParametrsInsideBrackets(getParametrsFromMethodDefinition(line));
-            qDebug()<<"par 2 = "<<par2;
+            if (par1 == par2)
+            {
+                qDebug()<<"here";
+                return true;
+            }
         }
     }
-    return true;
+    return false;
 }
 
 bool isFileWithExtension(const QString &fileName, const QString &extenion)
@@ -98,17 +101,33 @@ QString getParametrsFromMethodDefinition(const QString &funcDefinition)
 
 QString getRowParametrsInsideBrackets(QString textInsideBrackets)
 {
+    QString rRowParametrs;
     textInsideBrackets = removeComasInsideAngleBrackets(textInsideBrackets);
     auto parametrList = textInsideBrackets.split(',',QString::SkipEmptyParts);
     for (auto &parametr : parametrList)
     {
-        qDebug()<<"parametr = "<<parametr;
-        auto matchIter =  QRegularExpression(getVariableFromParametrs).globalMatch(textInsideBrackets);
+        parametr = parametr.simplified();
+        auto matchIter =  QRegularExpression(getVariableFromParametrs).globalMatch(parametr);
         auto match = matchIter.next();
-        auto variable = match.capturedTexts()[1];
-        qDebug()<<"variable = "<<variable;
+        if (match.hasMatch())
+        {
+            int captureStart = match.capturedStart(1);
+            int captureEnd = match.capturedEnd(1);
+
+            QString addedText = match.capturedTexts()[0];
+
+            addedText.replace(captureStart,
+                              captureEnd - captureStart,
+                              QString());
+            rRowParametrs.append(addedText);
+        }
+        else
+        {
+            rRowParametrs.append(parametr);
+        }
     }
-    return "";
+    qDebug()<<"RESULT ="<<rRowParametrs.replace(" ","");
+    return rRowParametrs.replace(" ","");
 }
 
 QString removeComasInsideAngleBrackets(QString functionParametrs)//replace all comas inside angle brackets to spaces

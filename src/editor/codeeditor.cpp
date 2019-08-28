@@ -132,7 +132,7 @@ void CodeEditor::writeDefinitionToSource()
         auto sourceFileText = fileManager.readFromFile(sourceFileName);
         if (definitionExists(sourceFileText, this->textCursor()))
         {
-            //to do
+
         }
     }
     curs.movePosition(QTextCursor::End);
