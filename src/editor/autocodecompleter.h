@@ -27,7 +27,7 @@ private:
                               QPlainTextEdit *textEdit,
                               QKeyEvent *event);
 public slots:
-    void replaceCurrentWord(QString word);
+    void replaceCurrentWord(const QString word);
 
 private:
     int mMinCompletionPrefixLength;

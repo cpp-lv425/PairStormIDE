@@ -21,9 +21,12 @@ QString getClassNameForMethodDefinition(QTextCursor cursor);
 MethodDefinitionPattern getMethodDefinitionPattern(const QString &funcDefinition);
 QString getParametrsFromMethodDefinition(const QString &funcDefinition);
 QString getRowParametrsInsideBrackets(QString textInsideBrackets);
+QString removeComasInsideAngleBrackets(QString functionParametrs);
 
 bool isValidMethodInitialization(QTextCursor cursor);
 bool definitionExists(const QString documentText, QTextCursor cursor);
 bool isFileWithExtension(const QString &fileName, const QString &extenion);
+
+
 
 #endif // METHODSPARTSDEFINITIONGETTERS_H

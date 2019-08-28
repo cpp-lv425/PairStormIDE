@@ -128,6 +128,7 @@ void CodeEditor::writeDefinitionToSource()
     {
         auto sourceFileName = removeExtension(getFileName(), headerExtension.length())
                 .append(sourceExtension);
+
         auto sourceFileText = fileManager.readFromFile(sourceFileName);
         if (definitionExists(sourceFileText, this->textCursor()))
         {
@@ -141,7 +142,7 @@ void CodeEditor::writeDefinitionToSource()
 
 void CodeEditor::contextMenuEvent(QContextMenuEvent *event)
 {
-    QMenu *menu = this->createStandardContextMenu();
+    std::shared_ptr<QMenu>menu(this->createStandardContextMenu());
     QMenu *refactorItem = menu->addMenu("Refactor");
 
     QAction *addDefinitionAction = new QAction("Add definition", refactorItem);
@@ -150,7 +151,6 @@ void CodeEditor::contextMenuEvent(QContextMenuEvent *event)
     addDefinitionAction->setEnabled(isValidMethodInitialization(this->textCursor()));
     connect(addDefinitionAction, &QAction::triggered, this, &CodeEditor::writeDefinitionToSource);
     menu->exec(event->globalPos());
-    delete menu;
 }
 
 void CodeEditor::setFontSize(const QString &fontSize)
@@ -166,7 +166,6 @@ void CodeEditor::setFontStyle(const QString &fontStyle)
     mFont.setFamily(mConfigParam.mFontStyle);
     this->setFont(mFont);
 }
-
 
 ConfigParams CodeEditor::getConfigParam()
 {

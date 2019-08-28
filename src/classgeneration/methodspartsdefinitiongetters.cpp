@@ -60,6 +60,7 @@ QString getMethodDefinitionName(QTextCursor cursor)// return className::fucnName
 bool definitionExists(const QString documentText, QTextCursor cursor)
 {
     //SAVE SOMEHOW
+    qDebug()<<"here!";
     QString methodFullName = getMethodDefinitionName(cursor);
     auto linesStringList = documentText.split(QRegularExpression("[\n]"), QString::SkipEmptyParts);
     for (auto &line : linesStringList)
@@ -68,8 +69,10 @@ bool definitionExists(const QString documentText, QTextCursor cursor)
         {
             auto par1 = getRowParametrsInsideBrackets(
                         getParametrsFromMethodDefinition(getTextByCursor(cursor)));
+            qDebug()<<"par 1 = "<<par1;
 
             auto par2 = getRowParametrsInsideBrackets(getParametrsFromMethodDefinition(line));
+            qDebug()<<"par 2 = "<<par2;
         }
     }
     return true;
@@ -95,5 +98,39 @@ QString getParametrsFromMethodDefinition(const QString &funcDefinition)
 
 QString getRowParametrsInsideBrackets(QString textInsideBrackets)
 {
-    return QString()
+    textInsideBrackets = removeComasInsideAngleBrackets(textInsideBrackets);
+    auto parametrList = textInsideBrackets.split(',',QString::SkipEmptyParts);
+    for (auto &parametr : parametrList)
+    {
+        qDebug()<<"parametr = "<<parametr;
+        auto matchIter =  QRegularExpression(getVariableFromParametrs).globalMatch(textInsideBrackets);
+        auto match = matchIter.next();
+        auto variable = match.capturedTexts()[1];
+        qDebug()<<"variable = "<<variable;
+    }
+    return "";
+}
+
+QString removeComasInsideAngleBrackets(QString functionParametrs)//replace all comas inside angle brackets to spaces
+{
+   auto openBrackets = 0;
+   for (auto it = functionParametrs.begin(); it != functionParametrs.end(); ++it)
+   {
+       switch ((*it).toLatin1())
+       {
+       case '>':
+           openBrackets++;
+           break;
+       case '<':
+           openBrackets--;
+           break;
+       case ',':
+           if (openBrackets)
+           {
+               *it = ' ';
+           }
+           break;
+       }
+   }
+   return functionParametrs;
 }
