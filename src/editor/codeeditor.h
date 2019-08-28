@@ -68,7 +68,7 @@ public:
 
     ConfigParams getConfigParam();
     void setConfigParam(const ConfigParams &configParam);
-    void highlighText();
+//    void highlighText();
 
     //DB methods
     void readAllCommentsFromDB(QVector<Comment> mStartComments);
@@ -120,7 +120,6 @@ public slots:
 
 signals:
     void changesAppeared();
-    void runHighlighter();
     void sendLexem(QString);
     void closeDocEventOccured(CodeEditor*);
     void textChangedInLine(int);
@@ -149,7 +148,6 @@ private:
     unsigned int mLinesCount;
     unsigned int mCodeSize;
 
-    QString mBeginTextState;
     QByteArray mBeginTextState;
     QVector<AddCommentButton*> mCommentsVector;
 
