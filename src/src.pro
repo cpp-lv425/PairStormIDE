@@ -50,6 +50,7 @@ include($$PWD/paletteconfigurator/paletteconfigurator.pri)
 include($$PWD/databaseaccessor/databaseaccessor.pri)
 include($$PWD/settingsconfigurator/settingsconfigurator.pri)
 include($$PWD/savefilesdialog/savefilesdialog.pri)
+include($$PWD/classgeneration/classgeneration.pri)
 include($$PWD/newprojectwizard/newprojectwizard.pri)
 
 RESOURCES += \

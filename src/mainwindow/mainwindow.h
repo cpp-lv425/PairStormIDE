@@ -114,6 +114,7 @@ public slots:
     void onOpenFileFromProjectViewer(QString fileName);
     void onConnectionStatusChanged(bool status);
     void onSettingsChanged(std::map<QString, QString> newValues);
+    void openCreatedClassFiles(QString headerFile, QString sourceFile);
 
 private:
     friend class SettingsConfigurator;

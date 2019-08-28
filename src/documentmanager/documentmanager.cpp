@@ -268,6 +268,12 @@ void DocumentManager::onCloseDocument(CodeEditor *doc)
     placementArea->deleteLater();
 }
 
+void DocumentManager::onOpenDocument(const QString &fileName)
+{
+    qDebug() << "open doc slot";
+    openDocument(fileName, true);
+}
+
 QMdiArea* DocumentManager::createMdiArea()
 {
     // creating new doc area
@@ -282,6 +288,7 @@ CodeEditor* DocumentManager::createDoc(const QString &fileName)
     // create new view
     CodeEditor *newView = new CodeEditor;
     connect(newView, &CodeEditor::closeDocEventOccured, this, &DocumentManager::onCloseDocument);
+    connect(newView, &CodeEditor::openDocument, this, &DocumentManager::onOpenDocument);
     newView->setFileName(fileName);
     newView->setFocusPolicy(Qt::StrongFocus);
     return newView;
@@ -672,6 +679,47 @@ bool DocumentManager::saveDocument(CodeEditor *doc)
     {
         throw;
     }
+}
+
+bool DocumentManager::saveDocument(const QString &fileName)
+{
+    auto openedWindow = openedDoc(fileName);
+
+    if (!openedWindow)
+    {
+        return false;
+    }
+
+    auto openedDocument = qobject_cast<CodeEditor*>(openedWindow->widget());
+
+    if (!openedDocument)
+    {
+        return false;
+    }
+
+    // check if doc was modified
+    if (!openedDocument->isChanged())
+    {
+        return true;
+    }
+
+    // content is written to file
+    try
+    {
+        FileManager().writeToFile
+                (fileName,
+                 openedDocument->toPlainText());
+
+    }
+    catch (const FileOpeningFailure&)
+    {
+        throw;
+    }
+
+    // doc snaps current content state
+    openedDocument->setBeginTextState();
+
+    return true;
 }
 
 void DocumentManager::saveDocument(const QString &fileName, const QString &fileContent)

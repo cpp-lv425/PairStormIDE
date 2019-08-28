@@ -19,6 +19,7 @@
 #include "documentmanager.h"
 #include "bottompaneldock.h"
 #include "savefilesdialog.h"
+#include "classgenerator.h"
 #include "chatwindowdock.h"
 #include "newfilewizard.h"
 #include "browserdialog.h"
@@ -386,15 +387,16 @@ void MainWindow::onNewClassTriggered()
     QString currentProjectDirectory = mpDocumentManager->getCurrentProjectPath();
 
     // implementation
-    //
+    ClassGenerator *classGenerator = new ClassGenerator(currentProjectDirectory);
+    classGenerator->show();
+    connect(classGenerator, &ClassGenerator::filesWereCreated, this, &MainWindow::openCreatedClassFiles);
 
-    // use method openDocument(path) to open newly created files
-    //openDocument(headerFileName);
-    //openDocument(implemFileName);
+
 }
 
 void MainWindow::onOpenFileTriggered()
 {
+
     // check if project is opened
     if (!mpDocumentManager->projectOpened())
     {
@@ -447,6 +449,14 @@ void MainWindow::onOpenProjectTriggered()
              userMessages[UserMessages::OpenDirectoryTitle],
             QDir::homePath());
 
+   /* Connection *db = ConnectionGetter::getDefaultConnection("C:/Users/Petro/Desktop/storage.db");
+    CreateDB database;
+    database.addTableFile();
+    database.addTableUser();
+    database.addTableComment();
+    database.addTableMessage();*/
+
+
     // check if project exists
     if (!FileManager().projectExists(dirName))
     {
@@ -458,6 +468,7 @@ void MainWindow::onOpenProjectTriggered()
     }
 
     databaseConnect(dirName);
+
     mpProjectViewerDock->setDir(dirName);
     mpDocumentManager->openProject(dirName);
 }
@@ -816,6 +827,12 @@ void MainWindow::onSettingsChanged(std::map<QString, QString> newValues)
         auto functor = settingsConfigurator.getSettingsFunctor(newValue.first);
         functor(this, newValue.second);
     }
+}
+
+void MainWindow::openCreatedClassFiles(QString headerFile, QString sourceFile)
+{
+    openDocument(headerFile);
+    openDocument(sourceFile);
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)

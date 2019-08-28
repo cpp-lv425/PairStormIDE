@@ -60,6 +60,7 @@ public slots:
     void onSplit(Qt::Orientation orientation);
     void onFocusChanged(QWidget *old, QWidget *now);
     void onCloseDocument(CodeEditor *doc);
+    void onOpenDocument(const QString &fileName);
 
 private:
     void splitWindow();
@@ -73,6 +74,7 @@ private:
     QMdiArea* areaInFocus();
     QMdiArea* getArea(CodeEditor *doc);
     bool saveDocument(CodeEditor *doc);
+    bool saveDocument(const QString &fileName);
     void saveDocument(const QString &fileName, const QString &fileContent);
     void setAllDocumentsNotModified();
 };
