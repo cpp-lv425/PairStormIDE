@@ -1,6 +1,7 @@
 #ifndef CHATWINDOWDOCK_H
 #define CHATWINDOWDOCK_H
 
+#include <QLabel>
 #include <QDockWidget>
 #include "chatwidgetinterface.h"
 

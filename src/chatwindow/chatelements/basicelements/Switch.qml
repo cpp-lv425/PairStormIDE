@@ -1,12 +1,26 @@
-import QtQuick 2.8
-import QtQuick.Templates 2.1 as T
+import QtQuick           2.8
+import QtQuick.Templates 2.1 as QmlTemplates
 
-Item {
+Item
+{
     id: switchItem
-    property int  preferredWidth:  10
-    property int  preferredHeight: 10
-    property real widthToHeight:   1.6
 
+    // default values for some switch properties
+    property color onStateColor:    "green"
+    property color offStateColor:   "lightgrey"
+    property real  widthToHeight:   1.6
+    property int   preferredWidth:  10
+    property int   preferredHeight: 10
+
+    states:
+    [
+        State { name: "off" },
+        State { name: "on"  }
+    ]
+
+    // readonly resolved properties
+    readonly property color offStateBorderColor: Qt.darker(offStateColor, 1.1)
+    readonly property color pressedStateColor:   Qt.darker(onStateColor,  1.5)
     readonly property real bodyWidth:
     {
         if (switchItem.preferredHeight > switchItem.preferredWidth / widthToHeight)
@@ -29,110 +43,119 @@ Item {
             return switchItem.preferredWidth / widthToHeight
         }
     }
-    readonly property color gray: "#b2b1b1"
-    readonly property color lightGray: "#dddddd"
-    readonly property color light: "#ffffff"
-    readonly property color blue: "#2d548b"
-    property color mainColor: "#24d292"
-    readonly property color dark: "#222222"
-    readonly property color mainColorDarker: Qt.darker(mainColor, 1.5)
 
-    states: [
-        State { name: "off" },
-        State { name: "on"  }
-    ]
-
-    T.Switch {
+    QmlTemplates.Switch
+    {
         id: switchControl
 
-        checked: {
-            if(switchItem.state === "on")
-                return true;
-            return false;
-        }
-        down: false
-
         anchors.centerIn: parent
-        implicitWidth:   switchItem.bodyWidth
-        implicitHeight:  switchItem.bodyHeight
+        implicitWidth:    switchItem.bodyWidth
+        implicitHeight:   switchItem.bodyHeight
 
-        indicator: Rectangle {
+        down:    false
+        checked: switchItem.state == "on"
+
+        indicator: Rectangle
+        {
             id: switchHandle
 
             anchors.verticalCenter: switchControl.verticalCenter
+
             implicitWidth:  switchItem.bodyWidth
             implicitHeight: switchItem.bodyHeight * 0.9
             radius:         implicitHeight * 3.38
 
-            color: switchItem.light
+            color:        switchItem.offStateColor
+            border.color: switchItem.offStateBorderColor
             border.width: 1
-            border.color: switchItem.lightGray
 
-            Rectangle {
+            Rectangle
+            {
                 id: switchHaft
 
                 anchors.verticalCenter: switchHandle.verticalCenter
-                width:  switchItem.bodyHeight * 1.1
+
+                width:  switchItem.bodyHeight * 1.01
                 height: width
                 radius: width * 3.38
 
-                color: switchItem.light
-                border.width: 2
-                border.color: switchItem.gray
+                color:        switchItem.offStateColor
+                border.color: switchHandle.border.color
+                border.width: 1
             }
 
-            states: [
-                State {
+            states:
+            [
+                State
+                {
                     name: "off"
                     when: !switchControl.checked && !switchControl.down
                 },
-                State {
+                State
+                {
                     name: "on"
                     when: switchControl.checked && !switchControl.down
 
-                    PropertyChanges {
+                    PropertyChanges
+                    {
                         target: switchHandle
-                        color: switchItem.mainColor
-                        border.color: switchItem.mainColor
+
+                        color:        switchItem.onStateColor
+                        border.color: switchItem.onStateColor
                     }
 
-                    PropertyChanges {
+                    PropertyChanges
+                    {
                         target: switchHaft
+
                         x: parent.width - width * 0.9
                     }
                 },
-                State {
+                State
+                {
                     name: "off_down"
                     when: !switchControl.checked && switchControl.down
 
-                    PropertyChanges {
+                    PropertyChanges
+                    {
                         target: switchHaft
-                        color: switchItem.light
+
+                        color: switchItem.offStateColor
                     }
                 },
-                State {
+                State
+                {
                     name: "on_down"
                     extend: "off_down"
                     when: switchControl.checked && switchControl.down
 
-                    PropertyChanges {
+                    PropertyChanges
+                    {
                         target: switchHaft
-                        x: parent.width - width * 0.9
-                        color: switchItem.light
+
+                        x:     parent.width - width * 0.9
+                        color: switchItem.offStateColor
                     }
-                    PropertyChanges {
+                    PropertyChanges
+                    {
                         target: switchHandle
-                        color: switchItem.mainColorDarker
-                        border.color: switchItem.mainColorDarker
+
+                        color:        switchItem.pressedStateColor
+                        border.color: switchItem.pressedStateColor
                     }
                 }
             ]
 
-            onStateChanged: {
+            onStateChanged:
+            {
                 if (state === "on")
+                {
                     switchItem.state = "on"
+                }
                 if (state === "off")
+                {
                     switchItem.state = "off"
+                }
             }
         }
     }

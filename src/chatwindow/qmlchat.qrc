@@ -3,6 +3,10 @@
         <file>chatelements/basicelements/Switch.qml</file>
         <file>chatelements/basicelements/ToothShapeToLeft.qml</file>
         <file>chatelements/basicelements/ToothShapeToRight.qml</file>
+        <file>chatelements/res/SEND.svg</file>
+        <file>chatelements/res/SORRY.svg</file>
+        <file>chatelements/res/SYSTEM.svg</file>
+        <file>chatelements/res/USER.svg</file>
         <file>chatelements/scripts/ChatBase.js</file>
         <file>chatelements/AvailUsers.qml</file>
         <file>chatelements/ChatControls.qml</file>
@@ -10,9 +14,5 @@
         <file>chatelements/MsgsLifeline.qml</file>
         <file>chat.qml</file>
         <file>chatdisabled.qml</file>
-        <file>chatelements/res/SORRY.svg</file>
-        <file>chatelements/res/SYSTEM.svg</file>
-        <file>chatelements/res/USER.svg</file>
-        <file>chatelements/res/SEND.svg</file>
     </qresource>
 </RCC>

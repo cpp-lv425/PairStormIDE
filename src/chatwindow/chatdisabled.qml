@@ -1,74 +1,58 @@
-import QtQuick 2.8
+import QtQuick          2.8
 import QtQuick.Controls 2.0
+import "chatelements/scripts/ChatBase.js" as ChatBase
 
-Item {
+Item
+{
     id: chatBody
     visible: true
-    Rectangle {
+
+    readonly property string userLoginHint: "Log in to use chat"
+
+    Rectangle
+    {
         anchors.fill: chatBody
-        color: {
-            if (globalTheme === "white")
-            {
-                return "#bde1ff"
-            }
-            if (globalTheme === "blue")
-            {
-                return "#2c8dde"
-            }
-            if (globalTheme === "dark")
-            {
-                return "#41607a"
-            }
-        }
+        color: ChatBase.backgroundColor(globalTheme)
 
-        Column {
+        Column
+        {
             anchors.centerIn: parent
-            //width: unsatisfiedUserImage.width
-            //spacing: 10
-            Control {
-                anchors.horizontalCenter: parent.horizontalCenter
-                //anchors.bottom: unsatisfiedUserImage.top
-                width: warningText.implicitWidth + 2
 
+            Control
+            {
+                anchors.horizontalCenter: parent.horizontalCenter
+                width:  warningText.implicitWidth + 2
                 height: 30
-                Label {
+
+                Label
+                {
                     id: warningText
-                    text: qsTr("Log in to use chat")
-                    color: {
-                        if (globalTheme === "white")
-                        {
-                            return "#6b3636"
-                        }
-                        if (globalTheme === "blue")
-                        {
-                            return "#6b3636"
-                        }
-                        if (globalTheme === "dark")
-                        {
-                            return "#fad2d2"
-                        }
-                    }
+
+                    anchors.centerIn: parent
+
+                    text:  chatBody.userLoginHint
+                    color: ChatBase.backgroundTextColor(globalTheme)
+
                     font.pixelSize: 23
-                    font.family: "arial"
-                    font.bold: true
+                    font.family:    "Arial"
+                    font.bold:      true
+
                     wrapMode: Label.Wrap
                 }
-
             }
 
-            Image {
-                id: unsatisfiedUserImage
-                //anchors.verticalCenter: parent.verticalCenter
+            Image
+            {
+                id: sorryUserImage
 
-                width: 200
-                height: 300
+                width:  200
+                height: 250
 
-                mipmap: true
-
-                sourceSize: Qt.size(width, height)
-
+                mipmap:   true
                 fillMode: Image.PreserveAspectFit
+
                 source: "chatelements/res/SORRY.svg"
+                sourceSize: Qt.size(width, height)
             }
         }
     }

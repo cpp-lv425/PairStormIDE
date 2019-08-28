@@ -1,143 +1,142 @@
-import QtQuick 2.7
-import QtQuick.Controls 2.0
+import QtQuick         2.8
 import QtQuick.Layouts 1.3
-import QtQml.Models 2.12
-import PairStormChat 1.0
-
 import "scripts/ChatBase.js" as ChatBase
 
-Item {
-    id: inputMessageArea
+Item
+{
+    id: messageInputArea
 
     width:  parent.width
     height: messageInput.implicitHeight + 8
-    onHeightChanged: {console.log("text heigh has been changned to " + height) }
 
-    Rectangle {
+    readonly property string messageInputHint: "Message..."
+
+    Rectangle
+    {
         anchors.fill: parent
-        //color: "steelblue"
-        color: "#263745"
+        color: ChatBase.chatInputBackgroundColor(ChatBase.globalTheme)
     }
-
-    RowLayout {
+    RowLayout
+    {
         anchors.fill: parent
 
-        Rectangle {
+        Rectangle
+        {
             id: messageInputField
 
-            //Layout.fillHeight: true
-            //height: messageInput.implicitHeight
-            Layout.alignment: Qt.AlignCenter
-            Layout.leftMargin: 5
+            Layout.alignment:   Qt.AlignCenter
+            Layout.leftMargin:  5
             Layout.rightMargin: 10
 
-            Layout.preferredHeight: messageInput.implicitHeight
-            Layout.maximumHeight:   inputMessageArea.height - 8
             Layout.fillWidth: true
-            radius: 4
 
-            color: "white"
-            border.width: 2
-            border.color: "snow"
+            Layout.maximumHeight:   messageInputArea.height - 8
+            Layout.preferredHeight: messageInput.implicitHeight
+            radius: 3
 
+            color:        Qt.darker(ChatBase.chatInputBackgroundColor(ChatBase.globalTheme), 1.1)
+            border.color: Qt.darker(ChatBase.chatInputBackgroundColor(ChatBase.globalTheme), 1.05)
 
-            TextInput {
+            border.width: 1
+
+            TextInput
+            {
                 id: messageInput
-                anchors.fill: parent
-                anchors.centerIn: parent
-                clip: true
-                wrapMode: TextInput.WordWrap
 
-                //text: qsTr("message")
-                //overwriteMode: true
+                anchors.fill: parent
+
+                topPadding:    3
+                leftPadding:   10
+                rightPadding:  10
+                bottomPadding: 3
 
                 selectByMouse: true
-                renderType: Text.QtRendering
+                clip:          true
+                renderType:    Text.QtRendering
+                wrapMode:      TextInput.WordWrap
 
-                color: "darkgrey"
-                selectedTextColor: "black"
-                selectionColor:    "silver"
+                color:             ChatBase.chatInputTextColor(ChatBase.globalTheme)
+                selectionColor:    ChatBase.chatInputSelectionBackColor(ChatBase.globalTheme)
+                selectedTextColor: ChatBase.chatInputSelectionTextColor(ChatBase.globalTheme)
 
-                topPadding: 3
-                bottomPadding: 3
-                leftPadding:  10
-                rightPadding: 10
                 font.pixelSize: 20
-                font.family: "consolas"
+                font.family:    "Consolas"
 
-                onAccepted: {
+                onAccepted:
+                {
                     if (messageInput.text === "")
                     {
-                        //console.log("message is empty")
                         return
                     }
-                    messagesList.appendMessage(messageInput.text)
+                    // TODO: send message
                     messageInput.clear()
-                    //console.log("send message: " + messageInput.text)
                 }
+                Text
+                {
+                    text: messageInputArea.messageInputHint
 
-                property string placeholderText: "Type message..."
-
-                Text {
-                    text: messageInput.placeholderText
-                    topPadding: 3
+                    topPadding:    3
+                    leftPadding:   10
+                    rightPadding:  10
                     bottomPadding: 3
-                    leftPadding:  10
-                    rightPadding: 10
-                    font.pixelSize: 20
-                    font.family: "consolas"
-                    color: "#aaa"
+
                     visible: !messageInput.text && !messageInput.activeFocus
+
+                    font.pixelSize: 20
+                    font.family:    "Consolas"
+
+                    color: ChatBase.chatInputTextHintColor(ChatBase.globalTheme)
                 }
             }
-
-            MouseArea {
+            MouseArea
+            {
                 anchors.fill: messageInput
+
+                enabled:     false
                 cursorShape: Qt.IBeamCursor
-                enabled: false
             }
         }
-
-        Rectangle {
+        Rectangle
+        {
             id: sendButton
 
-            //Layout.fillHeight: true
+            Layout.alignment: Qt.AlignBottom
+
             Layout.maximumHeight: 24
             Layout.minimumHeight: 24
-            Layout.minimumWidth: 24
-            Layout.maximumWidth: 24
-            Layout.alignment: Qt.AlignBottom
-            Layout.rightMargin: 4
-            Layout.bottomMargin: 7
+            Layout.minimumWidth:  24
+            Layout.maximumWidth:  24
+
+            Layout.rightMargin:   4
+            Layout.bottomMargin:  7
 
             color: "transparent"
 
-            Image {
+            Image
+            {
                 anchors.fill: sendButton
-                source: "res/SEND.svg"
 
-                mipmap: true
+                mipmap:     true
+                fillMode:   Image.PreserveAspectFit
+
+                source:     "res/SEND.svg"
                 sourceSize: Qt.size(width, height)
-
-                fillMode: Image.PreserveAspectFit
-                //sourceSize.width:  300
-                //sourceSize.height: 300
             }
-
-            MouseArea {
+            MouseArea
+            {
                 anchors.fill: parent
-                hoverEnabled: true
 
-                cursorShape: Qt.PointingHandCursor
-                onClicked: {
+                hoverEnabled: true
+                cursorShape:  Qt.PointingHandCursor
+
+                onClicked:
+                {
                     if (messageInput.text === "")
                     {
-                        //console.log("message is empty")
                         return
                     }
-                    messagesList.appendMessage(messageInput.text)
+                    // TODO: send message
                     messageInput.clear()
-                    //console.log("send message: " + messageInput.text)
                 }
             }
         }

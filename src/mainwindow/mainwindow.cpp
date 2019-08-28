@@ -556,6 +556,11 @@ void MainWindow::onConnectTriggered()
     }
     mpChatWindowDock->setUserName(userInput);
     mplocalConnector->configureOnLogin(userInput);
+    QSettings savedSettings(QApplication::organizationName(), QApplication::applicationName());
+    QString styleName = {savedSettings.contains("style") ?
+                         savedSettings.value("style").toString()
+                         : "WHITE"};
+    mpChatWindowDock->updateTheme(styleName);
 }
 
 void MainWindow::onSettingsTriggered()

@@ -1,188 +1,148 @@
-import QtQuick 2.8
+import QtQuick          2.8
+import QtQml.Models     2.12
+import QtQuick.Layouts  1.3
 import QtQuick.Controls 2.0
-import QtQuick.Layouts 1.3
-import QtQml.Models 2.12
-import QtGraphicalEffects 1.12
-
+import "basicelements"       as BasicElements
 import "scripts/ChatBase.js" as ChatBase
-import "basicelements" as BasicElements
-import PairStormChat 1.0
+// TODO: import pair storm chat
 
-
-Item {
+Item
+{
     id: availableUsers
 
-    Rectangle {
+    Rectangle
+    {
         anchors.fill: parent
 
-        antialiasing: true
-        color: "steelblue"
+        color: ChatBase.backgroundColor(ChatBase.globalTheme)
 
-        ListView {
+        ListView
+        {
             anchors.fill: parent
-            anchors.margins: 0
-            anchors.topMargin: 3
+            anchors.margins:      0
+            anchors.topMargin:    3
             anchors.bottomMargin: 7
-            spacing: 0
-            clip: true
+            spacing:              0
 
+            clip:                        true
+            focus:                       true
+            interactive:                 true
             highlightFollowsCurrentItem: true
-            snapMode: ListView.SnapToItem
-
-            focus: true
-            interactive: true
-            //flickableDirection: Flickable.VerticalFlick
-            boundsBehavior: Flickable.StopAtBounds
+            snapMode:                    ListView.SnapToItem
+            boundsBehavior:              Flickable.StopAtBounds
 
             model: availableUsersModel
         }
     }
-
-    DelegateModel {
+    DelegateModel
+    {
         id: availableUsersModel
 
-        model: UsersModel {
-            list: usersList
-
-            onDataChanged: {
-                /*
-                console.log("QML DATA HAS CHANGED");
-
-                if (parent.isUserConnected)
-                {
-                    console.log("QML USER CONNECTED")
-                }
-                else
-                {
-                    console.log("QML USER DISCONNECTED");
-                }*/
-
-                //userSwitch.state = isUserConnected? "on" : "off"
-            }
-
-
-            //usersList: AvailableUsersList
-        }
-
-
-        /*
+        // TODO: replace model
         model: ListModel {
             //@disable-check M16
-            ListElement { name: "Vasia nickname and something"; connected: true; }
+            ListElement { userName: "Vasia nickname and something"; isUserConnected: true; }
             //@disable-check M16
-            ListElement { name: "Diana nickname"; connected: true; }
+            ListElement { userName: "Diana nickname"; isUserConnected: true; }
             //@disable-check M16
-            ListElement { name: "Petia nickname"; connected: false; }
+            ListElement { userName: "Petia nickname"; isUserConnected: false; }
             //@disable-check M16
-            ListElement { name: "Bohdan nickname"; online: true; connected: false; }
+            ListElement { userName: "Bohdan nickname"; isUserConnected: false; }
             //@disable-check M16
-            ListElement { name: "Dima nickname"; online: true; connected: false; }
+            ListElement { userName: "Dima nickname"; isUserConnected: false; }
             //@disable-check M16
-            ListElement { name: "Roman nickname"; online: true; connected: false; }
-        }*/
+            ListElement { userName: "Roman nickname"; isUserConnected: false; }
+        }
 
-        delegate: Component {
-            Rectangle {
+        delegate: Component
+        {
+            Rectangle
+            {
                 id: userElement
 
                 width:  parent.width
                 height: availableUsers.height / 6
 
-                //model.onDataChanged {
+                color: ChatBase.chatUsersBackgroundColor(ChatBase.globalTheme)
 
-                //}
-
-                /*
-                height: {
-                    var maximumElementsNum = availableUsersModel.count
-                    var possibleElementsNum = 1
-                    while (possibleElementsNum < maximumElementsNum)
-                    {
-                        if (availableUsers.height / possibleElementsNum < 25)
-                        {
-                            return availableUsers.height / possibleElementsNum
-                        }
-                        possibleElementsNum += 1
-                    }
-                    return 25
-                }*/
-
-                //border.width: height * 0.03
-                //border.color:"white"
-
-                color: "lightgrey"
-                gradient: Gradient.SolidStone
-
-                RowLayout {
+                RowLayout
+                {
                     anchors.fill: parent
 
-                    Label {
-                        Layout.alignment: Qt.AlignCenter
-                        Layout.leftMargin: 10
-                        Layout.topMargin: 5
+                    Label
+                    {
+                        Layout.alignment:  Qt.AlignCenter
+                        Layout.topMargin:  5
+                        Layout.leftMargin: 15
 
                         Layout.fillHeight: true
-                        Layout.fillWidth: true
+                        Layout.fillWidth:  true
 
-                        text: qsTr(model.userName)
-                        font.pixelSize: userElement.height / (ChatBase.golden_ratio)
-                        font.family: "consolas"
-
-                        color: "lightgrey"
-
-                        clip: true
                         Layout.preferredWidth: 50
+                        text:  qsTr(model.userName)
                         elide: Text.ElideRight
-                    }
+                        clip:  true
 
-                    Control {
-                        Layout.alignment: Qt.AlignRight
-                        Layout.rightMargin: 10
-                        Layout.topMargin: 5
+                        font.pixelSize: userElement.height /
+                                        (ChatBase.golden_ratio)
+                        font.family:    "Consolas"
+
+                        color: ChatBase.chatUsersTextColor(ChatBase.globalTheme)
+                    }
+                    Control
+                    {
+                        Layout.alignment:    Qt.AlignRight
+                        Layout.topMargin:    5
+                        Layout.rightMargin:  0
                         Layout.bottomMargin: 5
 
                         Layout.fillHeight: true
-                        Layout.minimumWidth: 40
-                        Layout.preferredWidth: userElement.width / (ChatBase.golden_ratio * 5)
-                        Layout.maximumWidth: 60
 
-                        BasicElements.Switch {
-                            id: userSwitch
-                            anchors.fill: parent
-                            anchors.centerIn: parent
+                        Layout.minimumWidth:   40
+                        Layout.maximumWidth:   60
+                        Layout.preferredWidth: userElement.width /
+                                               (ChatBase.golden_ratio * 5)
 
-                            state: model.isUserConnected? "on" : "off"
+                        BasicElements.Switch
+                        {
+                            id: userSharingSwitch
 
-                            /*states: [
-                                State {
-                                    name: "on"
-                                    when: model.isUserConnected
-                                },
-                                State {
-                                    name: "off"
-                                    when: !model.isUserConnected
-                                }
-                            ]*/
+                            anchors.fill:    parent
 
-                            preferredHeight: parent.height
+                            onStateColor:    ChatBase.switchTurnedOnColor(ChatBase.globalTheme)
+                            offStateColor:   ChatBase.switchTurnedOffColor(ChatBase.globalTheme)
+                            widthToHeight:   ChatBase.golden_ratio
                             preferredWidth:  parent.width
-                            widthToHeight:   ChatBase.golden_ratio//1.618034
-                            onStateChanged: {
-                                //console.log("" + model.userName + " has been turned " + state)
-                                if (state === "on")
-                                {
-                                    model.isUserConnected = true
-                                }
-                                if (state === "off")
-                                {
-                                    model.isUserConnected = false
-                                }
+                            preferredHeight: parent.height
 
-                                //model.connected = !model.connected
-                                //AvailableUsersList.connectToUserOnClick()
+                            state: model.isUserConnected?
+                                       "on" : "off"
+
+                            onStateChanged:
+                            {
+                                switch(state)
+                                {
+                                case "on":
+                                    model.isUserConnected = true;
+                                    break;
+                                case "off":
+                                    model.isUserConnected = false;
+                                }
                             }
                         }
                     }
+                }
+                Rectangle
+                {
+                    anchors.left:   userElement.left
+                    anchors.bottom: userElement.bottom
+                    anchors.leftMargin: 9
+
+                    width:  userElement.width - 18
+                    height: 1
+                    radius: 1
+
+                    color: ChatBase.chatUsersSpacerColor(ChatBase.globalTheme)
                 }
             }
         }

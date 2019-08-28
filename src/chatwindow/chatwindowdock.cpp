@@ -9,6 +9,7 @@ ChatWindowDock::ChatWindowDock(QWidget *pParent) :
 {
     // Build chat widget & connect it to the dock
     mpChatWidget = new QmlChatWidget;
+    setWidget(mpChatWidget);
 
     connect(mpChatWidget, &ChatWidgetInterface::startSharingRequested,
             this,         &ChatWindowDock::sendRequestOnStartSharing,
@@ -23,7 +24,6 @@ ChatWindowDock::ChatWindowDock(QWidget *pParent) :
             Qt::UniqueConnection);
 
     setWindowTitle(mscChatTitle);
-    setWidget(mpChatWidget);
 }
 // ==========================================================================================
 // ==========================================================================================
@@ -99,4 +99,4 @@ void ChatWindowDock::keyPressEvent(QKeyEvent *event)
     QDockWidget::keyPressEvent(event);
 }
 
-const QString ChatWindowDock::mscChatTitle = QString("chat");
+const QString ChatWindowDock::mscChatTitle = QString("Chat");
