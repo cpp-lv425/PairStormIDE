@@ -23,12 +23,11 @@ const int TOP_UNUSED_PIXELS_HEIGHT = 4;
 #include<QVector>
 #include<QFont>
 #include<QStatusBar>
+#include <QList>
 #include"sqliteaccess.h"
 #include<QStringList>
 #include<QCompleter>
 #include"autocodecompleter.h"
-
-
 
 class QPaintEvent;
 class QResizeEvent;
@@ -81,6 +80,9 @@ private:
     bool isInRangeIncludBoth(int val, int leftMargin, int rightMargin);
     bool isInRangeIncludLast(int val, int leftMargin, int rightMargin);
 
+    void handleLinesAddition(int, int, int);
+    void handleLinesDelition(int, int, int);
+
     void addButton(const int line, const QString &Comment);
     void removeButtonByIndex(QVector<AddCommentButton*> &commentV, int index);
     void removeButtomByValue(QVector<AddCommentButton*> &commentV, AddCommentButton* commentButton);
@@ -98,7 +100,8 @@ protected:
 private slots:
     void updateLineNumberAreaWidth();
     void updateLineNumberArea(const QRect &rect, int dy);
-    void runLexer();
+    void handleLineChange(int);
+    void highlightText();
     void deleteComment();
 
 public slots:
@@ -117,6 +120,7 @@ public slots:
 
 signals:
     void changesAppeared();
+    void runHighlighter();
     void sendLexem(QString);
     void closeDocEventOccured(CodeEditor*);
     void textChangedInLine(int);
@@ -142,6 +146,10 @@ private:
     int mLinesCountPrev;
     int mLinesCountCurrent;
 
+    unsigned int mLinesCount;
+    unsigned int mCodeSize;
+
+    QString mBeginTextState;
     QByteArray mBeginTextState;
     QVector<AddCommentButton*> mCommentsVector;
 
@@ -151,12 +159,11 @@ private:
     QTextCharFormat fmtRegular;
     QTextCharFormat fmtUndefined;
 
-
     LastRemoveKey lastRemomeKey;
 
 protected:
     int mCurrentZoom;
-    QVector<Token> mTokens;
+    QList<QVector<Token>> mTokensList;
     friend class Event;
 };
 
