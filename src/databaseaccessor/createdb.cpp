@@ -1,8 +1,13 @@
 #include "createdb.h"
 #include <QDebug>
 
-CreateDB::CreateDB() :Accessor ()
+CreateDB::CreateDB(): Accessor ()
 {
+}
+
+CreateDB::~CreateDB()
+{
+    query.finish();
 }
 
 void CreateDB::addTableUser()

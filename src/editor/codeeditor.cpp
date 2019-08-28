@@ -18,14 +18,15 @@
 #include"methodspartsdefinitiongetters.h"
 #include"classgenerationliterals.h"
 #include<QMenu>
-
+#include <QVector>
 
 CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
 {
     setLineWrapMode(QPlainTextEdit::NoWrap);// don't move cursor to the next line where it's out of visible scope
     this->setVerticalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAlwaysOn);
     this->setTabStopDistance(TAB_SPACE * fontMetrics().width(QLatin1Char('0')));//set tab distance
-    mCurrentZoom = 100;//in persents
+    mCurrentZoom = 100;//in persents    
+    mLinesCount = 1;
 
     //read settings
     QSettings settings(QApplication::organizationName(), QApplication::applicationName());
@@ -39,6 +40,8 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     mTimer = new QTimer;
     mLcpp = new LexerCPP();
     mTimer = new QTimer;
+    QVector<Token> firstLine;
+    mTokensList.append(firstLine);
     mChangeManager = new ChangeManager(this->toPlainText().toUtf8().constData());
     //comment button
     mAddCommentButton = new AddCommentButton(this);
@@ -51,7 +54,7 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     mCommentWidget = new CommentWidget;
     mCommentWidget->setVisible(false);
 
-    CommentDb *commentGetter = new CommentDb;
+    commentGetter = new CommentDb;
     mStartComments = commentGetter->getAllCommentsFromFile("main.cpp");
 
     readAllCommentsFromDB(mStartComments);
@@ -60,16 +63,17 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     //If the text is scrolled, rect will cover the entire viewport area.
     //If the text is scrolled vertically, dy carries the amount of pixels the viewport was scrolled.
 
-    connect(this,                         &QPlainTextEdit::updateRequest,              this, &CodeEditor::updateLineNumberArea);
-    connect(mTimer,                       &QTimer::timeout,                            this, &CodeEditor::saveStateInTheHistory);
-    connect(this,                         &QPlainTextEdit::cursorPositionChanged,      this, &CodeEditor::textChangedInTheOneLine);
-    connect(mAddCommentButton,            &AddCommentButton::addCommentButtonPressed,  this, &CodeEditor::showCommentTextEdit);
-    connect(mCommentWidget->getEditTab(), &AddCommentTextEdit::emptyCommentWasSent,    this, &CodeEditor::emptyCommentWasAdded);
-    connect(mCommentWidget->getEditTab(), &AddCommentTextEdit::notEmptyCommentWasSent, this, &CodeEditor::notEmptyCommentWasAdded);
-    connect(mCommentWidget->getEditTab(), &AddCommentTextEdit::commentWasDeleted,      this, &CodeEditor::deleteComment);
-    connect(this,                         &CodeEditor::linesCountUpdated,              this, &CodeEditor::changeCommentButtonsState);
-    connect(this,                         &QPlainTextEdit::cursorPositionChanged,      this, &CodeEditor::runLexer);
-    connect(this,                         &QPlainTextEdit::cursorPositionChanged,      this, &CodeEditor::highlighText);
+
+    connect(this,                         &CodeEditor::textChanged,                        this, &CodeEditor::textChangedInTheOneLine);
+    connect(this,                         &CodeEditor::textChangedInLine,                  this, &CodeEditor::handleLineChange);
+    connect(this,                         &CodeEditor::cursorPositionChanged,              this, &CodeEditor::highlightText);
+    connect(this,                         &QPlainTextEdit::updateRequest,                  this, &CodeEditor::updateLineNumberArea);
+    connect(mTimer,                       &QTimer::timeout,                                this, &CodeEditor::saveStateInTheHistory);
+    connect(mAddCommentButton,            &AddCommentButton::addCommentButtonPressed,      this, &CodeEditor::showCommentTextEdit);
+    connect(mCommentWidget->getEditTab(), &AddCommentTextEdit::emptyCommentWasSent,        this, &CodeEditor::emptyCommentWasAdded);
+    connect(mCommentWidget->getEditTab(), &AddCommentTextEdit::notEmptyCommentWasSent,     this, &CodeEditor::notEmptyCommentWasAdded);
+    connect(mCommentWidget->getEditTab(), &AddCommentTextEdit::commentWasDeleted,          this, &CodeEditor::deleteComment);
+    connect(this,                         &CodeEditor::linesCountUpdated,                  this, &CodeEditor::changeCommentButtonsState);
 
     mTimer->start(CHANGE_SAVE_TIME);//save text by this time
     mLinesCountCurrent = 1;
@@ -90,10 +94,16 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     setTextColors();
 
     //completer
-    completerKeywords <<"SELECT" <<"FROM" <<"WHERE"<<"WHEN"<<"WHILE"<<"int"<<"double"<<"static_cast<>()";//for test
+    completerKeywords <<"SELECT" <<"FROM" <<"WHERE"<<"WHEN"<<"WHILE"<<"int"<<"double"<<"static_cast<>()";//for test. it shlould read it from tokens vector
     mCompleter = new AutoCodeCompleter(completerKeywords, this);
     mCompleter->setCaseSensitivity(Qt::CaseInsensitive);
     mCompleter->setWidget(this);
+}
+
+CodeEditor::~CodeEditor()
+{
+    commentGetter->deleteCommentsFromDb(getFileName());
+    commentGetter->addCommentsToDb(getAllCommentsToDB());
 }
 
 void CodeEditor::setTextColors()
@@ -112,7 +122,7 @@ void CodeEditor::setIdeType(const QString &ideType)
 
 void CodeEditor::writeDefinitionToSource()
 {
-    if (!isFileWithExtension(getFileName(),"h"))//if current file is not header, we can't define fucntion
+    if (!isFileWithExtension(getFileName(), "h"))//if current file is not header, we can't define fucntion
     {
         return;
     }
@@ -127,21 +137,22 @@ void CodeEditor::writeDefinitionToSource()
     FileManager fileManager;
     if (fileManager.sourceFileByTheSameNameExists(getFileName()))
     {
-        auto sourceFileName = removeExtension(getFileName(), headerExtension.length())
+        auto sourceFileName = removeExtension(getFileName(), headerExtension.length())//create source file path
                 .append(sourceExtension);
 
-        auto sourceFileText = fileManager.readFromFile(sourceFileName);
-        if (!definitionExists(sourceFileText, this->textCursor()))
+        auto sourceFileText = fileManager.readFromFile(sourceFileName);//get content of this source file
+        if (!definitionExists(sourceFileText, this->textCursor()))//check if definition already exists
         {
            auto sourceDocument =  getOpenedDocument(sourceFileName);
-           if (!sourceDocument)
+           if (!sourceDocument)//if file is not opened
            {
-               auto fileContent = fileManager.readFromFile(sourceFileName);
-               fileManager.writeToFile(sourceFileName, fileContent + "\n" + definitonTest);
+               //write method definition to source file and emit signal in order to open this file
+               fileManager.writeToFile(sourceFileName, sourceFileText + "\n" + definitonTest);
                emit openDocument(sourceFileName);
                QMessageBox::information(this, successDefinCreateTitle, successDefinCreateMessage);
                return;
            }
+           //if source file is opened
            sourceDocument->setPlainText(sourceDocument->toPlainText() + "\n" + definitonTest);
            QMessageBox::information(this, successDefinCreateTitle, successDefinCreateMessage);
         }
@@ -189,11 +200,71 @@ void CodeEditor::setConfigParam(const ConfigParams &configParam)
     mConfigParam = configParam;
 }
 
-void CodeEditor::runLexer()
+void CodeEditor::handleLinesAddition(int changeStart, int lastLineWithChange, int lineDifference)
+{
+    QString changedCode;
+
+    if (lineDifference > 0)
+    {
+        changeStart = lastLineWithChange - lineDifference;
+        mTokensList.removeAt(changeStart);
+    }
+
+    for (int i = changeStart; i <= lastLineWithChange; ++i)
+    {
+        changedCode = document()->findBlockByLineNumber(i).text();
+        mLcpp->lexicalAnalysis(changedCode);
+        if (lineDifference)
+        {
+            mTokensList.insert(i, mLcpp->getTokens());
+        }
+        else
+        {
+            mTokensList[i] = mLcpp->getTokens();
+        }
+    }
+}
+
+void CodeEditor::handleLinesDelition(int changeStart, int lastLineWithChange, int lineDifference)
+{
+    QString changedCode;
+    lineDifference = -lineDifference;
+    changedCode = document()->findBlockByLineNumber(lastLineWithChange).text();
+    mLcpp->lexicalAnalysis(changedCode);
+    mTokensList[lastLineWithChange] = mLcpp->getTokens();
+    for (int i = lastLineWithChange + 1; i < lastLineWithChange + lineDifference + 1; ++i)
+    {
+        mTokensList.removeAt(i);
+    }
+}
+
+void CodeEditor::handleLineChange(int lastLineWithChange)
 {
     mLcpp->clear();
-    mLcpp->lexicalAnalysis(document()->toPlainText());
-    mTokens = mLcpp->getTokens();
+
+    int changeStart = lastLineWithChange;
+
+    int currentLinesCount = document()->lineCount();
+    int lineDifference = currentLinesCount - mLinesCount;
+    mLinesCount = currentLinesCount;
+
+    if (lineDifference >= 0)
+    {
+        handleLinesAddition(changeStart, lastLineWithChange, lineDifference);
+    }
+    else
+    {
+        handleLinesDelition(changeStart, lastLineWithChange, lineDifference);
+    }
+
+    for(int i = 0; i < mTokensList.size(); ++i)
+    {
+        qDebug() << i;
+        for(int j = 0; j < mTokensList[i].size(); ++j)
+        {
+            qDebug() << mTokensList[i][j].mName;
+        }
+    }
 }
 
 int CodeEditor::getLineNumberAreaWidth()
@@ -218,7 +289,7 @@ void CodeEditor::setFileName(const QString &fileName)
     this->mFileName = fileName;
 }
 
-std::pair<const QString &, const QString &> CodeEditor::getChangedFileInfo()
+std::pair<const QString&, const QString&> CodeEditor::getChangedFileInfo()
 {
     return std::make_pair(this->toPlainText(), mFileName);
 }
@@ -247,14 +318,16 @@ void CodeEditor::redo()
 
 bool CodeEditor::isChanged()
 {
-    return mBeginTextState != QCryptographicHash::hash(this->toPlainText().toLatin1(), QCryptographicHash::Sha256);
+    return mBeginTextState != QCryptographicHash::hash(this->toPlainText().toLatin1(),
+                                                       QCryptographicHash::Sha256);
 }
 
 void CodeEditor::setBeginTextState()
 {
     // when document is opened control sum is generated in order to have an opportunity
     // to check whether document was modified
-    mBeginTextState = QCryptographicHash::hash(this->toPlainText().toLatin1(), QCryptographicHash::Sha256);
+    mBeginTextState = QCryptographicHash::hash(this->toPlainText().toLatin1(),
+                                               QCryptographicHash::Sha256);
 }
 
 const QByteArray& CodeEditor::getBeginTextState() const
@@ -273,7 +346,7 @@ void CodeEditor::updateLineNumberAreaWidth()
     setViewportMargins(getLineNumberAreaWidth(), 0, 0, 0);
 }
 
-void CodeEditor::updateLineNumberArea(const QRect &rect, int dy)// rectangle of current block and Y-Axis changing
+void CodeEditor::updateLineNumberArea(const QRect &rect, const int dy)// rectangle of current block and Y-Axis changing
 {
     if (dy)// when not all of the text is in the visible area (we scrolled it)
     {
@@ -284,7 +357,9 @@ void CodeEditor::updateLineNumberArea(const QRect &rect, int dy)// rectangle of 
         mLineNumberArea->update(0, 0, mLineNumberArea->width(), rect.height());//set position to the new block (area for line number)
     }
     if (rect.contains(viewport()->rect()))//when one covers other (text is under line counter)
+    {
         updateLineNumberAreaWidth();
+    }
 }
 
 void CodeEditor::resizeEvent(QResizeEvent *e)
@@ -316,13 +391,12 @@ void CodeEditor::specialAreasRepaintEvent(QPaintEvent *event)
         bottom += bottom - temp;// bottom - temp = dy which is block height
         ++blockNumber;
     }
-
     repaintButtonsArea(bottom, top, blockNumber);
 }
 
-void CodeEditor::repaintButtonsArea(int bottom, int top, int blockNumber)
+void CodeEditor::repaintButtonsArea(const int bottom, const int top, const int blockNumber)
 {
-    int addedHight = this->verticalScrollBar()->sliderPosition()? 0 : TOP_UNUSED_PIXELS_HEIGHT;
+    int addedHight = this->verticalScrollBar()->sliderPosition() ? 0 : TOP_UNUSED_PIXELS_HEIGHT;
     int height = bottom - top;
     for (auto &i : mCommentsVector)
     {
@@ -347,7 +421,7 @@ void CodeEditor::saveStateInTheHistory()
     mChangeManager->writeChange(newFileState);
 }
 
-void CodeEditor::zoom(int val)
+void CodeEditor::zoom(const int val)
 {
     if (val > 0)
     {
@@ -360,26 +434,22 @@ void CodeEditor::zoom(int val)
     mCurrentZoom+=val;
 }
 
-void CodeEditor::setZoom(int zoomVal)
+void CodeEditor::setZoom(const int zoomVal)
 {
     zoom(zoomVal - mCurrentZoom);
 }
 
 void CodeEditor::textChangedInTheOneLine()
 {
-    emit(textChangedInLine(this->textCursor().blockNumber() + 1));
+    emit(textChangedInLine(this->textCursor().blockNumber()));
 }
 
-AddCommentButton *CodeEditor::getCommentButtonByIndex(const int line)
+AddCommentButton* CodeEditor::getCommentButtonByIndex(const int line)
 {
-    for (int i = 0; i < mCommentsVector.size(); i++)
-    {
-        if (mCommentsVector[i]->getCurrentLine() == line)
-        {
-            return mCommentsVector[i];
-        }
-    }
-    return nullptr;
+    auto rCommentButton = std::find_if(mCommentsVector.begin(), mCommentsVector.end(),
+                      [=](AddCommentButton *button) {return button->getCurrentLine() == line; });
+
+    return rCommentButton == mCommentsVector.end() ? nullptr : *rCommentButton;
 }
 
 void CodeEditor::setNewAddedButtonSettings(AddCommentButton *commentButton)
@@ -428,10 +498,12 @@ QVector<Comment> CodeEditor::getAllCommentsToDB()
     for (auto &i : mCommentsVector)
     {
         Comment comment;
-        comment.mFile = getFileName();
+        comment.mFile = "main.cpp"; //getFileName();
+        qDebug()<<comment.mFile;
         comment.mLine = i->getCurrentLine();
         comment.mText = i->getCommentString();
-        comment.mUser = i->getUser();
+        comment.mUser = "unnamed";//i->getUser();
+        qDebug()<<comment.mUser;
         comments.push_back(comment);
     }
     return comments;
@@ -445,18 +517,11 @@ void CodeEditor::showCommentTextEdit(int line)
     mCommentWidget->setCommentLine(line);
 
     auto commentButton = getCommentButtonByIndex(line);
-    if (commentButton)//if comment button by passed in the parametr line which exists
-    {
-        mCommentWidget->getEditTab()->setText(commentButton->getCommentString());//set text from this button text
-    }
-    else
-    {
-        mCommentWidget->getEditTab()->setText("");
-    }
+
+    mCommentWidget->getEditTab()->setText(commentButton ? commentButton->getCommentString() : "");
 
     QSettings settings(QApplication::organizationName(), QApplication::applicationName());
     mCommentWidget->setWindowTitle("Comment to " + QString::number(line) + " line by " + settings.value("UserName").toString());
-
 }
 
 void CodeEditor::emptyCommentWasAdded()
@@ -545,17 +610,17 @@ void CodeEditor::rewriteButtonsLines(QVector<AddCommentButton *> &commentV, cons
     }
 }
 
-void CodeEditor::setAnotherButtonLine(AddCommentButton *comment, int diff)
+void CodeEditor::setAnotherButtonLine(AddCommentButton *comment, const int diff)
 {
     comment->setCurrentLine(comment->getCurrentLine() + diff);
 }
 
-bool CodeEditor::isInRangeIncludBoth(int val, int leftMargin, int rightMargin)
+bool CodeEditor::isInRangeIncludBoth(const int val, const int leftMargin, const int rightMargin)
 {
     return val >= leftMargin && val <= rightMargin;
 }
 
-bool CodeEditor::isInRangeIncludLast(int val, int leftMargin, int rightMargin)
+bool CodeEditor::isInRangeIncludLast(const int val, const int leftMargin, const int rightMargin)
 {
     return val > leftMargin && val <= rightMargin;
 }
@@ -579,7 +644,7 @@ void CodeEditor::addButton(const int line, const QString &comment)
     connect(mCommentsVector.back(), &AddCommentButton::addCommentButtonPressed, this, &CodeEditor::showCommentTextEdit);
 }
 
-void CodeEditor::removeButtonByIndex(QVector<AddCommentButton*> &commentV, int index)
+void CodeEditor::removeButtonByIndex(QVector<AddCommentButton*> &commentV, const int index)
 {
     commentV[index]->setVisible(false);
     commentV.erase(commentV.begin() + index);
@@ -593,17 +658,15 @@ void CodeEditor::removeButtomByValue(QVector<AddCommentButton*> &commentV, AddCo
 
 bool CodeEditor::commentButtonExists(int line)
 {
-    for (auto &i : mCommentsVector)
-    {
-        if (i->getCurrentLine() == line)
-        {
-            return true;
-        }
-    }
-    return false;
+    auto rCommentButton = std::find_if(mCommentsVector.begin(), mCommentsVector.end(),
+                      [=](AddCommentButton *button) {return button->getCurrentLine() == line; });
+
+    return !(rCommentButton == mCommentsVector.end());
+
 }
 
-void CodeEditor::removeButtons(QVector<AddCommentButton *> &commentV, int cursorLine, int startLine, int endLine, int diff)
+void CodeEditor::removeButtons(QVector<AddCommentButton*> &commentV, const int cursorLine,
+                               const int startLine, const int endLine, const int diff)
 {
     if (diff > 0)//we shouldn't remove button if the wasn't any removing
     {
@@ -732,33 +795,53 @@ void CodeEditor::closeEvent(QCloseEvent *event)
     emit closeDocEventOccured(this);
 }
 
-void formating(QTextCharFormat fmt, QTextCursor cursor,  Token token)
+void formating(QTextCharFormat fmt, QTextCursor &cursor, Token token, int startingPosition)
 {
-    cursor.setPosition(static_cast<int>(token.mBegin), QTextCursor::MoveAnchor);
-    cursor.setPosition(static_cast<int>(token.mEnd), QTextCursor::KeepAnchor);
+    cursor.setPosition(startingPosition + token.mBegin, QTextCursor::MoveAnchor);
+    cursor.setPosition(startingPosition + token.mEnd, QTextCursor::KeepAnchor);
     cursor.setCharFormat(fmt);
 }
 
-void CodeEditor::highlighText()
+void CodeEditor::highlightText()
 {
-    QTextCursor cursor = textCursor();
-    for(const auto &i: mTokens)
+    // Set cursor position to begining of visible area
+    QTextCursor cursor = this->cursorForPosition(QPoint(0, 0));
+    int firstVisibleLine = cursor.blockNumber();
+    int startingPosition = cursor.position();
+
+    // Set cursor to end of visible aread
+    QPoint bottom_right(this->viewport()->width() - 1, this->viewport()->height() - 1);
+    cursor = this->cursorForPosition(bottom_right);
+    int lastVisibleLine = cursor.blockNumber();
+
+    // Highlight visible area
+    for(int i = firstVisibleLine; i <= lastVisibleLine; ++i)
     {
-        switch(i.mType)
+        if(i < mTokensList.size())
         {
-        case(State::KW):
-            formating(fmtKeyword, cursor, i);
-            break;
-        case(State::LIT):
-            formating(fmtLiteral, cursor, i);
-            break;
-        case(State::COM):
-            formating(fmtComment, cursor, i);
-            break;
-        default:
-            formating(fmtRegular, cursor, i);
-            break;
+            for(int j = 0; j < mTokensList[i].size(); ++j)
+            {
+                switch(mTokensList[i][j].mType)
+                {
+                case(State::KW):
+                    formating(fmtKeyword, cursor, mTokensList[i][j], startingPosition);
+                    break;
+                case(State::LIT):
+                    formating(fmtLiteral, cursor, mTokensList[i][j], startingPosition);
+                    break;
+                case(State::COM):
+                    formating(fmtComment, cursor, mTokensList[i][j], startingPosition);
+                    break;
+                default:
+                    formating(fmtRegular, cursor, mTokensList[i][j], startingPosition);
+                    break;
+                }
+            }
         }
+        // Move cursor to the next line
+        cursor.setPosition(startingPosition);
+        cursor.movePosition(QTextCursor::EndOfLine);
+        startingPosition = cursor.position() + 1;
     }
 }
 

@@ -16,8 +16,9 @@ Connection::~Connection()
 void Connection::openDatabase()
 {
     mDb = QSqlDatabase::database();
+    qDebug()<<mPath;
     mDb.setDatabaseName(mPath);
-    if(mDb.open())
+    if (mDb.open())
         qDebug()<<"opened";
 }
 

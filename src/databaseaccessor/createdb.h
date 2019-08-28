@@ -6,6 +6,7 @@ class CreateDB: public Accessor
 {
 public:
     CreateDB();
+    ~CreateDB();
     void addTableUser();
     void addTableMessage();
     void addTableComment();

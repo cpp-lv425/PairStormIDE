@@ -4,9 +4,17 @@ CommentDb::CommentDb(): Accessor()
 {
 }
 
-void CommentDb::addCommentToDb(const Comment &comment)
+CommentDb::~CommentDb()
 {
-    execQuery(addCommentQuery(comment));
+    query.finish();
+}
+
+void CommentDb::addCommentsToDb(const QVector<Comment> &comments)
+{
+    for (auto &i : comments)
+    {
+        execQuery(addCommentQuery(i));
+    }
     query.finish();
 }
 
@@ -16,10 +24,9 @@ void CommentDb::deleteCommentFromDb(const int commentLine, const QString comment
     query.finish();
 }
 
-void CommentDb::updateCommentInDb(const Comment& comment)
+void CommentDb::deleteCommentsFromDb(const QString& commentFile)
 {
-    execQuery(updateCommentQuery(comment));
-    query.finish();
+    execQuery(deleteAllCommentsInFileQuery(commentFile));
 }
 
 QVector<Comment> CommentDb::getAllCommentsFromFile(const QString filename)
@@ -30,14 +37,12 @@ QVector<Comment> CommentDb::getAllCommentsFromFile(const QString filename)
       QVector<Comment> comments(count_of_messages);
       execQuery(allCommentInFileQuery(filename));
       int counter = 0;
-      while (query.next()) {
+      while (query.next())
+      {
           fillStructComment(comments[counter]);
           counter++;
       }
       query.finish();
-      for(auto i : comments){
-          qDebug()<<i.mLine<<" "<<i.mText;
-      }
       return comments;
 }
 
@@ -69,13 +74,6 @@ QString CommentDb::deleteCommentQuery(const int commentLine, const QString comme
             QString::number(commentLine);
 }
 
-QString CommentDb::updateCommentQuery(const Comment& comment)
-{
-    return "UPDATE Comment SET idUser = (SELECT id FROM User WHERE nickname = '" + comment.mUser + "'), "
-            +"text = " + comment.mText
-            + " WHERE line = " + QString::number(comment.mLine)
-            +" AND idFile = (SELECT id FROM File WHERE name = '" + comment.mFile + "')";
-}
 
 QString CommentDb::getCommentQuery(const int commentLine, const QString commentFile)
 {
@@ -110,4 +108,9 @@ QString CommentDb::allCommentInFileQuery(const QString filename)
             "inner join File on File.id=Comment.idFile "
             "where Comment.idFile = (Select File.ID from File where file.name = '"
             + filename + "')";
+}
+
+QString CommentDb::deleteAllCommentsInFileQuery(const QString filename)
+{
+    return "Delete from Comment where Comment.idFile = (Select id from File where name = '" + filename + "')";
 }

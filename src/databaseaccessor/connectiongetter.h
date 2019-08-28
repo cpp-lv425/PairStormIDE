@@ -6,9 +6,8 @@ class ConnectionGetter
 {
     ConnectionGetter() = default;
 public:
-    static Connection* getDefaultConnection(QString path);
+    static Connection* getDefaultConnection(const QString &path);
     static Connection* getDefaultConnection();
-
 };
 
 #endif // CONNECTIONGETTER_H

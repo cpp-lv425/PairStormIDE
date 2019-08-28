@@ -449,6 +449,7 @@ void MainWindow::onOpenProjectTriggered()
              userMessages[UserMessages::OpenDirectoryTitle],
             QDir::homePath());
 
+
    /* Connection *db = ConnectionGetter::getDefaultConnection("C:/Users/Petro/Desktop/storage.db");
     CreateDB database;
     database.addTableFile();
@@ -465,6 +466,9 @@ void MainWindow::onOpenProjectTriggered()
                 userMessages[UserMessages::ProjectDoesNotExistMsg]);
         return;
     }
+
+
+    databaseConnect(dirName);
 
     mpProjectViewerDock->setDir(dirName);
     mpDocumentManager->openProject(dirName);
@@ -1001,4 +1005,19 @@ void MainWindow::onNewProjectTriggered()
 
     // project is displayed on project viewer
     mpProjectViewerDock->setDir(dirName);
+}
+
+void MainWindow::databaseConnect(QString directory)
+{
+    db = ConnectionGetter::getDefaultConnection(directory + QDir::separator() + "storage.db");
+    CreateDB database;
+    database.addTableFile();
+    database.addTableUser();
+    database.addTableComment();
+    database.addTableMessage();
+}
+
+void MainWindow::databaseDisconnect()
+{
+    delete db;
 }

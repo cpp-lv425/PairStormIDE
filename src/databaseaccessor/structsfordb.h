@@ -2,6 +2,7 @@
 #define STRUCTSFORDB_H
 #include <QString>
 #include <QVector>
+
 struct Message
 {
     Message() = default;
@@ -14,7 +15,7 @@ struct Message
 
     QString mBody;
     QString mUser;
-    QString mTime;  //YYYY-MM-DD
+    QString mTime;  //YYYY-MM-DD hh:mm:ss
 };
 
 struct User

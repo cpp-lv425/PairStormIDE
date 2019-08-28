@@ -1,7 +1,12 @@
 #include "filedb.h"
 
-FileDb::FileDb() :Accessor ()
+FileDb::FileDb(): Accessor ()
 {
+}
+
+FileDb::~FileDb()
+{
+    query.finish();
 }
 
 void FileDb::addFileToDb(const File &file)

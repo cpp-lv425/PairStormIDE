@@ -1,6 +1,6 @@
 #include "connectiongetter.h"
 
-Connection* ConnectionGetter::getDefaultConnection(QString path)
+Connection* ConnectionGetter::getDefaultConnection(const QString &path)
 {
     Connection::mPath = path;
     return getDefaultConnection();
@@ -8,6 +8,6 @@ Connection* ConnectionGetter::getDefaultConnection(QString path)
 
 Connection *ConnectionGetter::getDefaultConnection()
 {
-    static Connection * defaultConn = new Connection();
+    static Connection *defaultConn = new Connection();
     return defaultConn;
 }
