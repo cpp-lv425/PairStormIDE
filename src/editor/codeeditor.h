@@ -67,6 +67,9 @@ private:
     bool isInRangeIncludBoth(int val, int leftMargin, int rightMargin);
     bool isInRangeIncludLast(int val, int leftMargin, int rightMargin);
 
+    void handleLinesAddition(int, int, int);
+    void handleLinesDelition(int, int, int);
+
     void removeButtonByIndex(QVector<AddCommentButton*> &commentV, int index);
     void removeButtomByValue(QVector<AddCommentButton*> &commentV, AddCommentButton* commentButton);
     void removeButtons(QVector<AddCommentButton*> &commentV, int cursorLine, int startLine, int endLine, int diff);
@@ -127,9 +130,6 @@ private:
 
     unsigned int mLinesCount;
     unsigned int mCodeSize;
-
-    unsigned int mChangesStart;
-    unsigned int mChangesEnd;
 
     QString mBeginTextState;
     QVector<AddCommentButton*> mCommentsVector;

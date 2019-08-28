@@ -92,16 +92,9 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     fmtRegular.setForeground(Qt::white);
 }
 
-void CodeEditor::handleLineChange(int lastLineWithChange)
+void CodeEditor::handleLinesAddition(int changeStart, int lastLineWithChange, int lineDifference)
 {
-    mLcpp->clear();
-
     QString changedCode;
-    int changeStart = lastLineWithChange;
-
-    int currentLinesCount = document()->lineCount();
-    int lineDifference = currentLinesCount - mLinesCount;
-    mLinesCount = currentLinesCount;
 
     if(lineDifference > 0)
     {
@@ -122,7 +115,11 @@ void CodeEditor::handleLineChange(int lastLineWithChange)
             mTokensList[i] = mLcpp->getTokens();
         }
     }
+}
 
+void CodeEditor::handleLinesDelition(int changeStart, int lastLineWithChange, int lineDifference)
+{
+    QString changedCode;
     if(lineDifference < 0)
     {
         lineDifference = -lineDifference;
@@ -134,19 +131,26 @@ void CodeEditor::handleLineChange(int lastLineWithChange)
             mTokensList.removeAt(i);
         }
     }
+}
 
-    mChangesStart = changeStart;
-    mChangesEnd = lastLineWithChange;
+void CodeEditor::handleLineChange(int lastLineWithChange)
+{
+    mLcpp->clear();
 
-//    qDebug() << "======================";
-//    for(int i = 0; i < mTokensList.size(); ++i)
-//    {
-//        qDebug() << i;
-//        for(int j = 0; j < mTokensList[i].size(); ++j)
-//        {
-//            qDebug() << mTokensList[i][j].mName << " " << mTokensList[i][j].mBegin << " " << mTokensList[i][j].mEnd;
-//        }
-//    }
+    int changeStart = lastLineWithChange;
+
+    int currentLinesCount = document()->lineCount();
+    int lineDifference = currentLinesCount - mLinesCount;
+    mLinesCount = currentLinesCount;
+
+    if(lineDifference >= 0)
+    {
+        handleLinesAddition(changeStart, lastLineWithChange, lineDifference);
+    }
+    else
+    {
+        handleLinesDelition(changeStart, lastLineWithChange, lineDifference);
+    }
 }
 
 void CodeEditor::runLexer()
