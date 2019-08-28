@@ -726,6 +726,47 @@ bool DocumentManager::saveDocument(CodeEditor *doc)
     }
 }
 
+bool DocumentManager::saveDocument(const QString &fileName)
+{
+    auto openedWindow = openedDoc(fileName);
+
+    if (!openedWindow)
+    {
+        return false;
+    }
+
+    auto openedDocument = qobject_cast<CodeEditor*>(openedWindow->widget());
+
+    if (!openedDocument)
+    {
+        return false;
+    }
+
+    // check if doc was modified
+    if (!openedDocument->isChanged())
+    {
+        return true;
+    }
+
+    // content is written to file
+    try
+    {
+        FileManager().writeToFile
+                (fileName,
+                 openedDocument->toPlainText());
+
+    }
+    catch (const FileOpeningFailure&)
+    {
+        throw;
+    }
+
+    // doc snaps current content state
+    openedDocument->setBeginTextState();
+
+    return true;
+}
+
 void DocumentManager::saveDocument(const QString &fileName, const QString &fileContent)
 {    
     try
