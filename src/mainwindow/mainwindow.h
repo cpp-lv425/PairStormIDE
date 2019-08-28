@@ -21,6 +21,7 @@ class ChatWindowDock;
 class QMdiSubWindow;
 class CodeEditor;
 class Browser;
+class Connection;
 QT_END_NAMESPACE
 
 class MainWindow : public QMainWindow
@@ -42,6 +43,7 @@ private:
     QScopedPointer<DocumentManager> mpDocumentManager;    
     Browser *mDocumentationBrowser;
     QScopedPointer<PaletteConfigurator> mpPaletteConfigurator;
+    Connection *db;
 
     void setupMainMenu();    
     void openDoc(QString fileName);
@@ -57,6 +59,9 @@ private:
     void setAppStyle(const QString &style);
     void setDocumentFontFamily(const QString &fontFamily);
     void setDocumentFontSize(const QString &fontSize);
+
+    void databaseConnect(QString directory);
+    void databaseDisconnect();
 
 private slots:
     // file menu actions

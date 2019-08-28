@@ -1,5 +1,5 @@
 #include "ideconfiguration.h"
-
+#include <QDebug>
 void ConfigParams::setConfigParams(const QString fontStyle, const QString fontSize, const QString ideType)
 {
    setFontSize(fontSize);
@@ -26,12 +26,12 @@ void ConfigParams::setIdeType(const QString &ideType)
     if (ideType == "WHITE" || ideType == "BLUE")
     {
         textColors.mCodeTextColor =        QColor("#000000");//black
-        textColors.mLineCounterAreaColor = QColor("#646060");//gray
+        textColors.mLineCounterAreaColor = QColor("#C0C0C0");//light gray
     }
     else//dark
     {
         textColors.mCodeTextColor =        QColor("#FAF8F2");//almost white
-        textColors.mLineCounterAreaColor = QColor("#202020");//gray
+        textColors.mLineCounterAreaColor = QColor("#373A38");//dark gray
     }
 }
 
