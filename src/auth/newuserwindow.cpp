@@ -11,42 +11,55 @@
 
 NewUserWindow::NewUserWindow(QWidget *parent) : QDialog(parent)
 {
+    // widget parameter
     setModal(true);
-    //window()->setFixedSize( window()->sizeHint() );
-    setWindowTitle("Create new account");
+    setWindowTitle(mTitle);
+
+    QPalette pal(palette());
+    pal.setColor(mWindowColorRole, mWindowColor);
+    setAutoFillBackground(true);
+    setPalette(pal);
+
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addStretch(mBasicStretch);
 
     //  login parameters
     QHBoxLayout *loginLayout = new QHBoxLayout;
-    mpLabelLogin = new QLabel("GitHub login", this);
+    mpLabelLogin = new QLabel(mLoginLabel, this);
     mpLabelLogin->setMinimumWidth(mLabelWidth);
     mpLabelLogin->setMaximumWidth(mLabelWidth);
+    QString styleForLabelLogin = mLabelLoginFontSize + mLabelLoginFontFamily + mLabelLoginFontStyle;
+    mpLabelLogin->setStyleSheet(styleForLabelLogin);
     mpEditLogin = new QLineEdit(this);
     mpEditLogin->setMinimumWidth(mEditWidth);
     mpEditLogin->setMaximumWidth(mEditWidth);
+    mpEditLogin->setStyleSheet(mLineEditColor);
     loginLayout->addWidget(mpLabelLogin);
     loginLayout->addWidget(mpEditLogin);
     mainLayout->addLayout(loginLayout);
 
     //  token/password parameters
     QHBoxLayout *tokenLayout = new QHBoxLayout;
-    mpLabelToken = new QLabel("Password or token", this);
+    mpLabelToken = new QLabel(mTokenLabel, this);
     mpLabelToken->setMinimumWidth(mLabelWidth);
     mpLabelToken->setMaximumWidth(mLabelWidth);
+    mpLabelToken->setStyleSheet(styleForLabelLogin);
     mpEditToken = new QLineEdit(this);
     mpEditToken->setMinimumWidth(mEditWidth);
     mpEditToken->setMaximumWidth(mEditWidth);
     mpEditToken->setEchoMode(QLineEdit::Password);
     mpEditToken->setPlaceholderText(mPlaceholderText);
     mpEditToken->setToolTip(mPlaceholderText);
+    mpEditToken->setStyleSheet(mLineEditColor);
     tokenLayout->addWidget(mpLabelToken);
     tokenLayout->addWidget(mpEditToken);
     mainLayout->addLayout(tokenLayout);
 
     // DialogButtonBox  parameters
     mpButtonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this);
-    //mpButtonBox->button( QDialogButtonBox::Ok )->setEnabled( false );
+    QString styleButtonBox = mButtonBoxFontSize + mButtonBoxFontFamily
+                           + mButtonBoxColor + mButtonBoxBackgroundColor;
+    mpButtonBox->setStyleSheet(styleButtonBox);
     connect(mpButtonBox, &QDialogButtonBox::clicked, this, &NewUserWindow::onBtnBoxClicked);
     mainLayout->addWidget(mpButtonBox);
 
@@ -55,18 +68,24 @@ NewUserWindow::NewUserWindow(QWidget *parent) : QDialog(parent)
     line->setFrameShape(QFrame::HLine);
     line->setFrameShadow(QFrame::Sunken);
     line->setLineWidth(mSeparatorWidth);
+    line->setStyleSheet(mSeparatorStyle);
     mainLayout->addWidget(line);
 
     // unnamed user button
     QHBoxLayout *unnamedButtonLayout = new QHBoxLayout;
-    mpUnnamedUserButton = new QPushButton("Try without authorizattion", this);
+    mpUnnamedUserButton = new QPushButton(mUnnamedUserLabel, this);
     mpUnnamedUserButton->setMinimumWidth(mUnnamedUserButtonWidth);
     mpUnnamedUserButton->setMaximumWidth(mUnnamedUserButtonWidth);
+    QString styleUnnamedUserButton = mUnnamedUserButtonFontSize + mUnnamedUserButtonFontFamily
+                                   + mUnnamedUserButtonColor + mUnnamedUserButtonBackgroundColor;
+    mpUnnamedUserButton->setStyleSheet(styleUnnamedUserButton);
     unnamedButtonLayout->addWidget(mpUnnamedUserButton);
     mainLayout->addLayout(unnamedButtonLayout);
     connect(mpUnnamedUserButton, &QPushButton::clicked, this, [=](){emit unnamedUser();});
     setLayout(mainLayout);
     show();
+
+    // set widget in the middle of screen
     move((QApplication::desktop()->width() - this->width()) / 2 ,
          (QApplication::desktop()->height() - this->height()) / 2);
 }
@@ -88,13 +107,13 @@ void NewUserWindow::onBtnBoxClicked(QAbstractButton *button)
         {
             return;
         }
-        if (mpEditToken->text().size() == 40 && mpEditLogin->text().size())// user typed token
+        if (mpEditToken->text().size() == mTokenSize && mpEditLogin->text().size())// user typed token
         {
             mpButtonBox->setEnabled(false);
             emit newUserToken(mpEditLogin->text(), mpEditToken->text());
             return;
         }
-        if (mpEditToken->text().size() && mpEditLogin->text().size())      // user typed password
+        if (mpEditToken->text().size() && mpEditLogin->text().size())               // user typed password
         {
             mpButtonBox->setEnabled(false);
             emit newUserPasssword(mpEditLogin->text(), mpEditToken->text());

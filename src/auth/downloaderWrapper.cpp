@@ -8,18 +8,17 @@
 #include <QDebug>
 
 DownloaderWrapper::DownloaderWrapper(QObject *pwgt) : QObject(pwgt)
-{   //qDebug() << "DownloaderGui";
+{
     mpDownloader  = new Downloader(this);
     connect(mpDownloader, &Downloader::respond, this,  &DownloaderWrapper::onRespond );
-    connect(mpDownloader, &Downloader::error, this,  &DownloaderWrapper::respond );
-    connect(mpDownloader, &Downloader::corrupted, this,  &DownloaderWrapper::respond );
-    //qDebug() << "/DownloaderGui";
+    connect(mpDownloader, &Downloader::error, this,  &DownloaderWrapper::respond ); // resend signal about error to outer object
+    connect(mpDownloader, &Downloader::corrupted, this,  &DownloaderWrapper::respond );// resend signal about data corruption to outer object
 }
 
 void DownloaderWrapper::get(const QString &userName,
                             const QString &url,
                             const QString &tokenOrPassword)
-{   //qDebug() << "DownloaderGui::get";
+{
     mpDownloader->downloadGET(QUrl(url), userName, tokenOrPassword);
 }
 

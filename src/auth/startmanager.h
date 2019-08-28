@@ -1,5 +1,5 @@
 /*
- * The purpose of the class is to authorize users.
+ * The purpose of the class is to authenticate users.
  * It includes:
  *  - searching configuration files for registered users;
  *  - provide possibility to choice between registered users,
@@ -26,7 +26,7 @@ public:
     //explicit StartManager(QObject *parent = nullptr);
     explicit StartManager(QWidget *parent = nullptr);
 
-    void start();
+    void start();                                       // to start authentication process
     void setPathToConfDir(const QString path);
 
     enum class userMode {RegisteredUser, NewUser, UnnamedUser, Size};
@@ -34,24 +34,29 @@ public:
 private:
     DownloaderWrapper *mpDownloader;
 
-    userMode mUserMode;
+    userMode mUserMode                        = userMode::UnnamedUser;
     respondStatus mRespondStatus;
 
     QString mPathToConfDir;
-    QString mUserName;
-    QString mToken;
+
+    QString mUserName                         = "unnamed";
+    const int mTokenSize                      = 40;
+    const char mTokenPlaceholder              = '0';
+    QString mToken                             {mTokenSize, '0'};
     QString mPassword;
     QString mTokenHash;
-    QString mTokenPrefix    = "PS";
+    QString mTokenPrefix                      = "PS";                       // prefix for generated token
     QByteArray mData;
+    const QString mConfDirectoryName          = "conf";
+    const QString mFileExtention              = ".json";
 
-    bool mIsTokenValid;
-    bool mIsTokenGenerated;
+    bool mIsTokenValid                        = false;
+    bool mIsTokenGenerated                    = false;
 
     QStringList mListRegisteredUsers;
 
-    QString mUrlToCheckUser = "https://api.github.com/user";
-    QString mUrlToGetToken  = "https://api.github.com/authorizations";
+    const QString mUrlToCheckUser             = "https://api.github.com/user";          //  Url to check validity token
+    const QString mUrlToGetToken              = "https://api.github.com/authorizations";//  Url to generate new token
 
     void makeListRegisteredUsers();
     void choiceWindow();
@@ -60,20 +65,34 @@ private:
     void newUsewWindow();
     void loadConFile();
 
-    void formatTokenName(QString &name);     // formatting token name as name + currentSecsSinceEpoch
-
-    int mTimeOutWelcomeWindow = 3000;        // ms
+    void formatTokenName(QString &tName);                                    // formatting token name as [tName] + currentSecsSinceEpoch
     void messageWindow(const QString &title, const QString &message, int timeOut);
 
+    //  messages
+    const QString mMessageTitle               = "Welcome to Pair Storm!";
+    const QString mMessageRegistered          = ", you are successfully registered!";
+    const QString mMessageUnauthenticated     = "You entering in unauthenticated mode";
+    const QString mMessageCredentialsValid    = ", your credentials are valid!";
+    const QString mMessageCredentialsNotValid = ", your credentials are not valid!";
+
+    //              DESIGN PARAMETERS
+    //  MessageWindow
+    const int mMessageWindowFontSise          = 14;
+    const bool mMessageWindowFontItalic       = true;
+    const QFont::Weight mWeight               = QFont::Bold;
+    const Qt::GlobalColor mMessageWindowColor = Qt::darkCyan;
+    const QString mMessageWindowFont          = "Helvetica";
+    const int mMessageWindowTimeOut           = 4000;                       // ms
+
 signals:
-    void cancel();                           // cancel mainwindow
+    void cancel();                                                          // cancel mainwindow
     void cancelNewUserWindow();
 
 public slots:
-    void onChoice(QString userName);        // set [mUserMode], [mUserName], [mToken] acording to user choise
-    void onUnnamedUserChoice();
-    void onNewUserToken(const QString &login, const QString &token);
-    void onNewUserPassword(const QString &login, const QString &pasword);
+    void onChoice(QString userName);                                        // to set [mUserMode], [mUserName], [mToken] acording to user choise
+    void onUnnamedUserChoice();                                             // user chose to continue as unregisteres user
+    void onNewUserToken(const QString &login, const QString &token);        // to register user typed GiyHub credentials (login and password)
+    void onNewUserPassword(const QString &login, const QString &pasword);   // to register user typed GiyHub login and token
 
 };
 

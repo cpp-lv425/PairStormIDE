@@ -7,8 +7,7 @@ SOURCES += \
     $$PWD/downloaderWrapper.cpp \
     $$PWD/newuserwindow.cpp \
     $$PWD/userslistmaker.cpp \
-         \
-        $$PWD/startmanager.cpp
+    $$PWD/startmanager.cpp
 
 HEADERS += \
     $$PWD/choicewindow.h \
@@ -16,7 +15,6 @@ HEADERS += \
     $$PWD/downloaderWrapper.h \
     $$PWD/newuserwindow.h \
     $$PWD/userslistmaker.h \
-     \
     $$PWD/startmanager.h
 
 

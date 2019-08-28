@@ -8,7 +8,8 @@ class Downloader;
 class QUrl;
 QT_END_NAMESPACE
 
-class DownloaderWrapper : public QObject {
+class DownloaderWrapper : public QObject
+{
 Q_OBJECT
 
 private:

@@ -1,16 +1,17 @@
+/*
+ * The purpose of this class is to provide list registered users according to provided path
+*/
 #ifndef USERSLISTMAKER_H
 #define USERSLISTMAKER_H
 
-//QT_BEGIN_NAMESPACE
 class QStringList;
 class QString;
-//QT_END_NAMESPACE
 
 class UsersListMaker
 {
 public:
     UsersListMaker();
-    static QStringList usersListMake(const QString path);
+    static QStringList usersListMake(const QString &path);
 };
 
 #endif // USERSLISTMAKER_H
