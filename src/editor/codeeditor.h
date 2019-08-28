@@ -88,6 +88,7 @@ private:
     bool commentButtonExists(int line);
     AddCommentButton* getCommentButtonByIndex(const int line);
     void setNewAddedButtonSettings(AddCommentButton *commentButton);
+    CodeEditor* getOpenedDocument(const QString &fileName);
 
 protected:
     void resizeEvent(QResizeEvent *event)override;

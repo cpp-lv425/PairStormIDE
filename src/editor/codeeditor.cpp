@@ -130,14 +130,16 @@ void CodeEditor::writeDefinitionToSource()
                 .append(sourceExtension);
 
         auto sourceFileText = fileManager.readFromFile(sourceFileName);
-        if (definitionExists(sourceFileText, this->textCursor()))
+        if (!definitionExists(sourceFileText, this->textCursor()))
         {
-
+           auto sourceDocument =  getOpenedDocument(sourceFileName);
+           if (!sourceDocument)
+           {
+               return;
+           }
+           sourceDocument->setPlainText(sourceDocument->toPlainText() + definitonTest);
         }
     }
-    curs.movePosition(QTextCursor::End);
-    this->setTextCursor(curs);
-    this->textCursor().insertText("\n" + definitonTest);//here it's for test. Should add to the source code file
 }
 
 void CodeEditor::contextMenuEvent(QContextMenuEvent *event)
@@ -385,6 +387,21 @@ void CodeEditor::setNewAddedButtonSettings(AddCommentButton *commentButton)
     mCommentWidget->setViewText(1);//set text to view. because it doens't set automiticaly when we do it to the edit
     commentButton->setToolTip(mCommentWidget->getViewTab()->getText());
     mCommentWidget->setVisible(false);
+}
+
+CodeEditor* CodeEditor::getOpenedDocument(const QString &fileName)
+{
+    auto allWidgets = QApplication::allWidgets();
+    for (auto widget: allWidgets)
+    {
+        auto doc = qobject_cast<CodeEditor*>(widget);
+
+        if (doc && doc->getFileName() == fileName)
+        {
+            return doc;
+        }
+    }
+    return  nullptr;
 }
 
 void CodeEditor::readAllCommentsFromDB(QVector<Comment> comments)

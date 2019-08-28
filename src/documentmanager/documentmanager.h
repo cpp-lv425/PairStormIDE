@@ -72,6 +72,7 @@ private:
     QMdiArea* areaInFocus();
     QMdiArea* getArea(CodeEditor *doc);
     bool saveDocument(CodeEditor *doc);
+    bool saveDocument(const QString &fileName);
     void saveDocument(const QString &fileName, const QString &fileContent);
     void setAllDocumentsNotModified();
 };
