@@ -17,8 +17,9 @@ QString getClassNameForMethodDefinition(QTextCursor cursor)
     {
         QString textInCursorLine = getTextByCursor(cursor);//get line string
         if (textInCursorLine.contains("class")
-           && !textInCursorLine.contains("friend"))
+           && !textInCursorLine.contains("friend"))// if we find "class", but it's just friend class declaration
         {
+            //find class name by regex
             auto matchIter =
                     QRegularExpression(classFindingRegex).globalMatch(getTextByCursor(cursor));
             auto match = matchIter.next();
@@ -57,23 +58,24 @@ QString getMethodDefinitionName(QTextCursor cursor)// return className::fucnName
             (className.isEmpty() ? QString() : "::") + declarationParts.mFucntionName;
 }
 
-bool definitionExists(const QString documentText, QTextCursor cursor)
+bool definitionExists(const QString sourceText, QTextCursor cursor)
 {
-    //SAVE SOMEHOW
-   // qDebug()<<"here!";
+    //cursor is in the header file
     QString methodFullName = getMethodDefinitionName(cursor);
-    auto linesStringList = documentText.split(QRegularExpression("[\n]"), QString::SkipEmptyParts);
+    auto linesStringList = sourceText.split(QRegularExpression("[\n]"), QString::SkipEmptyParts);
     for (auto &line : linesStringList)
     {
         if (line.contains(methodFullName))
         {
-            auto par1 = getRowParametrsInsideBrackets(
+            //get parametrs without variables' names in the header and source files
+            auto headerRowParams = getRowParametrsInsideBrackets(
                         getParametrsFromMethodDefinition(getTextByCursor(cursor)));
 
-            auto par2 = getRowParametrsInsideBrackets(getParametrsFromMethodDefinition(line));
-            if (par1 == par2)
+            auto sourceRowParams = getRowParametrsInsideBrackets(
+                        getParametrsFromMethodDefinition(line));
+
+            if (headerRowParams == sourceRowParams)
             {
-                qDebug()<<"here";
                 return true;
             }
         }
@@ -85,11 +87,11 @@ bool isFileWithExtension(const QString &fileName, const QString &extenion)
 {
     QString rFileName(fileName);
     auto splitList = rFileName.split('.');
-    if (splitList.size() <= 1)// if file doesn't have the extension
+    if (splitList.size() <= 1)// if file doesn't have an extension
     {
         return false;
     }
-    return splitList[1] == extenion;// if splited second part == given in the parametrextension
+    return splitList[inderOfExtinsionCapture] == extenion;// if splited second part == given in the parametr's extension
 }
 
 QString getParametrsFromMethodDefinition(const QString &funcDefinition)
@@ -101,12 +103,13 @@ QString getParametrsFromMethodDefinition(const QString &funcDefinition)
 
 QString getRowParametrsInsideBrackets(QString textInsideBrackets)
 {
-    QString rRowParametrs;
+    QString rRowParametrs;//here we will keep parametrs without variables' names
     textInsideBrackets = removeComasInsideAngleBrackets(textInsideBrackets);
-    auto parametrList = textInsideBrackets.split(',',QString::SkipEmptyParts);
+    auto parametrList = textInsideBrackets.split(',', QString::SkipEmptyParts);//split parametrs
     for (auto &parametr : parametrList)
     {
         parametr = parametr.simplified();
+        //find varable name
         auto matchIter =  QRegularExpression(getVariableFromParametrs).globalMatch(parametr);
         auto match = matchIter.next();
         if (match.hasMatch())
@@ -115,24 +118,23 @@ QString getRowParametrsInsideBrackets(QString textInsideBrackets)
             int captureEnd = match.capturedEnd(1);
 
             QString addedText = match.capturedTexts()[0];
-
+            //create list without variable name
             addedText.replace(captureStart,
                               captureEnd - captureStart,
                               QString());
             rRowParametrs.append(addedText);
         }
-        else
+        else//if here is not variable, just add full splited parametr
         {
             rRowParametrs.append(parametr);
         }
     }
-    qDebug()<<"RESULT ="<<rRowParametrs.replace(" ","");
-    return rRowParametrs.replace(" ","");
+    return rRowParametrs.replace(" ","");//return without spaces
 }
 
 QString removeComasInsideAngleBrackets(QString functionParametrs)//replace all comas inside angle brackets to spaces
 {
-   auto openBrackets = 0;
+   auto openBrackets = 0;//how many angelBrackets in the parametrs
    for (auto it = functionParametrs.begin(); it != functionParametrs.end(); ++it)
    {
        switch ((*it).toLatin1())

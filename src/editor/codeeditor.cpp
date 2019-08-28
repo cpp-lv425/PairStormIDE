@@ -117,7 +117,8 @@ void CodeEditor::writeDefinitionToSource()
         return;
     }
     QTextCursor curs = this->textCursor();
-    auto definePattern = getMethodDefinitionPattern(getTextByCursor(curs));//
+    //get className::methodName or methodName if it's fucntion
+    auto definePattern = getMethodDefinitionPattern(getTextByCursor(curs));
     auto className = getClassNameForMethodDefinition(curs);
     QString definitonTest = createMethodDefinitionBones(definePattern.mFunctionDataType,
                                                         className,
@@ -137,7 +138,12 @@ void CodeEditor::writeDefinitionToSource()
            {
                return;
            }
-           sourceDocument->setPlainText(sourceDocument->toPlainText() + definitonTest);
+           sourceDocument->setPlainText(sourceDocument->toPlainText() + "\n" + definitonTest);
+           QMessageBox::information(this, definitionExistsTitle, definitionExistsMessage);
+        }
+        else
+        {
+            QMessageBox::warning(this, successCreationTitle, successDefinCreateMessage);
         }
     }
 }
@@ -396,7 +402,7 @@ CodeEditor* CodeEditor::getOpenedDocument(const QString &fileName)
     {
         auto doc = qobject_cast<CodeEditor*>(widget);
 
-        if (doc && doc->getFileName() == fileName)
+        if (doc && (doc->getFileName() == fileName))
         {
             return doc;
         }
