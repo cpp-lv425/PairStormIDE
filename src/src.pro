@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui webenginewidgets network
+QT       += core gui webenginewidgets network sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -47,6 +47,7 @@ include($$PWD/logindialog/logindialog.pri)
 include($$PWD/splashscreen/splashscreen.pri)
 include($$PWD/utils/utils.pri)
 include($$PWD/paletteconfigurator/paletteconfigurator.pri)
+include($$PWD/databaseaccessor/databaseaccessor.pri)
 include($$PWD/settingsconfigurator/settingsconfigurator.pri)
 include($$PWD/savefilesdialog/savefilesdialog.pri)
 include($$PWD/newprojectwizard/newprojectwizard.pri)

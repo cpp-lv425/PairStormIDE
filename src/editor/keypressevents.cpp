@@ -136,9 +136,11 @@ void EventSendLexem::operator()(CodeEditor * codeEditor, QKeyEvent *e)
     int position = cursor.position();
     for (const auto &it: editorTokens(codeEditor))
     {
-        if (it.mType == State::KW && it.mBegin <= position && it.mEnd >= position)
+        if (it[position].mType == State::KW
+            && it[position].mBegin <= position
+            && it[position].mEnd >= position)
         {
-            emit codeEditor->sendLexem(it.mName);
+            emit codeEditor->sendLexem(it[position].mName);
         }
     }
 }
@@ -184,11 +186,13 @@ void EventCtrlSlash::operator()(CodeEditor *codeEditor, QKeyEvent *e)
                 }
             }
 }
+
 void EventCtrlSlash::selectText(QTextCursor &cursor, int start, int end)
 {
     cursor.setPosition(start, QTextCursor::MoveAnchor);
     cursor.setPosition(end, QTextCursor::KeepAnchor);
 }
+
 void EventCtrlSlash::insertMultilineComment(CodeEditor *editor, QTextCursor &cursor, int start, int end)
 {
     cursor.setPosition(start);
@@ -199,6 +203,7 @@ void EventCtrlSlash::insertMultilineComment(CodeEditor *editor, QTextCursor &cur
     editor->setTextCursor(cursor);
     editor->insertPlainText(COMMENT_BLOCK_END);
 }
+
 void EventCtrlSlash::removeMultilineComment(CodeEditor *editor, QTextCursor &cursor, int start, int end)
 {
     selectText(cursor, start, start + COMMENT_BLOCK_START.size());
@@ -214,7 +219,6 @@ void EventSaveChangeInHistory::operator()(CodeEditor *codeEditor, QKeyEvent *e)
 {
     plainTextPressEvent(codeEditor, e);
     codeEditor->saveStateInTheHistory();
-
 }
 
 EventSaveChangeInHistory::~EventSaveChangeInHistory() = default;
@@ -239,3 +243,13 @@ void EventRemoveKey::operator()(CodeEditor *codeEditor, QKeyEvent *e)
 }
 
 EventRemoveKey::~EventRemoveKey() = default;
+
+bool isNotEnterKey(QKeyEvent *e)
+{
+    return e->key() != Qt::Key_Enter && e->key() != Qt::Key_Return;
+}
+
+bool isUpDownKey(QKeyEvent *e)
+{
+    return e->key() == Qt::Key_Down || e->key() == Qt::Key_Up;
+}

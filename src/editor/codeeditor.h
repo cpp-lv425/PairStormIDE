@@ -23,10 +23,11 @@ const int TOP_UNUSED_PIXELS_HEIGHT = 4;
 #include<QVector>
 #include<QFont>
 #include<QStatusBar>
+#include <QList>
+#include"sqliteaccess.h"
 #include<QStringList>
 #include<QCompleter>
 #include"autocodecompleter.h"
-
 
 class QPaintEvent;
 class QResizeEvent;
@@ -46,6 +47,7 @@ class CodeEditor : public QPlainTextEdit
     Q_OBJECT
 public:
     CodeEditor(QWidget *parent = nullptr);
+    virtual ~CodeEditor();
     void specialAreasRepaintEvent(QPaintEvent *event);
     void repaintButtonsArea(int bottom, int top, int blockNumber);
     int getLineNumberAreaWidth();
@@ -66,7 +68,11 @@ public:
 
     ConfigParams getConfigParam();
     void setConfigParam(const ConfigParams &configParam);
-    void highlighText();
+//    void highlighText();
+
+    //DB methods
+    void readAllCommentsFromDB(QVector<Comment> mStartComments);
+    QVector<Comment> getAllCommentsToDB();
 
 private:
     void rewriteButtonsLines( QVector<AddCommentButton*> &commentV, int diff, int startLine);
@@ -74,6 +80,10 @@ private:
     bool isInRangeIncludBoth(int val, int leftMargin, int rightMargin);
     bool isInRangeIncludLast(int val, int leftMargin, int rightMargin);
 
+    void handleLinesAddition(int, int, int);
+    void handleLinesDelition(int, int, int);
+
+    void addButton(const int line, const QString &Comment);
     void removeButtonByIndex(QVector<AddCommentButton*> &commentV, int index);
     void removeButtomByValue(QVector<AddCommentButton*> &commentV, AddCommentButton* commentButton);
     void removeButtons(QVector<AddCommentButton*> &commentV, int cursorLine, int startLine, int endLine, int diff);
@@ -90,7 +100,8 @@ protected:
 private slots:
     void updateLineNumberAreaWidth();
     void updateLineNumberArea(const QRect &rect, int dy);
-    void runLexer();
+    void handleLineChange(int);
+    void highlightText();
     void deleteComment();
 
 public slots:
@@ -127,10 +138,15 @@ private:
     AddCommentButton *mAddCommentButton;
     CommentWidget *mCommentWidget;
     QLabel *mCurrentCommentLable;
+    QVector<Comment> mStartComments;
     QCompleter *mCompleter;
+    CommentDb *commentGetter;
 
     int mLinesCountPrev;
     int mLinesCountCurrent;
+
+    unsigned int mLinesCount;
+    unsigned int mCodeSize;
 
     QByteArray mBeginTextState;
     QVector<AddCommentButton*> mCommentsVector;
@@ -141,12 +157,11 @@ private:
     QTextCharFormat fmtRegular;
     QTextCharFormat fmtUndefined;
 
-
     LastRemoveKey lastRemomeKey;
 
 protected:
     int mCurrentZoom;
-    QVector<Token> mTokens;
+    QList<QVector<Token>> mTokensList;
     friend class Event;
 };
 

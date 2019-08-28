@@ -30,6 +30,7 @@
 #include "storeconf.h"
 #include "startpage.h"
 #include "utils.h"
+#include "sqliteaccess.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -456,6 +457,7 @@ void MainWindow::onOpenProjectTriggered()
         return;
     }
 
+    databaseConnect(dirName);
     mpProjectViewerDock->setDir(dirName);
     mpDocumentManager->openProject(dirName);
 }
@@ -982,13 +984,25 @@ void MainWindow::onNewProjectTriggered()
         return;
     }
 
-    // connect db
-    //
-    //
-
+    databaseConnect(dirName);
     // document manager is sent a message about new project
     mpDocumentManager->openProject(dirName);
 
     // project is displayed on project viewer
     mpProjectViewerDock->setDir(dirName);
+}
+
+void MainWindow::databaseConnect(QString directory)
+{
+    db = ConnectionGetter::getDefaultConnection(directory + QDir::separator() + "storage.db");
+    CreateDB database;
+    database.addTableFile();
+    database.addTableUser();
+    database.addTableComment();
+    database.addTableMessage();
+}
+
+void MainWindow::databaseDisconnect()
+{
+    delete db;
 }

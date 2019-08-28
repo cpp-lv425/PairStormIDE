@@ -641,19 +641,16 @@ void DocumentManager::configureDocuments(std::function<void(DocumentManager*, Co
 void DocumentManager::setStyle(CodeEditor *doc, const QString &styleName)
 {
     doc->setIdeType(styleName);
-    doc->highlighText();
 }
 
 void DocumentManager::setFontFamily(CodeEditor *doc, const QString &fontFamily)
 {
     doc->setFontStyle(fontFamily);
-    doc->highlighText();
 }
 
 void DocumentManager::setFontSize(CodeEditor *doc, const QString &fontSize)
 {
     doc->setFontSize(fontSize);
-    doc->highlighText();
 }
 
 bool DocumentManager::saveDocument(CodeEditor *doc)

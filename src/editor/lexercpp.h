@@ -7,11 +7,14 @@
 #include "keywords.h"
 #include "spaces.h"
 #include "operators.h"
+#include <QVector>
+
 
 class LexerCPP: public iLexer
 {
 private:
-    QVector<Token> mTokens;
+    QVector<QVector<Token>> mTokens;
+    QVector<Token> mTokensOnCurrentLine;
     State mState;
     inline void addLexem();
     inline void changeState(State, QChar);
