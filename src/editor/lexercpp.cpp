@@ -1,5 +1,4 @@
 #include "lexercpp.h"
-#include <QDebug>
 
 inline bool LexerCPP::isKeyword(const QString &lexem)
 {
@@ -270,37 +269,12 @@ void LexerCPP::handleLiteralState(const QChar &sym)
 
 void LexerCPP::lexicalAnalysis(QString code)
 {
-//    int i;
-//    if(code->isEmpty())
-//    {
-//        return;
-//    }
-
-//    int changedCodeSize = code->toPlainText().size();
-//    int symbolDifference = changedCodeSize - mCodeSize;
-//    mCodeSize = changedCodeSize;
-
-//    mIndex = begin > 0 ? ((mTokens[begin - 1].end() - 1)->mEnd + 1): 0;
-//    mCurrentLine = begin;
-
-//    int changedLinesCount = code->blockCount();
-//    int lineDifference = changedLinesCount - mLinesCount;
-
-//    int end = begin + 1;
-//    if(lineDifference)
-//    {
-//        mCurrentLine = 0;
-//        end = changedLinesCount;
-//        mIndex = 0;
-//        mTokens.clear();
-//    }
-
-//    qDebug() << "Index: " << index << ' ' << "Line: " << begin;
-//    qDebug() << code;
     mTokensOnCurrentLine.clear();
     QChar sym = 0;
     mIndex = 0;
+
     int end = code.size();
+
     while(mIndex < end)
     {
         sym = code[mIndex];
@@ -352,33 +326,7 @@ void LexerCPP::lexicalAnalysis(QString code)
 
     if(mState != State::ST)
     {
-//        qDebug() << "Add last lexem";
         ++mIndex;
         addLexem();
     }
-
-//    for(int j = 0; j < mTokensOnCurrentLine.size(); ++j)
-//    {
-//        qDebug() << mTokensOnCurrentLine[j].mName;
-//    }
-
-//    for(int i = 0; i < mTokens.size(); ++i)
-//    {
-//        for(int j = 0; i < mTokens[i].size(); ++j)
-//        {
-//            qDebug() << mTokens[i][j].mName;
-//        }
-//    }
-
-//    if(mTokens.contains(begin + 1) && !lineDifference)
-//    {
-//        for(int i = begin + 1; i < mTokens.size(); ++i)
-//        {
-//            for(int j = 0; j < mTokens[i].size(); ++j)
-//            {
-//                mTokens[i][j].mBegin += symbolDifference;
-//                mTokens[i][j].mEnd += symbolDifference;
-//            }
-//        }
-//    }
 }

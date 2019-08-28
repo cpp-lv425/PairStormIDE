@@ -10,7 +10,6 @@
 #include<QMessageBox>
 #include<iostream>
 #include<QLabel>
-#include <QDebug>
 #include <QVector>
 
 
@@ -151,11 +150,6 @@ void CodeEditor::handleLineChange(int lastLineWithChange)
     {
         handleLinesDelition(changeStart, lastLineWithChange, lineDifference);
     }
-}
-
-void CodeEditor::runLexer()
-{
-    int i = 0;
 }
 
 int CodeEditor::getLineNumberAreaWidth()
