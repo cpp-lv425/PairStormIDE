@@ -14,7 +14,7 @@ class NewProjectDialog: public QDialog
 
 public:
     explicit NewProjectDialog(QWidget *pParent = nullptr);
-    QString start();
+    QString promptProjectNameFromUser();
 
 private:
     QLineEdit *mpLine;

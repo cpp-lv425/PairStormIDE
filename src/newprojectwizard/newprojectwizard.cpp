@@ -89,7 +89,7 @@ NewProjectDialog::NewProjectDialog(QWidget *pParent): QDialog (pParent)
     setTabOrder(pCancelBtn, pBrowseBtn);
 }
 
-QString NewProjectDialog::start()
+QString NewProjectDialog::promptProjectNameFromUser()
 {
     // if user closes dialog
     if (!exec())
@@ -103,7 +103,7 @@ QString NewProjectDialog::start()
 
 bool NewProjectDialog::isValidProjectName(const QString &dirName)
 {
-    return !dirName.contains(QRegExp(R"exp([*/:;|=,\\\[\]])exp"));
+    return !dirName.contains(QRegExp(invalidFileOrDirNameRegex));
 }
 
 void NewProjectDialog::onSelectDirectory()

@@ -615,63 +615,13 @@ bool DocumentManager::projectOpened()
     return currentProject.size();
 }
 
-void DocumentManager::undoOnCurrentDocument()
+void DocumentManager::applyChangesToCurrentDocument(std::function<void (CodeEditor*)> functor)
 {
     auto pCurrentDocument = getCurrentDocument();
 
     if (pCurrentDocument)
     {
-        pCurrentDocument->undo();
-    }
-}
-
-void DocumentManager::redoOnCurrentDocument()
-{
-    auto pCurrentDocument = getCurrentDocument();
-
-    if (pCurrentDocument)
-    {
-        pCurrentDocument->redo();
-    }
-}
-
-void DocumentManager::cutOnCurrentDocument()
-{
-    auto pCurrentDocument = getCurrentDocument();
-
-    if (pCurrentDocument)
-    {
-        pCurrentDocument->cut();
-    }
-}
-
-void DocumentManager::copyOnCurrentDocument()
-{
-    auto pCurrentDocument = getCurrentDocument();
-
-    if (pCurrentDocument)
-    {
-        pCurrentDocument->copy();
-    }
-}
-
-void DocumentManager::pasteOnCurrentDocument()
-{
-    auto pCurrentDocument = getCurrentDocument();
-
-    if (pCurrentDocument)
-    {
-        pCurrentDocument->paste();
-    }
-}
-
-void DocumentManager::selectAllOnCurrentDocument()
-{
-    auto pCurrentDocument = getCurrentDocument();
-
-    if (pCurrentDocument)
-    {
-        pCurrentDocument->selectAll();
+        functor(pCurrentDocument);
     }
 }
 

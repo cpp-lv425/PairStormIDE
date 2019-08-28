@@ -41,6 +41,7 @@ public:
     bool fileBelongsToCurrentProject(const QString &fileName)const;
     bool projectOpened();
 
+    void applyChangesToCurrentDocument(std::function<void(CodeEditor*)> functor);
     void undoOnCurrentDocument();
     void redoOnCurrentDocument();
     void cutOnCurrentDocument();

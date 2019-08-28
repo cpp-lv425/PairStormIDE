@@ -449,13 +449,13 @@ void MainWindow::onOpenProjectTriggered()
              userMessages[UserMessages::OpenDirectoryTitle],
             QDir::homePath());
 
-
    /* Connection *db = ConnectionGetter::getDefaultConnection("C:/Users/Petro/Desktop/storage.db");
     CreateDB database;
     database.addTableFile();
     database.addTableUser();
     database.addTableComment();
     database.addTableMessage();*/
+
 
     // check if project exists
     if (!FileManager().projectExists(dirName))
@@ -466,7 +466,6 @@ void MainWindow::onOpenProjectTriggered()
                 userMessages[UserMessages::ProjectDoesNotExistMsg]);
         return;
     }
-
 
     databaseConnect(dirName);
 
@@ -644,32 +643,38 @@ void MainWindow::onExitTriggered()
 
 void MainWindow::onUndoTriggered()
 {
-    mpDocumentManager->undoOnCurrentDocument();
+    std::function<void(CodeEditor*)> functor = &CodeEditor::undo;
+    mpDocumentManager->applyChangesToCurrentDocument(functor);
 }
 
 void MainWindow::onRedoTriggered()
 {
-    mpDocumentManager->redoOnCurrentDocument();
+    std::function<void(CodeEditor*)> functor = &CodeEditor::redo;
+    mpDocumentManager->applyChangesToCurrentDocument(functor);
 }
 
 void MainWindow::onCutTriggered()
 {
-    mpDocumentManager->cutOnCurrentDocument();
+    std::function<void(CodeEditor*)> functor = &CodeEditor::cut;
+    mpDocumentManager->applyChangesToCurrentDocument(functor);
 }
 
 void MainWindow::onCopyTriggered()
 {
-    mpDocumentManager->copyOnCurrentDocument();
+    std::function<void(CodeEditor*)> functor = &CodeEditor::copy;
+    mpDocumentManager->applyChangesToCurrentDocument(functor);
 }
 
 void MainWindow::onPasteTriggered()
 {
-    mpDocumentManager->pasteOnCurrentDocument();
+    std::function<void(CodeEditor*)> functor = &CodeEditor::paste;
+    mpDocumentManager->applyChangesToCurrentDocument(functor);
 }
 
 void MainWindow::onSelectAllTriggered()
 {    
-    mpDocumentManager->selectAllOnCurrentDocument();
+    std::function<void(CodeEditor*)> functor = &CodeEditor::selectAll;
+    mpDocumentManager->applyChangesToCurrentDocument(functor);
 }
 
 void MainWindow::onFindTriggered()
@@ -976,7 +981,7 @@ void MainWindow::onNewProjectTriggered()
     {
         // new project dialog is called
         // name & location of new project directory is received
-        dirName = newProjectDialog.start();
+        dirName = newProjectDialog.promptProjectNameFromUser();
     }
     catch (const QException&)
     {
@@ -996,10 +1001,7 @@ void MainWindow::onNewProjectTriggered()
         return;
     }
 
-    // connect db
-    //
-    //
-
+    databaseConnect(dirName);
     // document manager is sent a message about new project
     mpDocumentManager->openProject(dirName);
 

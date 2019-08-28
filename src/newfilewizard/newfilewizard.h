@@ -25,7 +25,7 @@ private:
     QString mFileName;
     QLineEdit *mpDirLbl;
 
-    bool isValidFilename(const QString& fileName);
+    bool isValidFilename(const QString &fileName);
     bool directoryBelongsToProject(QString dirPath);
 
 private slots:
