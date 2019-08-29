@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui webenginewidgets network sql
+QT       += core gui quickwidgets webenginewidgets network quick quickcontrols2 sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 

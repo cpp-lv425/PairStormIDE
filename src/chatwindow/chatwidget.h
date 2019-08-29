@@ -1,48 +1,61 @@
 #ifndef CHATWIDGET_H
 #define CHATWIDGET_H
 
-#include <QWidget>
+#include <QLineEdit>
+#include <QHBoxLayout>
+#include <QListWidget>
+#include <QPushButton>
+#include <QPlainTextEdit>
+#include <QListWidgetItem>
 
-class QListWidgetItem;
-class QPlainTextEdit;
-class QListWidget;
-class QLineEdit;
+#include "chatwidgetinterface.h"
 
-class ChatWidget: public QWidget
+// ==========================================================================================
+//                                                                   CHAT WIDGET ON QT ENGINE
+// ==========================================================================================
+class ChatWidget: public ChatWidgetInterface
 {
     Q_OBJECT
 
-    QListWidget *mpUsersList;
-    QStringList  mOnlineUsers;
-    QStringList  mConnectedUsers;
-    QString      mUserName;
-
-    QPlainTextEdit *mpFeed;
-    QLineEdit      *mpEnterLine;
-
-    void updateUsersList();
-
 public:
-    explicit ChatWidget(QWidget *pParent = nullptr);
-    void setOnlineUsers(const QStringList & onlineUsers);
-    void setConnectedUsers(const QStringList & connectedUsers);
 
-    bool isUserConnected(const QString & userName);
+    ChatWidget();
+    ChatWidget(ChatWidget const&)             = delete;
+    ChatWidget& operator=(ChatWidget const&)  = delete;
 
-    void setCurrentUserName(const QString& userName);
-    void displayMessage(const QString& userName,
-                        const QString& message);
+    virtual void keyPressEvent(QKeyEvent *event)                         override;
 
 public slots:
-    void onSendCommand();
+
+    virtual void configureOnLogin(const QString &userName)               override;
+    virtual void updateTheme     (const QString &themeName)              override;
+
+    virtual void updateOnlineUsers   (const QStringList &onlineUsers)    override;
+    virtual void updateConnectedUsers(const QStringList &connectedUsers) override;
+
+    virtual void appendMessage(const QString &messageAuthor,
+                               const QString &messageBody)               override;
+
+private:
+
+    // Name of the current user
+    QString      mUserName;
+
+    // Lists of online as well as connected users
+    QStringList  mOnlineUsers;
+    QStringList  mConnectedUsers;
+
+    // Users list, editor & message input fields
+    QListWidget    *mpUsersList;
+    QPlainTextEdit *mpMessagesHistory;
+    QLineEdit      *mpInputMessageField;
+
+    void redrawUsersList();
 
 private slots:
-    void onUserToConnectSelected(QListWidgetItem *item);
-    void updateFeedOnSend();
 
-signals:
-    void userToConnectSelected(QString);
-    void sendMessage(const QString&);
+    void shareWithUserOnDoubleClick(QListWidgetItem *userItem);
+    void shareMessageOnSend();
 };
 
 #endif // CHATWIDGET_H

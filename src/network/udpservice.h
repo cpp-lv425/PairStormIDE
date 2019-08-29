@@ -26,7 +26,7 @@ public:
     UdpService(UdpService const&) = delete;
     UdpService& operator=(UdpService const&) = delete;
 
-    void broadcastDatagram(const QString & datagram);
+    void broadcastDatagram(const QString &datagram);
 
     Datagram getReceivedDatagram() const;
 
