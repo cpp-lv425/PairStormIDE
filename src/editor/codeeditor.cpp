@@ -23,6 +23,7 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     this->setTabStopDistance(TAB_SPACE * fontMetrics().width(QLatin1Char('0')));//set tab distance
     mCurrentZoom = 100;//in persents    
     mLinesCount = 1;
+    mCode = document()->toPlainText();
     mCodeSize = 1;
     mHighlightingStart = 0;
 
@@ -61,9 +62,10 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     //If the text is scrolled, rect will cover the entire viewport area.
     //If the text is scrolled vertically, dy carries the amount of pixels the viewport was scrolled.
 
-    connect(this,                         &CodeEditor::textChanged,               this, &CodeEditor::textChangedInTheOneLine);
+    connect(this,                         &CodeEditor::linesWasSwapped,                    this, &CodeEditor::handleLinesSwap);
+    connect(this,                         &CodeEditor::textChanged,                        this, &CodeEditor::textChangedInTheOneLine);
     connect(this,                         &CodeEditor::textChangedInLine,                  this, &CodeEditor::handleLineChange);
-    connect(this,                         &CodeEditor::runHighlighter,              this, &CodeEditor::highlightText);
+    connect(this,                         &CodeEditor::runHighlighter,                     this, &CodeEditor::highlightText);
 
     connect(this,                         &QPlainTextEdit::updateRequest,                  this, &CodeEditor::updateLineNumberArea);
     connect(mTimer,                       &QTimer::timeout,                                this, &CodeEditor::saveStateInTheHistory);
@@ -144,6 +146,14 @@ void CodeEditor::setConfigParam(const ConfigParams &configParam)
     mConfigParam = configParam;
 }
 
+void CodeEditor::handleLinesSwap(int firstLine, int secondLine)
+{
+    qDebug() << "OK";
+    QVector<Token> tmp = mTokensList[firstLine];
+    mTokensList[firstLine] = mTokensList[secondLine];
+    mTokensList[secondLine] = tmp;
+}
+
 void CodeEditor::handleLinesAddition(int changeStart, int lastLineWithChange, int lineDifference)
 {
     QString changedCode;
@@ -154,7 +164,9 @@ void CodeEditor::handleLinesAddition(int changeStart, int lastLineWithChange, in
         mTokensList.removeAt(changeStart);
     }
 
-    mHighlightingStart = changeStart;
+    qDebug() << mHighlightingStart;
+
+    mHighlightingStart = changeStart > 0 ? changeStart - 1 : changeStart;
     for (int i = changeStart; i <= lastLineWithChange; ++i)
     {
         changedCode = document()->findBlockByLineNumber(i).text();
@@ -162,13 +174,13 @@ void CodeEditor::handleLinesAddition(int changeStart, int lastLineWithChange, in
         if (lineDifference)
         {
             mTokensList.insert(i, mLcpp->getTokens());
-//            for(int j = 0; j < mTokensList[i].size(); ++j)
-//            {
-//                if(mTokensList[i][j].mType == State::ID)
-//                {
-//                    mIdentifiersList.append(mTokensList[i][j]);
-//                }
-//            }
+            for(int j = 0; j < mTokensList[i].size(); ++j)
+            {
+                if(mTokensList[i][j].mType == State::ID)
+                {
+                    mIdentifiersList.append(mTokensList[i][j]);
+                }
+            }
         }
         else
         {
@@ -195,13 +207,13 @@ void CodeEditor::handleLinesDelition(int changeStart, int lastLineWithChange, in
     for (int i = lastLineWithChange + 1; i < lastLineWithChange + lineDifference + 1; ++i)
     {
         mTokensList.removeAt(i);
-//        for(int j = 0; j < mTokensList[i].size(); ++j)
-//        {
-//            if(mTokensList[i][j].mType == State::ID && mIdentifiersList.contains(mTokensList[i][j]))
-//            {
-//                mIdentifiersList.removeOne(mTokensList[i][j]);
-//            }
-//        }
+        for(int j = 0; j < mTokensList[i].size(); ++j)
+        {
+            if(mTokensList[i][j].mType == State::ID && mIdentifiersList.contains(mTokensList[i][j]))
+            {
+                mIdentifiersList.removeOne(mTokensList[i][j]);
+            }
+        }
     }
 }
 
@@ -227,6 +239,15 @@ void CodeEditor::handleLineChange(int lastLineWithChange)
     else
     {
         handleLinesDelition(changeStart, lastLineWithChange, lineDifference);
+    }
+
+    for(int i = 0; i < mTokensList.size(); ++i)
+    {
+        qDebug() << i;
+        for(int j = 0; j < mTokensList[i].size(); ++j)
+        {
+            qDebug() << mTokensList[i][j].mName;
+        }
     }
 
     emit runHighlighter();
@@ -408,9 +429,9 @@ void CodeEditor::setZoom(int zoomVal)
 
 void CodeEditor::textChangedInTheOneLine()
 {
-    if(mCodeSize != document()->toPlainText().size())
+    if(mCode != document()->toPlainText())
     {
-        mCodeSize = document()->toPlainText().size();
+        mCode = document()->toPlainText();
         emit textChangedInLine(this->textCursor().blockNumber());
     }
 }

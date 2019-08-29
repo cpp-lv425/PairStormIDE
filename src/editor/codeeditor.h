@@ -107,6 +107,7 @@ private slots:
 public slots:
     void keyPressEvent(QKeyEvent *e) override;
     void saveStateInTheHistory();
+    void handleLinesSwap(int, int);
     void setZoom(int zoomVal);
     void textChangedInTheOneLine();
     void showCommentTextEdit(int);
@@ -119,6 +120,7 @@ public slots:
     void setIdeType(const QString &ideType);
 
 signals:
+    void linesWasSwapped(int, int);
     void changesAppeared();
     void sendLexem(QString);
     void runHighlighter();
@@ -148,6 +150,7 @@ private:
 
     unsigned int mLinesCount;
     unsigned int mCodeSize;
+    QString mCode;
 
     unsigned int mHighlightingStart;
 

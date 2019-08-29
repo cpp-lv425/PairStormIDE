@@ -1,4 +1,5 @@
 #include "keypressevents.h"
+#include <QDebug>
 
 //EventDefault
 void EventDefault::operator()(CodeEditor *codeEditor, QKeyEvent *e)
@@ -145,6 +146,60 @@ void EventSendLexem::operator()(CodeEditor * codeEditor, QKeyEvent *e)
     }
 }
 EventSendLexem::~EventSendLexem() = default;
+
+
+void EventCtrlUpArrow::operator()(CodeEditor *codeEditor, QKeyEvent *e)
+{
+    QTextCursor cursor = codeEditor->textCursor();
+    if(cursor.blockNumber() > 0)
+    {
+        emit codeEditor->linesWasSwapped(cursor.blockNumber(), cursor.blockNumber() - 1);
+
+        cursor.select(QTextCursor::LineUnderCursor);
+        QString textOnCurrentLine = cursor.selectedText();
+        cursor.removeSelectedText();
+
+        cursor.movePosition(QTextCursor::Up);
+        cursor.select(QTextCursor::LineUnderCursor);
+        QString textOnUpperLine = cursor.selectedText();
+        cursor.removeSelectedText();
+
+        cursor.movePosition(QTextCursor::Down);
+        cursor.insertText(textOnUpperLine);
+        cursor.movePosition(QTextCursor::Up);
+        cursor.insertText(textOnCurrentLine);
+
+        codeEditor->setTextCursor(cursor);
+    }
+}
+EventCtrlUpArrow::~EventCtrlUpArrow() = default;
+
+void EventCtrlDownArrow::operator()(CodeEditor *codeEditor, QKeyEvent *e)
+{
+    QTextCursor cursor = codeEditor->textCursor();
+
+    if(cursor.blockNumber() < codeEditor->document()->blockCount() - 1)
+    {
+        emit codeEditor->linesWasSwapped(cursor.blockNumber(), cursor.blockNumber() + 1);
+
+        cursor.select(QTextCursor::LineUnderCursor);
+        QString textOnCurrentLine = cursor.selectedText();
+        cursor.removeSelectedText();
+
+        cursor.movePosition(QTextCursor::Down);
+        cursor.select(QTextCursor::LineUnderCursor);
+        QString textOnLowerLine = cursor.selectedText();
+        cursor.removeSelectedText();
+
+        cursor.insertText(textOnCurrentLine);
+        cursor.movePosition(QTextCursor::Up);
+        cursor.insertText(textOnLowerLine);
+        cursor.movePosition(QTextCursor::Down);
+
+        codeEditor->setTextCursor(cursor);
+    }
+}
+EventCtrlDownArrow::~EventCtrlDownArrow() = default;
 
 //EventCtrlSlash
 void EventCtrlSlash::operator()(CodeEditor *codeEditor, QKeyEvent *e)

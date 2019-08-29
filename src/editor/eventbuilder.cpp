@@ -64,6 +64,10 @@ Event* EventBuilder::getEventControlModifier(QKeyEvent *e)
         return new EventSendLexem();
     case Qt::Key_V:
         return new EventCtrlV();
+    case Qt::Key_Up:
+        return new EventCtrlUpArrow();
+    case Qt::Key_Down:
+        return new EventCtrlDownArrow();
     default:
         return new EventDefault();
     }
