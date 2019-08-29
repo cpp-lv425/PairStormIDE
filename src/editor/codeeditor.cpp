@@ -54,9 +54,9 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     mCommentWidget->setVisible(false);
 
     commentGetter = new CommentDb;
-    mStartComments = commentGetter->getAllCommentsFromFile(getFileName());
+//    mStartComments = commentGetter->getAllCommentsFromFile(getFileName());
 
-    readAllCommentsFromDB(mStartComments);
+//    readAllCommentsFromDB(mStartComments);
 
     //This signal is emitted when the text document needs an update of the specified rect.
     //If the text is scrolled, rect will cover the entire viewport area.
@@ -96,6 +96,7 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     mCompleter = new AutoCodeCompleter(completerKeywords, this);
     mCompleter->setCaseSensitivity(Qt::CaseInsensitive);
     mCompleter->setWidget(this);
+    qDebug()<<"FILENAME = "<<getFileName();
 }
 
 CodeEditor::~CodeEditor()
@@ -159,6 +160,16 @@ void CodeEditor::writeDefinitionToSource()
              QMessageBox::information(this, definitionExistsTitle, definitionExistsMessage);
         }
     }
+}
+
+QVector<Comment> CodeEditor::getStartComments() const
+{
+    return mStartComments;
+}
+
+CommentDb *CodeEditor::getCommentGetter() const
+{
+    return commentGetter;
 }
 
 void CodeEditor::contextMenuEvent(QContextMenuEvent *event)
@@ -253,15 +264,6 @@ void CodeEditor::handleLineChange(int lastLineWithChange)
     else
     {
         handleLinesDelition(changeStart, lastLineWithChange, lineDifference);
-    }
-
-    for(int i = 0; i < mTokensList.size(); ++i)
-    {
-        qDebug() << i;
-        for(int j = 0; j < mTokensList[i].size(); ++j)
-        {
-            qDebug() << mTokensList[i][j].mName;
-        }
     }
 }
 

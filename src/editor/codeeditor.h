@@ -73,6 +73,10 @@ public:
     void readAllCommentsFromDB(QVector<Comment> mStartComments);
     QVector<Comment> getAllCommentsToDB();
 
+    CommentDb *getCommentGetter() const;
+
+    QVector<Comment> getStartComments() const;
+
 private:
     void rewriteButtonsLines(QVector<AddCommentButton*> &commentV, const int diff, const int startLine);
     void setAnotherButtonLine(AddCommentButton *comment, const int diff);
