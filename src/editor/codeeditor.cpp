@@ -3,6 +3,7 @@
 #include "eventbuilder.h"
 #include "filemanager.h"
 #include "codeeditor.h"
+#include "keywords.h"
 #include "utils.h"
 #include<QtGui>
 #include<QTextCursor>
@@ -99,9 +100,13 @@ CodeEditor::CodeEditor(QWidget *parent, const QString &fileName) : QPlainTextEdi
     setTextColors();
 
     //completer
-    QStringList keywords;
-    keywords <<"SELECT" <<"FROM" <<"WHERE"<<"WHEN"<<"WHILE"<<"int"<<"double"<<"static_cast<>()";//for test
-    mCompleter = new AutoCodeCompleter(keywords, this);
+    QStringList keywordsStringList;
+    for (auto &i :cKeywords)
+    {
+        keywordsStringList.append(i);
+    }
+
+    mCompleter = new AutoCodeCompleter(keywordsStringList, this);
     mCompleter->setCaseSensitivity(Qt::CaseInsensitive);
     mCompleter->setWidget(this);
 }
@@ -541,7 +546,6 @@ void CodeEditor::readAllCommentsFromDB(QVector<Comment> comments)
 {
     for(auto &i : comments)//go through all vector's elements from the DB
     {
-        qDebug()<<i.mLine<<"  "<< i.mText<< " "<< i.mUser;
         addButton(i.mLine, i.mText, i.mUser);
     }
 }
@@ -553,11 +557,9 @@ QVector<Comment> CodeEditor::getAllCommentsToDB()
     {
         Comment comment;
         comment.mFile = getFileName();
-        qDebug()<<comment.mFile;
         comment.mLine = i->getCurrentLine();
         comment.mText = i->getCommentString();
         comment.mUser = i->getUser();
-        qDebug()<<comment.mUser;
         comments.push_back(comment);
     }
     return comments;

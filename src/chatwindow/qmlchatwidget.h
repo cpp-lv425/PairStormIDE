@@ -59,8 +59,8 @@ private slots:
 
     void shareMessageOnSendingMessage (const ChatMessage &message);
 
-    void ConnectUserOnSwitchOn     (const QString &userName);
-    void DisconnectUserOnSwitchOff (const QString &userName);
+    void connectUserOnSwitchOn     (const QString &userName);
+    void disconnectUserOnSwitchOff (const QString &userName);
 };
 
 #endif // QMLCHATWIDGET_H
