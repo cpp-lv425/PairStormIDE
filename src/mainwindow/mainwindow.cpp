@@ -303,18 +303,18 @@ void MainWindow::createChatWindow()
             mpChatWindowDock, &ChatWindowDock::updateConnectedUsersOnChange,
             Qt::UniqueConnection);
     // Allow start sharing and stop sharing on user input
-    connect(mpChatWindowDock, &ChatWindowDock::userToConnectSelected,
+    connect(mpChatWindowDock, &ChatWindowDock::startSharingWithUser,
             mplocalConnector, &LocalConnectorInterface::startSharing,
             Qt::UniqueConnection);
-    connect(mpChatWindowDock, &ChatWindowDock::userToDisconnectSelected,
+    connect(mpChatWindowDock, &ChatWindowDock::stopSharingWithUser,
             mplocalConnector, &LocalConnectorInterface::stopSharing,
             Qt::UniqueConnection);
     // Allow sending and displaying messages
-    connect(mpChatWindowDock, &ChatWindowDock::sendMessage,
+    connect(mpChatWindowDock, &ChatWindowDock::shareMessage,
             mplocalConnector, &LocalConnectorInterface::shareMessage,
             Qt::UniqueConnection);
     connect(mplocalConnector, &LocalConnectorInterface::messageReceived,
-            mpChatWindowDock, &ChatWindowDock::displayMessage,
+            mpChatWindowDock, &ChatWindowDock::pushMessageToChat,
             Qt::UniqueConnection);
 
     mpChatWindowDock->setObjectName("mpChatWindowDock");
@@ -740,6 +740,11 @@ void MainWindow::onConnectTriggered()
     }
     mpChatWindowDock->setUserName(userInput);
     mplocalConnector->configureOnLogin(userInput);
+    QSettings savedSettings(QApplication::organizationName(), QApplication::applicationName());
+    QString styleName = {savedSettings.contains("style") ?
+                         savedSettings.value("style").toString()
+                         : "WHITE"};
+    mpChatWindowDock->updateTheme(styleName);
 }
 
 void MainWindow::onSettingsTriggered()
@@ -947,7 +952,7 @@ void MainWindow::setAppStyle(const QString &styleName)
 
     mpDocumentManager->configureDocuments(functor, styleName);
 
-    // call slot updateTheme from chat wdw dock
+    mpChatWindowDock->updateTheme(styleName);
 }
 
 void MainWindow::setDocumentFontFamily(const QString &fontFamily)

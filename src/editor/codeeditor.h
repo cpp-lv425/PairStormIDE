@@ -12,6 +12,7 @@ const int TOP_UNUSED_PIXELS_HEIGHT = 4;
 #include"ideconfiguration.h"
 #include"lexercpp.h"
 #include<utility>
+#include <QStringList>
 #include<QAbstractScrollArea>
 #include<QSettings>
 #include<QApplication>
@@ -84,7 +85,9 @@ private:
     bool isInRangeIncludLast(const int val, const int leftMargin, const int rightMargin);
 
     void handleLinesAddition(int, int, int);
-    void handleLinesDelition(int, int, int);
+    void handleLinesDelition(int, int);
+    void addToIdentifiersList(QStringList&, int);
+    void getNamesOfIdentifiers();
 
     void addButton(const int line, const QString &Comment, const QString &userName);
     void removeButtonByIndex(QVector<AddCommentButton*> &commentV, const int index);
@@ -112,6 +115,7 @@ private slots:
 public slots:
     void keyPressEvent(QKeyEvent *e) override;
     void saveStateInTheHistory();
+    void handleLinesSwap(int, int);
     void setZoom(int zoomVal);
     void textChangedInTheOneLine();
     void showCommentTextEdit(int);
@@ -125,8 +129,10 @@ public slots:
     void writeDefinitionToSource();
 
 signals:
+    void linesWasSwapped(int, int);
     void changesAppeared();
     void sendLexem(QString);
+    void runHighlighter();
     void closeDocEventOccured(CodeEditor*);
     void textChangedInLine(int);
     void textChangedInLines(int, int);
@@ -157,6 +163,9 @@ private:
 
     unsigned int mLinesCount;
     unsigned int mCodeSize;
+    QString mCode;
+
+    unsigned int mHighlightingStart;
 
     QByteArray mBeginTextState;
     QVector<AddCommentButton*> mCommentsVector;
@@ -172,6 +181,8 @@ private:
 protected:
     int mCurrentZoom;
     QList<QVector<Token>> mTokensList;
+    QList<QStringList> mIdentifiersList;
+    QStringList mIdentifiersNameList;
     friend class Event;
 
     // QWidget interface

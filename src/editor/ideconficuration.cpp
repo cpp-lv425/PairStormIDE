@@ -22,6 +22,7 @@ void ConfigParams::setIdeType(const QString &ideType)
     textColors.mBasicLiteralsColor =  QColor("#0080FF");// blue
     textColors.mCommentColor =        QColor("#009900");//green
     textColors.mStringsColor =        QColor("#CD9D2C");//orange
+    textColors.mWaveUnderlineColor =  QColor("#FF0000");//red
 
     if (ideType == "WHITE" || ideType == "BLUE")
     {

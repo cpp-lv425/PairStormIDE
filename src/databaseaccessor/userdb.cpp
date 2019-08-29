@@ -28,7 +28,7 @@ QVector<User> UserDb::getAllUsersFromDb()
     query.first();
     int count = query.record().value(0).toInt();
     QVector<User> rUser;
-    for (int i = 0; i< count; i++)
+    for (int i = 0; i < count; i++)
     {
         rUser.push_back(getUserFromDb(i));
     }

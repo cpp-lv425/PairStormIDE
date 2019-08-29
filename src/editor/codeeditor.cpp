@@ -28,6 +28,9 @@ CodeEditor::CodeEditor(const QString &fileName, QWidget *parent) : QPlainTextEdi
     this->setTabStopDistance(TAB_SPACE * fontMetrics().width(QLatin1Char('0')));//set tab distance
     mCurrentZoom = 100;//in persents    
     mLinesCount = 1;
+    mCode = document()->toPlainText();
+    mCodeSize = 1;
+    mHighlightingStart = 0;
 
     //read settings
     QString analizerFontSize = settings.value("editorFontSize").toString();
@@ -68,9 +71,10 @@ CodeEditor::CodeEditor(const QString &fileName, QWidget *parent) : QPlainTextEdi
     //If the text is scrolled, rect will cover the entire viewport area.
     //If the text is scrolled vertically, dy carries the amount of pixels the viewport was scrolled.
 
+    connect(this,                         &CodeEditor::linesWasSwapped,                    this, &CodeEditor::handleLinesSwap);
     connect(this,                         &CodeEditor::textChanged,                        this, &CodeEditor::textChangedInTheOneLine);
     connect(this,                         &CodeEditor::textChangedInLine,                  this, &CodeEditor::handleLineChange);
-    connect(this,                         &CodeEditor::cursorPositionChanged,              this, &CodeEditor::highlightText);
+    connect(this,                         &CodeEditor::runHighlighter,                     this, &CodeEditor::highlightText);
     connect(this,                         &QPlainTextEdit::updateRequest,                  this, &CodeEditor::updateLineNumberArea);
     connect(mTimer,                       &QTimer::timeout,                                this, &CodeEditor::saveStateInTheHistory);
     connect(mAddCommentButton,            &AddCommentButton::addCommentButtonPressed,      this, &CodeEditor::showCommentTextEdit);
@@ -98,8 +102,10 @@ CodeEditor::CodeEditor(const QString &fileName, QWidget *parent) : QPlainTextEdi
     setTextColors();
 
     //completer
-    completerKeywords <<"SELECT" <<"FROM" <<"WHERE"<<"WHEN"<<"WHILE"<<"int"<<"double"<<"static_cast<>()";//for test. it shlould read it from tokens vector
-    mCompleter = new AutoCodeCompleter(completerKeywords, this);
+    QStringList keywords;
+    keywords <<"SELECT" <<"FROM" <<"WHERE"<<"WHEN"<<"WHILE"<<"int"<<"double"<<"static_cast<>()";//for test
+    mCompleter = new AutoCodeCompleter(keywords, this);
+
     mCompleter->setCaseSensitivity(Qt::CaseInsensitive);
     mCompleter->setWidget(this);
 }
@@ -112,6 +118,8 @@ CodeEditor::~CodeEditor()
 
 void CodeEditor::setTextColors()
 {
+    fmtUndefined.setUnderlineStyle(QTextCharFormat::WaveUnderline);
+    fmtUndefined.setUnderlineColor(mConfigParam.textColors.mWaveUnderlineColor);
     fmtLiteral.setForeground(mConfigParam.textColors.mStringsColor);
     fmtKeyword.setForeground(mConfigParam.textColors.mBasicLiteralsColor);
     fmtComment.setForeground(mConfigParam.textColors.mCommentColor);
@@ -214,6 +222,24 @@ void CodeEditor::setConfigParam(const ConfigParams &configParam)
     mConfigParam = configParam;
 }
 
+void CodeEditor::handleLinesSwap(const int firstLine, const int secondLine)
+{
+    QVector<Token> tmp = mTokensList[firstLine];
+    mTokensList[firstLine] = mTokensList[secondLine];
+    mTokensList[secondLine] = tmp;
+}
+
+void CodeEditor::addToIdentifiersList(QStringList &identifiersName, int line)
+{
+    for (auto j = 0; j < mTokensList[line].size(); ++j)
+    {
+        if(mTokensList[line][j].mType == State::ID)
+        {
+            identifiersName << mTokensList[line][j].mName;
+        }
+    }
+}
+
 void CodeEditor::handleLinesAddition(int changeStart, int lastLineWithChange, int lineDifference)
 {
     QString changedCode;
@@ -224,7 +250,8 @@ void CodeEditor::handleLinesAddition(int changeStart, int lastLineWithChange, in
         mTokensList.removeAt(changeStart);
     }
 
-    for (int i = changeStart; i <= lastLineWithChange; ++i)
+    mHighlightingStart = changeStart > 0 ? changeStart - 1 : changeStart;
+    for (auto i = changeStart; i <= lastLineWithChange; ++i)
     {
         changedCode = document()->findBlockByLineNumber(i).text();
         mLcpp->lexicalAnalysis(changedCode);
@@ -239,16 +266,31 @@ void CodeEditor::handleLinesAddition(int changeStart, int lastLineWithChange, in
     }
 }
 
-void CodeEditor::handleLinesDelition(int changeStart, int lastLineWithChange, int lineDifference)
+void CodeEditor::handleLinesDelition(int lastLineWithChange, int lineDifference)
 {
     QString changedCode;
     lineDifference = -lineDifference;
     changedCode = document()->findBlockByLineNumber(lastLineWithChange).text();
+
     mLcpp->lexicalAnalysis(changedCode);
+    mHighlightingStart = lastLineWithChange;
     mTokensList[lastLineWithChange] = mLcpp->getTokens();
-    for (int i = lastLineWithChange + 1; i < lastLineWithChange + lineDifference + 1; ++i)
+
+    for (auto i = lastLineWithChange + 1; i < lastLineWithChange + lineDifference + 1; ++i)
     {
         mTokensList.removeAt(i);
+    }
+}
+
+void CodeEditor::getNamesOfIdentifiers()
+{
+    mIdentifiersNameList.clear();
+    for (auto i = 0; i < mIdentifiersList.size(); ++i)
+    {
+        for (auto j = 0; j < mIdentifiersList[i].size(); ++j)
+        {
+            mIdentifiersNameList << mIdentifiersList[i][j];
+        }
     }
 }
 
@@ -262,13 +304,18 @@ void CodeEditor::handleLineChange(int lastLineWithChange)
     int lineDifference = currentLinesCount - mLinesCount;
     mLinesCount = currentLinesCount;
 
+    if (!mLcpp->isLexerWasRunning())
+    {
+        lastLineWithChange += lineDifference;
+    }
+
     if (lineDifference >= 0)
     {
         handleLinesAddition(changeStart, lastLineWithChange, lineDifference);
     }
     else
     {
-        handleLinesDelition(changeStart, lastLineWithChange, lineDifference);
+        handleLinesDelition(lastLineWithChange, lineDifference);
     }
 }
 
@@ -446,7 +493,11 @@ void CodeEditor::setZoom(const int zoomVal)
 
 void CodeEditor::textChangedInTheOneLine()
 {
-    emit(textChangedInLine(this->textCursor().blockNumber()));
+    if (mCode != document()->toPlainText())
+    {
+        mCode = document()->toPlainText();
+        emit textChangedInLine(this->textCursor().blockNumber());
+    }
 }
 
 AddCommentButton* CodeEditor::getCommentButtonByIndex(const int line)
@@ -853,22 +904,22 @@ void formating(QTextCharFormat fmt, QTextCursor &cursor, Token token, int starti
 
 void CodeEditor::highlightText()
 {
-    // Set cursor position to begining of visible area
-    QTextCursor cursor = this->cursorForPosition(QPoint(0, 0));
-    int firstVisibleLine = cursor.blockNumber();
+    QTextBlock block = document()->findBlockByLineNumber(mHighlightingStart);
+    QTextCursor cursor(block);
+    int start = cursor.blockNumber();
     int startingPosition = cursor.position();
 
-    // Set cursor to end of visible aread
+    // Set cursor to end of visible area
     QPoint bottom_right(this->viewport()->width() - 1, this->viewport()->height() - 1);
     cursor = this->cursorForPosition(bottom_right);
     int lastVisibleLine = cursor.blockNumber();
 
     // Highlight visible area
-    for(int i = firstVisibleLine; i <= lastVisibleLine; ++i)
+    for (auto i = start; i <= lastVisibleLine; ++i)
     {
         if(i < mTokensList.size())
         {
-            for(int j = 0; j < mTokensList[i].size(); ++j)
+            for(auto j = 0; j < mTokensList[i].size(); ++j)
             {
                 switch(mTokensList[i][j].mType)
                 {
@@ -881,12 +932,16 @@ void CodeEditor::highlightText()
                 case(State::COM):
                     formating(fmtComment, cursor, mTokensList[i][j], startingPosition);
                     break;
+                case(State::UNDEF):
+                    formating(fmtUndefined, cursor, mTokensList[i][j], startingPosition);
+                    break;
                 default:
                     formating(fmtRegular, cursor, mTokensList[i][j], startingPosition);
                     break;
                 }
             }
         }
+
         // Move cursor to the next line
         cursor.setPosition(startingPosition);
         cursor.movePosition(QTextCursor::EndOfLine);

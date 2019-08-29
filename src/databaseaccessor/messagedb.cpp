@@ -17,14 +17,21 @@ void MessageDb::addMessageToDb(const Message &message)
 QVector<Message> MessageDb::getMessageFromDb(const QString startTime)
 {
     execQuery(numberOfMessages(startTime));
+
+    query.first();
     int countOfMessages =query.value(0).toInt();
+    if (!countOfMessages)
+    {
+        return QVector<Message>();
+    }
     QVector<Message> messages(countOfMessages);
     execQuery(getMessageQuery(startTime));
+    query.first();
     int counter = 0;
-    while (query.next()) {
+    do {
         fillStructMessage(messages[counter]);
         counter++;
-    }
+    } while (query.next());
     return messages;
 }
 
@@ -49,7 +56,7 @@ QString MessageDb::numberOfMessages(const QString startTime)
            " where datetime(Message.time) >= '" + startTime +"'";
 }
 
-void MessageDb::fillStructMessage(Message message)
+void MessageDb::fillStructMessage(Message &message)
 {
     message.mBody = query.record().value(0).toString();
     message.mUser = query.record().value(1).toString();
