@@ -1,10 +1,10 @@
 import QtQuick          2.8
 import QtQml.Models     2.12
+import PairStormChat    1.0
 import QtQuick.Layouts  1.3
 import QtQuick.Controls 2.0
 import "basicelements"       as BasicElements
 import "scripts/ChatBase.js" as ChatBase
-// TODO: import pair storm chat
 
 Item
 {
@@ -14,7 +14,7 @@ Item
     {
         anchors.fill: parent
 
-        color: ChatBase.backgroundColor(ChatBase.globalTheme)
+        color: ChatBase.backgroundColor(globalTheme)
 
         ListView
         {
@@ -38,20 +38,9 @@ Item
     {
         id: availableUsersModel
 
-        // TODO: replace model
-        model: ListModel {
-            //@disable-check M16
-            ListElement { userName: "Vasia nickname and something"; isUserConnected: true; }
-            //@disable-check M16
-            ListElement { userName: "Diana nickname"; isUserConnected: true; }
-            //@disable-check M16
-            ListElement { userName: "Petia nickname"; isUserConnected: false; }
-            //@disable-check M16
-            ListElement { userName: "Bohdan nickname"; isUserConnected: false; }
-            //@disable-check M16
-            ListElement { userName: "Dima nickname"; isUserConnected: false; }
-            //@disable-check M16
-            ListElement { userName: "Roman nickname"; isUserConnected: false; }
+        model: UsersModel
+        {
+            list: usersList
         }
 
         delegate: Component
@@ -63,7 +52,7 @@ Item
                 width:  parent.width
                 height: availableUsers.height / 6
 
-                color: ChatBase.chatUsersBackgroundColor(ChatBase.globalTheme)
+                color: ChatBase.chatUsersBackgroundColor(globalTheme)
 
                 RowLayout
                 {
@@ -87,7 +76,7 @@ Item
                                         (ChatBase.golden_ratio)
                         font.family:    "Consolas"
 
-                        color: ChatBase.chatUsersTextColor(ChatBase.globalTheme)
+                        color: ChatBase.chatUsersTextColor(globalTheme)
                     }
                     Control
                     {
@@ -109,8 +98,8 @@ Item
 
                             anchors.fill:    parent
 
-                            onStateColor:    ChatBase.switchTurnedOnColor(ChatBase.globalTheme)
-                            offStateColor:   ChatBase.switchTurnedOffColor(ChatBase.globalTheme)
+                            onStateColor:    ChatBase.switchTurnedOnColor(globalTheme)
+                            offStateColor:   ChatBase.switchTurnedOffColor(globalTheme)
                             widthToHeight:   ChatBase.golden_ratio
                             preferredWidth:  parent.width
                             preferredHeight: parent.height
@@ -142,7 +131,7 @@ Item
                     height: 1
                     radius: 1
 
-                    color: ChatBase.chatUsersSpacerColor(ChatBase.globalTheme)
+                    color: ChatBase.chatUsersSpacerColor(globalTheme)
                 }
             }
         }

@@ -6,6 +6,6 @@ Item
     Rectangle
     {
         anchors.fill: parent
-        color: ChatBase.chatInputBackgroundColor(ChatBase.globalTheme)
+        color: ChatBase.chatInputBackgroundColor(globalTheme)
     }
 }

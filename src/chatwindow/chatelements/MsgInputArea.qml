@@ -14,7 +14,7 @@ Item
     Rectangle
     {
         anchors.fill: parent
-        color: ChatBase.chatInputBackgroundColor(ChatBase.globalTheme)
+        color: ChatBase.chatInputBackgroundColor(globalTheme)
     }
     RowLayout
     {
@@ -34,8 +34,8 @@ Item
             Layout.preferredHeight: messageInput.implicitHeight
             radius: 3
 
-            color:        Qt.darker(ChatBase.chatInputBackgroundColor(ChatBase.globalTheme), 1.1)
-            border.color: Qt.darker(ChatBase.chatInputBackgroundColor(ChatBase.globalTheme), 1.05)
+            color:        Qt.darker(ChatBase.chatInputBackgroundColor(globalTheme), 1.1)
+            border.color: Qt.darker(ChatBase.chatInputBackgroundColor(globalTheme), 1.05)
 
             border.width: 1
 
@@ -55,9 +55,9 @@ Item
                 renderType:    Text.QtRendering
                 wrapMode:      TextInput.WordWrap
 
-                color:             ChatBase.chatInputTextColor(ChatBase.globalTheme)
-                selectionColor:    ChatBase.chatInputSelectionBackColor(ChatBase.globalTheme)
-                selectedTextColor: ChatBase.chatInputSelectionTextColor(ChatBase.globalTheme)
+                color:             ChatBase.chatInputTextColor(globalTheme)
+                selectionColor:    ChatBase.chatInputSelectionBackColor(globalTheme)
+                selectedTextColor: ChatBase.chatInputSelectionTextColor(globalTheme)
 
                 font.pixelSize: 20
                 font.family:    "Consolas"
@@ -68,7 +68,7 @@ Item
                     {
                         return
                     }
-                    // TODO: send message
+                    messagesList.appendMessage(messageInput.text)
                     messageInput.clear()
                 }
                 Text
@@ -85,7 +85,7 @@ Item
                     font.pixelSize: 20
                     font.family:    "Consolas"
 
-                    color: ChatBase.chatInputTextHintColor(ChatBase.globalTheme)
+                    color: ChatBase.chatInputTextHintColor(globalTheme)
                 }
             }
             MouseArea
@@ -135,7 +135,7 @@ Item
                     {
                         return
                     }
-                    // TODO: send message
+                    messagesList.appendMessage(messageInput.text)
                     messageInput.clear()
                 }
             }

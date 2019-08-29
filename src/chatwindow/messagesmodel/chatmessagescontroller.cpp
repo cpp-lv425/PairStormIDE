@@ -14,15 +14,19 @@ ChatMessagesController::ChatMessagesController(const QString &authorName,
                   databaseMessages.cend(),
                   [this](const Message & previouslySavedMessage)
                   {
-                      ChatMessage newChatMessage;
-                      newChatMessage.mAuthorName          = previouslySavedMessage.mUser;
-                      newChatMessage.mContent             = previouslySavedMessage.mBody;
-                      newChatMessage.mPublicationDateTime =
-                              QDateTime::fromString(previouslySavedMessage.mTime,
-                                                    "yyyy-MM-dd HH:mm:ss");
-                      newChatMessage.mType                = ChatMessage::Type::UserMessage;
+                      if (previouslySavedMessage.mBody != QString() &&
+                          previouslySavedMessage.mUser != QString())
+                      {
+                          ChatMessage newChatMessage;
+                          newChatMessage.mAuthorName          = previouslySavedMessage.mUser;
+                          newChatMessage.mContent             = previouslySavedMessage.mBody;
+                          newChatMessage.mPublicationDateTime =
+                                  QDateTime::fromString(previouslySavedMessage.mTime,
+                                                        "yyyy-MM-dd HH:mm:ss");
+                          newChatMessage.mType                = ChatMessage::Type::UserMessage;
 
-                      this->mChatMessages.append(newChatMessage);
+                          this->mChatMessages.append(newChatMessage);
+                      }
                   });
 }
 // ==========================================================================================

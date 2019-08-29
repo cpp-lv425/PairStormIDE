@@ -1,10 +1,10 @@
 import QtQuick          2.8
 import QtQml.Models     2.12
+import PairStormChat    1.0
 import QtQuick.Layouts  1.3
 import QtQuick.Controls 2.0
 import "basicelements"       as BasicElements
 import "scripts/ChatBase.js" as ChatBase
-// TODO: import pair storm chat
 
 Item
 {
@@ -13,7 +13,7 @@ Item
     Rectangle
     {
         anchors.fill: parent
-        color: ChatBase.backgroundColor(ChatBase.globalTheme)
+        color: ChatBase.backgroundColor(globalTheme)
     }
     ListView
     {
@@ -43,43 +43,30 @@ Item
     {
         id: messagesModel
 
-        // TODO: replace model
-        model: ListModel {
-            //@disable-check M16
-            ListElement { authorName: "Vasia nickname and something"; type: "ordinary"; content: "hello" }
-            //@disable-check M16
-            ListElement { authorName: "PairStorm"; type: "service"; content: "hello from Pair storm application" }
-            //@disable-check M16
-            ListElement { authorName: "PairStorm"; type: "service"; content: "you cannot log in twice" }
-            //@disable-check M16
-            ListElement { authorName: "Diana nickname"; type: "ordinary"; content: "pruvit" }
-            //@disable-check M16
-            ListElement { authorName: "ValntynFk"; type: "ordinary"; content: "hello" }
-            //@disable-check M16
-            ListElement { authorName: "ValentynFk"; type: "ordinary"; content: "flkj dsalkfjdsalkfj dslk jflksda ffdsalhflkds halkfhdsalkh flhdsa klflkdsa;hf ksadhlkf; dshakfl;hdsalk ;flkdsa flk hsalkf hsdalk hf;lkdsahfdsa ;" }
-            //@disable-check M16
-            ListElement { authorName: "Peter"; type: "ordinary"; content: "hello" }
+        model: MessagesModel
+        {
+            list: messagesList
         }
 
         delegate: Column
         {
             id: messageAttributesColumn
 
-            readonly property bool adjustRight: model.authorName === "ValentynFk" // TODO: change to global author name
+            readonly property bool adjustRight: model.authorName === globalUserName
 
-            anchors.right: messageAttributesColumn.adjustRight ?
-                               parent.right : undefined
             anchors.left:  messageAttributesColumn.adjustRight ?
                                undefined    : parent.left
+            anchors.right: messageAttributesColumn.adjustRight ?
+                               parent.right : undefined
 
             Row
             {
                 id: messageAttributesRow
 
-                anchors.right: messageAttributesColumn.adjustRight ?
-                                   parent.right : undefined
                 anchors.left:  messageAttributesColumn.adjustRight ?
                                    undefined    : parent.left
+                anchors.right: messageAttributesColumn.adjustRight ?
+                                   parent.right : undefined
 
                 Control
                 {
@@ -125,12 +112,12 @@ Item
                         if (model.type === "ordinary")
                         {
                             return messageAttributesColumn.adjustRight                   ?
-                                   ChatBase.chatAuthorMessageColor(ChatBase.globalTheme) :
-                                   ChatBase.chatUserMessageColor(ChatBase.globalTheme)
+                                   ChatBase.chatAuthorMessageColor(globalTheme) :
+                                   ChatBase.chatUserMessageColor(globalTheme)
                         }
                         if (model.type === "service")
                         {
-                            return ChatBase.chatSystemMessageColor(ChatBase.globalTheme)
+                            return ChatBase.chatSystemMessageColor(globalTheme)
                         }
                     }
 
@@ -147,7 +134,8 @@ Item
                         wrapMode:      Label.Wrap
 
                         text: model.content
-                        color: ChatBase.chatMessageTextColor(ChatBase.globalTheme)
+                        color:          ChatBase.chatMessageTextColor(globalTheme)
+                        selectionColor: Qt.darker(messageBody.color, 1.5)
 
                         MouseArea
                         {
@@ -160,10 +148,10 @@ Item
                     RowLayout
                     {
                         anchors.fill: parent
-                        anchors.right: messageAttributesColumn.adjustRight ?
-                                           messageBody.right : undefined
                         anchors.left: messageAttributesColumn.adjustRight ?
                                            undefined : messageBody.left
+                        anchors.right: messageAttributesColumn.adjustRight ?
+                                           messageBody.right : undefined
                         anchors.leftMargin:  10
                         anchors.rightMargin: 15
 
@@ -184,7 +172,7 @@ Item
                             text:  qsTr("  " + model.authorName)
                             clip:  true
                             elide: Text.ElideRight
-                            color: ChatBase.chatMessageTextColor(ChatBase.globalTheme)
+                            color: ChatBase.chatMessageTextColor(globalTheme)
 
                             font.pixelSize: 15
                             font.family:    "Consolas"
@@ -244,15 +232,17 @@ Item
             {
                 id: timestampText
 
-                anchors.right: messageAttributesColumn.adjustRight ?
-                                   parent.right : undefined
                 anchors.left:  messageAttributesColumn.adjustRight ?
                                    undefined    : parent.left
+                anchors.right: messageAttributesColumn.adjustRight ?
+                                   parent.right : undefined
+                anchors.leftMargin:  5
+                anchors.rightMargin: 5
 
-                text: "  datehere  " //TODO: paste normal date
-                color: ChatBase.backgroundTextColor(ChatBase.globalTheme)
+                text:  Qt.formatDateTime(model.publicationDateTime, "d MMM hh:mm")
+                color: ChatBase.backgroundTextColor(globalTheme)
 
-                font.pixelSize: 18
+                font.pixelSize: 15
                 font.family:    "Consolas"
                 font.bold:      true
             }

@@ -12,7 +12,7 @@ Item
     Rectangle
     {
         anchors.fill: chatBody
-        color: ChatBase.backgroundColor(ChatBase.globalTheme)
+        color: ChatBase.backgroundColor(globalTheme)
     }
     ColumnLayout
     {
