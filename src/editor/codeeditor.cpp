@@ -162,7 +162,6 @@ void CodeEditor::writeDefinitionToSource()
                 //write method definition to source file and emit signal in order to open this file
                 fileManager.writeToFile(sourceFileName, sourceFileText + "\n" + definitonTest);
                 emit openDocument(sourceFileName);
-                QMessageBox::information(this, successDefinCreateTitle, successDefinCreateMessage);
             }
             else
             {
