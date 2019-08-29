@@ -1,6 +1,6 @@
 .pragma library
 
-const golden_ratio    = 1.61803398875
+const goldenRatio     = 1.61803398875
 const gWhiteThemeName = "white"
 const gBlueThemeName  = "blue"
 const gDarkThemeName  = "dark"

@@ -1,5 +1,4 @@
 #include "qmlchatwidget.h"
-#include <QDebug>
 // ==========================================================================================
 // ==========================================================================================
 //                                                                                CONSTRUCTOR
@@ -45,7 +44,6 @@ void QmlChatWidget::keyPressEvent(QKeyEvent *event)
 //                                                             DOCKER RESIZE EVENTS PROCESSOR
 void QmlChatWidget::resizeEvent(QResizeEvent *event)
 {
-    qDebug() << "resizing";
     mpCurrentQmlChatWidget->update();
     mpCurrentQmlChatWidget->repaint();
 }
