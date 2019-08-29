@@ -285,11 +285,9 @@ QMdiArea* DocumentManager::createMdiArea()
 
 CodeEditor* DocumentManager::createDoc(const QString &fileName)
 {
-    // create new view
-    CodeEditor *newView = new CodeEditor;
+    CodeEditor *newView = new CodeEditor(nullptr, fileName);
     connect(newView, &CodeEditor::closeDocEventOccured, this, &DocumentManager::onCloseDocument);
     connect(newView, &CodeEditor::openDocument, this, &DocumentManager::onOpenDocument);
-    newView->setFileName(fileName);
     newView->setFocusPolicy(Qt::StrongFocus);
     return newView;
 }

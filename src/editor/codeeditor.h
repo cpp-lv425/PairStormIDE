@@ -47,12 +47,11 @@ class CodeEditor : public QPlainTextEdit
 {
     Q_OBJECT
 public:
-    CodeEditor(QWidget *parent = nullptr);
+    CodeEditor(QWidget *parent = nullptr, const QString &fileName = "");
     virtual ~CodeEditor();
     void specialAreasRepaintEvent(QPaintEvent *event);
     void repaintButtonsArea(const int bottom, const int top, const int blockNumber);
     int getLineNumberAreaWidth();
-    bool isinsidebracket();
     QString& getFileName();
     void setFileName(const QString &flename);
     std::pair<const QString &, const QString &> getChangedFileInfo();
@@ -73,6 +72,10 @@ public:
     //DB methods
     void readAllCommentsFromDB(QVector<Comment> mStartComments);
     QVector<Comment> getAllCommentsToDB();
+
+    CommentDb *getCommentGetter() const;
+
+    QVector<Comment> getStartComments() const;
 
 private:
     void rewriteButtonsLines(QVector<AddCommentButton*> &commentV, const int diff, const int startLine);

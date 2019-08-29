@@ -23,6 +23,7 @@ class QMdiSubWindow;
 class CodeEditor;
 class Browser;
 class Connection;
+class FileDb;
 QT_END_NAMESPACE
 
 class MainWindow : public QMainWindow
@@ -45,6 +46,7 @@ private:
     Browser *mDocumentationBrowser;
     QScopedPointer<PaletteConfigurator> mpPaletteConfigurator;
     Connection *db;
+    FileDb* dbFileManager;
 
     void setupMainMenu();    
     void openDocument(const QString &fileName);

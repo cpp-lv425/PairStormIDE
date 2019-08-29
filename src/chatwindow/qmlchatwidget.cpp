@@ -65,10 +65,10 @@ void QmlChatWidget::configureOnLogin(const QString &userName)
     // Create & connect chat users controller
     mpUsersController = new ChatUsersController(mUserName);
     connect(mpUsersController, &ChatUsersController::userStateChangedConnected,
-            this,              &QmlChatWidget::ConnectUserOnSwitchOn,
+            this,              &QmlChatWidget::connectUserOnSwitchOn,
             Qt::UniqueConnection);
     connect(mpUsersController, &ChatUsersController::userStateChangedDisconnected,
-            this,              &QmlChatWidget::DisconnectUserOnSwitchOff,
+            this,              &QmlChatWidget::disconnectUserOnSwitchOff,
             Qt::UniqueConnection);
     // Register chat users model & users controller in the QML
     qmlRegisterType<ChatUsersModel>("PairStormChat", 1, 0, "UsersModel");
@@ -193,7 +193,7 @@ void QmlChatWidget::shareMessageOnSendingMessage(const ChatMessage &message)
 // ==========================================================================================
 // ==========================================================================================
 //                                         SEND CONNECT REQUEST WHEN USER TRUNS ON THE SWITCH
-void QmlChatWidget::ConnectUserOnSwitchOn(const QString &userName)
+void QmlChatWidget::connectUserOnSwitchOn(const QString &userName)
 {
     emit startSharingRequested(userName);
 }
@@ -201,7 +201,7 @@ void QmlChatWidget::ConnectUserOnSwitchOn(const QString &userName)
 // ==========================================================================================
 // ==========================================================================================
 //                                     SEND DISCONNECT REQUEST WHEN USER TRUNS OFF THE SWITCH
-void QmlChatWidget::DisconnectUserOnSwitchOff(const QString &userName)
+void QmlChatWidget::disconnectUserOnSwitchOff(const QString &userName)
 {
     emit stopSharingRequested(userName);
 }
