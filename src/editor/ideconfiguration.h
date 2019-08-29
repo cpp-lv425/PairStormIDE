@@ -17,12 +17,14 @@ struct ConfigParams
 {
     TextColors textColors;
     QString mFontStyle;
+    QString mIdeType;
     int mFontSize;
 public:
     QString getFontStyle() const;
     void setFontStyle(const QString &fontStyle);
     int getFontSize() const;
     void setFontSize(const QString fontSize);
+    QString ConfigParams::getIdeType();
     void setIdeType(const QString &ideType);
     void setConfigParams(const QString fontStyle, const QString fontSize, const QString ideType);
 };

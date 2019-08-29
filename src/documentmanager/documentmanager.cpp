@@ -285,11 +285,18 @@ QMdiArea* DocumentManager::createMdiArea()
 
 CodeEditor* DocumentManager::createDoc(const QString &fileName)
 {
-    // create new view
-    CodeEditor *newView = new CodeEditor;
+    CodeEditor *newView = new CodeEditor(fileName);
     connect(newView, &CodeEditor::closeDocEventOccured, this, &DocumentManager::onCloseDocument);
     connect(newView, &CodeEditor::openDocument, this, &DocumentManager::onOpenDocument);
-    newView->setFileName(fileName);
+//<<<<<<< HEAD
+//    newView->setFileName(fileName);
+//    newView->getStartComments() = newView->getCommentGetter()->getAllCommentsFromFile(fileName);
+//    newView->readAllCommentsFromDB(newView->getStartComments());
+
+//    qDebug()<<"FILENAME = "<< newView->getFileName();
+//=======
+
+//>>>>>>> features/Lysyk-new-methods-db
     newView->setFocusPolicy(Qt::StrongFocus);
     return newView;
 }
@@ -648,16 +655,20 @@ void DocumentManager::configureDocuments(std::function<void(DocumentManager*, Co
 void DocumentManager::setStyle(CodeEditor *doc, const QString &styleName)
 {
     doc->setIdeType(styleName);
+    doc->textChangedInTheOneLine();
 }
 
 void DocumentManager::setFontFamily(CodeEditor *doc, const QString &fontFamily)
 {
     doc->setFontStyle(fontFamily);
+    doc->textChangedInTheOneLine();
+
 }
 
 void DocumentManager::setFontSize(CodeEditor *doc, const QString &fontSize)
 {
     doc->setFontSize(fontSize);
+    doc->textChangedInTheOneLine();
 }
 
 bool DocumentManager::saveDocument(CodeEditor *doc)

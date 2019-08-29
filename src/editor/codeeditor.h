@@ -47,7 +47,7 @@ class CodeEditor : public QPlainTextEdit
 {
     Q_OBJECT
 public:
-    CodeEditor(QWidget *parent = nullptr);
+    CodeEditor(const QString &fileName, QWidget *parent = nullptr);
     virtual ~CodeEditor();
     void specialAreasRepaintEvent(QPaintEvent *event);
     void repaintButtonsArea(const int bottom, const int top, const int blockNumber);
@@ -74,6 +74,10 @@ public:
     void readAllCommentsFromDB(QVector<Comment> mStartComments);
     QVector<Comment> getAllCommentsToDB();
 
+    CommentDb *getCommentGetter() const;
+
+    QVector<Comment> getStartComments() const;
+
 private:
     void rewriteButtonsLines(QVector<AddCommentButton*> &commentV, const int diff, const int startLine);
     void setAnotherButtonLine(AddCommentButton *comment, const int diff);
@@ -81,7 +85,7 @@ private:
     bool isInRangeIncludLast(const int val, const int leftMargin, const int rightMargin);
 
     void handleLinesAddition(int, int, int);
-    void handleLinesDelition(int, int, int);
+    void handleLinesDelition(int, int);
     void addToIdentifiersList(QStringList&, int);
     void getNamesOfIdentifiers();
 
@@ -154,6 +158,7 @@ private:
     QSettings settings;
 
 
+    QString mStyle;
     int mLinesCountPrev;
     int mLinesCountCurrent;
 
