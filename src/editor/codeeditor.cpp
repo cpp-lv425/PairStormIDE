@@ -30,6 +30,7 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     mCode = document()->toPlainText();
     mCodeSize = 1;
     mHighlightingStart = 0;
+    mStyle = mConfigParam.getIdeType();
 
     //read settings
     QString analizerFontSize = settings.value("editorFontSize").toString();
@@ -96,14 +97,8 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     setTextColors();
 
     //completer
-<<<<<<< HEAD
-    QStringList keywords;
-    keywords <<"SELECT" <<"FROM" <<"WHERE"<<"WHEN"<<"WHILE"<<"int"<<"double"<<"static_cast<>()";//for test
-    mCompleter = new AutoCodeCompleter(mIdentifiersNameList, this);
-=======
     completerKeywords <<"SELECT" <<"FROM" <<"WHERE"<<"WHEN"<<"WHILE"<<"int"<<"double"<<"static_cast<>()";//for test. it shlould read it from tokens vector
     mCompleter = new AutoCodeCompleter(completerKeywords, this);
->>>>>>> develop
     mCompleter->setCaseSensitivity(Qt::CaseInsensitive);
     mCompleter->setWidget(this);
 }
@@ -264,6 +259,7 @@ void CodeEditor::handleLinesDelition(int lastLineWithChange, int lineDifference)
     mHighlightingStart = lastLineWithChange;
     mTokensList[lastLineWithChange] = mLcpp->getTokens();
 
+    qDebug() << lastLineWithChange << ' ' << lineDifference;
     for (auto i = lastLineWithChange + 1; i < lastLineWithChange + lineDifference + 1; ++i)
     {
         mTokensList.removeAt(i);
@@ -306,9 +302,8 @@ void CodeEditor::handleLineChange(int lastLineWithChange)
         handleLinesDelition(lastLineWithChange, lineDifference);
     }
 
-    getNamesOfIdentifiers();
-
     emit runHighlighter();
+    qDebug() << "===================";
     for(int i = 0; i < mTokensList.size(); ++i)
     {
         qDebug() << i;
@@ -493,8 +488,10 @@ void CodeEditor::setZoom(const int zoomVal)
 
 void CodeEditor::textChangedInTheOneLine()
 {
-    if (mCode != document()->toPlainText())
+    qDebug() << mStyle << ' ' << mConfigParam.getIdeType();
+    if (mCode != document()->toPlainText() || mStyle != mConfigParam.getIdeType())
     {
+        mStyle = mConfigParam.getIdeType();
         mCode = document()->toPlainText();
         emit textChangedInLine(this->textCursor().blockNumber());
     }
@@ -907,6 +904,8 @@ void CodeEditor::highlightText()
     QTextCursor cursor(block);
     int start = cursor.blockNumber();
     int startingPosition = cursor.position();
+
+    qDebug() << start << ' ' << mHighlightingStart;
 
     // Set cursor to end of visible area
     QPoint bottom_right(this->viewport()->width() - 1, this->viewport()->height() - 1);

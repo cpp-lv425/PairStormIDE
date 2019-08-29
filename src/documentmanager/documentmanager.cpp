@@ -648,16 +648,20 @@ void DocumentManager::configureDocuments(std::function<void(DocumentManager*, Co
 void DocumentManager::setStyle(CodeEditor *doc, const QString &styleName)
 {
     doc->setIdeType(styleName);
+    doc->textChangedInTheOneLine();
 }
 
 void DocumentManager::setFontFamily(CodeEditor *doc, const QString &fontFamily)
 {
     doc->setFontStyle(fontFamily);
+    doc->textChangedInTheOneLine();
+
 }
 
 void DocumentManager::setFontSize(CodeEditor *doc, const QString &fontSize)
 {
     doc->setFontSize(fontSize);
+    doc->textChangedInTheOneLine();
 }
 
 bool DocumentManager::saveDocument(CodeEditor *doc)

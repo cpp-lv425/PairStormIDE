@@ -154,6 +154,7 @@ private:
     QSettings settings;
 
 
+    QString mStyle;
     int mLinesCountPrev;
     int mLinesCountCurrent;
 
