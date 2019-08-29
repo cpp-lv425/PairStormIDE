@@ -20,7 +20,7 @@
 #include<QMenu>
 #include <QVector>
 
-CodeEditor::CodeEditor(const QString &fileName, QWidget *parent) : QPlainTextEdit(parent)
+CodeEditor::CodeEditor(QWidget *parent, const QString &fileName) : QPlainTextEdit(parent)
 {
     mFileName = fileName;
     setLineWrapMode(QPlainTextEdit::NoWrap);// don't move cursor to the next line where it's out of visible scope
@@ -60,10 +60,6 @@ CodeEditor::CodeEditor(const QString &fileName, QWidget *parent) : QPlainTextEdi
 
     commentGetter = new CommentDb;
 
-   // qDebug()<<getFileName();
-
-//    mStartComments = commentGetter->getAllCommentsFromFile(getFileName());
-//    readAllCommentsFromDB(mStartComments);
     mStartComments = commentGetter->getAllCommentsFromFile(getFileName());
     readAllCommentsFromDB(mStartComments);
 
@@ -574,12 +570,6 @@ void CodeEditor::showCommentTextEdit(int line)
     mCommentWidget->setCommentButtonGeometry(mAddCommentButton->geometry());
     mCommentWidget->setCommentLine(line);
 
-//    auto commentButton = getCommentButtonByIndex(line);
-
-//    mCommentWidget->getEditTab()->setText(commentButton ? commentButton->getCommentString() : "");
-
-//    QSettings settings(QApplication::organizationName(), QApplication::applicationName());
-//    mCommentWidget->setWindowTitle("Comment to " + QString::number(line) + " line by " + settings.value("UserName").toString());
     QString userName;
     auto commentButton = getCommentButtonByIndex(line);
     if (commentButton)//if comment button by passed in the parametr line which exists
@@ -607,15 +597,6 @@ void CodeEditor::emptyCommentWasAdded()
 
 void CodeEditor::notEmptyCommentWasAdded()
 {
-//    if (commentButtonExists(mCommentWidget->getCommentLine()))//if button was existing, just reset text
-//    {
-//        auto commentButon = getCommentButtonByIndex(mCommentWidget->getCommentLine());
-//        setNewAddedButtonSettings(commentButon);
-//    }
-//    else
-//    {
-//        addButton(mCommentWidget->getCommentLine(), mCommentWidget->getEditTab()->getText());// create new button
-//    }
     if (commentButtonExists(mCommentWidget->getCommentLine()))//if button was existing, just reset text
     {
         auto commentButon = getCommentButtonByIndex(mCommentWidget->getCommentLine());
@@ -707,25 +688,6 @@ bool CodeEditor::isInRangeIncludLast(const int val, const int leftMargin, const 
 {
     return val > leftMargin && val <= rightMargin;
 }
-
-//void CodeEditor::addButton(const int line, const QString &comment)
-//{
-//    AddCommentButton *commentButtonNew = new AddCommentButton(this);
-//    commentButtonNew->setGeometry(mCommentWidget->getCommentButtonGeometry());
-//    commentButtonNew->setCurrentLine(line);
-//    commentButtonNew->setCommentString(comment);
-
-
-//    commentButtonNew->setStyleSheet("background-color: #18CD3C");
-//    commentButtonNew->setText("✔");
-//    commentButtonNew->setVisible(true);
-
-
-//    setNewAddedButtonSettings(commentButtonNew);
-
-//    mCommentsVector.push_back(commentButtonNew);
-//    connect(mCommentsVector.back(), &AddCommentButton::addCommentButtonPressed, this, &CodeEditor::showCommentTextEdit);
-//}
 
 void CodeEditor::addButton(const int line, const QString &comment, const QString &userName)
 {
