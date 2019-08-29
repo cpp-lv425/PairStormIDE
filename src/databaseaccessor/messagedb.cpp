@@ -17,8 +17,8 @@ void MessageDb::addMessageToDb(const Message &message)
 QVector<Message> MessageDb::getMessageFromDb(const QString startTime)
 {
     execQuery(numberOfMessages(startTime));
-    int count_of_messages =query.value(0).toInt();
-    QVector<Message> messages(count_of_messages);
+    int countOfMessages =query.value(0).toInt();
+    QVector<Message> messages(countOfMessages);
     execQuery(getMessageQuery(startTime));
     int counter = 0;
     while (query.next()) {
