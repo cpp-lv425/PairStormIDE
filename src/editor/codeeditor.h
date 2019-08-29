@@ -46,7 +46,7 @@ class CodeEditor : public QPlainTextEdit
 {
     Q_OBJECT
 public:
-    CodeEditor(QWidget *parent = nullptr);
+    CodeEditor(const QString &fileName, QWidget *parent = nullptr);
     virtual ~CodeEditor();
     void specialAreasRepaintEvent(QPaintEvent *event);
     void repaintButtonsArea(const int bottom, const int top, const int blockNumber);

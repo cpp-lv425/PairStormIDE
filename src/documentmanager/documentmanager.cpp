@@ -285,20 +285,10 @@ QMdiArea* DocumentManager::createMdiArea()
 
 CodeEditor* DocumentManager::createDoc(const QString &fileName)
 {
-    // create new view
-    /*
-     * commentGetter = new CommentDb;
-    mStartComments = commentGetter->getAllCommentsFromFile(getFileName());
-    readAllCommentsFromDB(mStartComments);
-*/
-    CodeEditor *newView = new CodeEditor;
+    CodeEditor *newView = new CodeEditor(fileName);
     connect(newView, &CodeEditor::closeDocEventOccured, this, &DocumentManager::onCloseDocument);
     connect(newView, &CodeEditor::openDocument, this, &DocumentManager::onOpenDocument);
 
-    newView->getStartComments() = newView->getCommentGetter()->getAllCommentsFromFile(fileName);
-    newView->readAllCommentsFromDB(newView->getStartComments());
-
-    newView->setFileName(fileName);
     newView->setFocusPolicy(Qt::StrongFocus);
     return newView;
 }
