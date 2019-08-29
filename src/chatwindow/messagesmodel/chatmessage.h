@@ -19,7 +19,7 @@ const QString gcSystemName = "PairStorm";
 const QHash<int, QString> gcSystemMessages {
     {
         SystemMessage::GreetingsMessage,
-        QString("Welcome Pair Storm Application\nTo get help, type \"help\"")
+        QString("Welcome to PairStorm Application\nTo get help, type \"help\"")
     },
     {
         SystemMessage::CanNotLogInTwiceMessage,
