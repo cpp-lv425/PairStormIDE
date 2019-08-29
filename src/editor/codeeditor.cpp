@@ -97,15 +97,9 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     setTextColors();
 
     //completer
-<<<<<<< HEAD
-    completerKeywords <<"SELECT" <<"FROM" <<"WHERE"<<"WHEN"<<"WHILE"<<"int"<<"double"<<"static_cast<>()";//for test. it shlould read it from tokens vector
-    mCompleter = new AutoCodeCompleter(completerKeywords, this);
-=======
     QStringList keywords;
     keywords <<"SELECT" <<"FROM" <<"WHERE"<<"WHEN"<<"WHILE"<<"int"<<"double"<<"static_cast<>()";//for test
     mCompleter = new AutoCodeCompleter(keywords, this);
-
->>>>>>> 24ada0583ea8e39a970c340d3c87a3672bbc2e82
     mCompleter->setCaseSensitivity(Qt::CaseInsensitive);
     mCompleter->setWidget(this);
 }
@@ -266,7 +260,6 @@ void CodeEditor::handleLinesDelition(int lastLineWithChange, int lineDifference)
     mHighlightingStart = lastLineWithChange;
     mTokensList[lastLineWithChange] = mLcpp->getTokens();
 
-    qDebug() << lastLineWithChange << ' ' << lineDifference;
     for (auto i = lastLineWithChange + 1; i < lastLineWithChange + lineDifference + 1; ++i)
     {
         mTokensList.removeAt(i);
@@ -310,18 +303,6 @@ void CodeEditor::handleLineChange(int lastLineWithChange)
     }
 
     emit runHighlighter();
-<<<<<<< HEAD
-    qDebug() << "===================";
-    for(int i = 0; i < mTokensList.size(); ++i)
-    {
-        qDebug() << i;
-        for(int j = 0; j < mTokensList[i].size(); ++j)
-        {
-            qDebug() << mTokensList[i][j].mName;
-        }
-    }
-=======
->>>>>>> 24ada0583ea8e39a970c340d3c87a3672bbc2e82
 }
 
 int CodeEditor::getLineNumberAreaWidth()
@@ -498,7 +479,6 @@ void CodeEditor::setZoom(const int zoomVal)
 
 void CodeEditor::textChangedInTheOneLine()
 {
-    qDebug() << mStyle << ' ' << mConfigParam.getIdeType();
     if (mCode != document()->toPlainText() || mStyle != mConfigParam.getIdeType())
     {
         mStyle = mConfigParam.getIdeType();
@@ -914,8 +894,6 @@ void CodeEditor::highlightText()
     QTextCursor cursor(block);
     int start = cursor.blockNumber();
     int startingPosition = cursor.position();
-
-    qDebug() << start << ' ' << mHighlightingStart;
 
     // Set cursor to end of visible area
     QPoint bottom_right(this->viewport()->width() - 1, this->viewport()->height() - 1);
