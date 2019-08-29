@@ -279,7 +279,7 @@ void CodeEditor::handleLinesDelition(int lastLineWithChange, int lineDifference)
 
     for (auto i = lastLineWithChange + 1; i < lastLineWithChange + lineDifference + 1; ++i)
     {
-        mTokensList.removeAt(i);
+        mTokensList.removeAt(lastLineWithChange + 1);
     }
 }
 
@@ -318,6 +318,8 @@ void CodeEditor::handleLineChange(int lastLineWithChange)
     {
         handleLinesDelition(lastLineWithChange, lineDifference);
     }
+
+    emit runHighlighter();
 }
 
 int CodeEditor::getLineNumberAreaWidth()
