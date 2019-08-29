@@ -82,7 +82,7 @@ private:
     void handleLinesAddition(int, int, int);
     void handleLinesDelition(int, int, int);
 
-    void addButton(const int line, const QString &Comment);
+    void addButton(const int line, const QString &Comment, const QString &userName);
     void removeButtonByIndex(QVector<AddCommentButton*> &commentV, const int index);
     void removeButtomByValue(QVector<AddCommentButton*> &commentV, AddCommentButton* commentButton);
     void removeButtons(QVector<AddCommentButton*> &commentV, const int cursorLine,
@@ -145,6 +145,7 @@ private:
     QCompleter *mCompleter;
     QStringList completerKeywords;
     CommentDb *commentGetter;
+    QSettings settings;
 
 
     int mLinesCountPrev;
