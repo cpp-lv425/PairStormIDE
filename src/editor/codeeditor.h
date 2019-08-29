@@ -47,12 +47,11 @@ class CodeEditor : public QPlainTextEdit
 {
     Q_OBJECT
 public:
-    CodeEditor(const QString &fileName, QWidget *parent = nullptr);
+    CodeEditor(QWidget *parent = nullptr, const QString &fileName = "");
     virtual ~CodeEditor();
     void specialAreasRepaintEvent(QPaintEvent *event);
     void repaintButtonsArea(const int bottom, const int top, const int blockNumber);
     int getLineNumberAreaWidth();
-    bool isinsidebracket();
     QString& getFileName();
     void setFileName(const QString &flename);
     std::pair<const QString &, const QString &> getChangedFileInfo();

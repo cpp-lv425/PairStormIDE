@@ -285,26 +285,9 @@ QMdiArea* DocumentManager::createMdiArea()
 
 CodeEditor* DocumentManager::createDoc(const QString &fileName)
 {
-//    CodeEditor *newView = new CodeEditor(fileName);
-//    connect(newView, &CodeEditor::closeDocEventOccured, this, &DocumentManager::onCloseDocument);
-//    connect(newView, &CodeEditor::openDocument, this, &DocumentManager::onOpenDocument);
-
-
-//<<<<<<< HEAD
-//    newView->setFileName(fileName);
-//    newView->getStartComments() = newView->getCommentGetter()->getAllCommentsFromFile(fileName);
-//    newView->readAllCommentsFromDB(newView->getStartComments());
-
-//    qDebug()<<"FILENAME = "<< newView->getFileName();
-//=======
-
-//>>>>>>> features/Lysyk-new-methods-db
-    CodeEditor *newView = new CodeEditor(fileName);
+    CodeEditor *newView = new CodeEditor(nullptr, fileName);
     connect(newView, &CodeEditor::closeDocEventOccured, this, &DocumentManager::onCloseDocument);
     connect(newView, &CodeEditor::openDocument, this, &DocumentManager::onOpenDocument);
-    newView->setStartComments(newView->getCommentGetter()->getAllCommentsFromFile(fileName));
-    newView->readAllCommentsFromDB(newView->getStartComments());
-
     newView->setFocusPolicy(Qt::StrongFocus);
     return newView;
 }
