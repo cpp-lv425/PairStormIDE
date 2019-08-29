@@ -318,6 +318,8 @@ void CodeEditor::handleLineChange(int lastLineWithChange)
     {
         handleLinesDelition(lastLineWithChange, lineDifference);
     }
+
+    emit runHighlighter();
 }
 
 int CodeEditor::getLineNumberAreaWidth()
