@@ -28,7 +28,7 @@ public:
     QmlChatWidget& operator=(QmlChatWidget const &) = delete;
 
     virtual void keyPressEvent(QKeyEvent *event)                         override;
-    virtual void resizeEvent  (QResizeEvent * event)                     override;
+    virtual void resizeEvent  (QResizeEvent* event)                     override;
 
 public slots:
 
@@ -59,8 +59,8 @@ private slots:
 
     void shareMessageOnSendingMessage (const ChatMessage &message);
 
-    void ConnectUserOnSwitchOn     (const QString &userName);
-    void DisconnectUserOnSwitchOff (const QString &userName);
+    void connectUserOnSwitchOn     (const QString &userName);
+    void disconnectUserOnSwitchOff (const QString &userName);
 };
 
 #endif // QMLCHATWIDGET_H
