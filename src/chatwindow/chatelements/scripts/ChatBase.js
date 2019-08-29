@@ -42,7 +42,7 @@ function chatUserMessageColor(themeName)
     case gWhiteThemeName:
         return "#436697";
     case gDarkThemeName:
-        return "#b3bfc9";
+        return "#6193b0";
     }
 }
 
@@ -53,7 +53,7 @@ function chatAuthorMessageColor(themeName)
     case gWhiteThemeName:
         return "#4e6072";
     case gDarkThemeName:
-        return "#b3bfc9";
+        return "#659bc3";
     }
 }
 
@@ -64,7 +64,7 @@ function chatSystemMessageColor(themeName)
     case gWhiteThemeName:
         return "#438497";
     case gDarkThemeName:
-        return "#b3bfc9";
+        return "#65b0c3";
     }
 }
 
@@ -75,7 +75,7 @@ function chatMessageTextColor(themeName)
     case gWhiteThemeName:
         return "#eaf4ff";
     case gDarkThemeName:
-        return "#b3bfc9";
+        return "#092b45";
     }
 }
 
@@ -87,7 +87,7 @@ function chatInputBackgroundColor(themeName)
     case gWhiteThemeName:
         return "#c3d5e8";
     case gDarkThemeName:
-        return "#b3bfc9";
+        return "#315e7f";
     }
 }
 
@@ -98,7 +98,7 @@ function chatInputTextColor(themeName)
     case gWhiteThemeName:
         return "#1e3956";
     case gDarkThemeName:
-        return "#b3bfc9";
+        return "#e0f2ff";
     }
 }
 
@@ -107,9 +107,9 @@ function chatInputSelectionBackColor(themeName)
     switch(themeName)
     {
     case gWhiteThemeName:
-        return "#1e262d";
+        return "#637d99";
     case gDarkThemeName:
-        return "#b3bfc9";
+        return "#1179c6";
     }
 }
 
@@ -118,9 +118,9 @@ function chatInputSelectionTextColor(themeName)
     switch(themeName)
     {
     case gWhiteThemeName:
-        return "#1e262d";
+        return "#b4d5f9";
     case gDarkThemeName:
-        return "#b3bfc9";
+        return "#e0f2ff";
     }
 }
 
@@ -131,7 +131,7 @@ function chatInputTextHintColor(themeName)
     case gWhiteThemeName:
         return "#7f8e9d";
     case gDarkThemeName:
-        return "#b3bfc9";
+        return "#6c9abc";
     }
 }
 
@@ -142,7 +142,7 @@ function chatUsersBackgroundColor(themeName)
     case gWhiteThemeName:
         return "#bdd3ed";
     case gDarkThemeName:
-        return "#b3bfc9";
+        return "#1f4d6f";
     }
 }
 
@@ -153,7 +153,7 @@ function chatUsersTextColor(themeName)
     case gWhiteThemeName:
         return "#516680";
     case gDarkThemeName:
-        return "#b3bfc9";
+        return "#d1ecff";
     }
 }
 
@@ -164,7 +164,7 @@ function chatUsersSpacerColor(themeName)
     case gWhiteThemeName:
         return "#7798c0";
     case gDarkThemeName:
-        return "#b3bfc9";
+        return "#37709a";
     }
 }
 
@@ -175,7 +175,7 @@ function switchTurnedOnColor(themeName)
     case gWhiteThemeName:
         return "#68afa5";
     case gDarkThemeName:
-        return "#b3bfc9";
+        return "#2fb098";
     }
 }
 
@@ -186,6 +186,6 @@ function switchTurnedOffColor(themeName)
     case gWhiteThemeName:
         return "#e5f0f8";
     case gDarkThemeName:
-        return "#b3bfc9";
+        return "#aedcff";
     }
 }

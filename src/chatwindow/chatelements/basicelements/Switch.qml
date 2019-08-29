@@ -67,7 +67,7 @@ Item
 
             color:        switchItem.offStateColor
             border.color: switchItem.offStateBorderColor
-            border.width: 1
+            border.width: 2
 
             Rectangle
             {

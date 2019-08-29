@@ -72,25 +72,20 @@ Item
                 {
                     id: leftToothShape
 
-                    property string qml: messageAttributesColumn.adjustRight ?
-                                             "" : "basicelements/ToothShapeToLeft.qml"
-
                     anchors.bottom: messageBody.bottom
                     width:  messageAttributesColumn.adjustRight ? 0 : 10
                     height: messageAttributesColumn.adjustRight ? 0 : 15
 
-                    Loader
+                    enabled: !messageAttributesColumn.adjustRight
+                    visible: !messageAttributesColumn.adjustRight
+
+                    BasicElements.ToothShapeToLeft
                     {
                         anchors.fill: parent
-                        Component.onCompleted:
-                        {
-                            setSource(leftToothShape.qml,
-                                      {
-                                          itemColor:  messageBody.color,
-                                          leftOffset: 16,
-                                          maxHeight:  20
-                                      })
-                        }
+
+                        itemColor:  messageBody.color
+                        leftOffset: 16
+                        maxHeight:  20
                     }
                 }
 
@@ -134,8 +129,9 @@ Item
                         wrapMode:      Label.Wrap
 
                         text: model.content
-                        color:          ChatBase.chatMessageTextColor(globalTheme)
-                        selectionColor: Qt.darker(messageBody.color, 1.5)
+                        color:             ChatBase.chatMessageTextColor(globalTheme)
+                        selectionColor:    Qt.darker(messageBody.color, 1.3)
+                        selectedTextColor: color
 
                         MouseArea
                         {
@@ -206,25 +202,20 @@ Item
                 {
                     id: rightToothShape
 
-                    property string qml: messageAttributesColumn.adjustRight ?
-                                             "basicelements/ToothShapeToRight.qml" : ""
-
                     anchors.bottom: messageBody.bottom
                     width:  messageAttributesColumn.adjustRight ? 10 : 0
                     height: messageAttributesColumn.adjustRight ? 15 : 0
 
-                    Loader
+                    enabled: messageAttributesColumn.adjustRight
+                    visible: messageAttributesColumn.adjustRight
+
+                    BasicElements.ToothShapeToRight
                     {
                         anchors.fill: parent
-                        Component.onCompleted:
-                        {
-                            setSource(rightToothShape.qml,
-                                      {
-                                          itemColor:  messageBody.color,
-                                          leftOffset: 16,
-                                          maxHeight:  20
-                                      })
-                        }
+
+                        itemColor:  messageBody.color
+                        leftOffset: 16
+                        maxHeight:  20
                     }
                 }
             }
