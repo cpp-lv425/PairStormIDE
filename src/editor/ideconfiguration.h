@@ -11,6 +11,7 @@ struct TextColors
     QColor mCommentColor;
     QColor mCodeTextColor;
     QColor mLineCounterAreaColor;
+    QColor mWaveUnderlineColor;
 };
 struct ConfigParams
 {

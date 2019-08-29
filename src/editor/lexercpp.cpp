@@ -52,7 +52,6 @@ inline bool LexerCPP::isBlockComments(const QString &lexem)
     return cRx.exactMatch(lexem);
 }
 
-
 inline bool LexerCPP::isSpace(const QChar& sym)
 {
     return cSpaces.contains(sym);
@@ -100,6 +99,11 @@ void LexerCPP::clear()
     mIndex = 0;
     mCurrentLexem.clear();
     mState = State::ST;
+}
+
+bool LexerCPP::isLexerWasRunning() const
+{
+    return mWasRunning;
 }
 
 QVector<Token> LexerCPP::getTokens() const
@@ -269,7 +273,7 @@ void LexerCPP::handleLiteralState(const QChar &sym)
 
 void LexerCPP::lexicalAnalysis(QString code)
 {
-    wasRunning = true;
+    mWasRunning = true;
     mTokensOnCurrentLine.clear();
     QChar sym = 0;
     mIndex = 0;

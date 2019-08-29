@@ -155,7 +155,7 @@ QString getLineUnderCursor(QTextCursor &cursor)
 void EventCtrlUpArrow::operator()(CodeEditor *codeEditor, QKeyEvent *e)
 {
     QTextCursor cursor = codeEditor->textCursor();
-    if(cursor.blockNumber() > 0)
+    if (cursor.blockNumber() > 0)
     {
         emit codeEditor->linesWasSwapped(cursor.blockNumber(), cursor.blockNumber() - 1);
 
@@ -180,7 +180,7 @@ void EventCtrlDownArrow::operator()(CodeEditor *codeEditor, QKeyEvent *e)
 {
     QTextCursor cursor = codeEditor->textCursor();
 
-    if(cursor.blockNumber() < codeEditor->document()->blockCount() - 1)
+    if (cursor.blockNumber() < codeEditor->document()->blockCount() - 1)
     {
         emit codeEditor->linesWasSwapped(cursor.blockNumber(), cursor.blockNumber() + 1);
 

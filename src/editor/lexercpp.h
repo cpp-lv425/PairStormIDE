@@ -14,6 +14,7 @@ class LexerCPP: public iLexer
 {
 private:
     QVector<Token> mTokensOnCurrentLine;
+    bool mWasRunning;
     State mState;
     bool isCommentBlock;
     inline void addLexem();
@@ -41,18 +42,17 @@ private:
     void handleLiteralState(const QChar&);
     void handleCommentState(const QChar&);
     void handleUndefinedState(const QChar&);
-   // QStringList mIdentificatorsList; 
 
 public:
     LexerCPP()
     {
-        wasRunning = false;
+        mWasRunning = false;
         isCommentBlock = false;
     }
     ~LexerCPP() override = default;
-    bool wasRunning;
     void lexicalAnalysis(QString) override;
     QVector<Token> getTokens() const;
+    bool isLexerWasRunning() const;
     void clear();
 };
 

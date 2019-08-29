@@ -110,7 +110,7 @@ CodeEditor::~CodeEditor()
 void CodeEditor::setTextColors()
 {
     fmtUndefined.setUnderlineStyle(QTextCharFormat::WaveUnderline);
-    fmtUndefined.setUnderlineColor(Qt::red);
+    fmtUndefined.setUnderlineColor(mConfigParam.textColors.mWaveUnderlineColor);
     fmtLiteral.setForeground(mConfigParam.textColors.mStringsColor);
     fmtKeyword.setForeground(mConfigParam.textColors.mBasicLiteralsColor);
     fmtComment.setForeground(mConfigParam.textColors.mCommentColor);
@@ -148,7 +148,7 @@ void CodeEditor::setConfigParam(const ConfigParams &configParam)
     mConfigParam = configParam;
 }
 
-void CodeEditor::handleLinesSwap(int firstLine, int secondLine)
+void CodeEditor::handleLinesSwap(const int firstLine, const int secondLine)
 {
     QVector<Token> tmp = mTokensList[firstLine];
     mTokensList[firstLine] = mTokensList[secondLine];
@@ -157,7 +157,7 @@ void CodeEditor::handleLinesSwap(int firstLine, int secondLine)
 
 void CodeEditor::addToIdentifiersList(QStringList &identifiersName, int line)
 {
-    for(int j = 0; j < mTokensList[line].size(); ++j)
+    for (auto j = 0; j < mTokensList[line].size(); ++j)
     {
         if(mTokensList[line][j].mType == State::ID)
         {
@@ -178,7 +178,7 @@ void CodeEditor::handleLinesAddition(int changeStart, int lastLineWithChange, in
     }
 
     mHighlightingStart = changeStart > 0 ? changeStart - 1 : changeStart;
-    for (int i = changeStart; i <= lastLineWithChange; ++i)
+    for (auto i = changeStart; i <= lastLineWithChange; ++i)
     {
         changedCode = document()->findBlockByLineNumber(i).text();
         mLcpp->lexicalAnalysis(changedCode);
@@ -210,7 +210,7 @@ void CodeEditor::handleLinesDelition(int changeStart, int lastLineWithChange, in
     mTokensList[lastLineWithChange] = mLcpp->getTokens();
     addToIdentifiersList(identifiersName, lastLineWithChange);
 
-    for (int i = lastLineWithChange + 1; i < lastLineWithChange + lineDifference + 1; ++i)
+    for (auto i = lastLineWithChange + 1; i < lastLineWithChange + lineDifference + 1; ++i)
     {
         mTokensList.removeAt(i);
         mIdentifiersList.removeAt(i);
@@ -220,9 +220,9 @@ void CodeEditor::handleLinesDelition(int changeStart, int lastLineWithChange, in
 void CodeEditor::getNamesOfIdentifiers()
 {
     mIdentifiersNameList.clear();
-    for(int i = 0; i < mIdentifiersList.size(); ++i)
+    for (auto i = 0; i < mIdentifiersList.size(); ++i)
     {
-        for(int j = 0; j < mIdentifiersList[i].size(); ++j)
+        for (auto j = 0; j < mIdentifiersList[i].size(); ++j)
         {
             mIdentifiersNameList << mIdentifiersList[i][j];
         }
@@ -239,7 +239,7 @@ void CodeEditor::handleLineChange(int lastLineWithChange)
     int lineDifference = currentLinesCount - mLinesCount;
     mLinesCount = currentLinesCount;
 
-    if(!mLcpp->wasRunning)
+    if (!mLcpp->isLexerWasRunning())
     {
         lastLineWithChange += lineDifference;
     }
@@ -254,11 +254,6 @@ void CodeEditor::handleLineChange(int lastLineWithChange)
     }
 
     getNamesOfIdentifiers();
-
-    for(int i = 0; i < mIdentifiersNameList.size(); ++i)
-    {
-        qDebug() << mIdentifiersNameList[i];
-    }
 
     emit runHighlighter();
 }
@@ -434,7 +429,7 @@ void CodeEditor::setZoom(int zoomVal)
 
 void CodeEditor::textChangedInTheOneLine()
 {
-    if(mCode != document()->toPlainText())
+    if (mCode != document()->toPlainText())
     {
         mCode = document()->toPlainText();
         emit textChangedInLine(this->textCursor().blockNumber());
@@ -443,7 +438,7 @@ void CodeEditor::textChangedInTheOneLine()
 
 AddCommentButton *CodeEditor::getCommentButtonByIndex(const int line)
 {
-    for (int i = 0; i < mCommentsVector.size(); i++)
+    for (auto i = 0; i < mCommentsVector.size(); i++)
     {
         if (mCommentsVector[i]->getCurrentLine() == line)
         {
@@ -808,11 +803,11 @@ void CodeEditor::highlightText()
     int lastVisibleLine = cursor.blockNumber();
 
     // Highlight visible area
-    for(int i = start; i <= lastVisibleLine; ++i)
+    for (auto i = start; i <= lastVisibleLine; ++i)
     {
         if(i < mTokensList.size())
         {
-            for(int j = 0; j < mTokensList[i].size(); ++j)
+            for(auto j = 0; j < mTokensList[i].size(); ++j)
             {
                 switch(mTokensList[i][j].mType)
                 {
