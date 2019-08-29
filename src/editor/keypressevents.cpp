@@ -146,6 +146,61 @@ void EventSendLexem::operator()(CodeEditor * codeEditor, QKeyEvent *e)
 }
 EventSendLexem::~EventSendLexem() = default;
 
+QString getLineUnderCursor(QTextCursor &cursor)
+{
+    cursor.select(QTextCursor::LineUnderCursor);
+    return cursor.selectedText();
+}
+
+void EventCtrlUpArrow::operator()(CodeEditor *codeEditor, QKeyEvent *e)
+{
+    QTextCursor cursor = codeEditor->textCursor();
+    if (cursor.blockNumber() > 0)
+    {
+        emit codeEditor->linesWasSwapped(cursor.blockNumber(), cursor.blockNumber() - 1);
+
+        QString textOnCurrentLine = getLineUnderCursor(cursor);
+        cursor.removeSelectedText();
+
+        cursor.movePosition(QTextCursor::Up);
+        QString textOnUpperLine = getLineUnderCursor(cursor);
+        cursor.removeSelectedText();
+
+        cursor.movePosition(QTextCursor::Down);
+        cursor.insertText(textOnUpperLine);
+        cursor.movePosition(QTextCursor::Up);
+        cursor.insertText(textOnCurrentLine);
+
+        codeEditor->setTextCursor(cursor);
+    }
+}
+EventCtrlUpArrow::~EventCtrlUpArrow() = default;
+
+void EventCtrlDownArrow::operator()(CodeEditor *codeEditor, QKeyEvent *e)
+{
+    QTextCursor cursor = codeEditor->textCursor();
+
+    if (cursor.blockNumber() < codeEditor->document()->blockCount() - 1)
+    {
+        emit codeEditor->linesWasSwapped(cursor.blockNumber(), cursor.blockNumber() + 1);
+
+        QString textOnCurrentLine = getLineUnderCursor(cursor);
+        cursor.removeSelectedText();
+
+        cursor.movePosition(QTextCursor::Down);
+        QString textOnLowerLine = getLineUnderCursor(cursor);
+        cursor.removeSelectedText();
+
+        cursor.insertText(textOnCurrentLine);
+        cursor.movePosition(QTextCursor::Up);
+        cursor.insertText(textOnLowerLine);
+        cursor.movePosition(QTextCursor::Down);
+
+        codeEditor->setTextCursor(cursor);
+    }
+}
+EventCtrlDownArrow::~EventCtrlDownArrow() = default;
+
 //EventCtrlSlash
 void EventCtrlSlash::operator()(CodeEditor *codeEditor, QKeyEvent *e)
 {
