@@ -20,8 +20,9 @@
 #include<QMenu>
 #include <QVector>
 
-CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
+CodeEditor::CodeEditor(const QString &fileName, QWidget *parent) : QPlainTextEdit(parent)
 {
+    mFileName = fileName;
     setLineWrapMode(QPlainTextEdit::NoWrap);// don't move cursor to the next line where it's out of visible scope
     this->setVerticalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAlwaysOn);
     this->setTabStopDistance(TAB_SPACE * fontMetrics().width(QLatin1Char('0')));//set tab distance
@@ -54,10 +55,14 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     mCommentWidget->setVisible(false);
 
     commentGetter = new CommentDb;
+
    // qDebug()<<getFileName();
 
 //    mStartComments = commentGetter->getAllCommentsFromFile(getFileName());
 //    readAllCommentsFromDB(mStartComments);
+    mStartComments = commentGetter->getAllCommentsFromFile(getFileName());
+    readAllCommentsFromDB(mStartComments);
+
 
     //This signal is emitted when the text document needs an update of the specified rect.
     //If the text is scrolled, rect will cover the entire viewport area.
