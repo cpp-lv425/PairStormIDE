@@ -274,7 +274,7 @@ void LexerCPP::lexicalAnalysis(QString code)
     QChar sym = 0;
     mIndex = 0;
 
-    int end = code.size();
+    unsigned int end = static_cast<unsigned int>(code.size());
 
     while(mIndex < end)
     {

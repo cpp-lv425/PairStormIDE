@@ -155,6 +155,17 @@ void CodeEditor::handleLinesSwap(int firstLine, int secondLine)
     mTokensList[secondLine] = tmp;
 }
 
+void CodeEditor::addToIdentifiersList(QStringList &identifiersName, int line)
+{
+    for(int j = 0; j < mTokensList[line].size(); ++j)
+    {
+        if(mTokensList[line][j].mType == State::ID)
+        {
+            identifiersName << mTokensList[line][j].mName;
+        }
+    }
+}
+
 void CodeEditor::handleLinesAddition(int changeStart, int lastLineWithChange, int lineDifference)
 {
     QString changedCode;
@@ -163,6 +174,7 @@ void CodeEditor::handleLinesAddition(int changeStart, int lastLineWithChange, in
     {
         changeStart = lastLineWithChange - lineDifference;
         mTokensList.removeAt(changeStart);
+        mIdentifiersList.removeAt(changeStart);
     }
 
     mHighlightingStart = changeStart > 0 ? changeStart - 1 : changeStart;
@@ -173,10 +185,15 @@ void CodeEditor::handleLinesAddition(int changeStart, int lastLineWithChange, in
         if (lineDifference)
         {
             mTokensList.insert(i, mLcpp->getTokens());
+            QStringList identifiersName;
+            addToIdentifiersList(identifiersName, i);
+            mIdentifiersList.insert(i, identifiersName);
         }
         else
         {
+            QStringList identifiersName;
             mTokensList[i] = mLcpp->getTokens();
+            addToIdentifiersList(identifiersName, i);
         }
     }
 }
@@ -186,12 +203,29 @@ void CodeEditor::handleLinesDelition(int changeStart, int lastLineWithChange, in
     QString changedCode;
     lineDifference = -lineDifference;
     changedCode = document()->findBlockByLineNumber(lastLineWithChange).text();
+
     mLcpp->lexicalAnalysis(changedCode);
     mHighlightingStart = lastLineWithChange;
+    QStringList identifiersName;
     mTokensList[lastLineWithChange] = mLcpp->getTokens();
+    addToIdentifiersList(identifiersName, lastLineWithChange);
+
     for (int i = lastLineWithChange + 1; i < lastLineWithChange + lineDifference + 1; ++i)
     {
         mTokensList.removeAt(i);
+        mIdentifiersList.removeAt(i);
+    }
+}
+
+void CodeEditor::getNamesOfIdentifiers()
+{
+    mIdentifiersNameList.clear();
+    for(int i = 0; i < mIdentifiersList.size(); ++i)
+    {
+        for(int j = 0; j < mIdentifiersList[i].size(); ++j)
+        {
+            mIdentifiersNameList << mIdentifiersList[i][j];
+        }
     }
 }
 
@@ -217,6 +251,13 @@ void CodeEditor::handleLineChange(int lastLineWithChange)
     else
     {
         handleLinesDelition(changeStart, lastLineWithChange, lineDifference);
+    }
+
+    getNamesOfIdentifiers();
+
+    for(int i = 0; i < mIdentifiersNameList.size(); ++i)
+    {
+        qDebug() << mIdentifiersNameList[i];
     }
 
     emit runHighlighter();
@@ -756,25 +797,12 @@ void formating(QTextCharFormat fmt, QTextCursor &cursor, Token token, int starti
 
 void CodeEditor::highlightText()
 {
-    // Set cursor position to begining of visible area
-//    QTextCursor cursor = this->cursorForPosition(QPoint(0, 0));
-//    int firstVisibleLine = cursor.blockNumber();
-//    int startingPosition = cursor.position();
-
     QTextBlock block = document()->findBlockByLineNumber(mHighlightingStart);
     QTextCursor cursor(block);
     int start = cursor.blockNumber();
     int startingPosition = cursor.position();
 
-//    for(int i = 0; i < mHighlightingStart; ++i)
-//    {
-//        cursor.setPosition(startingPosition);
-//        cursor.movePosition(QTextCursor::EndOfLine);
-//        startingPosition = cursor.position() + 1;
-//    }
-//    qDebug() << startingPosition;
-
-    // Set cursor to end of visible aread
+    // Set cursor to end of visible area
     QPoint bottom_right(this->viewport()->width() - 1, this->viewport()->height() - 1);
     cursor = this->cursorForPosition(bottom_right);
     int lastVisibleLine = cursor.blockNumber();
@@ -806,6 +834,7 @@ void CodeEditor::highlightText()
                 }
             }
         }
+
         // Move cursor to the next line
         cursor.setPosition(startingPosition);
         cursor.movePosition(QTextCursor::EndOfLine);

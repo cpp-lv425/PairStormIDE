@@ -12,6 +12,7 @@ const int TOP_UNUSED_PIXELS_HEIGHT = 4;
 #include"ideconfiguration.h"
 #include"lexercpp.h"
 #include<utility>
+#include <QStringList>
 #include<QAbstractScrollArea>
 #include<QSettings>
 #include<QApplication>
@@ -82,6 +83,8 @@ private:
 
     void handleLinesAddition(int, int, int);
     void handleLinesDelition(int, int, int);
+    void addToIdentifiersList(QStringList&, int);
+    void getNamesOfIdentifiers();
 
     void addButton(const int line, const QString &Comment);
     void removeButtonByIndex(QVector<AddCommentButton*> &commentV, int index);
@@ -168,7 +171,8 @@ private:
 protected:
     int mCurrentZoom;
     QList<QVector<Token>> mTokensList;
-    QList<Token> mIdentifiersList;
+    QList<QStringList> mIdentifiersList;
+    QStringList mIdentifiersNameList;
     friend class Event;
 };
 
