@@ -96,14 +96,10 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     setTextColors();
 
     //completer
-<<<<<<< HEAD
     QStringList keywords;
     keywords <<"SELECT" <<"FROM" <<"WHERE"<<"WHEN"<<"WHILE"<<"int"<<"double"<<"static_cast<>()";//for test
-    mCompleter = new AutoCodeCompleter(mIdentifiersNameList, this);
-=======
-    completerKeywords <<"SELECT" <<"FROM" <<"WHERE"<<"WHEN"<<"WHILE"<<"int"<<"double"<<"static_cast<>()";//for test. it shlould read it from tokens vector
-    mCompleter = new AutoCodeCompleter(completerKeywords, this);
->>>>>>> develop
+    mCompleter = new AutoCodeCompleter(keywords, this);
+
     mCompleter->setCaseSensitivity(Qt::CaseInsensitive);
     mCompleter->setWidget(this);
 }
@@ -309,14 +305,6 @@ void CodeEditor::handleLineChange(int lastLineWithChange)
     getNamesOfIdentifiers();
 
     emit runHighlighter();
-    for(int i = 0; i < mTokensList.size(); ++i)
-    {
-        qDebug() << i;
-        for(int j = 0; j < mTokensList[i].size(); ++j)
-        {
-            qDebug() << mTokensList[i][j].mName;
-        }
-    }
 }
 
 int CodeEditor::getLineNumberAreaWidth()
