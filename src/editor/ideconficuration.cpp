@@ -26,14 +26,21 @@ void ConfigParams::setIdeType(const QString &ideType)
 
     if (ideType == "WHITE" || ideType == "BLUE")
     {
+        mIdeType = "WHITE";
         textColors.mCodeTextColor =        QColor("#000000");//black
         textColors.mLineCounterAreaColor = QColor("#C0C0C0");//light gray
     }
     else//dark
     {
+        mIdeType = "DARK";
         textColors.mCodeTextColor =        QColor("#FAF8F2");//almost white
         textColors.mLineCounterAreaColor = QColor("#373A38");//dark gray
     }
+}
+
+QString ConfigParams::getIdeType()
+{
+    return mIdeType;
 }
 
 QString ConfigParams::getFontStyle() const

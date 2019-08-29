@@ -31,6 +31,7 @@ CodeEditor::CodeEditor(const QString &fileName, QWidget *parent) : QPlainTextEdi
     mCode = document()->toPlainText();
     mCodeSize = 1;
     mHighlightingStart = 0;
+    mStyle = mConfigParam.getIdeType();
 
     //read settings
     QString analizerFontSize = settings.value("editorFontSize").toString();
@@ -105,7 +106,6 @@ CodeEditor::CodeEditor(const QString &fileName, QWidget *parent) : QPlainTextEdi
     QStringList keywords;
     keywords <<"SELECT" <<"FROM" <<"WHERE"<<"WHEN"<<"WHILE"<<"int"<<"double"<<"static_cast<>()";//for test
     mCompleter = new AutoCodeCompleter(keywords, this);
-
     mCompleter->setCaseSensitivity(Qt::CaseInsensitive);
     mCompleter->setWidget(this);
 }
@@ -493,8 +493,9 @@ void CodeEditor::setZoom(const int zoomVal)
 
 void CodeEditor::textChangedInTheOneLine()
 {
-    if (mCode != document()->toPlainText())
+    if (mCode != document()->toPlainText() || mStyle != mConfigParam.getIdeType())
     {
+        mStyle = mConfigParam.getIdeType();
         mCode = document()->toPlainText();
         emit textChangedInLine(this->textCursor().blockNumber());
     }
