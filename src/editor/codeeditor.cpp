@@ -54,7 +54,7 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     mCommentWidget->setVisible(false);
 
     commentGetter = new CommentDb;
-    mStartComments = commentGetter->getAllCommentsFromFile("main.cpp");
+    mStartComments = commentGetter->getAllCommentsFromFile(getFileName());
 
     readAllCommentsFromDB(mStartComments);
 
