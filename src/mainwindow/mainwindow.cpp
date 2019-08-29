@@ -1012,6 +1012,7 @@ void MainWindow::onNewProjectTriggered()
 void MainWindow::databaseConnect(QString directory)
 {
     db = ConnectionGetter::getDefaultConnection(directory + QDir::separator() + "storage.db");
+    qDebug()<<"on databaseConnect function";
     CreateDB database;
     database.addTableFile();
     database.addTableUser();

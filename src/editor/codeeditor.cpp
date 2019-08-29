@@ -29,7 +29,6 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     mLinesCount = 1;
 
     //read settings
-    QSettings settings(QApplication::organizationName(), QApplication::applicationName());
     QString analizerFontSize = settings.value("editorFontSize").toString();
     QString analizerFontName = settings.value("editorFontName").toString();
     QString analizerStyle = settings.value("style").toString();
@@ -55,14 +54,13 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     mCommentWidget->setVisible(false);
 
     commentGetter = new CommentDb;
-    mStartComments = commentGetter->getAllCommentsFromFile("main.cpp");
+    mStartComments = commentGetter->getAllCommentsFromFile(getFileName());
 
     readAllCommentsFromDB(mStartComments);
 
     //This signal is emitted when the text document needs an update of the specified rect.
     //If the text is scrolled, rect will cover the entire viewport area.
     //If the text is scrolled vertically, dy carries the amount of pixels the viewport was scrolled.
-
 
     connect(this,                         &CodeEditor::textChanged,                        this, &CodeEditor::textChangedInTheOneLine);
     connect(this,                         &CodeEditor::textChangedInLine,                  this, &CodeEditor::handleLineChange);
@@ -488,7 +486,7 @@ void CodeEditor::readAllCommentsFromDB(QVector<Comment> comments)
 {
     for(auto &i : comments)//go through all vector's elements from the DB
     {
-        addButton(i.mLine, i.mText);
+        addButton(i.mLine, i.mText, i.mUser);
     }
 }
 
@@ -498,11 +496,11 @@ QVector<Comment> CodeEditor::getAllCommentsToDB()
     for (auto &i : mCommentsVector)
     {
         Comment comment;
-        comment.mFile = "main.cpp"; //getFileName();
+        comment.mFile = getFileName();
         qDebug()<<comment.mFile;
         comment.mLine = i->getCurrentLine();
         comment.mText = i->getCommentString();
-        comment.mUser = "unnamed";//i->getUser();
+        comment.mUser = i->getUser();
         qDebug()<<comment.mUser;
         comments.push_back(comment);
     }
@@ -516,12 +514,25 @@ void CodeEditor::showCommentTextEdit(int line)
     mCommentWidget->setCommentButtonGeometry(mAddCommentButton->geometry());
     mCommentWidget->setCommentLine(line);
 
+//    auto commentButton = getCommentButtonByIndex(line);
+
+//    mCommentWidget->getEditTab()->setText(commentButton ? commentButton->getCommentString() : "");
+
+//    QSettings settings(QApplication::organizationName(), QApplication::applicationName());
+//    mCommentWidget->setWindowTitle("Comment to " + QString::number(line) + " line by " + settings.value("UserName").toString());
+    QString userName;
     auto commentButton = getCommentButtonByIndex(line);
-
-    mCommentWidget->getEditTab()->setText(commentButton ? commentButton->getCommentString() : "");
-
-    QSettings settings(QApplication::organizationName(), QApplication::applicationName());
-    mCommentWidget->setWindowTitle("Comment to " + QString::number(line) + " line by " + settings.value("UserName").toString());
+    if (commentButton)//if comment button by passed in the parametr line which exists
+    {
+        mCommentWidget->getEditTab()->setText(commentButton->getCommentString());//set text from this button text
+        userName = commentButton->getUser();
+    }
+    else
+    {
+        mCommentWidget->getEditTab()->setText("");
+        userName = settings.value("UserName").toString();
+    }
+    mCommentWidget->setWindowTitle("Comment to " + QString::number(line) + " line by " + userName);
 }
 
 void CodeEditor::emptyCommentWasAdded()
@@ -536,14 +547,26 @@ void CodeEditor::emptyCommentWasAdded()
 
 void CodeEditor::notEmptyCommentWasAdded()
 {
+//    if (commentButtonExists(mCommentWidget->getCommentLine()))//if button was existing, just reset text
+//    {
+//        auto commentButon = getCommentButtonByIndex(mCommentWidget->getCommentLine());
+//        setNewAddedButtonSettings(commentButon);
+//    }
+//    else
+//    {
+//        addButton(mCommentWidget->getCommentLine(), mCommentWidget->getEditTab()->getText());// create new button
+//    }
     if (commentButtonExists(mCommentWidget->getCommentLine()))//if button was existing, just reset text
     {
-        auto commentButonExisted = getCommentButtonByIndex(mCommentWidget->getCommentLine());
-        setNewAddedButtonSettings(commentButonExisted);
+        auto commentButon = getCommentButtonByIndex(mCommentWidget->getCommentLine());
+        commentButon->setUser(settings.value("UserName").toString());
+        setNewAddedButtonSettings(commentButon);
     }
     else
     {
-        addButton(mCommentWidget->getCommentLine(), mCommentWidget->getEditTab()->getText());// create new button
+        addButton(mCommentWidget->getCommentLine(),
+                  mCommentWidget->getEditTab()->getText(),
+                  settings.value("UserName").toString());// create new button
     }
 }
 
@@ -587,7 +610,7 @@ void CodeEditor::setLastRemomeKey(const LastRemoveKey &value)
     lastRemomeKey = value;
 }
 
-void CodeEditor::rewriteButtonsLines(QVector<AddCommentButton *> &commentV, const int diff, const int startLine)
+void CodeEditor::rewriteButtonsLines(QVector<AddCommentButton*> &commentV, const int diff, const int startLine)
 {
     //move buttons' lines according to diff
     for (auto &i : commentV)
@@ -625,18 +648,36 @@ bool CodeEditor::isInRangeIncludLast(const int val, const int leftMargin, const 
     return val > leftMargin && val <= rightMargin;
 }
 
-void CodeEditor::addButton(const int line, const QString &comment)
+//void CodeEditor::addButton(const int line, const QString &comment)
+//{
+//    AddCommentButton *commentButtonNew = new AddCommentButton(this);
+//    commentButtonNew->setGeometry(mCommentWidget->getCommentButtonGeometry());
+//    commentButtonNew->setCurrentLine(line);
+//    commentButtonNew->setCommentString(comment);
+
+
+//    commentButtonNew->setStyleSheet("background-color: #18CD3C");
+//    commentButtonNew->setText("✔");
+//    commentButtonNew->setVisible(true);
+
+
+//    setNewAddedButtonSettings(commentButtonNew);
+
+//    mCommentsVector.push_back(commentButtonNew);
+//    connect(mCommentsVector.back(), &AddCommentButton::addCommentButtonPressed, this, &CodeEditor::showCommentTextEdit);
+//}
+
+void CodeEditor::addButton(const int line, const QString &comment, const QString &userName)
 {
     AddCommentButton *commentButtonNew = new AddCommentButton(this);
     commentButtonNew->setGeometry(mCommentWidget->getCommentButtonGeometry());
     commentButtonNew->setCurrentLine(line);
     commentButtonNew->setCommentString(comment);
-
+    commentButtonNew->setUser(userName);
 
     commentButtonNew->setStyleSheet("background-color: #18CD3C");
     commentButtonNew->setText("✔");
     commentButtonNew->setVisible(true);
-
 
     setNewAddedButtonSettings(commentButtonNew);
 
