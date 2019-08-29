@@ -63,7 +63,6 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     //If the text is scrolled, rect will cover the entire viewport area.
     //If the text is scrolled vertically, dy carries the amount of pixels the viewport was scrolled.
 
-
     connect(this,                         &CodeEditor::textChanged,                        this, &CodeEditor::textChangedInTheOneLine);
     connect(this,                         &CodeEditor::textChangedInLine,                  this, &CodeEditor::handleLineChange);
     connect(this,                         &CodeEditor::cursorPositionChanged,              this, &CodeEditor::highlightText);
@@ -538,8 +537,8 @@ void CodeEditor::notEmptyCommentWasAdded()
 {
     if (commentButtonExists(mCommentWidget->getCommentLine()))//if button was existing, just reset text
     {
-        auto commentButonExisted = getCommentButtonByIndex(mCommentWidget->getCommentLine());
-        setNewAddedButtonSettings(commentButonExisted);
+        auto commentButon = getCommentButtonByIndex(mCommentWidget->getCommentLine());
+        setNewAddedButtonSettings(commentButon);
     }
     else
     {
@@ -587,7 +586,7 @@ void CodeEditor::setLastRemomeKey(const LastRemoveKey &value)
     lastRemomeKey = value;
 }
 
-void CodeEditor::rewriteButtonsLines(QVector<AddCommentButton *> &commentV, const int diff, const int startLine)
+void CodeEditor::rewriteButtonsLines(QVector<AddCommentButton*> &commentV, const int diff, const int startLine)
 {
     //move buttons' lines according to diff
     for (auto &i : commentV)
