@@ -109,6 +109,8 @@ CodeEditor::~CodeEditor()
 
 void CodeEditor::setTextColors()
 {
+    fmtUndefined.setUnderlineStyle(QTextCharFormat::WaveUnderline);
+    fmtUndefined.setUnderlineColor(Qt::red);
     fmtLiteral.setForeground(mConfigParam.textColors.mStringsColor);
     fmtKeyword.setForeground(mConfigParam.textColors.mBasicLiteralsColor);
     fmtComment.setForeground(mConfigParam.textColors.mCommentColor);
@@ -148,7 +150,6 @@ void CodeEditor::setConfigParam(const ConfigParams &configParam)
 
 void CodeEditor::handleLinesSwap(int firstLine, int secondLine)
 {
-    qDebug() << "OK";
     QVector<Token> tmp = mTokensList[firstLine];
     mTokensList[firstLine] = mTokensList[secondLine];
     mTokensList[secondLine] = tmp;
@@ -164,8 +165,6 @@ void CodeEditor::handleLinesAddition(int changeStart, int lastLineWithChange, in
         mTokensList.removeAt(changeStart);
     }
 
-    qDebug() << mHighlightingStart;
-
     mHighlightingStart = changeStart > 0 ? changeStart - 1 : changeStart;
     for (int i = changeStart; i <= lastLineWithChange; ++i)
     {
@@ -174,13 +173,13 @@ void CodeEditor::handleLinesAddition(int changeStart, int lastLineWithChange, in
         if (lineDifference)
         {
             mTokensList.insert(i, mLcpp->getTokens());
-            for(int j = 0; j < mTokensList[i].size(); ++j)
-            {
-                if(mTokensList[i][j].mType == State::ID)
-                {
-                    mIdentifiersList.append(mTokensList[i][j]);
-                }
-            }
+//            for(int j = 0; j < mTokensList[i].size(); ++j)
+//            {
+//                if(mTokensList[i][j].mType == State::ID)
+//                {
+//                    mIdentifiersList.append(mTokensList[i][j]);
+//                }
+//            }
         }
         else
         {
@@ -207,13 +206,13 @@ void CodeEditor::handleLinesDelition(int changeStart, int lastLineWithChange, in
     for (int i = lastLineWithChange + 1; i < lastLineWithChange + lineDifference + 1; ++i)
     {
         mTokensList.removeAt(i);
-        for(int j = 0; j < mTokensList[i].size(); ++j)
-        {
-            if(mTokensList[i][j].mType == State::ID && mIdentifiersList.contains(mTokensList[i][j]))
-            {
-                mIdentifiersList.removeOne(mTokensList[i][j]);
-            }
-        }
+//        for(int j = 0; j < mTokensList[i].size(); ++j)
+//        {
+////            if(mTokensList[i][j].mType == State::ID && mIdentifiersList.contains(mTokensList[i][j]))
+////            {
+////                mIdentifiersList.removeOne(mTokensList[i][j]);
+////            }
+//        }
     }
 }
 
@@ -239,15 +238,6 @@ void CodeEditor::handleLineChange(int lastLineWithChange)
     else
     {
         handleLinesDelition(changeStart, lastLineWithChange, lineDifference);
-    }
-
-    for(int i = 0; i < mTokensList.size(); ++i)
-    {
-        qDebug() << i;
-        for(int j = 0; j < mTokensList[i].size(); ++j)
-        {
-            qDebug() << mTokensList[i][j].mName;
-        }
     }
 
     emit runHighlighter();
@@ -832,6 +822,9 @@ void CodeEditor::highlightText()
                     break;
                 case(State::COM):
                     formating(fmtComment, cursor, mTokensList[i][j], startingPosition);
+                    break;
+                case(State::UNDEF):
+                    formating(fmtUndefined, cursor, mTokensList[i][j], startingPosition);
                     break;
                 default:
                     formating(fmtRegular, cursor, mTokensList[i][j], startingPosition);

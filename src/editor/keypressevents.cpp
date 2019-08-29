@@ -1,5 +1,4 @@
 #include "keypressevents.h"
-#include <QDebug>
 
 //EventDefault
 void EventDefault::operator()(CodeEditor *codeEditor, QKeyEvent *e)
@@ -147,6 +146,11 @@ void EventSendLexem::operator()(CodeEditor * codeEditor, QKeyEvent *e)
 }
 EventSendLexem::~EventSendLexem() = default;
 
+QString getLineUnderCursor(QTextCursor &cursor)
+{
+    cursor.select(QTextCursor::LineUnderCursor);
+    return cursor.selectedText();
+}
 
 void EventCtrlUpArrow::operator()(CodeEditor *codeEditor, QKeyEvent *e)
 {
@@ -155,13 +159,11 @@ void EventCtrlUpArrow::operator()(CodeEditor *codeEditor, QKeyEvent *e)
     {
         emit codeEditor->linesWasSwapped(cursor.blockNumber(), cursor.blockNumber() - 1);
 
-        cursor.select(QTextCursor::LineUnderCursor);
-        QString textOnCurrentLine = cursor.selectedText();
+        QString textOnCurrentLine = getLineUnderCursor(cursor);
         cursor.removeSelectedText();
 
         cursor.movePosition(QTextCursor::Up);
-        cursor.select(QTextCursor::LineUnderCursor);
-        QString textOnUpperLine = cursor.selectedText();
+        QString textOnUpperLine = getLineUnderCursor(cursor);
         cursor.removeSelectedText();
 
         cursor.movePosition(QTextCursor::Down);
@@ -182,13 +184,11 @@ void EventCtrlDownArrow::operator()(CodeEditor *codeEditor, QKeyEvent *e)
     {
         emit codeEditor->linesWasSwapped(cursor.blockNumber(), cursor.blockNumber() + 1);
 
-        cursor.select(QTextCursor::LineUnderCursor);
-        QString textOnCurrentLine = cursor.selectedText();
+        QString textOnCurrentLine = getLineUnderCursor(cursor);
         cursor.removeSelectedText();
 
         cursor.movePosition(QTextCursor::Down);
-        cursor.select(QTextCursor::LineUnderCursor);
-        QString textOnLowerLine = cursor.selectedText();
+        QString textOnLowerLine = getLineUnderCursor(cursor);
         cursor.removeSelectedText();
 
         cursor.insertText(textOnCurrentLine);
