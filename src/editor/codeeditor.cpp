@@ -96,8 +96,10 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     setTextColors();
 
     //completer
-    completerKeywords <<"SELECT" <<"FROM" <<"WHERE"<<"WHEN"<<"WHILE"<<"int"<<"double"<<"static_cast<>()";//for test. it shlould read it from tokens vector
-    mCompleter = new AutoCodeCompleter(completerKeywords, this);
+    QStringList keywords;
+    keywords <<"SELECT" <<"FROM" <<"WHERE"<<"WHEN"<<"WHILE"<<"int"<<"double"<<"static_cast<>()";//for test
+    mCompleter = new AutoCodeCompleter(keywords, this);
+
     mCompleter->setCaseSensitivity(Qt::CaseInsensitive);
     mCompleter->setWidget(this);
 }
@@ -230,7 +232,6 @@ void CodeEditor::handleLinesAddition(int changeStart, int lastLineWithChange, in
     {
         changeStart = lastLineWithChange - lineDifference;
         mTokensList.removeAt(changeStart);
-        mIdentifiersList.removeAt(changeStart);
     }
 
     mHighlightingStart = changeStart > 0 ? changeStart - 1 : changeStart;
@@ -241,20 +242,15 @@ void CodeEditor::handleLinesAddition(int changeStart, int lastLineWithChange, in
         if (lineDifference)
         {
             mTokensList.insert(i, mLcpp->getTokens());
-            QStringList identifiersName;
-            addToIdentifiersList(identifiersName, i);
-            mIdentifiersList.insert(i, identifiersName);
         }
         else
         {
-            QStringList identifiersName;
             mTokensList[i] = mLcpp->getTokens();
-            addToIdentifiersList(identifiersName, i);
         }
     }
 }
 
-void CodeEditor::handleLinesDelition(int changeStart, int lastLineWithChange, int lineDifference)
+void CodeEditor::handleLinesDelition(int lastLineWithChange, int lineDifference)
 {
     QString changedCode;
     lineDifference = -lineDifference;
@@ -262,14 +258,11 @@ void CodeEditor::handleLinesDelition(int changeStart, int lastLineWithChange, in
 
     mLcpp->lexicalAnalysis(changedCode);
     mHighlightingStart = lastLineWithChange;
-    QStringList identifiersName;
     mTokensList[lastLineWithChange] = mLcpp->getTokens();
-    addToIdentifiersList(identifiersName, lastLineWithChange);
 
     for (auto i = lastLineWithChange + 1; i < lastLineWithChange + lineDifference + 1; ++i)
     {
         mTokensList.removeAt(i);
-        mIdentifiersList.removeAt(i);
     }
 }
 
@@ -306,7 +299,7 @@ void CodeEditor::handleLineChange(int lastLineWithChange)
     }
     else
     {
-        handleLinesDelition(changeStart, lastLineWithChange, lineDifference);
+        handleLinesDelition(lastLineWithChange, lineDifference);
     }
 
     getNamesOfIdentifiers();
