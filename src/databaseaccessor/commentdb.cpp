@@ -91,6 +91,7 @@ void CommentDb::fillStructComment(Comment &comment)
     comment.mText = query.record().value(1).toString();
     comment.mUser = query.record().value(2).toString();
     comment.mFile = query.record().value(3).toString();
+    qDebug()<<comment.mText;
 }
 
 QString CommentDb::numberOfCommentInFileQuery(const QString filename)

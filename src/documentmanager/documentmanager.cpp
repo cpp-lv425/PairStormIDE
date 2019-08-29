@@ -294,11 +294,11 @@ CodeEditor* DocumentManager::createDoc(const QString &fileName)
     CodeEditor *newView = new CodeEditor;
     connect(newView, &CodeEditor::closeDocEventOccured, this, &DocumentManager::onCloseDocument);
     connect(newView, &CodeEditor::openDocument, this, &DocumentManager::onOpenDocument);
-
+    newView->setFileName(fileName);
     newView->getStartComments() = newView->getCommentGetter()->getAllCommentsFromFile(fileName);
     newView->readAllCommentsFromDB(newView->getStartComments());
 
-    newView->setFileName(fileName);
+    qDebug()<<"FILENAME = "<< newView->getFileName();
     newView->setFocusPolicy(Qt::StrongFocus);
     return newView;
 }

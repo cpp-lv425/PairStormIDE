@@ -97,7 +97,6 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     mCompleter = new AutoCodeCompleter(completerKeywords, this);
     mCompleter->setCaseSensitivity(Qt::CaseInsensitive);
     mCompleter->setWidget(this);
-    qDebug()<<"FILENAME = "<<getFileName();
 }
 
 CodeEditor::~CodeEditor()
@@ -489,6 +488,7 @@ void CodeEditor::readAllCommentsFromDB(QVector<Comment> comments)
 {
     for(auto &i : comments)//go through all vector's elements from the DB
     {
+        qDebug()<<i.mLine<<"  "<< i.mText<< " "<< i.mUser;
         addButton(i.mLine, i.mText, i.mUser);
     }
 }
