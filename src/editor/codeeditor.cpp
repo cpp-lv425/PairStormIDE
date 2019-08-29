@@ -260,7 +260,6 @@ void CodeEditor::handleLinesDelition(int lastLineWithChange, int lineDifference)
     mHighlightingStart = lastLineWithChange;
     mTokensList[lastLineWithChange] = mLcpp->getTokens();
 
-    qDebug() << "Last line: " << lastLineWithChange;
     for (auto i = lastLineWithChange + 1; i < lastLineWithChange + lineDifference + 1; ++i)
     {
         mTokensList.removeAt(lastLineWithChange + 1);
@@ -301,15 +300,6 @@ void CodeEditor::handleLineChange(int lastLineWithChange)
     else
     {
         handleLinesDelition(lastLineWithChange, lineDifference);
-    }
-
-    for(int i = 0; i < mTokensList.size(); ++i)
-    {
-        qDebug() << i;
-        for(int j = 0; j < mTokensList[i].size(); ++j)
-        {
-            qDebug() << mTokensList[i][j].mName;
-        }
     }
 
     emit runHighlighter();
