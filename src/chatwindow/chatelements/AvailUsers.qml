@@ -73,7 +73,7 @@ Item
                         clip:  true
 
                         font.pixelSize: userElement.height /
-                                        (ChatBase.golden_ratio)
+                                        (ChatBase.goldenRatio)
                         font.family:    "Consolas"
 
                         color: ChatBase.chatUsersTextColor(globalTheme)
@@ -90,7 +90,7 @@ Item
                         Layout.minimumWidth:   40
                         Layout.maximumWidth:   60
                         Layout.preferredWidth: userElement.width /
-                                               (ChatBase.golden_ratio * 5)
+                                               (ChatBase.goldenRatio * 5)
 
                         BasicElements.Switch
                         {
@@ -100,7 +100,7 @@ Item
 
                             onStateColor:    ChatBase.switchTurnedOnColor(globalTheme)
                             offStateColor:   ChatBase.switchTurnedOffColor(globalTheme)
-                            widthToHeight:   ChatBase.golden_ratio
+                            widthToHeight:   ChatBase.goldenRatio
                             preferredWidth:  parent.width
                             preferredHeight: parent.height
 

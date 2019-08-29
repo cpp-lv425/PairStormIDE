@@ -14,5 +14,6 @@
         <file>chatelements/MsgsLifeline.qml</file>
         <file>chat.qml</file>
         <file>chatdisabled.qml</file>
+        <file>chatelements/res/CHATCTRL.svg</file>
     </qresource>
 </RCC>

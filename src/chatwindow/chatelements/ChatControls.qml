@@ -3,9 +3,27 @@ import "scripts/ChatBase.js" as ChatBase
 
 Item
 {
-    Rectangle
+    id: controlButtons
+
+    Image
     {
-        anchors.fill: parent
-        color: ChatBase.chatInputBackgroundColor(globalTheme)
+        id: chatSettingsImage
+
+        anchors.centerIn: parent
+        width:  parent.width  / ChatBase.goldenRatio
+        height: parent.height / ChatBase.goldenRatio
+
+        mipmap:   true
+        fillMode: Image.PreserveAspectFit
+
+        source: "res/CHATCTRL.svg"
+        sourceSize: Qt.size(width, height)
+    }
+    MouseArea
+    {
+        anchors.fill: chatSettingsImage
+
+        enabled:     false
+        cursorShape: Qt.PointingHandCursor
     }
 }
