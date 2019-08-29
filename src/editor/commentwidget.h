@@ -34,10 +34,10 @@ public:
 
     void setPosition(QPlainTextEdit *editor, AddCommentButton *commentButton);
 
-    AddCommentTextEdit *getEditTab() const;
+    AddCommentTextEdit* getEditTab() const;
     void setEditTab(AddCommentTextEdit *value);
 
-    ViewTextEdit *getViewTab() const;
+    ViewTextEdit* getViewTab() const;
     void setViewTab(ViewTextEdit *value);
 
     QRect getCommentButtonGeometry() const;
@@ -48,7 +48,7 @@ public:
     int getCommentLine() const;
     void setCommentLine(int value);
 
-    QTabWidget *getCommentTabWIdget() const;
+    QTabWidget* getCommentTabWIdget() const;
     void setCommentTabWIdget(QTabWidget *value);
 
 private:

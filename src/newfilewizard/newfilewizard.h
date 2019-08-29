@@ -14,20 +14,23 @@ class NewFileDialog: public QDialog
 
 public:
     explicit NewFileDialog(QStringList &fileExtensions,
-                 QWidget *pParent = nullptr);
+                           QString projectPath,
+                           QWidget *pParent = nullptr);
     QString start();
-    bool isValidFilename(const QString& fileName);
 
 private:
     QLineEdit *mpLine;
     QListWidget *mpExtensionsList;
-    QString mPath;
+    QString mProjectPath;
     QString mFileName;
     QLineEdit *mpDirLbl;
 
+    bool isValidFilename(const QString &fileName);
+    bool directoryBelongsToProject(QString dirPath);
+
 private slots:
     void onSelectDirectory();
-    void onCreateFile();    
+    void onCreateFile();
 };
 
 #endif // NEWFILEWIZARD_H

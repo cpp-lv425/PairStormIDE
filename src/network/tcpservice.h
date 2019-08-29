@@ -24,11 +24,11 @@ class TcpService : public QObject
 
 public:
 
-    explicit TcpService(const QString & serverName, QObject *qObject = nullptr);
+    explicit TcpService(const QString &serverName, QObject *qObject = nullptr);
     TcpService(TcpService const&)            = delete;
     TcpService& operator=(TcpService const&) = delete;
 
-    bool sendDataToTcpServer(const QString & data, const ServerData & serverData);
+    bool sendDataToTcpServer(const QString &data, const ServerData &serverData);
 
     bool       isServerActive()      const;
     ServerData getServerAttributes() const;

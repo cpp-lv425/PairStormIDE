@@ -22,7 +22,7 @@ public:
 
 public slots:
 
-    virtual void configureOnLogin(const QString & userName) override;
+    virtual void configureOnLogin(const QString &userName) override;
 
     virtual void startSharing(const QString userName)       override;
     virtual void stopSharing (const QString userName)       override;
@@ -47,8 +47,8 @@ private:
     void startSharingAttributes();
     void startClearingOutdatedAttributes();
 
-    ServerData popFromConnectedAttributes(const QString & serverName);
-    ServerData pushToConnectedAttributes (const QString & serverName);
+    ServerData popFromConnectedAttributes(const QString &serverName);
+    ServerData pushToConnectedAttributes (const QString &serverName);
 
     QStringList getOnlineUsers()    const;
     QStringList getConnectedUsers() const;
