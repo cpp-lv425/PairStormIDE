@@ -82,7 +82,7 @@ private:
     bool isInRangeIncludLast(int val, int leftMargin, int rightMargin);
 
     void handleLinesAddition(int, int, int);
-    void handleLinesDelition(int, int, int);
+    void handleLinesDelition(int, int);
     void addToIdentifiersList(QStringList&, int);
     void getNamesOfIdentifiers();
 
