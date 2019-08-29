@@ -5,23 +5,27 @@
 AutoCodeCompleter::AutoCodeCompleter(const QStringList &completions, QObject *parent):
     QCompleter(completions, parent)
 {
+    mMinCompletionPrefixLength = 1;// we will see completetion menu if we pressed more that 1 character
     connect(this, SIGNAL(activated(QString)), this, SLOT(replaceCurrentWord(QString)));
 }
+
+AutoCodeCompleter::~AutoCodeCompleter() = default;
 
 void AutoCodeCompleter::createCompletionMenu(QTextCursor &textCursor,
                                              QPlainTextEdit *textEdit,
                                              QKeyEvent *event)
 {
     if (textCursor.selectedText().length() < getMinCompletionPrefixLength())// if min length hasn't inputed
+    {
         return;
-
+    }
     setCompletionPrefix(textCursor.selectedText());
     QRect rect = QRect(textEdit->cursorRect().bottomLeft(),//create rectangle with possible words
-                       QSize(COMPLETION_MENU_WIDTH, COMPLETION_MANU_HEIGHT));
+                       QSize(COMPLETION_MENU_WIDTH, COMPLETION_MENU_HIGHT));
     complete(rect);
-    //qt considers space as nothing when we're select start of word (see int eventFilter function)
+    //qt considers space as nothing when we're select start of word (see int the eventFilter function)
     //so if we inserted text and pressed space the fucntion textCursor.movePosition(QTextCursor::StartOfWord, QTextCursor::KeepAnchor)
-    //will return previous word. and the previous completion word will be shown again. In oreder to avoid it, here this situation is
+    //will return previous word. and the previous completion word will be shown again. In order to avoid it, here this situation is
     //hadling by catching space keyPress event. When we pressed space, we don't show popup menu.
     if (event->key() == Qt::Key_Space)
     {
@@ -43,6 +47,10 @@ bool AutoCodeCompleter::eventFilter(QObject *object, QEvent *event)
             }
 
             QPlainTextEdit *textEdit = qobject_cast<QPlainTextEdit*>(widget());//create textEdit
+            if (!textEdit)
+            {
+                return false;
+            }
             QTextCursor textCursor = textEdit->textCursor();
 
             textCursor.movePosition(QTextCursor::StartOfWord, QTextCursor::KeepAnchor);//make selection of the previous word
@@ -57,7 +65,7 @@ bool AutoCodeCompleter::eventFilter(QObject *object, QEvent *event)
             popup()->hide();
             if (popup()->currentIndex().isValid())
             {
-                // if complete word is selected
+                // if complete word is choosen
                 emit activated(popup()->currentIndex().data(completionRole()).toString());
             }
             return true;
@@ -66,25 +74,26 @@ bool AutoCodeCompleter::eventFilter(QObject *object, QEvent *event)
     return QCompleter::eventFilter(object, event);// handle not key event
 }
 
-void AutoCodeCompleter::setMinCompletionPrefixLength(int minCompletionPrefixLength)
-{
-    mMinCompletionPrefixLength = minCompletionPrefixLength;
-}
-
-void AutoCodeCompleter::replaceCurrentWord(QString text)
+void AutoCodeCompleter::replaceCurrentWord(const QString word)
 {
     QPlainTextEdit *textEdit = qobject_cast<QPlainTextEdit*>(widget());
+    if (!textEdit)
+    {
+        return;
+    }
     QTextCursor textCursor = textEdit->textCursor();
     textCursor.movePosition(QTextCursor::StartOfWord);
-    textCursor.movePosition(QTextCursor::EndOfWord, QTextCursor::KeepAnchor);
-    textCursor.insertText(text);
+    textCursor.movePosition(QTextCursor::EndOfWord, QTextCursor::KeepAnchor);//select word by cursor
+    textCursor.insertText(word);//replace selected word to string given in the parametr
     textEdit->setTextCursor(textCursor);
+}
+
+void AutoCodeCompleter::setMinCompletionPrefixLength(const int minCompletionPrefixLength)
+{
+    mMinCompletionPrefixLength = minCompletionPrefixLength;
 }
 
 int AutoCodeCompleter::getMinCompletionPrefixLength() const
 {
     return mMinCompletionPrefixLength;
 }
-
-AutoCodeCompleter::~AutoCodeCompleter() = default;
-

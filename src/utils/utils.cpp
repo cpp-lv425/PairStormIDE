@@ -11,3 +11,9 @@ IncorrectUserInput::IncorrectUserInput():  QException()
 FileOpeningFailure::FileOpeningFailure(): QException()
 {
 }
+
+DocumentPlacementFailure::DocumentPlacementFailure(): QException()
+{
+}
+
+const char* invalidFileOrDirNameRegex = R"exp([*/:;|=,\\\[\]])exp";

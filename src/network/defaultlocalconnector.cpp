@@ -2,7 +2,7 @@
 // ==========================================================================================
 // ==========================================================================================
 //                                                             LAUNCH SERVICES ON USER LOG IN
-void DefaultLocalConnector::configureOnLogin(const QString & userName)
+void DefaultLocalConnector::configureOnLogin(const QString &userName)
 {
     if (mpUdpService && mpTcpService)
     {
@@ -80,7 +80,7 @@ void DefaultLocalConnector::startClearingOutdatedAttributes()
 //                                                           CLEAR OUTDATED SERVER ATTRIBUTES
 void DefaultLocalConnector::clearOutdatedAttributesOnTimerTick()
 {
-    if(mDiscoveredServersAttrib.empty())
+    if (mDiscoveredServersAttrib.empty())
     {
         return;
     }
@@ -90,7 +90,7 @@ void DefaultLocalConnector::clearOutdatedAttributesOnTimerTick()
     mDiscoveredServersAttrib.erase(
                 std::remove_if(mDiscoveredServersAttrib.begin(),
                                mDiscoveredServersAttrib.end(),
-                               [currentMs, &outdatedServerNames] (const ServerData & serverAttributes) -> bool
+                               [currentMs, &outdatedServerNames] (const ServerData &serverAttributes) -> bool
                                {
                                    bool isOutdated = (currentMs - serverAttributes.mDiscoveryMoment) >
                                                       gDefaultOutdatingCycleMs;
@@ -106,9 +106,9 @@ void DefaultLocalConnector::clearOutdatedAttributesOnTimerTick()
     if (!outdatedServerNames.empty())
     {
         bool isAnyConnectedAttributesOutdated = false;
-        for(const auto & serverName : outdatedServerNames)
+        for (const auto &serverName : outdatedServerNames)
         {
-            if(!popFromConnectedAttributes(serverName).empty())
+            if (!popFromConnectedAttributes(serverName).empty())
             {
                 isAnyConnectedAttributesOutdated = true;
             }
@@ -148,7 +148,7 @@ void DefaultLocalConnector::addServerAttributesOnReceive()
     auto pExistentAttributes =
             std::find_if(mDiscoveredServersAttrib.begin(),
                          mDiscoveredServersAttrib.end(),
-                         [curretnAttributes] (const ServerData & inServerData)
+                         [curretnAttributes] (const ServerData &inServerData)
                          {
                              return inServerData.mName ==
                                     curretnAttributes.mName;
@@ -172,7 +172,7 @@ QStringList DefaultLocalConnector::getOnlineUsers() const
 {
     QStringList userNames;
     // Get user names from discovered servers
-    for (const auto & serverAttrib : mDiscoveredServersAttrib)
+    for (const auto &serverAttrib : mDiscoveredServersAttrib)
         userNames.push_back(serverAttrib.mName);
 
     return userNames;
@@ -185,7 +185,7 @@ QStringList DefaultLocalConnector::getConnectedUsers() const
 {
     QStringList userNames;
     // Get user names from connected servers
-    for (const auto & serverAttrib : mConnectedServersAttrib)
+    for (const auto &serverAttrib : mConnectedServersAttrib)
         userNames.push_back(serverAttrib.mName);
 
     return userNames;
@@ -194,17 +194,17 @@ QStringList DefaultLocalConnector::getConnectedUsers() const
 // ==========================================================================================
 // ==========================================================================================
 //                                                             TRY ADDING SERVER TO CONNECTED
-ServerData DefaultLocalConnector::pushToConnectedAttributes(const QString & serverName)
+ServerData DefaultLocalConnector::pushToConnectedAttributes(const QString &serverName)
 {
     ServerData serverAttributes;
     auto pDiscoveredServerAttributes =
             std::find_if(mDiscoveredServersAttrib.begin(),
                          mDiscoveredServersAttrib.end(),
-                         [serverName] (const ServerData & serverData)
+                         [serverName] (const ServerData &serverData)
                          {
                              return serverData.mName == serverName;
                          });
-    if(pDiscoveredServerAttributes == mDiscoveredServersAttrib.end())
+    if (pDiscoveredServerAttributes == mDiscoveredServersAttrib.end())
     {
         // If there is no such server in the discovered serers
         return serverAttributes;
@@ -212,11 +212,11 @@ ServerData DefaultLocalConnector::pushToConnectedAttributes(const QString & serv
     auto pConnectedServerAttributes =
             std::find_if(mConnectedServersAttrib.begin(),
                          mConnectedServersAttrib.end(),
-                         [serverName] (const ServerData & serverData)
+                         [serverName] (const ServerData &serverData)
                          {
                              return serverData.mName == serverName;
                          });
-    if(pConnectedServerAttributes == mConnectedServersAttrib.end())
+    if (pConnectedServerAttributes == mConnectedServersAttrib.end())
     {
         // If server is not already connected
         serverAttributes = *pDiscoveredServerAttributes;
@@ -228,17 +228,17 @@ ServerData DefaultLocalConnector::pushToConnectedAttributes(const QString & serv
 // ==========================================================================================
 // ==========================================================================================
 //                                                         TRY REMOVING SERVER FROM CONNECTED
-ServerData DefaultLocalConnector::popFromConnectedAttributes(const QString & serverName)
+ServerData DefaultLocalConnector::popFromConnectedAttributes(const QString &serverName)
 {
     ServerData serverAttributes;
     auto pServerAttributes =
             std::find_if(mConnectedServersAttrib.begin(),
                          mConnectedServersAttrib.end(),
-                         [serverName] (const ServerData & serverData)
+                         [serverName] (const ServerData &serverData)
                          {
                              return serverData.mName == serverName;
                          });
-    if(pServerAttributes != mConnectedServersAttrib.end())
+    if (pServerAttributes != mConnectedServersAttrib.end())
     {
         serverAttributes = *pServerAttributes;
         mConnectedServersAttrib.erase(pServerAttributes);
@@ -304,7 +304,7 @@ void DefaultLocalConnector::shareMessage(const QString messageContent)
     message.mType       = NetworkMessage::Type::ChatMessage;
     message.mSourceName = mpTcpService->getServerAttributes().mName;
     message.mContent    = messageContent;
-    for(const auto & serverAttrib : mConnectedServersAttrib)
+    for (const auto &serverAttrib : mConnectedServersAttrib)
     {
         mpTcpService->sendDataToTcpServer(message.toJsonQString(), serverAttrib);
     }
@@ -324,7 +324,7 @@ void DefaultLocalConnector::shareChange(const QString changeContent)
     message.mType       = NetworkMessage::Type::ChangesMessage;
     message.mSourceName = mpTcpService->getServerAttributes().mName;
     message.mContent    = changeContent;
-    for(const auto & serverAttrib : mConnectedServersAttrib)
+    for (const auto &serverAttrib : mConnectedServersAttrib)
     {
         mpTcpService->sendDataToTcpServer(message.toJsonQString(), serverAttrib);
     }
@@ -349,7 +349,7 @@ void DefaultLocalConnector::parseTcpSegmentOnReceive()
     {
     case NetworkMessage::Type::StartSharingMessage:
         qDebug() << message.mSourceName << " wants to start sharing his workflow";
-        if(!pushToConnectedAttributes(message.mSourceName).empty())
+        if (!pushToConnectedAttributes(message.mSourceName).empty())
         {
             // Emit signal if user is successfully connected
             emit startSharingRequested (message.mSourceName);
@@ -358,7 +358,7 @@ void DefaultLocalConnector::parseTcpSegmentOnReceive()
         break;
     case NetworkMessage::Type::StopSharingMessage:
         qDebug() << message.mSourceName << " wants to stop sharing his workflow";
-        if(!popFromConnectedAttributes(message.mSourceName).empty())
+        if (!popFromConnectedAttributes(message.mSourceName).empty())
         {
             // Emit signal if user is successfully disconnected
             emit stopSharingRequested (message.mSourceName);

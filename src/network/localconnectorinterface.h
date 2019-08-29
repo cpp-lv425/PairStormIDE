@@ -17,7 +17,7 @@ protected:
 public slots:
 
     //======================= Slots for GUI events ===========================
-    virtual void configureOnLogin(const QString & userName) = 0;
+    virtual void configureOnLogin(const QString &userName) = 0;
 
     virtual void startSharing(const QString userName)       = 0;
     virtual void stopSharing (const QString userName)       = 0;

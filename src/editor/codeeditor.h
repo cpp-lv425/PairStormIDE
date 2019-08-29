@@ -50,7 +50,7 @@ public:
     CodeEditor(QWidget *parent = nullptr);
     virtual ~CodeEditor();
     void specialAreasRepaintEvent(QPaintEvent *event);
-    void repaintButtonsArea(int bottom, int top, int blockNumber);
+    void repaintButtonsArea(const int bottom, const int top, const int blockNumber);
     int getLineNumberAreaWidth();
     bool isinsidebracket();
     QString& getFileName();
@@ -58,7 +58,7 @@ public:
     std::pair<const QString &, const QString &> getChangedFileInfo();
     void undo();
     void redo();
-    void zoom(int val);
+    void zoom(const int val);
     bool isChanged();
     void setBeginTextState();
     const QByteArray& getBeginTextState()const;
@@ -69,31 +69,32 @@ public:
 
     ConfigParams getConfigParam();
     void setConfigParam(const ConfigParams &configParam);
-//    void highlighText();
 
     //DB methods
     void readAllCommentsFromDB(QVector<Comment> mStartComments);
     QVector<Comment> getAllCommentsToDB();
 
 private:
-    void rewriteButtonsLines( QVector<AddCommentButton*> &commentV, int diff, int startLine);
-    void setAnotherButtonLine(AddCommentButton *comment, int diff);
-    bool isInRangeIncludBoth(int val, int leftMargin, int rightMargin);
-    bool isInRangeIncludLast(int val, int leftMargin, int rightMargin);
+    void rewriteButtonsLines(QVector<AddCommentButton*> &commentV, const int diff, const int startLine);
+    void setAnotherButtonLine(AddCommentButton *comment, const int diff);
+    bool isInRangeIncludBoth(const int val, const int leftMargin, const int rightMargin);
+    bool isInRangeIncludLast(const int val, const int leftMargin, const int rightMargin);
 
     void handleLinesAddition(int, int, int);
     void handleLinesDelition(int, int);
     void addToIdentifiersList(QStringList&, int);
     void getNamesOfIdentifiers();
 
-    void addButton(const int line, const QString &Comment);
-    void removeButtonByIndex(QVector<AddCommentButton*> &commentV, int index);
+    void addButton(const int line, const QString &Comment, const QString &userName);
+    void removeButtonByIndex(QVector<AddCommentButton*> &commentV, const int index);
     void removeButtomByValue(QVector<AddCommentButton*> &commentV, AddCommentButton* commentButton);
-    void removeButtons(QVector<AddCommentButton*> &commentV, int cursorLine, int startLine, int endLine, int diff);
+    void removeButtons(QVector<AddCommentButton*> &commentV, const int cursorLine,
+                       const int startLine, const int endLine, const int diff);
 
-    bool isCommentButtonExist(int line);
+    bool commentButtonExists(int line);
     AddCommentButton* getCommentButtonByIndex(const int line);
     void setNewAddedButtonSettings(AddCommentButton *commentButton);
+    CodeEditor* getOpenedDocument(const QString &fileName);
 
 protected:
     void resizeEvent(QResizeEvent *event)override;
@@ -102,7 +103,7 @@ protected:
 
 private slots:
     void updateLineNumberAreaWidth();
-    void updateLineNumberArea(const QRect &rect, int dy);
+    void updateLineNumberArea(const QRect &rect, const int dy);
     void handleLineChange(int);
     void highlightText();
     void deleteComment();
@@ -121,6 +122,7 @@ public slots:
     void setFontSize(const QString &fontSize);
     void setFontStyle(const QString &fontStyle);
     void setIdeType(const QString &ideType);
+    void writeDefinitionToSource();
 
 signals:
     void linesWasSwapped(int, int);
@@ -131,6 +133,7 @@ signals:
     void textChangedInLine(int);
     void textChangedInLines(int, int);
     void linesCountUpdated();
+    void openDocument(const QString &);
 
 private:
     QWidget *mLineNumberArea;
@@ -146,7 +149,10 @@ private:
     QLabel *mCurrentCommentLable;
     QVector<Comment> mStartComments;
     QCompleter *mCompleter;
+    QStringList completerKeywords;
     CommentDb *commentGetter;
+    QSettings settings;
+
 
     int mLinesCountPrev;
     int mLinesCountCurrent;
@@ -174,6 +180,10 @@ protected:
     QList<QStringList> mIdentifiersList;
     QStringList mIdentifiersNameList;
     friend class Event;
+
+    // QWidget interface
+protected:
+    virtual void contextMenuEvent(QContextMenuEvent *event) override;
 };
 
 #endif // CODEEDITOR_H

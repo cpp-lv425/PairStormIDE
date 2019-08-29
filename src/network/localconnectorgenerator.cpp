@@ -2,9 +2,9 @@
 // ==========================================================================================
 // ==========================================================================================
 //                                                                 GENERATE DEFAULT CONNECTOR
-LocalConnectorInterface * LocalConnectorGenerator::getDefaultConnector()
+LocalConnectorInterface* LocalConnectorGenerator::getDefaultConnector()
 {
-    static LocalConnectorInterface * localConnector =
+    static LocalConnectorInterface *localConnector =
             new DefaultLocalConnector();
     return localConnector;
 }
