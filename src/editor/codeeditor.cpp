@@ -156,22 +156,23 @@ void CodeEditor::writeDefinitionToSource()
         auto sourceFileText = fileManager.readFromFile(sourceFileName);//get content of this source file
         if (!definitionExists(sourceFileText, this->textCursor()))//check if definition already exists
         {
-           auto sourceDocument =  getOpenedDocument(sourceFileName);
-           if (!sourceDocument)//if file is not opened
-           {
-               //write method definition to source file and emit signal in order to open this file
-               fileManager.writeToFile(sourceFileName, sourceFileText + "\n" + definitonTest);
-               emit openDocument(sourceFileName);
-               QMessageBox::information(this, successDefinCreateTitle, successDefinCreateMessage);
-               return;
-           }
-           //if source file is opened
-           sourceDocument->setPlainText(sourceDocument->toPlainText() + "\n" + definitonTest);
-           QMessageBox::information(this, successDefinCreateTitle, successDefinCreateMessage);
+            auto sourceDocument =  getOpenedDocument(sourceFileName);
+            if (!sourceDocument)//if file is not opened
+            {
+                //write method definition to source file and emit signal in order to open this file
+                fileManager.writeToFile(sourceFileName, sourceFileText + "\n" + definitonTest);
+                emit openDocument(sourceFileName);
+                QMessageBox::information(this, successDefinCreateTitle, successDefinCreateMessage);
+            }
+            else
+            {
+                 sourceDocument->setPlainText(sourceDocument->toPlainText() + "\n" + definitonTest);
+            }
+            QMessageBox::information(this, successDefinCreateTitle, successDefinCreateMessage);
         }
         else
         {
-             QMessageBox::information(this, definitionExistsTitle, definitionExistsMessage);
+            QMessageBox::information(this, definitionExistsTitle, definitionExistsMessage);
         }
     }
 }

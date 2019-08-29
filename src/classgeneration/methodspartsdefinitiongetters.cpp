@@ -50,7 +50,7 @@ QString createFilePath(const QString &rootPath, const QString &file)
     return rootPath + '/' + file;
 }
 
-QString getMethodDefinitionName(QTextCursor cursor)// return className::fucnName or funcName is class dosn't exist
+QString getMethodDefinitionName(QTextCursor cursor)// return className::fucnName or funcName is it's fucntion
 {
     auto declarationParts = getMethodDefinitionPattern(getTextByCursor(cursor));
     auto className = getClassNameForMethodDefinition(cursor);
