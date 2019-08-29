@@ -486,7 +486,7 @@ void CodeEditor::readAllCommentsFromDB(QVector<Comment> comments)
 {
     for(auto &i : comments)//go through all vector's elements from the DB
     {
-        addButton(i.mLine, i.mText);
+        addButton(i.mLine, i.mText, i.mUser);
     }
 }
 
