@@ -496,11 +496,11 @@ QVector<Comment> CodeEditor::getAllCommentsToDB()
     for (auto &i : mCommentsVector)
     {
         Comment comment;
-        comment.mFile = "main.cpp"; //getFileName();
+        comment.mFile = getFileName();
         qDebug()<<comment.mFile;
         comment.mLine = i->getCurrentLine();
         comment.mText = i->getCommentString();
-        comment.mUser = "unnamed";//i->getUser();
+        comment.mUser = i->getUser();
         qDebug()<<comment.mUser;
         comments.push_back(comment);
     }
