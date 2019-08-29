@@ -8,14 +8,14 @@
 class Connection
 {
 public:
-
-    ~Connection();
     void openDatabase();
+    ~Connection();
     QSqlDatabase getDatabase();
     static QString getPath();
     void close();
 private:
     Connection();
+
     static QString mPath;
     QSqlDatabase mDb;
     const QString typeDatabase = "QSQLITE";

@@ -64,17 +64,6 @@ void QmlChatWidget::configureOnLogin(const QString &userName)
 
     mUserName = userName;
 
-    // Create & connect chat messages controller
-    mpMessagesController = new ChatMessagesController(userName);
-    mpMessagesController->sendSystemMessage(SystemMessage::GreetingsMessage);
-    connect(mpMessagesController, &ChatMessagesController::sendingMessage,
-            this,                 &QmlChatWidget::shareMessageOnSendingMessage,
-            Qt::UniqueConnection);
-    // Register chat messages model & messages controller in the QML
-    qmlRegisterType<ChatMessagesModel>("PairStormChat", 1, 0, "MessagesModel");
-    qmlRegisterUncreatableType<ChatMessagesController>("PairStormChat", 1, 0, "MessagesList",
-                                                       "Messages list can be created only in backend");
-
     // Create & connect chat users controller
     mpUsersController = new ChatUsersController(mUserName);
     connect(mpUsersController, &ChatUsersController::userStateChangedConnected,
@@ -87,6 +76,18 @@ void QmlChatWidget::configureOnLogin(const QString &userName)
     qmlRegisterType<ChatUsersModel>("PairStormChat", 1, 0, "UsersModel");
     qmlRegisterUncreatableType<ChatUsersController>("PairStormChat", 1, 0, "UsersList",
                                                     "Users list can be created only in backend");
+
+    // Create & connect chat messages controller
+    mpMessagesController = new ChatMessagesController(userName);
+    mpMessagesController->sendSystemMessage(SystemMessage::GreetingsMessage);
+    connect(mpMessagesController, &ChatMessagesController::sendingMessage,
+            this,                 &QmlChatWidget::shareMessageOnSendingMessage,
+            Qt::UniqueConnection);
+    // Register chat messages model & messages controller in the QML
+    qmlRegisterType<ChatMessagesModel>("PairStormChat", 1, 0, "MessagesModel");
+    qmlRegisterUncreatableType<ChatMessagesController>("PairStormChat", 1, 0, "MessagesList",
+                                                       "Messages list can be created only in backend");
+
 
 
     QQuickView *tmpView = new QQuickView();
