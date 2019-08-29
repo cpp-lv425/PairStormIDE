@@ -39,7 +39,8 @@ MainWindow::MainWindow(QWidget *parent) :
     // create instance of Document Manager
     mpDocumentManager(new DocumentManager),
     // initializing palette configurator with current palette
-    mpPaletteConfigurator(new PaletteConfigurator(palette()))
+    mpPaletteConfigurator(new PaletteConfigurator(palette())),
+    dbFileManager(new FileDb)
 {
     // Generate default local network connector
     mplocalConnector =
@@ -352,6 +353,8 @@ void MainWindow::onNewFileTriggered()
         // new file dialog is called
         // name of newly created file is received
         newFileName = newFileDialog.start();
+        File newfile(newFileName);
+        dbFileManager->addFileToDb(newfile);
     }
     catch (const QException&)
     {
@@ -1011,7 +1014,7 @@ void MainWindow::onNewProjectTriggered()
 
 void MainWindow::databaseConnect(QString directory)
 {
-    db = ConnectionGetter::getDefaultConnection(directory + QDir::separator() + "storage.db");
+    db = ConnectionGetter::getDefaultConnection(directory + "/storage.db");
     qDebug()<<"on databaseConnect function";
     CreateDB database;
     database.addTableFile();

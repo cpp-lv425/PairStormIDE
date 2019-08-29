@@ -34,6 +34,7 @@ QVector<Comment> CommentDb::getAllCommentsFromFile(const QString filename)
       execQuery(numberOfCommentInFileQuery(filename));
       query.first();
       int count_of_messages =query.value(0).toInt();
+      qDebug()<<count_of_messages;
       QVector<Comment> comments(count_of_messages);
       execQuery(allCommentInFileQuery(filename));
       int counter = 0;

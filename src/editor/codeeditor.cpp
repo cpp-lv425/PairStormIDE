@@ -54,6 +54,7 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     mCommentWidget->setVisible(false);
 
     commentGetter = new CommentDb;
+    qDebug()<<getFileName();
     mStartComments = commentGetter->getAllCommentsFromFile(getFileName());
 
     readAllCommentsFromDB(mStartComments);
@@ -253,15 +254,6 @@ void CodeEditor::handleLineChange(int lastLineWithChange)
     else
     {
         handleLinesDelition(changeStart, lastLineWithChange, lineDifference);
-    }
-
-    for(int i = 0; i < mTokensList.size(); ++i)
-    {
-        qDebug() << i;
-        for(int j = 0; j < mTokensList[i].size(); ++j)
-        {
-            qDebug() << mTokensList[i][j].mName;
-        }
     }
 }
 
