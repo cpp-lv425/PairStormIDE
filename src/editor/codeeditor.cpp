@@ -173,24 +173,10 @@ void CodeEditor::handleLinesAddition(int changeStart, int lastLineWithChange, in
         if (lineDifference)
         {
             mTokensList.insert(i, mLcpp->getTokens());
-//            for(int j = 0; j < mTokensList[i].size(); ++j)
-//            {
-//                if(mTokensList[i][j].mType == State::ID)
-//                {
-//                    mIdentifiersList.append(mTokensList[i][j]);
-//                }
-//            }
         }
         else
         {
             mTokensList[i] = mLcpp->getTokens();
-//            for(int j = 0; j < mTokensList[i].size(); ++j)
-//            {
-//                if(mTokensList[i][j].mType == State::ID)
-//                {
-//                    mIdentifiersList.append(mTokensList[i][j]);
-//                }
-//            }
         }
     }
 }
@@ -206,13 +192,6 @@ void CodeEditor::handleLinesDelition(int changeStart, int lastLineWithChange, in
     for (int i = lastLineWithChange + 1; i < lastLineWithChange + lineDifference + 1; ++i)
     {
         mTokensList.removeAt(i);
-//        for(int j = 0; j < mTokensList[i].size(); ++j)
-//        {
-////            if(mTokensList[i][j].mType == State::ID && mIdentifiersList.contains(mTokensList[i][j]))
-////            {
-////                mIdentifiersList.removeOne(mTokensList[i][j]);
-////            }
-//        }
     }
 }
 
@@ -241,11 +220,6 @@ void CodeEditor::handleLineChange(int lastLineWithChange)
     }
 
     emit runHighlighter();
-
-//    for(int i = 0; i < mIdentifiersList.size(); ++i)
-//    {
-//        qDebug() << mIdentifiersList[i].mName;
-//    }
 }
 
 int CodeEditor::getLineNumberAreaWidth()
