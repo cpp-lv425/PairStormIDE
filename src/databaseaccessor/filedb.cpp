@@ -20,14 +20,12 @@ File FileDb::getFileFromDb(const int idFile)
     execQuery(getFileQuery(idFile));
     File rFile;
     fillStructureFile(rFile);
-    query.finish();
     return rFile;
 }
 
 void FileDb::deleteFileFromDb(const QString filename)
 {
     execQuery(deleteFileQuery(filename));
-    query.finish();
 }
 
 QString FileDb::addFileQuery(const File &file)

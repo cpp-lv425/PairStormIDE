@@ -16,11 +16,7 @@ void Accessor::setQuery(QSqlDatabase db)
 void Accessor::execQuery(QString queryStr)
 {
    query.prepare(queryStr);
-   if (query.exec())
-      {
-          qDebug()<<"executed query";
-      }
-      else
+   if (!query.exec())
       {
            qDebug()<<"not executed query";
       }

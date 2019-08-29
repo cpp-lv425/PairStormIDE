@@ -20,8 +20,9 @@
 #include<QMenu>
 #include <QVector>
 
-CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
+CodeEditor::CodeEditor(const QString &fileName, QWidget *parent) : QPlainTextEdit(parent)
 {
+    mFileName = fileName;
     setLineWrapMode(QPlainTextEdit::NoWrap);// don't move cursor to the next line where it's out of visible scope
     this->setVerticalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAlwaysOn);
     this->setTabStopDistance(TAB_SPACE * fontMetrics().width(QLatin1Char('0')));//set tab distance
@@ -58,9 +59,14 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     mCommentWidget->setVisible(false);
 
     commentGetter = new CommentDb;
-    mStartComments = commentGetter->getAllCommentsFromFile(getFileName());
 
+   // qDebug()<<getFileName();
+
+//    mStartComments = commentGetter->getAllCommentsFromFile(getFileName());
+//    readAllCommentsFromDB(mStartComments);
+    mStartComments = commentGetter->getAllCommentsFromFile(getFileName());
     readAllCommentsFromDB(mStartComments);
+
 
     //This signal is emitted when the text document needs an update of the specified rect.
     //If the text is scrolled, rect will cover the entire viewport area.
@@ -167,6 +173,16 @@ void CodeEditor::writeDefinitionToSource()
              QMessageBox::information(this, definitionExistsTitle, definitionExistsMessage);
         }
     }
+}
+
+QVector<Comment> CodeEditor::getStartComments() const
+{
+    return mStartComments;
+}
+
+CommentDb *CodeEditor::getCommentGetter() const
+{
+    return commentGetter;
 }
 
 void CodeEditor::contextMenuEvent(QContextMenuEvent *event)
@@ -301,8 +317,6 @@ void CodeEditor::handleLineChange(int lastLineWithChange)
     {
         handleLinesDelition(lastLineWithChange, lineDifference);
     }
-
-    emit runHighlighter();
 }
 
 int CodeEditor::getLineNumberAreaWidth()
@@ -531,6 +545,7 @@ void CodeEditor::readAllCommentsFromDB(QVector<Comment> comments)
 {
     for(auto &i : comments)//go through all vector's elements from the DB
     {
+        qDebug()<<i.mLine<<"  "<< i.mText<< " "<< i.mUser;
         addButton(i.mLine, i.mText, i.mUser);
     }
 }
