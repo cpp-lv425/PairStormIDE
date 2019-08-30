@@ -91,7 +91,7 @@ bool isFileWithExtension(const QString &fileName, const QString &extenion)
     {
         return false;
     }
-    return splitList[inderOfExtinsionCapture] == extenion;// if splited second part == given in the parametr's extension
+    return splitList.back() == extenion;// if splited second part == given in the parametr's extension
 }
 
 QString getParametrsFromMethodDefinition(const QString &funcDefinition)
