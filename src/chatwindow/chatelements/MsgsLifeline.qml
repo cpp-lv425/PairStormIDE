@@ -2,7 +2,7 @@ import QtQuick          2.8
 import QtQml.Models     2.12
 import PairStormChat    1.0
 import QtQuick.Layouts  1.3
-import QtQuick.Controls 2.0
+import QtQuick.Controls 2.5
 import "basicelements"       as BasicElements
 import "scripts/ChatBase.js" as ChatBase
 
@@ -38,6 +38,8 @@ Item
         }
 
         model: messagesModel
+
+        ScrollBar.vertical: ScrollBar {}
     }
     DelegateModel
     {
@@ -59,6 +61,9 @@ Item
             anchors.right: messageAttributesColumn.adjustRight ?
                                parent.right : undefined
 
+            anchors.rightMargin: 7
+            anchors.leftMargin:  7
+
             Row
             {
                 id: messageAttributesRow
@@ -71,6 +76,7 @@ Item
                 Control
                 {
                     id: leftToothShape
+                    z: 1
 
                     anchors.bottom: messageBody.bottom
                     width:  messageAttributesColumn.adjustRight ? 0 : 10
@@ -84,14 +90,16 @@ Item
                         anchors.fill: parent
 
                         itemColor:  messageBody.color
-                        leftOffset: 16
-                        maxHeight:  20
+                        maxHeight:  messageBody.height
+                        rightOffset: 16
                     }
                 }
 
                 Rectangle
                 {
                     id: messageBody
+                    z: 2
+
 
                     width:
                     {
@@ -106,7 +114,7 @@ Item
                     {
                         if (model.type === "ordinary")
                         {
-                            return messageAttributesColumn.adjustRight                   ?
+                            return messageAttributesColumn.adjustRight          ?
                                    ChatBase.chatAuthorMessageColor(globalTheme) :
                                    ChatBase.chatUserMessageColor(globalTheme)
                         }
@@ -126,12 +134,14 @@ Item
 
                         selectByMouse: true
                         readOnly:      true
-                        wrapMode:      Label.Wrap
+                        wrapMode:      TextEdit.Wrap
 
-                        text: model.content
+                        text: qsTr(model.content + "\n")
+
                         color:             ChatBase.chatMessageTextColor(globalTheme)
                         selectionColor:    Qt.darker(messageBody.color, 1.3)
                         selectedTextColor: color
+
 
                         MouseArea
                         {
@@ -197,10 +207,52 @@ Item
                             }
                         }
                     }
+                    Label
+                    {
+                        id: timestampText
+
+                        //anchors.right: messageBody.right
+                        //wrapMode: Label.Wrap
+                        /*
+
+                        anchors.left:  messageAttributesColumn.adjustRight ?
+                                           undefined    : parent.left
+                        anchors.right: messageAttributesColumn.adjustRight ?
+                                           parent.right : undefined
+                        */
+                        anchors.right: parent.right
+                        anchors.bottom: parent.bottom
+                        anchors.bottomMargin: 2
+                        //anchors.leftMargin:  5
+                        anchors.rightMargin: 8
+
+
+                        text:  Qt.formatDateTime(model.publicationDateTime, "h:mm AP")
+                        color: "black"
+                        /*
+                        color:
+                        {
+                            if (model.type === "ordinary")
+                            {
+                                return messageAttributesColumn.adjustRight          ?
+                                       ChatBase.chatAuthorMessageColor(globalTheme) :
+                                       ChatBase.chatUserMessageColor(globalTheme)
+                            }
+                            if (model.type === "service")
+                            {
+                                return ChatBase.chatSystemMessageColor(globalTheme)
+                            }
+                        }*/
+
+                        font.pixelSize: 12
+                        font.family:    "Hack"
+                        font.bold:      true
+                    }
                 }
                 Control
                 {
                     id: rightToothShape
+                    z: 1
 
                     anchors.bottom: messageBody.bottom
                     width:  messageAttributesColumn.adjustRight ? 10 : 0
@@ -214,28 +266,10 @@ Item
                         anchors.fill: parent
 
                         itemColor:  messageBody.color
+                        maxHeight:  messageBody.height
                         leftOffset: 16
-                        maxHeight:  20
                     }
                 }
-            }
-            Label
-            {
-                id: timestampText
-
-                anchors.left:  messageAttributesColumn.adjustRight ?
-                                   undefined    : parent.left
-                anchors.right: messageAttributesColumn.adjustRight ?
-                                   parent.right : undefined
-                anchors.leftMargin:  5
-                anchors.rightMargin: 5
-
-                text:  Qt.formatDateTime(model.publicationDateTime, "d MMM hh:mm")
-                color: ChatBase.backgroundTextColor(globalTheme)
-
-                font.pixelSize: 15
-                font.family:    "Consolas"
-                font.bold:      true
             }
         }
     }

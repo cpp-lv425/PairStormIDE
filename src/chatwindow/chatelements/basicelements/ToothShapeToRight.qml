@@ -39,10 +39,13 @@ Item
             strokeColor: toothShapeItem.itemColor
             fillColor:   toothShapeItem.itemColor
 
+            capStyle:  ShapePath.FlatCap
+            joinStyle: ShapePath.RoundJoin
+
             startX: -toothShapeItem.leftOffset;
             startY: 0
+            PathLine { x: -toothShapeItem.leftOffset; y: -toothShapeItem.maxHeight }
             PathLine { x: -2; y: -toothShapeItem.height     }
-            PathLine { x: -1; y: -toothShapeItem.maxHeight  }
             PathLine { x: 0;  y: -toothShapeItem.height/2   }
             PathLine { x: 1;  y: -toothShapeItem.height/3   }
             PathLine { x: 2;  y: -toothShapeItem.height/3.5 }
