@@ -138,10 +138,12 @@ Item
 
                         text: qsTr(model.content + "\n")
 
+                        font.pixelSize: 12
+                        font.family:    "Menlo"
+
                         color:             ChatBase.chatMessageTextColor(globalTheme)
                         selectionColor:    Qt.darker(messageBody.color, 1.3)
                         selectedTextColor: color
-
 
                         MouseArea
                         {
@@ -175,13 +177,13 @@ Item
                                 return Math.min(messageBody.width - 10,
                                                 messageAuthor.implicitWidth)
                             }
-                            text:  qsTr("  " + model.authorName)
+                            text:  qsTr("    " + model.authorName)
                             clip:  true
                             elide: Text.ElideRight
                             color: ChatBase.chatMessageTextColor(globalTheme)
 
-                            font.pixelSize: 15
-                            font.family:    "Consolas"
+                            font.pixelSize: 14
+                            font.family:    "Roboto"
                             font.bold:      true
 
                             Image
@@ -211,42 +213,30 @@ Item
                     {
                         id: timestampText
 
-                        //anchors.right: messageBody.right
-                        //wrapMode: Label.Wrap
-                        /*
-
-                        anchors.left:  messageAttributesColumn.adjustRight ?
-                                           undefined    : parent.left
-                        anchors.right: messageAttributesColumn.adjustRight ?
-                                           parent.right : undefined
-                        */
                         anchors.right: parent.right
                         anchors.bottom: parent.bottom
                         anchors.bottomMargin: 2
-                        //anchors.leftMargin:  5
-                        anchors.rightMargin: 8
-
+                        anchors.rightMargin:  8
 
                         text:  Qt.formatDateTime(model.publicationDateTime, "h:mm AP")
-                        color: "black"
-                        /*
+
+                        font.pixelSize: 11
+                        font.family:    "Monaco"
+                        font.bold:      true
+
                         color:
                         {
                             if (model.type === "ordinary")
                             {
                                 return messageAttributesColumn.adjustRight          ?
-                                       ChatBase.chatAuthorMessageColor(globalTheme) :
-                                       ChatBase.chatUserMessageColor(globalTheme)
+                                       ChatBase.chatAuthorMessageDateColor(globalTheme) :
+                                       ChatBase.chatUserMessageDateColor(globalTheme)
                             }
                             if (model.type === "service")
                             {
-                                return ChatBase.chatSystemMessageColor(globalTheme)
+                                return ChatBase.chatSystemMessageDateColor(globalTheme)
                             }
-                        }*/
-
-                        font.pixelSize: 12
-                        font.family:    "Hack"
-                        font.bold:      true
+                        }
                     }
                 }
                 Control
