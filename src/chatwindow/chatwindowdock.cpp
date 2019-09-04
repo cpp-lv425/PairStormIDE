@@ -1,69 +1,102 @@
 #include "chatwindowdock.h"
-
-#include <QListWidgetItem>
-#include <QKeyEvent>
-
-#include "mainwindow.h"
+#include "qmlchatwidget.h"
 #include "chatwidget.h"
-
-ChatWindowDock::ChatWindowDock(QWidget *pParent): QDockWidget (pParent)
+// ==========================================================================================
+// ==========================================================================================
+//                                                                                CONSTRUCTOR
+ChatWindowDock::ChatWindowDock(QWidget *pParent) :
+    QDockWidget (pParent)
 {
-    setWindowTitle("Chat");
-    mpChatWidget = new ChatWidget;
-
-    connect(mpChatWidget, &ChatWidget::userToConnectSelected,
-            this, &ChatWindowDock::onUserToConnectSelected);
-    connect(mpChatWidget, &ChatWidget::sendMessage,
-            this, &ChatWindowDock::onSendMessage);
-
+    // Build chat widget & connect it to the dock
+    mpChatWidget = new QmlChatWidget;
     setWidget(mpChatWidget);
-    setMinimumWidth(200);
-}
 
+    connect(mpChatWidget, &ChatWidgetInterface::startSharingRequested,
+            this,         &ChatWindowDock::sendRequestOnStartSharing,
+            Qt::UniqueConnection);
+
+    connect(mpChatWidget, &ChatWidgetInterface::stopSharingRequested,
+            this,         &ChatWindowDock::sendRequestOnStopSharing,
+            Qt::UniqueConnection);
+
+    connect(mpChatWidget, &ChatWidgetInterface::messageSent,
+            this,         &ChatWindowDock::shareMessageOnSend,
+            Qt::UniqueConnection);
+
+    setWindowTitle(mscChatTitle);
+}
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
+//                                                 CONFIGURE CHAT WHEN GUI SETS NEW USER NAME
 void ChatWindowDock::setUserName(const QString &userName)
 {
-    mpChatWidget->setCurrentUserName(userName);
+    mpChatWidget->configureOnLogin(userName);
 }
-
-void ChatWindowDock::displayMessage(const QString userName, const QString message)
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
+//                                                       GIVE RECEIVED MESSAGE TO CHAT WIDGET
+void ChatWindowDock::pushMessageToChat(const QString userName, const QString message)
 {
-    mpChatWidget->displayMessage(userName, message);
+    mpChatWidget->appendMessage(userName, message);
 }
-
-void ChatWindowDock::onUserToConnectSelected(QString userName)
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
+//                                                                 UPDATE THEME IN THE WIDGET
+void ChatWindowDock::updateTheme(const QString &newThemeName)
 {
-    if (!mpChatWidget->isUserConnected(userName))
-    {
-        emit userToConnectSelected(userName);
-    }
-    else
-    {
-        emit userToDisconnectSelected(userName);
-    }
+    mpChatWidget->updateTheme(newThemeName);
 }
-
-void ChatWindowDock::onSendMessage(const QString &message)
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
+//                                                   START SHARING WHEN USER INTENDS TO SHARE
+void ChatWindowDock::sendRequestOnStartSharing(const QString &userName)
 {
-    emit sendMessage(message);
+    emit startSharingWithUser(userName);
 }
-
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
+//                                               STOP SHARING WHEN USER WANTS TO STOP SHARING
+void ChatWindowDock::sendRequestOnStopSharing(const QString &userName)
+{
+    emit stopSharingWithUser(userName);
+}
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
+//                                                  SHARE MESSAGES, OUTGOING FROM CHAT WIDGET
+void ChatWindowDock::shareMessageOnSend(const QString &message)
+{
+    emit shareMessage(message);
+}
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
+//                                                       UPDATE ONLINE USERS LIST IN THE CHAT
+void ChatWindowDock::updateOnlineUsersOnChange(const QStringList onlineUsers)
+{
+    mpChatWidget->updateOnlineUsers(onlineUsers);
+}
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
+//                                                         UPDATE CONNECTED USERS IN THE CHAT
+void ChatWindowDock::updateConnectedUsersOnChange(const QStringList connectedUsers)
+{
+    mpChatWidget->updateConnectedUsers(connectedUsers);
+}
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
+//                                                          PASS KEY PRESS EVENTS TO THE CHAT
 void ChatWindowDock::keyPressEvent(QKeyEvent *event)
 {
-    if(event->key() == Qt::Key_Enter
-       || event->key() == Qt::Key_Return)
-    {
-        mpChatWidget->onSendCommand();
-    }
-
+    mpChatWidget->keyPressEvent(event);
     QDockWidget::keyPressEvent(event);
 }
 
-void ChatWindowDock::updateOnlineUsersOnChange(const QStringList onlineUsers)
-{
-    mpChatWidget->setOnlineUsers(onlineUsers);
-}
-
-void ChatWindowDock::updateConnectedUsersOnChange(const QStringList connectedUsers)
-{
-    mpChatWidget->setConnectedUsers(connectedUsers);
-}
+const QString ChatWindowDock::mscChatTitle = QString("Chat");

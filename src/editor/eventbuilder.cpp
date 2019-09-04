@@ -14,6 +14,10 @@ Event *EventBuilder::getEventNoModifier(QKeyEvent *e)
         return new EventApostrophe();
     case Qt::Key_Slash:
         return new EventSlash();
+    case Qt::Key_Backspace:
+        return new EventRemoveKey();
+    case Qt::Key_Delete:
+        return new EventRemoveKey();
     default:
         return new EventDefault();
     }
@@ -59,7 +63,11 @@ Event* EventBuilder::getEventControlModifier(QKeyEvent *e)
     case Qt::Key_D:
         return new EventSendLexem();
     case Qt::Key_V:
-        return new EventSaveChangeInHistory();
+        return new EventCtrlV();
+    case Qt::Key_Up:
+        return new EventCtrlUpArrow();
+    case Qt::Key_Down:
+        return new EventCtrlDownArrow();
     default:
         return new EventDefault();
     }

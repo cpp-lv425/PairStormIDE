@@ -2,43 +2,31 @@
 #define IDECONFIGURATION_H
 #include<QString>
 #include<QColor>
+#include<QTextFormat>
 
+struct TextColors
+{
+    QColor mStringsColor;
+    QColor mBasicLiteralsColor;
+    QColor mCommentColor;
+    QColor mCodeTextColor;
+    QColor mLineCounterAreaColor;
+    QColor mWaveUnderlineColor;
+};
 struct ConfigParams
 {
-    QColor mCodeTextColor;
-    QColor mCurrentLineColor;// line where we're standing
-    QColor mBasicLiteralsColor;// int, double, main, return, for, etc
-    QColor mUserTypesColor;// user's classes color
-    QColor mDefineTypesColor;// aliases values
-    QColor mCommentColor;
-    QColor mLineCounterAreaColor;//backg
-    QColor mStringsColor;// text between "..."
-
-    QString mTextStyle;
+    TextColors textColors;
+    QString mFontStyle;
+    QString mIdeType;
     int mFontSize;
-
-    void setConfigParams(QString textStyle, QString fontSize, QString ideType)
-    {
-        mTextStyle = textStyle;
-        mFontSize  = fontSize.toInt();
-        mBasicLiteralsColor =   QColor("#5377DB");// blue
-        mUserTypesColor =       QColor("#46C976");//light green
-        mDefineTypesColor =     QColor("#CA55E8");//purpule
-        mCommentColor =         QColor("#a0bf55");//green
-        mLineCounterAreaColor = QColor("#B5A8A8");//gray
-        mStringsColor =         QColor("#CD9D2C");//orange
-
-        if(ideType == "WHITE" || ideType == "BLUE")
-        {
-            mCodeTextColor =    QColor("#000000");//black
-            mCurrentLineColor = QColor("#EBDFE8");//very light gray
-        }
-
-        else//dark
-        {
-            mCodeTextColor =    QColor("#FAF8F2");//almost white
-            mCurrentLineColor = QColor("#8010FF");// almost black
-        }
-    }
+public:
+    QString getFontStyle() const;
+    void setFontStyle(const QString &fontStyle);
+    int getFontSize() const;
+    void setFontSize(const QString fontSize);
+    QString ConfigParams::getIdeType();
+    void setIdeType(const QString &ideType);
+    void setConfigParams(const QString fontStyle, const QString fontSize, const QString ideType);
 };
+
 #endif // IDECONFIGURATION_H

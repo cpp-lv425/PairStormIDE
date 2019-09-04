@@ -8,10 +8,17 @@ struct Token
 {
     QString mName;
     State mType;
-    unsigned int mBegin;
-    unsigned int mEnd;
+    int mBegin;
+    int mEnd;
     Token(QString name, State type, unsigned int begin, unsigned int end):
           mName(name), mType(type), mBegin(begin), mEnd(end) {}
+    bool operator== (const Token argument)
+    {
+        return mName == argument.mName
+               && mType == argument.mType
+               && mBegin == argument.mBegin
+               && mEnd == argument.mEnd;
+    }
 };
 
 #endif // TOKEN_H

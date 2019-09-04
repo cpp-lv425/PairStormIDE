@@ -26,5 +26,5 @@ BottomPanelDock::BottomPanelDock(QWidget *pParent): QDockWidget (pParent)
     mpTabWgt->addTab(pVersionsCtrl, tr("Version Control"));
 
     setWidget(mpTabWgt);
-    mpTabWgt->show();
+    setMaximumHeight(pParent->width() / 5);
 }

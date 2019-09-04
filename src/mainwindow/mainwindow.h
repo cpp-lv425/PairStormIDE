@@ -10,15 +10,20 @@ class MainWindow;
 
 QT_BEGIN_NAMESPACE
 class LocalConnectorInterface;
+class SettingsConfigurator;
+class PaletteConfigurator;
 class ProjectViewerDock;
 class QFileSystemModel;
+class NewProjectDialog;
 class BottomPanelDock;
+class DocumentManager;
 class QListWidgetItem;
 class ChatWindowDock;
 class QMdiSubWindow;
 class CodeEditor;
 class Browser;
-class MDIArea;
+class Connection;
+class FileDb;
 QT_END_NAMESPACE
 
 class MainWindow : public QMainWindow
@@ -32,34 +37,43 @@ public:
     ~MainWindow();
 
 private:
-    LocalConnectorInterface * mplocalConnector;
+    LocalConnectorInterface *mplocalConnector;
     Ui::MainWindow *ui;
     ProjectViewerDock *mpProjectViewerDock;
     ChatWindowDock *mpChatWindowDock;
     BottomPanelDock *mpBottomPanelDock;
-    MDIArea *mpDocsArea;
-    QString mCurrentUserName;
+    QScopedPointer<DocumentManager> mpDocumentManager;    
     Browser *mDocumentationBrowser;
-    void setupMainMenu();
-    void saveDocument(CodeEditor *pDoc, const QString &fileName);
-    void openDoc(QString fileName);
-    bool isOpened(const QString &fileName)const;
-    bool isModified(QList<QMdiSubWindow*> &docsList);
-    void saveAllModifiedDocuments(QList<QMdiSubWindow*> &docsList);
+    QScopedPointer<PaletteConfigurator> mpPaletteConfigurator;
+    Connection *db;
+    FileDb* dbFileManager;
+
+    void setupMainMenu();    
+    void openDocument(const QString &fileName);
     void createProjectViewer();
     void createChatWindow();
     void createButtomPanel();
-    CodeEditor* getCurrentDoc();
 
     void saveMainWindowState();
     void restoreMainWindowState();
-    void setAppStyle();
+    void setInitialAppStyle();
+
+    // methods for dynamic change of IDE settings
+    void setAppStyle(const QString &style);
+    void setDocumentFontFamily(const QString &fontFamily);
+    void setDocumentFontSize(const QString &fontSize);
+
+    void databaseConnect(QString directory);
+    void databaseDisconnect();
 
 private slots:
     // file menu actions
+    void onNewProjectTriggered();
     void onNewFileTriggered();
+    void onNewClassTriggered();
     void onOpenFileTriggered();
-    void onOpenFolderTriggered();
+    void onOpenProjectTriggered();
+    void onCloseProjectTriggered();
     void onOpenStartPage();
     void onSaveFileTriggered();
     void onSaveFileAsTriggered();
@@ -78,9 +92,13 @@ private slots:
 
     // view menu
     void onFullScreenTriggered();
+    void onSplitHorizontallyTriggered();
+    void onSplitVerticallyTriggered();
     void onShowProjectViewerTriggered();
     void onShowChatWindowDockTriggered();
     void onShowBottomPanel();
+    void onCombineAreas();
+    void onCloseEmptyDocArea();   
 
     // tools menu
     void onRefactorTriggered();
@@ -92,17 +110,16 @@ private slots:
     void onReferenceTriggered();
     void onUserGuideTriggered();
     void onCheckUpdatesTriggered();
-
     void onReferenceFromEditor(const QString &keyword);
 
 public slots:
-    void onOpenFileFromProjectViewer(QString fileName);    
-    void onCloseWindow(CodeEditor *curDoc);   
+    void onOpenFileFromProjectViewer(QString fileName);
     void onConnectionStatusChanged(bool status);
+    void onSettingsChanged(std::map<QString, QString> newValues);
+    void openCreatedClassFiles(QString headerFile, QString sourceFile);
 
 private:
-    // creates new doc in MDIArea
-    CodeEditor* createNewDoc();
+    friend class SettingsConfigurator;
 
 protected:
     void closeEvent(QCloseEvent *event);

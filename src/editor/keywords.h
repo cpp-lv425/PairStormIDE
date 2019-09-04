@@ -11,7 +11,7 @@ const QSet<QString> cKeywords = {"auto", "break", "case", "char", "const", "cont
                                 "volatile", "while", "asm", "bool", "catch", "class",
                                 "const_cast", "wchar_t", "dynamic_cast", "explicit", "export", "false",
                                 "friend", "inline", "mutable", "namespace", "virtual", "operator",
-                                "private", "protected", "public", "reinterpret_cast", "static_cast", "template",
+                                "private", "protected", "public", "reinterpret_cast<>()", "static_cast<>()", "template",
                                 "this", "throw", "true", "try", "typeid", "typename",
                                 "using", "sizeof", "alignof", "typeid", "new", "delete", "delete[]"};
 

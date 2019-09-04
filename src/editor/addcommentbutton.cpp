@@ -1,7 +1,8 @@
 #include "addcommentbutton.h"
 
 AddCommentButton::AddCommentButton(QWidget *parent):QPushButton (parent)
-{}
+{
+}
 
 AddCommentButton::~AddCommentButton() = default;
 
@@ -21,5 +22,22 @@ void AddCommentButton::mousePressEvent(QMouseEvent *event)
     emit addCommentButtonPressed(mCurrentLine);
 }
 
+QString AddCommentButton::getUser() const
+{
+    return mUser;
+}
 
+void AddCommentButton::setUser(const QString &user)
+{
+    mUser = user;
+}
 
+QString AddCommentButton::getCommentString() const
+{
+    return mCommentString;
+}
+
+void AddCommentButton::setCommentString(const QString &value)
+{
+    mCommentString = value;
+}

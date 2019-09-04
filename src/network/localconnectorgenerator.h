@@ -16,7 +16,7 @@ public:
     LocalConnectorGenerator& operator=(LocalConnectorGenerator const&) = delete;
 
     // Genrates default connector
-    static LocalConnectorInterface * getDefaultConnector();
+    static LocalConnectorInterface* getDefaultConnector();
 };
 
 #endif // LOCALCONNECTORGENERATOR_H

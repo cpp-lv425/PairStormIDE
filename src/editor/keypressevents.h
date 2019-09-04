@@ -110,6 +110,23 @@ public:
     ~EventSendLexem() override;
 
 };
+
+//Event for Ctrl + UpArrow
+class EventCtrlUpArrow : public Event
+{
+public:
+    void operator()(CodeEditor *codeEditor, QKeyEvent *e) override;
+    ~EventCtrlUpArrow() override;
+};
+
+//Event for Ctrl + DownArrow
+class EventCtrlDownArrow : public Event
+{
+public:
+    void operator()(CodeEditor *codeEditor, QKeyEvent *e) override;
+    ~EventCtrlDownArrow() override;
+};
+
 //Event for Ctrl + Slash
 class  EventCtrlSlash : public Event
 {
@@ -132,6 +149,25 @@ class  EventSaveChangeInHistory : public Event
 public:
     void operator()(CodeEditor *codeEditor, QKeyEvent *e) override;
     ~EventSaveChangeInHistory() override;
-
 };
+
+//EventCtrlV
+class  EventCtrlV : public Event
+{
+public:
+    void operator()(CodeEditor *codeEditor, QKeyEvent *e) override;
+    ~EventCtrlV() override;
+};
+
+class EventRemoveKey: public Event
+{
+public:
+    void operator()(CodeEditor *codeEditor, QKeyEvent *e) override;
+    ~EventRemoveKey() override;
+};
+
+bool isNotEnterKey(QKeyEvent *e);
+
+bool isUpDownKey(QKeyEvent *e);
+
 #endif // CODEEDITOREVENTS_H

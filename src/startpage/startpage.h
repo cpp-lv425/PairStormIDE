@@ -20,31 +20,26 @@ public:
 
 private:
     Ui::StartPage *ui;
-    QPushButton *mpNewBtn;
-    QPushButton *mpOpenBtn;
-    QPushButton *mpOpenDirBtn;
+    QPushButton *mpNewProjectBtn;
+    QPushButton *mpOpenProjectBtn;
     QPushButton *mpSettingsBtn;
 
 private slots:
-    void newBtnPressed();
-    void openBtnPressed();
-    void openDirPressed();
+    void newProjectBtnPressed();
+    void openProjectBtnPressed();
     void settingsBtnPressed();
 
 signals:
-    void onNewBtnPressed();
-    void onOpenBtnPressed();
-    void onOpenDirPressed();
+    void onNewProjectBtnPressed();
+    void onOpenProjectBtnPressed();
     void onSettingsBtnPressed();
 
 private:
     void setupLabels(QLabel *pLabel,
-                     QFont &lblFont,
-                     QPalette &palette);
+                     QFont &lblFont);
     void setupButton(QPushButton *pButton,
                      QIcon icon,
-                     int iconDimension,
-                     int maxWidth, const QString& text);
+                     int iconDimension);
 };
 
 #endif // STARTPAGE_H

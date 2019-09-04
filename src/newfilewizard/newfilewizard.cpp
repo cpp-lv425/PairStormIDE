@@ -1,6 +1,7 @@
 #include "newfilewizard.h"
 
 #include <QApplication>
+#include <QDirIterator>
 #include <QVBoxLayout>
 #include <QStringList>
 #include <QListWidget>
@@ -10,6 +11,7 @@
 #include <QLineEdit>
 #include <QScreen>
 #include <QLabel>
+#include <QDebug>
 #include <QDir>
 
 #include "usermessages.h"
@@ -17,7 +19,10 @@
 #include "utils.h"
 
 NewFileDialog::NewFileDialog(QStringList &fileExtensions,
-                             QWidget *pParent): QDialog (pParent)
+                             QString projectPath,
+                             QWidget *pParent):
+    QDialog (pParent),
+    mProjectPath(projectPath)
 {
     setWindowTitle("New File");
 
@@ -26,10 +31,7 @@ NewFileDialog::NewFileDialog(QStringList &fileExtensions,
     pLabel->setWordWrap(true);
     QFont lblFont("Segoe UI", 12);
     lblFont.setBold(true);
-    pLabel->setFont(lblFont);
-    QPalette palette;
-    palette.setColor(QPalette::WindowText, Qt::blue);
-    pLabel->setPalette(palette);
+    pLabel->setFont(lblFont);    
 
     // filename label
     QLabel *pFileNameLbl = new QLabel(tr("File Name"));
@@ -59,7 +61,7 @@ NewFileDialog::NewFileDialog(QStringList &fileExtensions,
     pLayout->addWidget(mpExtensionsList);
 
     // directory lineEdit
-    mpDirLbl = new QLineEdit(QDir::homePath());
+    mpDirLbl = new QLineEdit(projectPath);
     mpDirLbl->setReadOnly(true);
 
     // browse button
@@ -96,6 +98,10 @@ NewFileDialog::NewFileDialog(QStringList &fileExtensions,
     int x = screenGeometry.center().x() - width() / 2;
     int y = screenGeometry.center().y() - height() / 2;
     move(x, y);
+
+    // specify tab order
+    setTabOrder(pOkBtn, pCancelBtn);
+    setTabOrder(pCancelBtn, pBrowseBtn);
 }
 
 QString NewFileDialog::start()
@@ -112,16 +118,35 @@ QString NewFileDialog::start()
 
 bool NewFileDialog::isValidFilename(const QString &fileName)
 {
-    return !fileName.contains(QRegExp(R"exp([*/:;|=,\\\[\]])exp"));
+    return !fileName.contains(QRegExp(invalidFileOrDirNameRegex));
+}
+
+bool NewFileDialog::directoryBelongsToProject(QString dirPath)
+{
+    if (mProjectPath == dirPath)
+    {
+        return true;
+    }
+    QDirIterator dirIter(mProjectPath, QDir::Dirs, QDirIterator::Subdirectories);
+
+    while (dirIter.hasNext())
+    {
+        dirIter.next();
+        if (dirIter.filePath() == dirPath)
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
 void NewFileDialog::onSelectDirectory()
 {
-    mPath = QFileDialog::getExistingDirectory
+    QString path = QFileDialog::getExistingDirectory
             (this,
              userMessages[UserMessages::SelectDirectoryTitle],
-             QDir::homePath());
-    mpDirLbl->setText(mPath);
+             mProjectPath);
+    mpDirLbl->setText(path);
 }
 
 void NewFileDialog::onCreateFile()
@@ -144,10 +169,19 @@ void NewFileDialog::onCreateFile()
                              userMessages[UserMessages::EmptyFileNameMsg]);
         return;
     }
+
     if (!isValidFilename(mpLine->text()))
     {
         QMessageBox::warning(this, userMessages[UserMessages::WrongFileNameTitle],
                              userMessages[UserMessages::InvalidFileNameMsg]);
+        return;
+    }
+
+    if (!directoryBelongsToProject(dirName))
+    {
+        QMessageBox::warning(this,
+                             userMessages[UserMessages::WrongDirectoryTitle],
+                             userMessages[UserMessages::DirectoryDoesNotBelongToProjectMsg]);
         return;
     }
 

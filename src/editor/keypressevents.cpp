@@ -136,13 +136,70 @@ void EventSendLexem::operator()(CodeEditor * codeEditor, QKeyEvent *e)
     int position = cursor.position();
     for (const auto &it: editorTokens(codeEditor))
     {
-        if (it.mType == State::KW && it.mBegin <= position && it.mEnd >= position)
+        if (it[position].mType == State::KW
+            && it[position].mBegin <= position
+            && it[position].mEnd >= position)
         {
-            emit codeEditor->sendLexem(it.mName);
+            emit codeEditor->sendLexem(it[position].mName);
         }
     }
 }
 EventSendLexem::~EventSendLexem() = default;
+
+QString getLineUnderCursor(QTextCursor &cursor)
+{
+    cursor.select(QTextCursor::LineUnderCursor);
+    return cursor.selectedText();
+}
+
+void EventCtrlUpArrow::operator()(CodeEditor *codeEditor, QKeyEvent *e)
+{
+    QTextCursor cursor = codeEditor->textCursor();
+    if (cursor.blockNumber() > 0)
+    {
+        emit codeEditor->linesWasSwapped(cursor.blockNumber(), cursor.blockNumber() - 1);
+
+        QString textOnCurrentLine = getLineUnderCursor(cursor);
+        cursor.removeSelectedText();
+
+        cursor.movePosition(QTextCursor::Up);
+        QString textOnUpperLine = getLineUnderCursor(cursor);
+        cursor.removeSelectedText();
+
+        cursor.movePosition(QTextCursor::Down);
+        cursor.insertText(textOnUpperLine);
+        cursor.movePosition(QTextCursor::Up);
+        cursor.insertText(textOnCurrentLine);
+
+        codeEditor->setTextCursor(cursor);
+    }
+}
+EventCtrlUpArrow::~EventCtrlUpArrow() = default;
+
+void EventCtrlDownArrow::operator()(CodeEditor *codeEditor, QKeyEvent *e)
+{
+    QTextCursor cursor = codeEditor->textCursor();
+
+    if (cursor.blockNumber() < codeEditor->document()->blockCount() - 1)
+    {
+        emit codeEditor->linesWasSwapped(cursor.blockNumber(), cursor.blockNumber() + 1);
+
+        QString textOnCurrentLine = getLineUnderCursor(cursor);
+        cursor.removeSelectedText();
+
+        cursor.movePosition(QTextCursor::Down);
+        QString textOnLowerLine = getLineUnderCursor(cursor);
+        cursor.removeSelectedText();
+
+        cursor.insertText(textOnCurrentLine);
+        cursor.movePosition(QTextCursor::Up);
+        cursor.insertText(textOnLowerLine);
+        cursor.movePosition(QTextCursor::Down);
+
+        codeEditor->setTextCursor(cursor);
+    }
+}
+EventCtrlDownArrow::~EventCtrlDownArrow() = default;
 
 //EventCtrlSlash
 void EventCtrlSlash::operator()(CodeEditor *codeEditor, QKeyEvent *e)
@@ -184,11 +241,13 @@ void EventCtrlSlash::operator()(CodeEditor *codeEditor, QKeyEvent *e)
                 }
             }
 }
+
 void EventCtrlSlash::selectText(QTextCursor &cursor, int start, int end)
 {
     cursor.setPosition(start, QTextCursor::MoveAnchor);
     cursor.setPosition(end, QTextCursor::KeepAnchor);
 }
+
 void EventCtrlSlash::insertMultilineComment(CodeEditor *editor, QTextCursor &cursor, int start, int end)
 {
     cursor.setPosition(start);
@@ -199,6 +258,7 @@ void EventCtrlSlash::insertMultilineComment(CodeEditor *editor, QTextCursor &cur
     editor->setTextCursor(cursor);
     editor->insertPlainText(COMMENT_BLOCK_END);
 }
+
 void EventCtrlSlash::removeMultilineComment(CodeEditor *editor, QTextCursor &cursor, int start, int end)
 {
     selectText(cursor, start, start + COMMENT_BLOCK_START.size());
@@ -214,6 +274,37 @@ void EventSaveChangeInHistory::operator()(CodeEditor *codeEditor, QKeyEvent *e)
 {
     plainTextPressEvent(codeEditor, e);
     codeEditor->saveStateInTheHistory();
-
 }
+
 EventSaveChangeInHistory::~EventSaveChangeInHistory() = default;
+
+//EventCtrlV
+void EventCtrlV::operator()(CodeEditor *codeEditor, QKeyEvent *e)
+{
+    int lineStart = codeEditor->textCursor().blockNumber() + 1;
+    plainTextPressEvent(codeEditor, e);
+    codeEditor->saveStateInTheHistory();
+
+    int lineEnd = codeEditor->textCursor().blockNumber() + 1;
+    emit(codeEditor->textChangedInLines(lineStart, lineEnd));
+}
+
+EventCtrlV::~EventCtrlV() = default;
+
+void EventRemoveKey::operator()(CodeEditor *codeEditor, QKeyEvent *e)
+{
+    plainTextPressEvent(codeEditor,e);
+    codeEditor->setLastRemomeKey(e->key() == Qt::Key_Backspace ? BACK : DEL);
+}
+
+EventRemoveKey::~EventRemoveKey() = default;
+
+bool isNotEnterKey(QKeyEvent *e)
+{
+    return e->key() != Qt::Key_Enter && e->key() != Qt::Key_Return;
+}
+
+bool isUpDownKey(QKeyEvent *e)
+{
+    return e->key() == Qt::Key_Down || e->key() == Qt::Key_Up;
+}
