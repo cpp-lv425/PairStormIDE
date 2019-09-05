@@ -1,18 +1,27 @@
 #ifndef CONSOLEWINDOW_H
 #define CONSOLEWINDOW_H
 
-#include <QObject>
 #include <QWidget>
+#include <QPlainTextEdit>
+
+namespace Ui
+{
+class ConsoleWindow;
+}
 
 class ConsoleWindow : public QWidget
 {
     Q_OBJECT
+
 public:
     explicit ConsoleWindow(QWidget *parent = nullptr);
+    ~ConsoleWindow();
+    QString getTextFromConsole();
+    void setTextToConsole(const QString &);
 
-signals:
 
-public slots:
+private:
+    Ui::ConsoleWindow *ui;
 };
 
 #endif // CONSOLEWINDOW_H
