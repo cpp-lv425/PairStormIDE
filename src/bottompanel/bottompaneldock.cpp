@@ -1,4 +1,5 @@
 #include "bottompaneldock.h"
+#include "consolewindow/consolewindow.h"
 
 #include <QTabWidget>
 
@@ -10,7 +11,7 @@ BottomPanelDock::BottomPanelDock(QWidget *pParent): QDockWidget (pParent)
     mpTabWgt = new QTabWidget;
 
     // issues
-    QWidget *pIssuesTab = new QWidget;
+    QWidget *pIssuesTab = new ConsoleWindow;
     mpTabWgt->addTab(pIssuesTab, tr("Issues"));
 
     // compilation information
@@ -23,8 +24,8 @@ BottomPanelDock::BottomPanelDock(QWidget *pParent): QDockWidget (pParent)
 
     // version control
     QWidget *pVersionsCtrl = new QWidget;
-    mpTabWgt->addTab(pVersionsCtrl, tr("Version Control"));
+    mpTabWgt->addTab(pVersionsCtrl, tr("Terminal"));
 
     setWidget(mpTabWgt);
-    setMaximumHeight(pParent->width() / 5);
+    //setMaximumHeight(pParent->width() / 5);
 }

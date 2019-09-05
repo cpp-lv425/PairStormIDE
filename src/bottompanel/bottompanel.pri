@@ -7,3 +7,5 @@ HEADERS += \
 
 SOURCES += \
     $$PWD/bottompaneldock.cpp
+
+include($$PWD/consolewindow/consolewindow.pri)
