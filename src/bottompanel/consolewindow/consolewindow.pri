@@ -1,8 +1,10 @@
 HEADERS += \
-    $$PWD/consolewindow.h
+    $$PWD/terminalcontroller.h \
+    $$PWD/terminalview.h
 
 SOURCES += \
-    $$PWD/consolewindow.cpp
+    $$PWD/terminalcontroller.cpp \
+    $$PWD/terminalview.cpp
 
 FORMS += \
-    $$PWD/consolewindow.ui
+    $$PWD/terminalview.ui

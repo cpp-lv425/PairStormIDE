@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>ConsoleWindow</class>
- <widget class="QWidget" name="ConsoleWindow">
+ <class>TerminalView</class>
+ <widget class="QWidget" name="TerminalView">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>368</width>
-    <height>250</height>
+    <width>400</width>
+    <height>300</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,7 +15,7 @@
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <item>
-    <widget class="QPlainTextEdit" name="consoleText"/>
+    <widget class="QPlainTextEdit" name="inputCommandsEdit"/>
    </item>
   </layout>
  </widget>
