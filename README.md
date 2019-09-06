@@ -9,13 +9,13 @@
 [![Slack](https://img.shields.io/badge/Slack-Join-red)](http://cppteamsoftserve.slack.com/)
 
 
-<img src="src/img/SPLASHSCREEN.png" alt="PairStorm" align="center" width="256" height="256">
+<img src="src/img/SPLASHSCREEN.png" alt="PairStorm" align="center">
 
 Pair Storm is a project oriented integrated development environment, which based on conception of pair programming. The software contains many useful features, which aim to help programmers to write good and clearly code. About them you can read below. Also Pair Storm helps to organize coworking between two or more programmer. To reaching these goal in the program were added many modules, which help to communicate, share code etc. IDE was created by group LV-425.C++ of the SoftServe IT Academy. 
 
 :two_men_holding_hands: User-Friendly Interface :two_men_holding_hands:
 ======================================================================
-<img align="right" height=200 width=410 style="margin-left: 20px" src="https://user-images.githubusercontent.com/52821952/64379078-d01ec680-d036-11e9-8f44-14010ae4b005.png">
+<img align="right" height=160 width=410 style="margin-left: 20px" src="https://user-images.githubusercontent.com/52821952/64379078-d01ec680-d036-11e9-8f44-14010ae4b005.png">
 Interface of Pair Storm is pretty simple. If you were using integrated development environment like Visual Studio, Qt Creator, CLion and etc before, work with Pair Storm will not be a problem for you. The most used tools is always in sight. If you want access to advanced settings use the relevant menu.
  
 :speech_balloon: Embedded Chat :speech_balloon:
@@ -25,7 +25,7 @@ Pair Storm IDE has embedded chat. It helps to communicate with another programme
 
 :hammer: Refactoring Tools :hammer:
 ===================================
-<img align="right" width=250 style="margin-left: 20px" src="https://user-images.githubusercontent.com/52821952/64385117-dc0e8680-d03e-11e9-993a-bc40d504a335.png">
+<img align="right" width=220 style="margin-left: 20px" src="https://user-images.githubusercontent.com/52821952/64385117-dc0e8680-d03e-11e9-993a-bc40d504a335.png">
 IDE gives users many useful tools, which make development process easier and faster. For example, Pair Storm has embedded class generator. Using it programmer can create .h and .cpp files, define new methods in both file and etc. 
 
 Also Pair Storm have many useful features, which help programmer to write good code: auto tabulation, auto completion and etc.
