@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QString>
 #include <QProcess>
+#include "documentmanager.h"
 
 class ConsoleServiceProvider: public QObject
 {
@@ -16,12 +17,17 @@ public:
     void setStdOutput();
 signals:
     void processIsReadyToReadStandartOutput(QString);
+    void appendedTextIsReadyToSet(QString);
 public slots:
     void runConsoleCommand(const QString &command);
+private:
+    void writeToConsole(const QString &command);
 
 private:
     QString mCompilerPath;
     QProcess *mConsoleProcess;
+    DocumentManager documentManager;
+
 };
 
 #endif // CONSOLESERVICEPROVIDER_H

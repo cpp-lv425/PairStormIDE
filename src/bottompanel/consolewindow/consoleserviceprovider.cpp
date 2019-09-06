@@ -9,6 +9,7 @@ ConsoleServiceProvider::ConsoleServiceProvider()
     mConsoleProcess = new QProcess(this);
     connect(mConsoleProcess, &QProcess::readyReadStandardOutput,
             this, &ConsoleServiceProvider::setStdOutput);
+    mConsoleProcess->setWorkingDirectory("C:\\Users\\Petro\\Desktop");//for test
 }
 
 QString ConsoleServiceProvider::compilerPath() const
@@ -23,23 +24,22 @@ void ConsoleServiceProvider::setCompilerPath(const QString &compilerPath)
 
 void ConsoleServiceProvider::setStdOutput()
 {
+    qDebug()<<"Document manager path = "<<documentManager.getCurrentProjectPath();
+    qDebug()<<"Working directory path= "<<mConsoleProcess->workingDirectory();
     if (QSysInfo::productType() == windowsProductType)
     {
         QTextCodec *codec = QTextCodec::codecForName(codecStandart);
         emit processIsReadyToReadStandartOutput
                 (codec->toUnicode(mConsoleProcess->readAllStandardOutput()));
-         qDebug()<<"process is ready emit"<<codec->toUnicode(mConsoleProcess->readAllStandardOutput());
     }
     else
     {
         emit processIsReadyToReadStandartOutput(mConsoleProcess->readAllStandardOutput());
-        qDebug()<<"process is ready emit"<<mConsoleProcess->readAllStandardOutput();
     }
 }
 
 void ConsoleServiceProvider::runConsoleCommand(const QString &command)
 {
-    qDebug()<<"inside runConsoleCommandMethod"<<" command = "<<command;
     QString executionCommand;
     if (QSysInfo::productType() == windowsProductType)
     {
@@ -47,6 +47,11 @@ void ConsoleServiceProvider::runConsoleCommand(const QString &command)
     }
     executionCommand += command;
     mConsoleProcess->start(executionCommand);
+}
+
+void ConsoleServiceProvider::writeToConsole(const QString &command)
+{
+    emit appendedTextIsReadyToSet(command);
 }
 
 ConsoleServiceProvider::~ConsoleServiceProvider() = default;

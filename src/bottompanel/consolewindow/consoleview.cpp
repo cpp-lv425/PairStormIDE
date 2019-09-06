@@ -11,10 +11,8 @@ void ConsoleView::keyPressEvent(QKeyEvent *event)
     if (event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter)
     {
         emit commandWasInputed(getTextByCursor(this->textCursor()));
-        qDebug()<<"commandWasInputed. "<<getTextByCursor(this->textCursor());
     }
     QPlainTextEdit::keyPressEvent(event);
-    qDebug()<<"keyEvent";
 }
 
 ConsoleView::~ConsoleView() = default;
