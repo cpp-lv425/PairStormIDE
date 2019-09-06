@@ -26,3 +26,9 @@ ConsoleWindow::~ConsoleWindow()
 {
     delete ui;
 }
+
+void ConsoleWindow::setProjectPath(QString path)
+{
+    consoleServiceProvider->setWorkingDirectory(path);
+}
+

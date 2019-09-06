@@ -61,6 +61,8 @@ public slots:
     void onFocusChanged(QWidget *old, QWidget *now);
     void onCloseDocument(CodeEditor *doc);
     void onOpenDocument(const QString &fileName);
+signals:
+    void projectPathWasChanged(QString);
 
 private:
     void splitWindow();

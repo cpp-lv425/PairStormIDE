@@ -14,6 +14,7 @@ public:
     ~ConsoleView();
 signals:
     void commandWasInputed(QString);
+    void projectPathWasChanged(QString);
     // QWidget interface
 protected:
     virtual void keyPressEvent(QKeyEvent *event);

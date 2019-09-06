@@ -20,13 +20,14 @@ signals:
     void appendedTextIsReadyToSet(QString);
 public slots:
     void runConsoleCommand(const QString &command);
+    void setWorkingDirectory(QString);
 private:
     void writeToConsole(const QString &command);
 
 private:
     QString mCompilerPath;
     QProcess *mConsoleProcess;
-    DocumentManager documentManager;
+    DocumentManager *documentManager;
 
 };
 

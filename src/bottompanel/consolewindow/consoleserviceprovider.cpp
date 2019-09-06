@@ -1,5 +1,6 @@
 #include "consoleserviceprovider.h"
 #include "consoleliterals.h"
+#include "documentmanager.h"
 #include <QTextCodec>
 #include <QDebug>
 #include <QtCore>
@@ -7,9 +8,13 @@
 ConsoleServiceProvider::ConsoleServiceProvider()
 {
     mConsoleProcess = new QProcess(this);
+    documentManager = new DocumentManager;
     connect(mConsoleProcess, &QProcess::readyReadStandardOutput,
             this, &ConsoleServiceProvider::setStdOutput);
-    mConsoleProcess->setWorkingDirectory("C:\\Users\\Petro\\Desktop");//for test
+    connect(documentManager, &DocumentManager::projectPathWasChanged,
+            this, &ConsoleServiceProvider::setWorkingDirectory);
+    //connect(documentManager, SIGNAL(projectPathWasChanged(QString)), mConsoleProcess, SLOT())
+    //mConsoleProcess->setWorkingDirectory("C:\\Users\\Petro\\Desktop");//for test
 }
 
 QString ConsoleServiceProvider::compilerPath() const
@@ -24,8 +29,6 @@ void ConsoleServiceProvider::setCompilerPath(const QString &compilerPath)
 
 void ConsoleServiceProvider::setStdOutput()
 {
-    qDebug()<<"Document manager path = "<<documentManager.getCurrentProjectPath();
-    qDebug()<<"Working directory path= "<<mConsoleProcess->workingDirectory();
     if (QSysInfo::productType() == windowsProductType)
     {
         QTextCodec *codec = QTextCodec::codecForName(codecStandart);
@@ -47,6 +50,13 @@ void ConsoleServiceProvider::runConsoleCommand(const QString &command)
     }
     executionCommand += command;
     mConsoleProcess->start(executionCommand);
+}
+
+void ConsoleServiceProvider::setWorkingDirectory(QString directory)
+{
+    qDebug()<<"set working directory";
+    mConsoleProcess->setWorkingDirectory(directory);
+    qDebug()<<"working directory ="<<directory;
 }
 
 void ConsoleServiceProvider::writeToConsole(const QString &command)

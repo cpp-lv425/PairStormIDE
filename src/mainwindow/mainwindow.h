@@ -42,10 +42,11 @@ private:
     ProjectViewerDock *mpProjectViewerDock;
     ChatWindowDock *mpChatWindowDock;
     BottomPanelDock *mpBottomPanelDock;
-    QScopedPointer<DocumentManager> mpDocumentManager;    
+    //QScopedPointer<DocumentManager> mpDocumentManager;
     Browser *mDocumentationBrowser;
     QScopedPointer<PaletteConfigurator> mpPaletteConfigurator;
     Connection *db;
+    DocumentManager *mpDocumentManager;
     FileDb* dbFileManager;
 
     void setupMainMenu();    
@@ -117,6 +118,9 @@ public slots:
     void onConnectionStatusChanged(bool status);
     void onSettingsChanged(std::map<QString, QString> newValues);
     void openCreatedClassFiles(QString headerFile, QString sourceFile);
+    void reSendProjectPathChanged(QString);
+signals:
+    void projectPathWasChanged(QString);
 
 private:
     friend class SettingsConfigurator;

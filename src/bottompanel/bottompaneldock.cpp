@@ -2,6 +2,7 @@
 #include <QTabWidget>
 #include "mainwindow.h"
 #include "consolewindow/consolewindow.h"
+#include <QDebug>
 
 BottomPanelDock::BottomPanelDock(QWidget *pParent): QDockWidget (pParent)
 {
@@ -9,20 +10,29 @@ BottomPanelDock::BottomPanelDock(QWidget *pParent): QDockWidget (pParent)
     mpTabWgt = new QTabWidget;
 
     // issues
-    QWidget *pIssuesTab = new QWidget;
+    pIssuesTab = new QWidget;
     mpTabWgt->addTab(pIssuesTab, tr("Issues"));
 
     // compilation information
-    QWidget *pCompileInfo = new QWidget;
+    pCompileInfo = new QWidget;
     mpTabWgt->addTab(pCompileInfo, tr("Compile Output"));
 
     // debugging
-    QWidget *pDebugConsole = new QWidget;
+    pDebugConsole = new QWidget;
     mpTabWgt->addTab(pDebugConsole, tr("Debugger Console"));
 
     // version control
-    QWidget *pVersionsCtrl = new ConsoleWindow;
-    mpTabWgt->addTab(pVersionsCtrl, tr("Terminal"));
+    pTerminalConsole = new ConsoleWindow;
+    mpTabWgt->addTab(pTerminalConsole, tr("Terminal"));
+
+    connect(this, &BottomPanelDock::projectPathWasChanged,
+            pTerminalConsole, &ConsoleWindow::setProjectPath);
+
 
     setWidget(mpTabWgt);
+}
+
+void BottomPanelDock::reSendProjectPathChanged(QString path)
+{
+    emit projectPathWasChanged(path);
 }
