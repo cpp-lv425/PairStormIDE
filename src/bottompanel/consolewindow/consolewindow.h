@@ -2,6 +2,8 @@
 #define CONSOLEWINDOW_H
 
 #include <QWidget>
+#include "consoleserviceprovider.h"
+#include "consoleview.h"
 
 namespace Ui
 {
@@ -18,6 +20,8 @@ public:
 
 private:
     Ui::ConsoleWindow *ui;
+    ConsoleServiceProvider *consoleServiceProvider;
+    ConsoleView *consoleView;
 };
 
 #endif // CONSOLEWINDOW_H

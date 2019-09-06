@@ -2,6 +2,8 @@
 #define CONSOLESERVICEPROVIDER_H
 
 #include <QObject>
+#include <QString>
+#include <QProcess>
 
 class ConsoleServiceProvider: public QObject
 {
@@ -9,6 +11,17 @@ class ConsoleServiceProvider: public QObject
 public:
     ConsoleServiceProvider();
     virtual ~ConsoleServiceProvider();
+    QString compilerPath() const;
+    void setCompilerPath(const QString &compilerPath);
+    void setStdOutput();
+signals:
+    void processIsReadyToReadStandartOutput(QString);
+public slots:
+    void runConsoleCommand(const QString &command);
+
+private:
+    QString mCompilerPath;
+    QProcess *mConsoleProcess;
 };
 
 #endif // CONSOLESERVICEPROVIDER_H

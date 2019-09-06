@@ -1,8 +1,7 @@
 #include "bottompaneldock.h"
-
 #include <QTabWidget>
-
 #include "mainwindow.h"
+#include "consolewindow/consolewindow.h"
 
 BottomPanelDock::BottomPanelDock(QWidget *pParent): QDockWidget (pParent)
 {
@@ -22,7 +21,7 @@ BottomPanelDock::BottomPanelDock(QWidget *pParent): QDockWidget (pParent)
     mpTabWgt->addTab(pDebugConsole, tr("Debugger Console"));
 
     // version control
-    QWidget *pVersionsCtrl = new QWidget;
+    QWidget *pVersionsCtrl = new ConsoleWindow;
     mpTabWgt->addTab(pVersionsCtrl, tr("Terminal"));
 
     setWidget(mpTabWgt);
