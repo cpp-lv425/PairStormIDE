@@ -36,8 +36,6 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    // create instance of Document Manager
-    mpDocumentManager(new DocumentManager),
     // initializing palette configurator with current palette
     mpPaletteConfigurator(new PaletteConfigurator(palette())),
     dbFileManager(new FileDb)
@@ -51,7 +49,9 @@ MainWindow::MainWindow(QWidget *parent) :
             this,
             &MainWindow::onConnectionStatusChanged,
             Qt::UniqueConnection);
-
+    mpDocumentManager = new DocumentManager;
+    connect(mpDocumentManager, &DocumentManager::projectPathWasChanged,
+            this, &MainWindow::reSendProjectPathChanged);
     ui->setupUi(this);
     {
         StoreConf conf;
@@ -327,6 +327,7 @@ void MainWindow::createButtomPanel()
     mpBottomPanelDock = new BottomPanelDock(this);
     mpBottomPanelDock->setObjectName("mpBottomPanelDock");
     addDockWidget(Qt::BottomDockWidgetArea, mpBottomPanelDock);
+    connect(this, &MainWindow::projectPathWasChanged, mpBottomPanelDock, &BottomPanelDock::reSendProjectPathChanged);
 }
 
 void MainWindow::onNewFileTriggered()
@@ -841,6 +842,11 @@ void MainWindow::openCreatedClassFiles(QString headerFile, QString sourceFile)
 {
     openDocument(headerFile);
     openDocument(sourceFile);
+}
+
+void MainWindow::reSendProjectPathChanged(QString str)
+{
+   emit projectPathWasChanged(str);
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
