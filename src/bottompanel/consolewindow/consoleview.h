@@ -11,13 +11,13 @@ class ConsoleView: public QPlainTextEdit
     Q_OBJECT
 public:
     ConsoleView(QWidget *parent = nullptr);
-    ~ConsoleView();
+    ~ConsoleView() override;
+
 signals:
     void commandWasInputed(QString);
     void projectPathWasChanged(QString);
-    // QWidget interface
 protected:
-    virtual void keyPressEvent(QKeyEvent *event);
+    virtual void keyPressEvent(QKeyEvent *event) override;
 };
 
 #endif // CONSOLEVIEW_H

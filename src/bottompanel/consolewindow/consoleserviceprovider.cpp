@@ -13,8 +13,6 @@ ConsoleServiceProvider::ConsoleServiceProvider()
             this, &ConsoleServiceProvider::setStdOutput);
     connect(documentManager, &DocumentManager::projectPathWasChanged,
             this, &ConsoleServiceProvider::setWorkingDirectory);
-    //connect(documentManager, SIGNAL(projectPathWasChanged(QString)), mConsoleProcess, SLOT())
-    //mConsoleProcess->setWorkingDirectory("C:\\Users\\Petro\\Desktop");//for test
 }
 
 QString ConsoleServiceProvider::compilerPath() const
@@ -41,22 +39,22 @@ void ConsoleServiceProvider::setStdOutput()
     }
 }
 
-void ConsoleServiceProvider::runConsoleCommand(const QString &command)
+void ConsoleServiceProvider::runConsoleCommand(QString command)
 {
     QString executionCommand;
     if (QSysInfo::productType() == windowsProductType)
     {
         executionCommand = cmdWindowsStartPath;
     }
-    executionCommand += command;
+    //remove start prefix for command execution (PS$)
+   // executionCommand += command.replace(0, QString(commandTextPrefix).length(), QString());
+    executionCommand +=command;
     mConsoleProcess->start(executionCommand);
 }
 
 void ConsoleServiceProvider::setWorkingDirectory(QString directory)
 {
-    qDebug()<<"set working directory";
     mConsoleProcess->setWorkingDirectory(directory);
-    qDebug()<<"working directory ="<<directory;
 }
 
 void ConsoleServiceProvider::writeToConsole(const QString &command)

@@ -21,7 +21,7 @@ BottomPanelDock::BottomPanelDock(QWidget *pParent): QDockWidget (pParent)
     pDebugConsole = new QWidget;
     mpTabWgt->addTab(pDebugConsole, tr("Debugger Console"));
 
-    // version control
+    // version control and console
     pTerminalConsole = new ConsoleWindow;
     mpTabWgt->addTab(pTerminalConsole, tr("Terminal"));
 

@@ -5,6 +5,7 @@
 
 QT_BEGIN_NAMESPACE
 class QTabWidget;
+class ConsoleWindow;
 QT_END_NAMESPACE
 
 class BottomPanelDock: public QDockWidget
@@ -22,7 +23,7 @@ private:
     QWidget *pIssuesTab;
     QWidget *pCompileInfo;
     QWidget *pDebugConsole;
-    QWidget *pTerminalConsole;
+    ConsoleWindow *pTerminalConsole;
 };
 
 #endif // BOTTOMPANELDOCK_H

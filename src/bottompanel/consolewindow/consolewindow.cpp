@@ -31,4 +31,3 @@ void ConsoleWindow::setProjectPath(QString path)
 {
     consoleServiceProvider->setWorkingDirectory(path);
 }
-

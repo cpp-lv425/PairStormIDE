@@ -19,7 +19,7 @@ signals:
     void processIsReadyToReadStandartOutput(QString);
     void appendedTextIsReadyToSet(QString);
 public slots:
-    void runConsoleCommand(const QString &command);
+    void runConsoleCommand(QString command);
     void setWorkingDirectory(QString);
 private:
     void writeToConsole(const QString &command);
