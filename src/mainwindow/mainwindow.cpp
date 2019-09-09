@@ -32,6 +32,7 @@
 #include "startpage.h"
 #include "utils.h"
 #include "sqliteaccess.h"
+#include <QDataStream>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -469,8 +470,9 @@ void MainWindow::onOpenProjectTriggered()
                 userMessages[UserMessages::ProjectDoesNotExistMsg]);
         return;
     }
-
+    restoreDatabaseFile();
     databaseConnect(dirName);
+    hideDatabaseFile();
 
     mpProjectViewerDock->setDir(dirName);
     mpDocumentManager->openProject(dirName);
@@ -1019,8 +1021,8 @@ void MainWindow::onNewProjectTriggered()
 
 void MainWindow::databaseConnect(QString directory)
 {
-    db = ConnectionGetter::getDefaultConnection(directory + "/storage.db");
-    qDebug()<<"on databaseConnect function";
+
+    db = ConnectionGetter::getDefaultConnection( + "C:/Users/Anastasia Antonyk/Desktop/sqlite/.storagehide.db");
     CreateDB database;
     database.addTableFile();
     database.addTableUser();
@@ -1031,4 +1033,48 @@ void MainWindow::databaseConnect(QString directory)
 void MainWindow::databaseDisconnect()
 {
     delete db;
+}
+
+void MainWindow::restoreDatabaseFile()
+{
+   /* QFile projectFile(FileManager().getProjectFileName());
+    QDataStream read(&projectFile);
+    const char * p;
+    read.writeRawData(p,10);*/
+   // qDebug()<<p;
+    //(&projectFile, QIODevice::ReadOnly);
+   // QFile outFile( "output.txt" );
+      // outFile.open( QIODevice::WriteOnly );
+
+       //QDataStream outStream( &outFile );
+   /* QFile file("C:/Users/Anastasia Antonyk/Desktop/sqlite/file.projps");
+    unsigned int len = file.size();
+    char * ch2 = new char [len];
+    qDebug()<<len;
+    file.open(QIODevice::ReadOnly);
+    QDataStream in(&file);
+    in.readRawData(ch2,len);
+    QFile fileDB("C:/Users/Anastasia Antonyk/Desktop/sqlite/storage1.db");
+fileDB.open(QIODevice::WriteOnly);
+QDataStream out(&fileDB);
+out.writeRawData(ch2,len);
+QString str(ch2);
+qDebug()<<str;*/
+}
+
+void MainWindow::hideDatabaseFile()
+{
+    QFile fileDB("C:/Users/Anastasia Antonyk/Desktop/sqlite/storage.db");
+    QFile fileproj("C:/Users/Anastasia Antonyk/Desktop/sqlite/file.projps");
+    fileDB.open(QIODevice::ReadOnly);
+    fileproj.open(QIODevice::WriteOnly);
+    QDataStream in(&fileDB);
+    QDataStream out(&fileproj);
+    unsigned int len = fileDB.size();
+    qDebug()<<len;
+    char * ch2 = new char [len];
+    int readed =  in.readRawData(ch2,len);
+    out.writeRawData(ch2,readed);
+    QString str(ch2);
+    qDebug()<<str;
 }

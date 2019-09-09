@@ -65,6 +65,8 @@ private:
 
     void databaseConnect(QString directory);
     void databaseDisconnect();
+    void restoreDatabaseFile();
+    void hideDatabaseFile();
 
 private slots:
     // file menu actions
