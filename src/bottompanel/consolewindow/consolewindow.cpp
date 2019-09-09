@@ -17,7 +17,10 @@ ConsoleWindow::ConsoleWindow(QWidget *parent) :
 
     connect(consoleServiceProvider, &ConsoleServiceProvider::processIsReadyToReadStandartOutput,
             consoleView, &QPlainTextEdit::appendPlainText);
-    connect(consoleView, &ConsoleView::commandWasInputed, consoleServiceProvider, &ConsoleServiceProvider::runConsoleCommand);
+
+    connect(consoleView, &ConsoleView::commandWasInputed,
+            consoleServiceProvider, &ConsoleServiceProvider::runConsoleCommand);
+
     connect(consoleServiceProvider, &ConsoleServiceProvider::appendedTextIsReadyToSet,
             consoleView, &QPlainTextEdit::appendPlainText);
 }

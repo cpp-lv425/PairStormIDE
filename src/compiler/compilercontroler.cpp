@@ -66,13 +66,12 @@ QString CompilerControler::createMakeFileContent(const QString &executibleFileNa
     {
         rMakeFileContent += sourceFile + ".o: " +
                 sourceFile + ".cpp\n" +
-                "\t$(CC) $ (CFLAGS) " + sourceFile + ".cpp\n\n";
+                "\t$(CC) $(CFLAGS) " + sourceFile + ".cpp\n\n";
     }
 
     rMakeFileContent += "clean:\n"
                         "\trm -rf *o " + executibleFileName;
 
-    qDebug()<<"Make file content = "<< rMakeFileContent;
     auto plainText = new QPlainTextEdit;
     plainText->setPlainText(rMakeFileContent);
     plainText->show();

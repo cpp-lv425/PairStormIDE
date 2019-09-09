@@ -18,11 +18,6 @@ QString ConsoleServiceProvider::compilerPath() const
     return mCompilerPath;
 }
 
-void ConsoleServiceProvider::setCompilerPath(const QString &compilerPath)
-{
-    mCompilerPath = compilerPath;
-}
-
 void ConsoleServiceProvider::setStdOutput()
 {
     if (QSysInfo::productType() == windowsProductType)// if it's windows console
