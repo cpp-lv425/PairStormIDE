@@ -181,7 +181,7 @@ QVector<Comment> CodeEditor::getStartComments() const
     return mStartComments;
 }
 
-CommentDb *CodeEditor::getCommentGetter() const
+CommentDb* CodeEditor::getCommentGetter() const
 {
     return commentGetter;
 }

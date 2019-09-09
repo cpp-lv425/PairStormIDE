@@ -11,8 +11,6 @@ ConsoleServiceProvider::ConsoleServiceProvider()
     documentManager = new DocumentManager;
     connect(mConsoleProcess, &QProcess::readyReadStandardOutput,
             this, &ConsoleServiceProvider::setStdOutput);
-    connect(documentManager, &DocumentManager::projectPathWasChanged,
-            this, &ConsoleServiceProvider::setWorkingDirectory);
 }
 
 QString ConsoleServiceProvider::compilerPath() const
@@ -27,7 +25,7 @@ void ConsoleServiceProvider::setCompilerPath(const QString &compilerPath)
 
 void ConsoleServiceProvider::setStdOutput()
 {
-    if (QSysInfo::productType() == windowsProductType)
+    if (QSysInfo::productType() == windowsProductType)// if it's windows console
     {
         QTextCodec *codec = QTextCodec::codecForName(codecStandart);
         emit processIsReadyToReadStandartOutput
@@ -46,8 +44,6 @@ void ConsoleServiceProvider::runConsoleCommand(QString command)
     {
         executionCommand = cmdWindowsStartPath;
     }
-    //remove start prefix for command execution (PS$)
-   // executionCommand += command.replace(0, QString(commandTextPrefix).length(), QString());
     executionCommand +=command;
     mConsoleProcess->start(executionCommand);
 }
