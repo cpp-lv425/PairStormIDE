@@ -1,6 +1,6 @@
 #include "compilercontroler.h"
 #include <QDirIterator>
-#include <filemanager.h>
+#include "filemanager.h"
 #include <QDebug>
 #include <QPlainTextEdit>
 #include <QString>
@@ -31,8 +31,16 @@ void CompilerControler::setProjectPath(const QString &projectPath)
 
 void CompilerControler::runCompilation()
 {
+    FileManager fileManager;
+    auto makeFilePath = mProjectPath + "/MakeFile";
+
     getAllSourceFilesFromTheProjectDirectory();
-    createMakeFileContent(getExecutibleFileName());
+
+    qDebug()<<"file path = "<< makeFilePath;
+    fileManager.createFile(makeFilePath);
+    fileManager.writeToFile(makeFilePath, createMakeFileContent(getExecutibleFileName()));
+
+    //run exec
 }
 
 QString CompilerControler::getExecutibleFileName() const
@@ -43,8 +51,6 @@ QString CompilerControler::getExecutibleFileName() const
 
 QString CompilerControler::createMakeFileContent(const QString &executibleFileName) const
 {
-//    FileManager fileManager;
-//    fileManager.createFile(mProjectPath + "MakeFile");
     QString rMakeFileContent;
     rMakeFileContent += QString("CC=g++\n\n") +
             QString("CFLAGS=-c -Wall\n\n") +

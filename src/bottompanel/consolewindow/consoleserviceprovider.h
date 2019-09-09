@@ -13,7 +13,6 @@ public:
     ConsoleServiceProvider();
     virtual ~ConsoleServiceProvider();
     QString compilerPath() const;
-    void setCompilerPath(const QString &compilerPath);
     void setStdOutput();
 signals:
     void processIsReadyToReadStandartOutput(QString);
