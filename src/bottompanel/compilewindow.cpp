@@ -1,5 +1,6 @@
 #include "compilewindow.h"
 #include "ui_compilewindow.h"
+#include "compiler/compilercontroler.h"
 
 CompileWindow::CompileWindow(QWidget *parent) :
     QWidget(parent),
@@ -16,4 +17,9 @@ CompileWindow::~CompileWindow()
 void CompileWindow::on_compileButton_clicked()
 {
     emit programIsReadyToCompile();
+}
+
+void CompileWindow::on_Removeall_clicked()
+{
+    removeAllExecutableAndObjectsFiles();
 }

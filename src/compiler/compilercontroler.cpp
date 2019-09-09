@@ -33,6 +33,8 @@ void CompilerControler::setProjectPath(const QString &projectPath)
 
 void CompilerControler::runCompilation()
 {
+    removeAllExecutableAndObjectsFiles();
+
     FileManager fileManager;
     auto makeFilePath = mProjectPath + "/MakeFile";
 
@@ -44,9 +46,14 @@ void CompilerControler::runCompilation()
     ConsoleServiceProvider *consoleProvider = new ConsoleServiceProvider;
     consoleProvider->setWorkingDirectory(mProjectPath);
     consoleProvider->runConsoleCommand("mingw32-make.exe -f MakeFile");
-    QProcess process;
-    QString file = QDir::homePath() + createMakeFileContent(getExecutibleFileName());
-    qDebug()<<"FILEEEE = "<<mProjectPath + "/" +  getExecutibleFileName();
+    QString fullExecutableFilePath = mProjectPath + "/" + getExecutibleFileName();
+    //qDebug()<<"fullExecPath = "<<fullExecutableFilePath;
+    //system("start C:/Users/Petro/Desktop/ForCompile/ForCompile");
+    //QProcess process;
+   // process.start(fullExecutableFilePath);
+    //system(fullExecutableFilePath.to);
+    //QString file = QDir::homePath() + createMakeFileContent(getExecutibleFileName());
+    //qDebug()<<"FILEEEE = "<<mProjectPath + "/" +  getExecutibleFileName();
    // process
 
     //run exec
@@ -56,6 +63,17 @@ QString CompilerControler::getExecutibleFileName() const
 {
     auto fullProjectPathParts = mProjectPath.split('/');
     return fullProjectPathParts.last();
+}
+
+void CompilerControler::removeAllExecutableAndObjectsFiles()
+{
+    QDir dir(mProjectPath);
+    dir.setNameFilters(QStringList() << "*.o" << "*.exe");
+    dir.setFilter(QDir::Files);
+    foreach (QString dirFile, dir.entryList())
+    {
+        dir.remove(dirFile);
+    }
 }
 
 QString CompilerControler::createMakeFileContent(const QString &executibleFileName) const

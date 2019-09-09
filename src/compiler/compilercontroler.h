@@ -17,6 +17,7 @@ public:
     QString getProjectPath() const;
     void setProjectPath(const QString &projectPath);
     void runCompilation();
+    void removeAllExecutableAndObjectsFiles();
 private:
     QString getExecutibleFileName() const;
 public slots:

@@ -3,7 +3,8 @@
 
 #include <QWidget>
 
-namespace Ui {
+namespace Ui
+{
 class CompileWindow;
 }
 
@@ -19,6 +20,8 @@ signals:
 
 private slots:
     void on_compileButton_clicked();
+
+    void on_Removeall_clicked();
 
 private:
     Ui::CompileWindow *ui;
