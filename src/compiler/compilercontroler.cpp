@@ -3,7 +3,9 @@
 #include "filemanager.h"
 #include <QDebug>
 #include <QPlainTextEdit>
+#include <consolewindow/consolewindow.h>
 #include <QString>
+#include<QProcess>
 
 CompilerControler::CompilerControler()
 {
@@ -36,9 +38,16 @@ void CompilerControler::runCompilation()
 
     getAllSourceFilesFromTheProjectDirectory();
 
-    qDebug()<<"file path = "<< makeFilePath;
     fileManager.createFile(makeFilePath);
     fileManager.writeToFile(makeFilePath, createMakeFileContent(getExecutibleFileName()));
+
+    ConsoleServiceProvider *consoleProvider = new ConsoleServiceProvider;
+    consoleProvider->setWorkingDirectory(mProjectPath);
+    consoleProvider->runConsoleCommand("mingw32-make.exe -f MakeFile");
+    QProcess process;
+    QString file = QDir::homePath() + createMakeFileContent(getExecutibleFileName());
+    qDebug()<<"FILEEEE = "<<mProjectPath + "/" +  getExecutibleFileName();
+   // process
 
     //run exec
 }
@@ -78,9 +87,6 @@ QString CompilerControler::createMakeFileContent(const QString &executibleFileNa
     rMakeFileContent += "clean:\n"
                         "\trm -rf *o " + executibleFileName;
 
-    auto plainText = new QPlainTextEdit;
-    plainText->setPlainText(rMakeFileContent);
-    plainText->show();
     return rMakeFileContent;
 }
 
