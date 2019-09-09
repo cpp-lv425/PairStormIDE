@@ -17,7 +17,9 @@
 #include<QLabel>
 #include"classgenerator.h"
 #include"methodspartsdefinitiongetters.h"
+#include "compiler/compilercontroler.h"
 #include"classgenerationliterals.h"
+#include "documentmanager.h"
 #include<QMenu>
 #include <QVector>
 

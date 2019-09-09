@@ -24,6 +24,7 @@ class CodeEditor;
 class Browser;
 class Connection;
 class FileDb;
+class CompilerControler;
 QT_END_NAMESPACE
 
 class MainWindow : public QMainWindow
@@ -48,6 +49,7 @@ private:
     Connection *db;
     DocumentManager *mpDocumentManager;
     FileDb* dbFileManager;
+    CompilerControler * compilerControler;
 
     void setupMainMenu();    
     void openDocument(const QString &fileName);

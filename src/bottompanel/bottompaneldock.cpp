@@ -2,6 +2,7 @@
 #include <QTabWidget>
 #include "mainwindow.h"
 #include "consolewindow/consolewindow.h"
+#include "compilewindow.h"
 #include <QDebug>
 
 BottomPanelDock::BottomPanelDock(QWidget *pParent): QDockWidget (pParent)
@@ -14,8 +15,10 @@ BottomPanelDock::BottomPanelDock(QWidget *pParent): QDockWidget (pParent)
     mpTabWgt->addTab(pIssuesTab, tr("Issues"));
 
     // compilation information
-    pCompileInfo = new QWidget;
+    pCompileInfo = new CompileWindow;
     mpTabWgt->addTab(pCompileInfo, tr("Compile Output"));
+    connect(pCompileInfo, &CompileWindow::programIsReadyToCompile,
+            this, &BottomPanelDock::reSendProgramIsReadyToCompile);
 
     // debugging
     pDebugConsole = new QWidget;
@@ -35,4 +38,9 @@ BottomPanelDock::BottomPanelDock(QWidget *pParent): QDockWidget (pParent)
 void BottomPanelDock::reSendProjectPathChanged(QString path)
 {
     emit projectPathWasChanged(path);
+}
+
+void BottomPanelDock::reSendProgramIsReadyToCompile()
+{
+    emit programIsReadyToCompile();
 }

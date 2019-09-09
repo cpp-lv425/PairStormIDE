@@ -11,6 +11,7 @@
 #include <QStyle>
 #include <QFile>
 
+#include "compiler/compilercontroler.h"
 #include "localconnectorgenerator.h"
 #include "settingsconfigurator.h"
 #include "paletteconfigurator.h"
@@ -57,7 +58,9 @@ MainWindow::MainWindow(QWidget *parent) :
         StoreConf conf;
         conf.restoreConFile();
     }
-
+    compilerControler = new CompilerControler;
+    connect(this, &MainWindow::projectPathWasChanged,
+            compilerControler, &CompilerControler::setProjectPath);
     // when first started main window is maximized
     setWindowState(Qt::WindowMaximized);
 
@@ -233,12 +236,14 @@ void MainWindow::setupMainMenu()
     helpMenu->addSeparator();
 
     // opening reference window
-    QAction *pReferenceAction = helpMenu->addAction("&Reference Assistant...", this, &MainWindow::onReferenceTriggered, Qt::CTRL + Qt::Key_F1);
+    QAction *pReferenceAction = helpMenu->addAction("&Reference Assistant...",
+                                                    this, &MainWindow::onReferenceTriggered, Qt::CTRL + Qt::Key_F1);
     pReferenceAction->setIcon(QIcon(":/img/REFERENCEASSISTANT.png"));
     pToolbar->addAction(pReferenceAction);
 
     // user guide
-    QAction *pUserGuideActoin = helpMenu->addAction("User &Guide...", this, &MainWindow::onUserGuideTriggered, Qt::Key_F1);
+    QAction *pUserGuideActoin = helpMenu->addAction("User &Guide...",
+                                                    this, &MainWindow::onUserGuideTriggered, Qt::Key_F1);
     pUserGuideActoin->setDisabled(true);
     helpMenu->addSeparator();
 
@@ -328,6 +333,8 @@ void MainWindow::createButtomPanel()
     mpBottomPanelDock->setObjectName("mpBottomPanelDock");
     addDockWidget(Qt::BottomDockWidgetArea, mpBottomPanelDock);
     connect(this, &MainWindow::projectPathWasChanged, mpBottomPanelDock, &BottomPanelDock::reSendProjectPathChanged);
+    connect(mpBottomPanelDock, &BottomPanelDock::programIsReadyToCompile,
+            compilerControler, &CompilerControler::runCompilation);
 }
 
 void MainWindow::onNewFileTriggered()
