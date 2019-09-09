@@ -2,6 +2,7 @@
 #include <QDirIterator>
 #include <filemanager.h>
 #include <QDebug>
+#include <QPlainTextEdit>
 #include <QString>
 
 CompilerControler::CompilerControler()
@@ -30,7 +31,14 @@ void CompilerControler::setProjectPath(const QString &projectPath)
 
 void CompilerControler::runCompilation()
 {
-    getAllSourceFilesFromTheProjectDirectory(mProjectPath);
+    getAllSourceFilesFromTheProjectDirectory();
+    createMakeFileContent(getExecutibleFileName());
+}
+
+QString CompilerControler::getExecutibleFileName() const
+{
+    auto fullProjectPathParts = mProjectPath.split('/');
+    return fullProjectPathParts.last();
 }
 
 QString CompilerControler::createMakeFileContent(const QString &executibleFileName) const
@@ -47,12 +55,12 @@ QString CompilerControler::createMakeFileContent(const QString &executibleFileNa
     {
         rMakeFileContent += sourceFile + ".o ";
     }
-    rMakeFileContent += "\t$(CC) ";
+    rMakeFileContent += "\n\t$(CC) ";
     for (auto sourceFile: sourceFilesPathes)
     {
         rMakeFileContent += sourceFile + ".o ";
     }
-    rMakeFileContent += "o" + executibleFileName + "\n\n";
+    rMakeFileContent += "-o " + executibleFileName + "\n\n";
 
     for (auto sourceFile: sourceFilesPathes)
     {
@@ -64,16 +72,24 @@ QString CompilerControler::createMakeFileContent(const QString &executibleFileNa
     rMakeFileContent += "clean:\n"
                         "\trm -rf *o " + executibleFileName;
 
+    qDebug()<<"Make file content = "<< rMakeFileContent;
+    auto plainText = new QPlainTextEdit;
+    plainText->setPlainText(rMakeFileContent);
+    plainText->show();
     return rMakeFileContent;
 }
 
-void CompilerControler::getAllSourceFilesFromTheProjectDirectory(const QString &dirPath)
+void CompilerControler::getAllSourceFilesFromTheProjectDirectory()
 {
-    qDebug()<<"))path(( = "<<mProjectPath;
-    QDirIterator it(mProjectPath, QStringList() << "*.cpp", QDir::Files, QDirIterator::Subdirectories);
-    while (it.hasNext())
+    QDirIterator fileInDirectoryIter(mProjectPath,
+                                    QStringList() << "*.cpp",
+                                    QDir::Files,
+                                    QDirIterator::Subdirectories);
+
+    while (fileInDirectoryIter.hasNext())
     {
-        qDebug()<<it.hasNext();
+        QFileInfo sourceFileInfo = fileInDirectoryIter.next();
+        sourceFilesPathes << sourceFileInfo.completeBaseName();
     }
 }
 

@@ -13,11 +13,12 @@ public:
     virtual ~CompilerControler();
     QString compilerPath() const;
     QString createMakeFileContent(const QString &executibleFileName) const;
-    void getAllSourceFilesFromTheProjectDirectory(const QString &dirPath);
+    void getAllSourceFilesFromTheProjectDirectory();
     QString getProjectPath() const;
     void setProjectPath(const QString &projectPath);
     void runCompilation();
-
+private:
+    QString getExecutibleFileName() const;
 public slots:
     void setCompilerPath(QString compilerPath);
 private:
