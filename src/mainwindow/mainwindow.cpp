@@ -54,11 +54,6 @@ MainWindow::MainWindow(QWidget *parent) :
             Qt::UniqueConnection);
 
     ui->setupUi(this);
-    //{
-    //    StartManager startManager(this);
-    //    connect(&startManager, &StartManager::cancel, this, [&]() {mIsFinished = true;});
-    //    startManager.start();
-    //}
 
     // when first started main window is maximized
     setWindowState(Qt::WindowMaximized);
