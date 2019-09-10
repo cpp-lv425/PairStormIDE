@@ -45,7 +45,7 @@ void CompilerControler::runCompilation()
         dir.mkdir(".");
     }
 
-    auto makeFilePath = mProjectPath + "/MakeFile";
+    auto makeFilePath = buildDirectoryPath + "/MakeFile";
 
     getAllSourceFilesFromTheProjectDirectory();
 
@@ -53,7 +53,8 @@ void CompilerControler::runCompilation()
     fileManager.createFile(makeFilePath);
     fileManager.writeToFile(makeFilePath, createMakeFileContent(getExecutibleFileName()));
 
-    consoleProvider->setWorkingDirectory(mProjectPath);
+    qDebug()<<"build directory = "<<buildDirectoryPath;
+    consoleProvider->setWorkingDirectory(buildDirectoryPath);
     consoleProvider->runConsoleCommand("mingw32-make.exe -f MakeFile");
 
 
