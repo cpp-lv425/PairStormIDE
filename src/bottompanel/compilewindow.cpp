@@ -21,5 +21,5 @@ void CompileWindow::on_compileButton_clicked()
 
 void CompileWindow::on_Removeall_clicked()
 {
-    removeAllExecutableAndObjectsFiles();
+    //removeAllExecutableAndObjectsFiles();
 }

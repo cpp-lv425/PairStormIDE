@@ -5,10 +5,12 @@
 #include <QPlainTextEdit>
 #include <consolewindow/consolewindow.h>
 #include <QString>
+#include <QThread>
 #include<QProcess>
 
 CompilerControler::CompilerControler()
 {
+    consoleProvider = new ConsoleServiceProvider;
 }
 
 QString CompilerControler::compilerPath() const
@@ -33,30 +35,35 @@ void CompilerControler::setProjectPath(const QString &projectPath)
 
 void CompilerControler::runCompilation()
 {
-    removeAllExecutableAndObjectsFiles();
+    sourceFilesPathes.clear();
+    //removeAllExecutableAndObjectsFiles();
+    auto buildDirectoryPath = mProjectPath + "/PS_Build";
+    QDir dir(buildDirectoryPath);
+    if (!dir.exists())
+    {
+        qDebug()<<"folder creation";
+        dir.mkdir(".");
+    }
 
-    FileManager fileManager;
     auto makeFilePath = mProjectPath + "/MakeFile";
 
     getAllSourceFilesFromTheProjectDirectory();
 
+    FileManager fileManager;
     fileManager.createFile(makeFilePath);
     fileManager.writeToFile(makeFilePath, createMakeFileContent(getExecutibleFileName()));
 
-    ConsoleServiceProvider *consoleProvider = new ConsoleServiceProvider;
     consoleProvider->setWorkingDirectory(mProjectPath);
     consoleProvider->runConsoleCommand("mingw32-make.exe -f MakeFile");
-    QString fullExecutableFilePath = mProjectPath + "/" + getExecutibleFileName();
-    //qDebug()<<"fullExecPath = "<<fullExecutableFilePath;
-    //system("start C:/Users/Petro/Desktop/ForCompile/ForCompile");
-    //QProcess process;
-   // process.start(fullExecutableFilePath);
-    //system(fullExecutableFilePath.to);
-    //QString file = QDir::homePath() + createMakeFileContent(getExecutibleFileName());
-    //qDebug()<<"FILEEEE = "<<mProjectPath + "/" +  getExecutibleFileName();
-   // process
 
-    //run exec
+
+//    QString fullExecutableFilePath = mProjectPath + "/" + getExecutibleFileName();
+//    qDebug()<<"fullExecPath = "<<fullExecutableFilePath;
+
+//    QProcess process;
+//    process.waitForFinished();
+//    qDebug()<<"after waiting";
+
 }
 
 QString CompilerControler::getExecutibleFileName() const

@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QString>
 #include <QStringList>
+#include "consolewindow/consoleserviceprovider.h"
 
 class CompilerControler: public QObject
 {
@@ -26,6 +27,7 @@ private:
     QString mCompilerPath;
     QStringList sourceFilesPathes;
     QString mProjectPath;
+    ConsoleServiceProvider *consoleProvider;
 };
 
 #endif // COMPILERCONTROLER_H
