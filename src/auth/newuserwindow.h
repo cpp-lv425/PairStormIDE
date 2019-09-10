@@ -23,7 +23,9 @@ class NewUserWindow : public QDialog
 {
     Q_OBJECT
 public:
-    explicit NewUserWindow(QWidget *parent = nullptr);
+    explicit NewUserWindow(QStringList &registeredUsersList, QWidget *parent = nullptr);
+
+    void unblockButtons();
 private:
     QLabel *mpLabelLogin;
     QLabel *mpLabelToken;
@@ -34,15 +36,18 @@ private:
 
     QDialogButtonBox *mpButtonBox;
 
+    QStringList mRegisteredUsersList;
+
     //          DESIGN PARAMETERS
     const Qt::GlobalColor mWindowColor              = Qt::lightGray;
     const QPalette::ColorRole mWindowColorRole      = QPalette::Background;
-    QString mPlaceholderText                        = "Sequence with 40 characters treats as token";
+    QString mPlaceholderTextLogin                   = "Your GitHub login";
+    QString mPlaceholderTextToken                   = "Sequence with 40 characters treats as token";
     const QString mTitle                            = "Create new account";
     const QString mLoginLabel                       = "GitHub login";
     const QString mTokenLabel                       = "Password or token";
     const QString mSeparatorStyle                   = "background-color: grey;";
-    const QString mUnnamedUserLabel                 = "Try without authorizattion";
+    const QString mUnnamedUserLabel                 = "Try without authorization";
     const int mTokenSize                            = 40;
 
     int mLabelWidth                                 = 135;
@@ -71,6 +76,7 @@ private:
     const QString mButtonBoxColor                   = "color: rgb(0, 0, 0);";
     const QString mButtonBoxBackgroundColor         = "background-color: grey;";
 
+    bool checkInRegisteredUsers(const QString &newUser);
 public slots:
     void onBtnBoxClicked(QAbstractButton * button);
 
@@ -79,6 +85,7 @@ signals:
     void unnamedUser();                                                 //  user chose nunamed mode
     void newUserToken(const QString &login, const QString &token);      //  user typed login and token to registrate
     void newUserPasssword(const QString &login, const QString &passwrd);//  user typed login and password to registrate
+    void accountAlreadyExist();                                         //  user typed login that already registered
 };
 
 #endif // NEWUSERWINDOW_H

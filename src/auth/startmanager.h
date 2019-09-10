@@ -1,5 +1,5 @@
 /*
- * The purpose of the class is to authenticate users.
+ * The purpose of the class is to authorize users.
  * It includes:
  *  - searching configuration files for registered users;
  *  - provide possibility to choice between registered users,
@@ -12,27 +12,26 @@
 #ifndef STARTMANAGER_H
 #define STARTMANAGER_H
 
-//#include <QObject>
 #include <QWidget>
 #include <QMap>
 
 class DownloaderWrapper;
+class NewUserWindow;
 
-//class StartManager : public QObject
 class StartManager : public QWidget
 {
     Q_OBJECT
 public:
-    //explicit StartManager(QObject *parent = nullptr);
     explicit StartManager(QWidget *parent = nullptr);
 
-    void start();                                       // to start authentication process
+    void start();                                       // to start authorization process
     void setPathToConfDir(const QString path);
 
     enum class userMode {RegisteredUser, NewUser, UnnamedUser, Size};
     enum class respondStatus {Normal, Error, Corrupted, Size};
 private:
     DownloaderWrapper *mpDownloader;
+    NewUserWindow *mNewUserWindow;
 
     userMode mUserMode                        = userMode::UnnamedUser;
     respondStatus mRespondStatus;
@@ -71,16 +70,17 @@ private:
     //  messages
     const QString mMessageTitle               = "Welcome to Pair Storm!";
     const QString mMessageRegistered          = ", you are successfully registered!";
-    const QString mMessageUnauthenticated     = "You entering in unauthenticated mode";
+    const QString mMessageUnauthenticated     = "You entering in unauthorized mode";
     const QString mMessageCredentialsValid    = ", your credentials are valid!";
     const QString mMessageCredentialsNotValid = ", your credentials are not valid!";
+    const QString mMessageAccountAlreadyExist = "You already registered!";
 
     //              DESIGN PARAMETERS
     //  MessageWindow
     const int mMessageWindowFontSise          = 14;
-    const bool mMessageWindowFontItalic       = true;
+    const bool mMessageWindowFontItalic       = false;
     const QFont::Weight mWeight               = QFont::Bold;
-    const Qt::GlobalColor mMessageWindowColor = Qt::darkCyan;
+    const Qt::GlobalColor mMessageWindowColor = Qt::darkYellow;
     const QString mMessageWindowFont          = "Helvetica";
     const int mMessageWindowTimeOut           = 4000;                       // ms
 

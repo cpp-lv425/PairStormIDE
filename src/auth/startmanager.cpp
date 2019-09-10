@@ -23,7 +23,6 @@
 #include <QMessageBox>
 #include <QJsonDocument>
 
-//StartManager::StartManager(QObject *parent) : QObject(parent)
 StartManager::StartManager(QWidget *parent) : QWidget(parent)
 {
     mpDownloader = new DownloaderWrapper(this);
@@ -86,23 +85,24 @@ void StartManager::start()
     }
     case userMode::NewUser:
     {   //  E
-        // create new user window
-        NewUserWindow newUserWindow(this);
-        connect(&newUserWindow, &NewUserWindow::cancel, this, [=](){emit cancel();});  // user pressed Cancel button in bottom right side
-        connect(&newUserWindow, &NewUserWindow::rejected, this, [=](){emit cancel();});// user pressed Cross button in top right side
+        // create new user window mNewUserWindow
+        mNewUserWindow = new NewUserWindow(mListRegisteredUsers ,this);
+        connect(mNewUserWindow, &NewUserWindow::accountAlreadyExist, this, [&](){messageWindow(mMessageTitle, mMessageAccountAlreadyExist, mMessageWindowTimeOut);});  // user typed login that already exist
+        connect(mNewUserWindow, &NewUserWindow::cancel, this, [=](){emit cancel();});  // user pressed Cancel button in bottom right side
+        connect(mNewUserWindow, &NewUserWindow::rejected, this, [=](){emit cancel();});// user pressed Cross button in top right side
 
         // user clicked button [Try without authentication] - need to do three things:
-        connect(&newUserWindow, &NewUserWindow::unnamedUser, this, &StartManager::onUnnamedUserChoice); // assign [mUserMode], [mUserName], [mToken]
-        connect(&newUserWindow, &NewUserWindow::unnamedUser, &newUserWindow, &NewUserWindow::accept);   // terminate newUserWindow
-        connect(&newUserWindow, &NewUserWindow::unnamedUser, this, [&](){                               // show notification window
+        connect(mNewUserWindow, &NewUserWindow::unnamedUser, this, &StartManager::onUnnamedUserChoice); // assign [mUserMode], [mUserName], [mToken]
+        connect(mNewUserWindow, &NewUserWindow::unnamedUser, mNewUserWindow, &NewUserWindow::accept);   // terminate newUserWindow
+        connect(mNewUserWindow, &NewUserWindow::unnamedUser, this, [&](){                               // show notification window
             messageWindow(mMessageTitle, mMessageUnauthenticated, mMessageWindowTimeOut);
                     });
 
-        connect(&newUserWindow, &NewUserWindow::newUserToken, this, &StartManager::onNewUserToken);// during registration user typed login and token
-        connect(&newUserWindow, &NewUserWindow::newUserPasssword, this, &StartManager::onNewUserPassword);// during registration user typed login and password
-        connect(this, &StartManager::cancelNewUserWindow, &newUserWindow, &NewUserWindow::accept);// token validated (or got new token) - close newUserWindow
+        connect(mNewUserWindow, &NewUserWindow::newUserToken, this, &StartManager::onNewUserToken);// during registration user typed login and token
+        connect(mNewUserWindow, &NewUserWindow::newUserPasssword, this, &StartManager::onNewUserPassword);// during registration user typed login and password
+        connect(this, &StartManager::cancelNewUserWindow, mNewUserWindow, &NewUserWindow::accept);// token validated (or got new token) - close newUserWindow
 
-        newUserWindow.exec();
+        mNewUserWindow->exec();
 
         break;
     }
@@ -182,6 +182,10 @@ void StartManager::validateToken()
             {
                 mIsTokenValid = true;
             }
+            else
+            {
+                messageWindow(mMessageTitle, mUserName + mMessageCredentialsNotValid, mMessageWindowTimeOut);
+            }
         }
         if(mpDownloader->mRespondMap.contains("name"))
         {
@@ -239,6 +243,10 @@ void StartManager::generateToken()
             mToken = mpDownloader->mRespondMap["token"];
             mIsTokenGenerated = true;
             qDebug() << "mToken" << mToken;
+        }
+        else
+        {
+            messageWindow(mMessageTitle, mUserName + mMessageCredentialsNotValid, mMessageWindowTimeOut);
         }
         if(mpDownloader->mRespondMap.contains("note"))
         {
@@ -376,6 +384,10 @@ void StartManager::onNewUserToken(const QString &login, const QString &token)
     mUserName = login;
     mToken = token;
     validateToken();
+
+    // unblock OK Cancel buttons in New User Window
+    mNewUserWindow->unblockButtons();
+
     if (mIsTokenValid)
     {
         emit cancelNewUserWindow();
@@ -396,6 +408,10 @@ void StartManager::onNewUserPassword(const QString &login, const QString &passwo
     mUserName = login;
     mPassword = password;
     generateToken();
+
+    // unblock OK Cancel buttons in New User Window
+    mNewUserWindow->unblockButtons();
+
     if (mIsTokenGenerated)
     {
         emit cancelNewUserWindow();

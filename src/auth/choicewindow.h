@@ -42,7 +42,7 @@ private:
     const QString mTitle                                = "Sign in, please";
     const QString mAccountsLabel                        = "Avalable accounts";
     const QString mNewUserLabel                         = "New user";
-    const QString mUnnamedUserLabel                     = "Try without authorizattion";
+    const QString mUnnamedUserLabel                     = "Try without authorization";
     //  label accounts
     const QString mLabelAccountsFontSize                = "font-size: 16px;";
     const QString mLabelAccountsFontFamily              = "font-family: Helvetica;";

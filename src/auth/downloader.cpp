@@ -34,8 +34,7 @@ void Downloader::downloadGET(const QUrl &url,
         request.setRawHeader("Authorization", headerData.toLocal8Bit());
     }
 
-    QNetworkReply *pnr = mNetworkAccessManager->get(request);
-    Q_UNUSED(pnr)
+    mNetworkAccessManager->get(request);
 }
 
 void Downloader::downloadPOST(const QUrl &url,
@@ -67,8 +66,7 @@ void Downloader::downloadPOST(const QUrl &url,
     QByteArray postDataSize = QByteArray::number(jsonString.size());
     request.setHeader(QNetworkRequest::ContentLengthHeader, postDataSize);
 
-    QNetworkReply*  pnr = mNetworkAccessManager->post(request, jsonString);
-    Q_UNUSED(pnr)
+    mNetworkAccessManager->post(request, jsonString);
 }
 
 void Downloader::onFinished(QNetworkReply *pnr)

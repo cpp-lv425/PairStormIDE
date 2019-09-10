@@ -1,4 +1,5 @@
 #include "newuserwindow.h"
+#include "userslistmaker.h"
 
 #include<QVBoxLayout>
 #include<QLabel>
@@ -8,8 +9,11 @@
 #include <QDialogButtonBox>
 #include <QPushButton>
 #include <QDebug>
+#include <QSettings>
 
-NewUserWindow::NewUserWindow(QWidget *parent) : QDialog(parent)
+NewUserWindow::NewUserWindow(QStringList &registeredUsersList, QWidget *parent)
+    : QDialog(parent)
+    , mRegisteredUsersList {registeredUsersList}
 {
     // widget parameter
     setModal(true);
@@ -34,6 +38,7 @@ NewUserWindow::NewUserWindow(QWidget *parent) : QDialog(parent)
     mpEditLogin->setMinimumWidth(mEditWidth);
     mpEditLogin->setMaximumWidth(mEditWidth);
     mpEditLogin->setStyleSheet(mLineEditColor);
+    mpEditLogin->setToolTip(mPlaceholderTextLogin);
     loginLayout->addWidget(mpLabelLogin);
     loginLayout->addWidget(mpEditLogin);
     mainLayout->addLayout(loginLayout);
@@ -48,8 +53,8 @@ NewUserWindow::NewUserWindow(QWidget *parent) : QDialog(parent)
     mpEditToken->setMinimumWidth(mEditWidth);
     mpEditToken->setMaximumWidth(mEditWidth);
     mpEditToken->setEchoMode(QLineEdit::Password);
-    mpEditToken->setPlaceholderText(mPlaceholderText);
-    mpEditToken->setToolTip(mPlaceholderText);
+    mpEditToken->setPlaceholderText(mPlaceholderTextToken);
+    mpEditToken->setToolTip(mPlaceholderTextToken);
     mpEditToken->setStyleSheet(mLineEditColor);
     tokenLayout->addWidget(mpLabelToken);
     tokenLayout->addWidget(mpEditToken);
@@ -90,6 +95,16 @@ NewUserWindow::NewUserWindow(QWidget *parent) : QDialog(parent)
          (QApplication::desktop()->height() - this->height()) / 2);
 }
 
+void NewUserWindow::unblockButtons()
+{
+    mpButtonBox->setEnabled(true);
+}
+
+bool NewUserWindow::checkInRegisteredUsers(const QString &newUser)
+{
+    return mRegisteredUsersList.contains(newUser  + ".json");
+}
+
 void NewUserWindow::onBtnBoxClicked(QAbstractButton *button)
 {
     QDialogButtonBox::StandardButton pressedButton;
@@ -107,6 +122,13 @@ void NewUserWindow::onBtnBoxClicked(QAbstractButton *button)
         {
             return;
         }
+
+        if (checkInRegisteredUsers(mpEditLogin->text()))                   // check if this account already exist
+        {
+           emit accountAlreadyExist();
+           return;
+        }
+
         if (mpEditToken->text().size() == mTokenSize && mpEditLogin->text().size())// user typed token
         {
             mpButtonBox->setEnabled(false);
