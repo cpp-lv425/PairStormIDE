@@ -24,6 +24,7 @@ class CodeEditor;
 class Browser;
 class Connection;
 class FileDb;
+class CompilerControler;
 QT_END_NAMESPACE
 
 class MainWindow : public QMainWindow
@@ -42,11 +43,13 @@ private:
     ProjectViewerDock *mpProjectViewerDock;
     ChatWindowDock *mpChatWindowDock;
     BottomPanelDock *mpBottomPanelDock;
-    QScopedPointer<DocumentManager> mpDocumentManager;    
+    //QScopedPointer<DocumentManager> mpDocumentManager;
     Browser *mDocumentationBrowser;
     QScopedPointer<PaletteConfigurator> mpPaletteConfigurator;
     Connection *db;
+    DocumentManager *mpDocumentManager;
     FileDb* dbFileManager;
+    CompilerControler * compilerControler;
 
     void setupMainMenu();    
     void openDocument(const QString &fileName);
@@ -117,6 +120,9 @@ public slots:
     void onConnectionStatusChanged(bool status);
     void onSettingsChanged(std::map<QString, QString> newValues);
     void openCreatedClassFiles(QString headerFile, QString sourceFile);
+    void reSendProjectPathChanged(QString);
+signals:
+    void projectPathWasChanged(QString);
 
 private:
     friend class SettingsConfigurator;

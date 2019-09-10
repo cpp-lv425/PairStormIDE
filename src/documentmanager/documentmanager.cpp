@@ -40,6 +40,7 @@ QSplitter* DocumentManager::getSplitter()
 
 void DocumentManager::openProject(const QString &path)
 {
+    emit projectPathWasChanged(path);
     currentProject = path;
 }
 

@@ -11,6 +11,7 @@
 #include <QStyle>
 #include <QFile>
 
+#include "compiler/compilercontroler.h"
 #include "localconnectorgenerator.h"
 #include "settingsconfigurator.h"
 #include "paletteconfigurator.h"
@@ -35,8 +36,6 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    // create instance of Document Manager
-    mpDocumentManager(new DocumentManager),
     // initializing palette configurator with current palette
     mpPaletteConfigurator(new PaletteConfigurator(palette())),
     dbFileManager(new FileDb)
@@ -50,13 +49,17 @@ MainWindow::MainWindow(QWidget *parent) :
             this,
             &MainWindow::onConnectionStatusChanged,
             Qt::UniqueConnection);
-
+    mpDocumentManager = new DocumentManager;
+    connect(mpDocumentManager, &DocumentManager::projectPathWasChanged,
+            this, &MainWindow::reSendProjectPathChanged);
     ui->setupUi(this);
     {
         StoreConf conf;
         conf.restoreConFile();
     }
-
+    compilerControler = new CompilerControler;
+    connect(this, &MainWindow::projectPathWasChanged,
+            compilerControler, &CompilerControler::setProjectPath);
     // when first started main window is maximized
     setWindowState(Qt::WindowMaximized);
 
@@ -232,12 +235,14 @@ void MainWindow::setupMainMenu()
     helpMenu->addSeparator();
 
     // opening reference window
-    QAction *pReferenceAction = helpMenu->addAction("&Reference Assistant...", this, &MainWindow::onReferenceTriggered, Qt::CTRL + Qt::Key_F1);
+    QAction *pReferenceAction = helpMenu->addAction("&Reference Assistant...",
+                                                    this, &MainWindow::onReferenceTriggered, Qt::CTRL + Qt::Key_F1);
     pReferenceAction->setIcon(QIcon(":/img/REFERENCEASSISTANT.png"));
     pToolbar->addAction(pReferenceAction);
 
     // user guide
-    QAction *pUserGuideActoin = helpMenu->addAction("User &Guide...", this, &MainWindow::onUserGuideTriggered, Qt::Key_F1);
+    QAction *pUserGuideActoin = helpMenu->addAction("User &Guide...",
+                                                    this, &MainWindow::onUserGuideTriggered, Qt::Key_F1);
     pUserGuideActoin->setDisabled(true);
     helpMenu->addSeparator();
 
@@ -326,6 +331,9 @@ void MainWindow::createButtomPanel()
     mpBottomPanelDock = new BottomPanelDock(this);
     mpBottomPanelDock->setObjectName("mpBottomPanelDock");
     addDockWidget(Qt::BottomDockWidgetArea, mpBottomPanelDock);
+    connect(this, &MainWindow::projectPathWasChanged, mpBottomPanelDock, &BottomPanelDock::reSendProjectPathChanged);
+    connect(mpBottomPanelDock, &BottomPanelDock::programIsReadyToCompile,
+            compilerControler, &CompilerControler::runCompilation);
 }
 
 void MainWindow::onNewFileTriggered()
@@ -834,6 +842,11 @@ void MainWindow::openCreatedClassFiles(QString headerFile, QString sourceFile)
 {
     openDocument(headerFile);
     openDocument(sourceFile);
+}
+
+void MainWindow::reSendProjectPathChanged(QString str)
+{
+   emit projectPathWasChanged(str);
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)

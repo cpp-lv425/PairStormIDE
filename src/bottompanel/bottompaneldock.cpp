@@ -1,8 +1,9 @@
 #include "bottompaneldock.h"
-
 #include <QTabWidget>
-
 #include "mainwindow.h"
+#include "consolewindow/consolewindow.h"
+#include "compilewindow.h"
+#include <QDebug>
 
 BottomPanelDock::BottomPanelDock(QWidget *pParent): QDockWidget (pParent)
 {
@@ -10,21 +11,36 @@ BottomPanelDock::BottomPanelDock(QWidget *pParent): QDockWidget (pParent)
     mpTabWgt = new QTabWidget;
 
     // issues
-    QWidget *pIssuesTab = new QWidget;
+    pIssuesTab = new QWidget;
     mpTabWgt->addTab(pIssuesTab, tr("Issues"));
 
     // compilation information
-    QWidget *pCompileInfo = new QWidget;
+    pCompileInfo = new CompileWindow;
     mpTabWgt->addTab(pCompileInfo, tr("Compile Output"));
+    connect(pCompileInfo, &CompileWindow::programIsReadyToCompile,
+            this, &BottomPanelDock::reSendProgramIsReadyToCompile);
 
     // debugging
-    QWidget *pDebugConsole = new QWidget;
+    pDebugConsole = new QWidget;
     mpTabWgt->addTab(pDebugConsole, tr("Debugger Console"));
 
-    // version control
-    QWidget *pVersionsCtrl = new QWidget;
-    mpTabWgt->addTab(pVersionsCtrl, tr("Version Control"));
+    // version control and console
+    pTerminalConsole = new ConsoleWindow;
+    mpTabWgt->addTab(pTerminalConsole, tr("Terminal"));
+
+    connect(this, &BottomPanelDock::projectPathWasChanged,
+            pTerminalConsole, &ConsoleWindow::setProjectPath);
+
 
     setWidget(mpTabWgt);
-    setMaximumHeight(pParent->width() / 5);
+}
+
+void BottomPanelDock::reSendProjectPathChanged(QString path)
+{
+    emit projectPathWasChanged(path);
+}
+
+void BottomPanelDock::reSendProgramIsReadyToCompile()
+{
+    emit programIsReadyToCompile();
 }

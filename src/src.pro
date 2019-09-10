@@ -51,6 +51,7 @@ include($$PWD/settingsconfigurator/settingsconfigurator.pri)
 include($$PWD/savefilesdialog/savefilesdialog.pri)
 include($$PWD/classgeneration/classgeneration.pri)
 include($$PWD/newprojectwizard/newprojectwizard.pri)
+include($$PWD/compiler/compiler.pri)
 
 RESOURCES += \
     globalresources.qrc

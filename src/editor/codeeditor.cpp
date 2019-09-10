@@ -17,7 +17,9 @@
 #include<QLabel>
 #include"classgenerator.h"
 #include"methodspartsdefinitiongetters.h"
+#include "compiler/compilercontroler.h"
 #include"classgenerationliterals.h"
+#include "documentmanager.h"
 #include<QMenu>
 #include <QVector>
 
@@ -181,7 +183,7 @@ QVector<Comment> CodeEditor::getStartComments() const
     return mStartComments;
 }
 
-CommentDb *CodeEditor::getCommentGetter() const
+CommentDb* CodeEditor::getCommentGetter() const
 {
     return commentGetter;
 }
