@@ -42,10 +42,6 @@ void CompilerControler::runCompilation()
     auto makeFilePath = mProjectPath + "/MakeFile";
 
     getAllSourceFilesFromTheProjectDirectory();
-    for(auto i : sourceFilesPathes)
-    {
-        qDebug()<<"inside pathes = "<<i;
-    }
 
     fileManager.createFile(makeFilePath);
     fileManager.writeToFile(makeFilePath, createMakeFileContent(getExecutibleFileName()));
@@ -53,7 +49,6 @@ void CompilerControler::runCompilation()
     consoleProvider->setWorkingDirectory(mProjectPath);
     consoleProvider->runConsoleCommand("mingw32-make.exe -f MakeFile");
     QString fullExecutableFilePath = mProjectPath + "/" + getExecutibleFileName();
-    qDebug()<<"fullExecPath = "<<fullExecutableFilePath;
 
     QProcess process;
 
@@ -72,7 +67,6 @@ void CompilerControler::removeAllExecutableAndObjectsFiles()
     dir.setFilter(QDir::Files);
     foreach (QString dirFile, dir.entryList())
     {
-        qDebug()<<"file ="<<dirFile;
         dir.remove(dirFile);
     }
 }
