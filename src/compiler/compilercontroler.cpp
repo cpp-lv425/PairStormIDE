@@ -67,6 +67,7 @@ void CompilerControler::removeAllExecutableAndObjectsFiles()
     dir.setFilter(QDir::Files);
     foreach (QString dirFile, dir.entryList())
     {
+        qDebug()<<"file ="<<dirFile;
         dir.remove(dirFile);
     }
 }
@@ -93,8 +94,8 @@ QString CompilerControler::createMakeFileContent(const QString &executibleFileNa
     for (auto sourceFile: sourceFilesPathes)
     {
         rMakeFileContent += sourceFile + ".o: " +
-                sourceFile + ".cpp\n" +
-                "\t$(CC) $(CFLAGS) " + sourceFile + ".cpp\n\n";
+                mProjectPath + "/" + sourceFile + ".cpp\n" +
+                "\t$(CC) $(CFLAGS) " + mProjectPath + "/" + sourceFile + ".cpp\n\n";
     }
 
     rMakeFileContent += "clean:\n"
