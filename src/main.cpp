@@ -3,6 +3,7 @@
 
 #include "mainwindow.h"
 #include "splashscreen.h"
+#include "startmanager.h"
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
@@ -15,7 +16,12 @@ int main(int argc, char *argv[])
     QQuickWindow::setSceneGraphBackend(QSGRendererInterface::Software);
 
     MainWindow w;
+    w.hide();
     splashScreen.finish(&w);
+    StartManager startManager(&w);
+    w.connect(&startManager, &StartManager::cancel, &w, [&]() {w.mIsFinished = true;});
+    startManager.start();
+    w.show();
 
     if (w.mIsFinished)
     {
