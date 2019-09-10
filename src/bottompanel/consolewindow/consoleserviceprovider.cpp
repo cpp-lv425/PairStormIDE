@@ -20,16 +20,22 @@ QString ConsoleServiceProvider::compilerPath() const
 
 void ConsoleServiceProvider::setStdOutput()
 {
-    if (QSysInfo::productType() == windowsProductType)// if it's windows console
+    mConsoleProcess->setReadChannel(QProcess::StandardOutput);
+    qDebug()<<"OUTPUT!!!";
+    while (mConsoleProcess->canReadLine())
     {
-        QTextCodec *codec = QTextCodec::codecForName(codecStandart);
-        emit processIsReadyToReadStandartOutput
-                (codec->toUnicode(mConsoleProcess->readAllStandardOutput()));
+        qDebug()<<QString::fromLocal8Bit(mConsoleProcess->readLine());
     }
-    else
-    {
-        emit processIsReadyToReadStandartOutput(mConsoleProcess->readAllStandardOutput());
-    }
+//    if (QSysInfo::productType() == windowsProductType)// if it's windows console
+//    {
+//        QTextCodec *codec = QTextCodec::codecForName(codecStandart);
+//        emit processIsReadyToReadStandartOutput
+//                (codec->toUnicode(mConsoleProcess->readAllStandardOutput()));
+//    }
+//    else
+//    {
+//        emit processIsReadyToReadStandartOutput(mConsoleProcess->readAllStandardOutput());
+//    }
 }
 
 void ConsoleServiceProvider::runConsoleCommand(QString command)
@@ -40,6 +46,8 @@ void ConsoleServiceProvider::runConsoleCommand(QString command)
         executionCommand = cmdWindowsStartPath;
     }
     executionCommand +=command;
+    qDebug()<<"working directory = "<< mConsoleProcess->workingDirectory();
+    qDebug()<<"exec command = "<< executionCommand;
     mConsoleProcess->start(executionCommand);
 }
 

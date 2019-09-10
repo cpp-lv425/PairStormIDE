@@ -36,34 +36,26 @@ void CompilerControler::setProjectPath(const QString &projectPath)
 void CompilerControler::runCompilation()
 {
     sourceFilesPathes.clear();
-    //removeAllExecutableAndObjectsFiles();
-    auto buildDirectoryPath = mProjectPath + "/PS_Build";
-    QDir dir(buildDirectoryPath);
-    if (!dir.exists())
-    {
-        qDebug()<<"folder creation";
-        dir.mkdir(".");
-    }
-
-    auto makeFilePath = buildDirectoryPath + "/MakeFile";
-
-    getAllSourceFilesFromTheProjectDirectory();
+    removeAllExecutableAndObjectsFiles();
 
     FileManager fileManager;
+    auto makeFilePath = mProjectPath + "/MakeFile";
+
+    getAllSourceFilesFromTheProjectDirectory();
+    for(auto i : sourceFilesPathes)
+    {
+        qDebug()<<"inside pathes = "<<i;
+    }
+
     fileManager.createFile(makeFilePath);
     fileManager.writeToFile(makeFilePath, createMakeFileContent(getExecutibleFileName()));
 
-    qDebug()<<"build directory = "<<buildDirectoryPath;
-    consoleProvider->setWorkingDirectory(buildDirectoryPath);
+    consoleProvider->setWorkingDirectory(mProjectPath);
     consoleProvider->runConsoleCommand("mingw32-make.exe -f MakeFile");
+    QString fullExecutableFilePath = mProjectPath + "/" + getExecutibleFileName();
+    qDebug()<<"fullExecPath = "<<fullExecutableFilePath;
 
-
-//    QString fullExecutableFilePath = mProjectPath + "/" + getExecutibleFileName();
-//    qDebug()<<"fullExecPath = "<<fullExecutableFilePath;
-
-//    QProcess process;
-//    process.waitForFinished();
-//    qDebug()<<"after waiting";
+    QProcess process;
 
 }
 
@@ -76,10 +68,11 @@ QString CompilerControler::getExecutibleFileName() const
 void CompilerControler::removeAllExecutableAndObjectsFiles()
 {
     QDir dir(mProjectPath);
-    dir.setNameFilters(QStringList() << "*.o" << "*.exe");
+    dir.setNameFilters(QStringList() << "*.o" << "*.exe" << "MakeFile");
     dir.setFilter(QDir::Files);
     foreach (QString dirFile, dir.entryList())
     {
+        qDebug()<<"file ="<<dirFile;
         dir.remove(dirFile);
     }
 }
