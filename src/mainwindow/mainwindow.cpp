@@ -203,10 +203,6 @@ void MainWindow::setupMainMenu()
 
     toolsMenu->addSeparator();
 
-    // buidling solution
-    QMenu *buildSubMenu = new QMenu("&Build");
-    QAction *pBuildActoin = toolsMenu->addMenu(buildSubMenu);
-    pBuildActoin->setDisabled(true);
 
     // debugging program
     QMenu *debugSubMenu = new QMenu("&Debug");
@@ -239,6 +235,16 @@ void MainWindow::setupMainMenu()
                                                     this, &MainWindow::onReferenceTriggered, Qt::CTRL + Qt::Key_F1);
     pReferenceAction->setIcon(QIcon(":/img/REFERENCEASSISTANT.png"));
     pToolbar->addAction(pReferenceAction);
+
+
+
+
+    // buidling solution
+    QAction *pBuildAction = toolsMenu->addAction("&Build and run", this, &MainWindow::onBuildAndRunTriggered, Qt::CTRL + Qt::Key_R);
+    pBuildAction->setIcon(QIcon(":/img/COMPILERUN.png"));
+    pToolbar->addAction(pBuildAction);
+
+
 
     // user guide
     QAction *pUserGuideActoin = helpMenu->addAction("User &Guide...",
@@ -760,6 +766,12 @@ void MainWindow::onSettingsTriggered()
     connect(menuOptions, &MenuOptions::valuesChanged,
             this, &MainWindow::onSettingsChanged);
     Q_UNUSED(menuOptions)
+}
+
+void MainWindow::onBuildAndRunTriggered()
+{
+    // When user press compile and run the solution
+    mpBottomPanelDock->reSendProgramIsReadyToCompile();
 }
 
 void MainWindow::onAboutTriggered()

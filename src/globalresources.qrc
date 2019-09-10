@@ -14,5 +14,6 @@
         <file>img/SAVE.png</file>
         <file>img/SETTINGS.png</file>
         <file>img/SPLASHSCREEN.png</file>
+        <file>img/COMPILERUN.png</file>
     </qresource>
 </RCC>

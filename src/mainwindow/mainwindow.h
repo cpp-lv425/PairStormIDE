@@ -107,6 +107,7 @@ private slots:
     void onRefactorTriggered();
     void onConnectTriggered();
     void onSettingsTriggered();
+    void onBuildAndRunTriggered();
 
     // help menu
     void onAboutTriggered();
