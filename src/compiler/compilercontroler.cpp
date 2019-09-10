@@ -38,19 +38,28 @@ void CompilerControler::runCompilation()
     sourceFilesPathes.clear();
     removeAllExecutableAndObjectsFiles();
 
-    FileManager fileManager;
-    auto makeFilePath = mProjectPath + "/MakeFile";
+    auto buildDirectoryPath = mProjectPath + "/PS_BUILD";
+    QDir buildDirectory(buildDirectoryPath);
+    if (!buildDirectory.exists())
+    {
+        qDebug()<<"created new build dir";
+        buildDirectory.mkdir(buildDirectoryPath);
+    }
+
+    auto makeFilePath = buildDirectoryPath + "/MakeFile";
 
     getAllSourceFilesFromTheProjectDirectory();
 
+    FileManager fileManager;
     fileManager.createFile(makeFilePath);
     fileManager.writeToFile(makeFilePath, createMakeFileContent(getExecutibleFileName()));
 
-    consoleProvider->setWorkingDirectory(mProjectPath);
+    consoleProvider->setWorkingDirectory(buildDirectoryPath);
     consoleProvider->runConsoleCommand("mingw32-make.exe -f MakeFile");
     QString fullExecutableFilePath = mProjectPath + "/" + getExecutibleFileName();
 
     QProcess process;
+    // run .exe
 
 }
 
