@@ -1,4 +1,5 @@
 HEADERS += \
+    $$PWD/compilationstringliterals.h \
     $$PWD/compilercontroler.h
 
 SOURCES += \

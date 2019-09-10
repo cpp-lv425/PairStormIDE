@@ -24,6 +24,7 @@ void ConsoleServiceProvider::setStdOutput()
     auto errors = mConsoleProcess->readAllStandardError();
     auto textEdit = new QPlainTextEdit;
     textEdit->setPlainText(errors);
+    qDebug()<<"errors!";
     if(!errors.isEmpty())
     {
         textEdit->show();
