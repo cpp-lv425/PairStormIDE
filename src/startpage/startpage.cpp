@@ -12,81 +12,57 @@ StartPage::StartPage(QWidget *parent) :
     ui(new Ui::StartPage)
 {    
     ui->setupUi(this);
-    setWindowTitle("Start Page");
+    setWindowTitle("Start Page");    
+    const int iconDimension = 50;
 
-    const int maxButtonsWidth = 200;
-    const int iconDimension = 32;
-
-    QFont lblFont("Segoe UI", 10);
+    QFont lblFont("Segoe UI", 12);
     lblFont.setBold(true);
 
-
     // creating & configuring new file button
-    mpNewBtn = new QPushButton;
-    setupButton(mpNewBtn,
-                QIcon(":/img/NEWFILE.png"),
-                iconDimension,
-                maxButtonsWidth,
-                "New File");
-    connect(mpNewBtn, &QPushButton::pressed, this, &StartPage::newBtnPressed);
-
-    // creating & configuring open file button
-    mpOpenBtn = new QPushButton;
-    setupButton(mpOpenBtn,
-                QIcon(":/img/OPENFILE.png"),
-                iconDimension,
-                maxButtonsWidth,
-                "Open File");
-    connect(mpOpenBtn, &QPushButton::pressed, this, &StartPage::openBtnPressed);
+    mpNewProjectBtn = new QPushButton;
+    setupButton(mpNewProjectBtn,
+                QIcon(":/img/NEWPROJECT.png"),
+                iconDimension);
+    connect(mpNewProjectBtn, &QPushButton::pressed, this, &StartPage::newProjectBtnPressed);
 
     // creating & configuring open folder button
-    mpOpenDirBtn = new QPushButton;
-    setupButton(mpOpenDirBtn,
+    mpOpenProjectBtn = new QPushButton;
+    setupButton(mpOpenProjectBtn,
                 QIcon(":/img/OPENDIR.png"),
-                iconDimension,
-                maxButtonsWidth,
-                "Open Folder");
-    connect(mpOpenDirBtn, &QPushButton::pressed, this, &StartPage::openDirPressed);
+                iconDimension);
+    connect(mpOpenProjectBtn, &QPushButton::pressed, this, &StartPage::openProjectBtnPressed);
 
     // creating & configuring settings call button
     mpSettingsBtn = new QPushButton;
     setupButton(mpSettingsBtn,
                 QIcon(":/img/SETTINGS.png"),
-                iconDimension,
-                maxButtonsWidth,
-                "Settings");
+                iconDimension);
     connect(mpSettingsBtn, &QPushButton::pressed, this, &StartPage::settingsBtnPressed);
 
     // bindong buttons
     QVBoxLayout *pBtnLayout = new QVBoxLayout;
-    pBtnLayout->addWidget(mpNewBtn);
-    pBtnLayout->addWidget(mpOpenBtn);
-    pBtnLayout->addWidget(mpOpenDirBtn);
+    pBtnLayout->addWidget(mpNewProjectBtn);    
+    pBtnLayout->addWidget(mpOpenProjectBtn);
     pBtnLayout->addWidget(mpSettingsBtn);
 
     // creating & laying out labels
-    QLabel *pNewLbl = new QLabel(tr("Create new file"));
-    setupLabels(pNewLbl, lblFont);
+    QLabel *pNewLbl = new QLabel(tr("Create new project"));
+    setupLabels(pNewLbl, lblFont);    
 
-    QLabel *pOpenLbl = new QLabel(tr("Open existing file"));
-    setupLabels(pOpenLbl, lblFont);
-
-    QLabel *pOpenDirLbl = new QLabel(tr("Open existing project directory"));
+    QLabel *pOpenDirLbl = new QLabel(tr("Open existing project"));
     setupLabels(pOpenDirLbl, lblFont);
 
     QLabel *pSettingsLbl = new QLabel(tr("Configure IDE"));
-    setupLabels(pSettingsLbl, lblFont);
-    pSettingsLbl->setDisabled(true);
+    setupLabels(pSettingsLbl, lblFont);    
 
     QVBoxLayout *pLblLayout = new QVBoxLayout;
     pLblLayout->addWidget(pNewLbl);
-    pLblLayout->addWidget(pOpenLbl);
     pLblLayout->addWidget(pOpenDirLbl);
     pLblLayout->addWidget(pSettingsLbl);
 
     // window lay out
     QHBoxLayout *pWdwLayout = new QHBoxLayout;
-    pWdwLayout->addLayout(pBtnLayout);
+    pWdwLayout->addLayout(pBtnLayout);    
     pWdwLayout->addLayout(pLblLayout);
 
     setLayout(pWdwLayout);
@@ -109,20 +85,12 @@ void StartPage::showStartPage()
 }
 
 void StartPage::setupButton(QPushButton *pButton,
-                            QIcon icon, int iconDimension,
-                            int maxWidth, const QString &text)
+                            QIcon icon, int iconDimension)
 {
     pButton->setIcon(icon);
-    pButton->setIconSize(QSize(iconDimension,iconDimension));
-    pButton->setMaximumWidth(maxWidth);
-    pButton->setSizePolicy(QSizePolicy::Expanding,
-                           QSizePolicy::Expanding);
-    pButton->setStyleSheet("text-align:left;");
-    pButton->setLayout(new QGridLayout);
-    QLabel *textLabel = new QLabel(text);
-    textLabel->setAlignment(Qt::AlignCenter);
-    textLabel->setAttribute(Qt::WA_TransparentForMouseEvents, true);
-    pButton->layout()->addWidget(textLabel);
+    pButton->setIconSize(QSize(iconDimension, iconDimension));
+    pButton->setSizePolicy(QSizePolicy::Minimum,
+                           QSizePolicy::Minimum);
 }
 
 StartPage::~StartPage()
@@ -130,21 +98,15 @@ StartPage::~StartPage()
     delete ui;
 }
 
-void StartPage::newBtnPressed()
+void StartPage::newProjectBtnPressed()
 {
-    emit onNewBtnPressed();
+    emit onNewProjectBtnPressed();
     accept();
 }
 
-void StartPage::openBtnPressed()
+void StartPage::openProjectBtnPressed()
 {
-    emit onOpenBtnPressed();
-    accept();
-}
-
-void StartPage::openDirPressed()
-{
-    emit onOpenDirPressed();
+    emit onOpenProjectBtnPressed();
     accept();
 }
 
@@ -158,5 +120,7 @@ void StartPage::setupLabels(QLabel *pLabel,
                             QFont &lblFont)
 {
     pLabel->setAlignment(Qt::AlignCenter);
+    pLabel->setSizePolicy(QSizePolicy::Expanding,
+                               QSizePolicy::Expanding);
     pLabel->setFont(lblFont);    
 }

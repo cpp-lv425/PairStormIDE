@@ -10,9 +10,11 @@ class MainWindow;
 
 QT_BEGIN_NAMESPACE
 class LocalConnectorInterface;
+class SettingsConfigurator;
 class PaletteConfigurator;
 class ProjectViewerDock;
 class QFileSystemModel;
+class NewProjectDialog;
 class BottomPanelDock;
 class DocumentManager;
 class QListWidgetItem;
@@ -20,6 +22,8 @@ class ChatWindowDock;
 class QMdiSubWindow;
 class CodeEditor;
 class Browser;
+class Connection;
+class FileDb;
 QT_END_NAMESPACE
 
 class MainWindow : public QMainWindow
@@ -34,31 +38,43 @@ public:
 
     bool mIsFinished;
 private:
-    LocalConnectorInterface * mplocalConnector;
+    LocalConnectorInterface *mplocalConnector;
     Ui::MainWindow *ui;
     ProjectViewerDock *mpProjectViewerDock;
     ChatWindowDock *mpChatWindowDock;
     BottomPanelDock *mpBottomPanelDock;
-    QScopedPointer<DocumentManager> mpDocumentManager;
-    QString mCurrentUserName;
+    QScopedPointer<DocumentManager> mpDocumentManager;    
     Browser *mDocumentationBrowser;
     QScopedPointer<PaletteConfigurator> mpPaletteConfigurator;
+    Connection *db;
+    FileDb* dbFileManager;
 
     void setupMainMenu();    
-    void openDoc(QString fileName);
+    void openDocument(const QString &fileName);
     void createProjectViewer();
     void createChatWindow();
     void createButtomPanel();
 
     void saveMainWindowState();
     void restoreMainWindowState();
-    void setAppStyle();
+    void setInitialAppStyle();
+
+    // methods for dynamic change of IDE settings
+    void setAppStyle(const QString &style);
+    void setDocumentFontFamily(const QString &fontFamily);
+    void setDocumentFontSize(const QString &fontSize);
+
+    void databaseConnect(QString directory);
+    void databaseDisconnect();
 
 private slots:
     // file menu actions
+    void onNewProjectTriggered();
     void onNewFileTriggered();
+    void onNewClassTriggered();
     void onOpenFileTriggered();
-    void onOpenFolderTriggered();
+    void onOpenProjectTriggered();
+    void onCloseProjectTriggered();
     void onOpenStartPage();
     void onSaveFileTriggered();
     void onSaveFileAsTriggered();
@@ -83,8 +99,7 @@ private slots:
     void onShowChatWindowDockTriggered();
     void onShowBottomPanel();
     void onCombineAreas();
-    void onCloseEmptyDocArea();
-    void onCloseCurrentDocArea();
+    void onCloseEmptyDocArea();   
 
     // tools menu
     void onRefactorTriggered();
@@ -96,12 +111,16 @@ private slots:
     void onReferenceTriggered();
     void onUserGuideTriggered();
     void onCheckUpdatesTriggered();
-
     void onReferenceFromEditor(const QString &keyword);
 
 public slots:
     void onOpenFileFromProjectViewer(QString fileName);
     void onConnectionStatusChanged(bool status);
+    void onSettingsChanged(std::map<QString, QString> newValues);
+    void openCreatedClassFiles(QString headerFile, QString sourceFile);
+
+private:
+    friend class SettingsConfigurator;
 
 protected:
     void closeEvent(QCloseEvent *event);

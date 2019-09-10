@@ -2,7 +2,7 @@
 // ==========================================================================================
 // ==========================================================================================
 //                                                                    TCP SERVICE CONSTRUCTOR
-TcpService::TcpService(const QString & serverName, QObject *qObject) :
+TcpService::TcpService(const QString &serverName, QObject *qObject) :
     QObject(qObject), mcServerPortNumber(gDefaultTcpPortNumber), mcServerName(serverName)
 {
     QNetworkConfigurationManager confManager;
@@ -91,18 +91,18 @@ void TcpService::saveServerAttributes()
     mServerAttributes.mPort = mpTcpServer->serverPort();
 
     // Append server addresses for each interface
-    for (const auto & availInterface : QNetworkInterface::allInterfaces())
+    for (const auto &availInterface : QNetworkInterface::allInterfaces())
     {
         QNetworkInterface::InterfaceFlags intFlags = availInterface.flags();
         bool isInterfaceRunning (intFlags & QNetworkInterface::IsRunning);
         bool isInterfaceLoopBack(intFlags & QNetworkInterface::IsLoopBack);
         // Omit interfaces that are LoopBack or are not active
-        if(!isInterfaceRunning || isInterfaceLoopBack) continue;
+        if (!isInterfaceRunning || isInterfaceLoopBack) continue;
 
         // Add all active IPv4 addresses inside this interface
-        for (const auto & ipEntry : availInterface.addressEntries())
+        for (const auto &ipEntry : availInterface.addressEntries())
         {
-            if(ipEntry.ip().protocol() == QAbstractSocket::IPv4Protocol)
+            if (ipEntry.ip().protocol() == QAbstractSocket::IPv4Protocol)
             {
                 mServerAttributes.mIps.push_back(ipEntry.ip());
             }
@@ -113,7 +113,7 @@ void TcpService::saveServerAttributes()
 // ==========================================================================================
 // ==========================================================================================
 //                                           CONNECT TO TCP SERVER BY GIVEN SERVER ATTRIBUTES
-bool TcpService::sendDataToTcpServer(const QString & data, const ServerData & serverData)
+bool TcpService::sendDataToTcpServer(const QString &data, const ServerData &serverData)
 {
     if (serverData.empty())
     {
@@ -121,7 +121,7 @@ bool TcpService::sendDataToTcpServer(const QString & data, const ServerData & se
     }
 
     // Create new empty server socket & attach it after successful connection
-    QTcpSocket * pServerSocket(new QTcpSocket(this));
+    QTcpSocket *pServerSocket(new QTcpSocket(this));
     connect(
         pServerSocket, &QTcpSocket::connected,
         this,          &TcpService::attachSocketOnServerConnected,
@@ -130,7 +130,7 @@ bool TcpService::sendDataToTcpServer(const QString & data, const ServerData & se
     // Set server port and its working IP address from interface IPs
     const PortNumType port = serverData.mPort;
     QHostAddress serverIp  = serverData.mActiveIp;
-    for (const auto & interfaceIp : serverData.mIps)
+    for (const auto &interfaceIp : serverData.mIps)
     {
         if (interfaceIp.isEqual(serverIp, QHostAddress::ConvertV4MappedToIPv4))
         {
@@ -180,7 +180,7 @@ Segment TcpService::getReceivedSegment() const
 void TcpService::saveSegmentOnReceival()
 {
     // Get source' socket ptr
-    QTcpSocket * pSenderSocket(qobject_cast<QTcpSocket*>(sender()));
+    QTcpSocket *pSenderSocket(qobject_cast<QTcpSocket*>(sender()));
 
     // Get received data & socket attributes, i.e. IP and port
     QByteArray   data (pSenderSocket->readAll());
@@ -204,7 +204,7 @@ void TcpService::saveSegmentOnReceival()
 void TcpService::attachSocketOnServerConnected()
 {
     // Get connected host' socket ptr
-    QTcpSocket * pServerSocket(qobject_cast<QTcpSocket*>(sender()));
+    QTcpSocket *pServerSocket(qobject_cast<QTcpSocket*>(sender()));
 
     // Trigger saving received segments on readyRead
     connect(
@@ -225,7 +225,7 @@ void TcpService::attachSocketOnServerConnected()
 void TcpService::attachSocketOnClientConnected()
 {
     // Get brand new client' socket and save its ptr
-    QTcpSocket * pClientSocket(mpTcpServer->nextPendingConnection());
+    QTcpSocket *pClientSocket(mpTcpServer->nextPendingConnection());
 
     // Trigger saving received segments on readyRead
     connect(
@@ -246,7 +246,7 @@ void TcpService::attachSocketOnClientConnected()
 void TcpService::closeSocketOnDisconnected()
 {
     // Get and close disconnected socket
-    QTcpSocket * pDisconnectedSocket(qobject_cast<QTcpSocket*>(sender()));
+    QTcpSocket *pDisconnectedSocket(qobject_cast<QTcpSocket*>(sender()));
     pDisconnectedSocket->close();
 }// ==========================================================================================
 // ==========================================================================================

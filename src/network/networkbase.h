@@ -57,7 +57,7 @@ struct ServerData
         // Fill object with needed values
         jsonAttrib["name"] = mName;
         QJsonArray jsonIpArr;
-        for (const auto & ip : mIps)
+        for (const auto &ip : mIps)
         {
             jsonIpArr.push_back(ip.toString());
         }
@@ -70,7 +70,7 @@ struct ServerData
         return QString(attribData);
     }
 
-    void fromJsonQString(const QString & attribData)
+    void fromJsonQString(const QString &attribData)
     {
         *this = ServerData();
         // Decompose the Json bearer string
@@ -79,18 +79,18 @@ struct ServerData
         QJsonObject jsonAttrib = doc.object();
 
         // Verify if the Json object is not corrupted
-        if(jsonAttrib.isEmpty()                 ||
-           !jsonAttrib.keys().contains("app")   ||
-           !jsonAttrib.keys().contains("ips")   ||
-           !jsonAttrib.keys().contains("name")  ||
-           !jsonAttrib.keys().contains("port"))
+        if (jsonAttrib.isEmpty()                 ||
+            !jsonAttrib.keys().contains("app")   ||
+            !jsonAttrib.keys().contains("ips")   ||
+            !jsonAttrib.keys().contains("name")  ||
+            !jsonAttrib.keys().contains("port"))
         {
             return;
         }
         // Check if the API version match
         QSettings applicationSettings;
         QString appLabel = applicationSettings.value("applicationName").toString();
-        if(jsonAttrib.value("app").toString() != appLabel)
+        if (jsonAttrib.value("app").toString() != appLabel)
         {
             return;
         }
@@ -111,7 +111,7 @@ struct ServerData
     }
 };
 
-struct Message
+struct NetworkMessage
 {
     QString mSourceName;
     QString mContent;
@@ -144,24 +144,24 @@ struct Message
 
     void fromJsonQString(QString str)
     {
-        *this = Message();
+        *this = NetworkMessage();
         // Decompose the Json bearer string
         QJsonDocument doc = QJsonDocument::fromJson(str.toUtf8());
         QJsonObject json = doc.object();
 
         // Verify if the Json object is not corrupted
-        if(json.isEmpty()                      ||
-           !json.keys().contains("app")        ||
-           !json.keys().contains("sourceName") ||
-           !json.keys().contains("data")       ||
-           !json.keys().contains("type"))
+        if (json.isEmpty()                      ||
+            !json.keys().contains("app")        ||
+            !json.keys().contains("sourceName") ||
+            !json.keys().contains("data")       ||
+            !json.keys().contains("type"))
         {
             return;
         }
         // Check if the API version match
         QSettings applicationSettings;
         QString appLabel = applicationSettings.value("applicationName").toString();
-        if(json.value("app").toString() != appLabel)
+        if (json.value("app").toString() != appLabel)
         {
             return;
         }

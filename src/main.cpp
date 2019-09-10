@@ -1,5 +1,5 @@
 #include <QApplication>
-#include <QWebEngineSettings>
+#include <QQuickWindow>
 
 #include "mainwindow.h"
 #include "splashscreen.h"
@@ -12,9 +12,7 @@ int main(int argc, char *argv[])
     QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 
-    QWebEngineSettings::defaultSettings()->setAttribute(QWebEngineSettings::DnsPrefetchEnabled, true);
-    QWebEngineSettings::defaultSettings()->setAttribute(QWebEngineSettings::LocalStorageEnabled, true);
-
+    QQuickWindow::setSceneGraphBackend(QSGRendererInterface::Software);
 
     MainWindow w;
     splashScreen.finish(&w);

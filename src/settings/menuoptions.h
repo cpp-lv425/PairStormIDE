@@ -53,6 +53,7 @@ private:
     int mMenuHeight             = 280;
 private slots:
     void onBtnClicked(QAbstractButton * button);
+
 signals:
     void valuesChanged(std::map<QString, QString> newValues);
 };

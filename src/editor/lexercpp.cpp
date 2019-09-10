@@ -52,7 +52,6 @@ inline bool LexerCPP::isBlockComments(const QString &lexem)
     return cRx.exactMatch(lexem);
 }
 
-
 inline bool LexerCPP::isSpace(const QChar& sym)
 {
     return cSpaces.contains(sym);
@@ -84,11 +83,10 @@ inline bool LexerCPP::isLexemEnd(const QChar& sym)
 inline void LexerCPP::addLexem()
 {
     --mIndex;
-    mTokens.append(Token(QString(mCurrentLexem), State(mState), mIndex - mCurrentLexem.size(), mIndex));
+    mTokensOnCurrentLine.append(Token(QString(mCurrentLexem), State(mState), mIndex - mCurrentLexem.size(), mIndex));
     mCurrentLexem.clear();
     mState = State::ST;
 }
-
 
 inline void LexerCPP::changeState(State state, QChar sym)
 {
@@ -98,14 +96,19 @@ inline void LexerCPP::changeState(State state, QChar sym)
 
 void LexerCPP::clear()
 {
-    mTokens.clear();
+    mIndex = 0;
     mCurrentLexem.clear();
     mState = State::ST;
 }
 
+bool LexerCPP::isLexerWasRunning() const
+{
+    return mWasRunning;
+}
+
 QVector<Token> LexerCPP::getTokens() const
 {
-    return mTokens;
+    return mTokensOnCurrentLine;
 }
 
 void LexerCPP::handleStartState(const QChar &sym)
@@ -270,11 +273,14 @@ void LexerCPP::handleLiteralState(const QChar &sym)
 
 void LexerCPP::lexicalAnalysis(QString code)
 {
-    mCodeSize = code.size();
-    mIndex = 0;
+    mWasRunning = true;
+    mTokensOnCurrentLine.clear();
     QChar sym = 0;
+    mIndex = 0;
 
-    while(mIndex < code.size())
+    unsigned int end = static_cast<unsigned int>(code.size());
+
+    while(mIndex < end)
     {
         sym = code[mIndex];
         ++mIndex;
