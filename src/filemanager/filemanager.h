@@ -13,7 +13,7 @@ public:
     void createProjectFile(const QString &path);
     bool projectExists(const QString &path);
     bool sourceFileByTheSameNameExists(const QString &headerName);
-    QString getProjectFileName();
+    static QString getProjectFileName();
 private:
     static QString projectFileName;
 };

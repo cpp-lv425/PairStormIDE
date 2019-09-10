@@ -470,9 +470,9 @@ void MainWindow::onOpenProjectTriggered()
                 userMessages[UserMessages::ProjectDoesNotExistMsg]);
         return;
     }
-    restoreDatabaseFile();
+    restoreDatabaseFile(dirName);
     databaseConnect(dirName);
-    hideDatabaseFile();
+    hideDatabaseFile(dirName);
 
     mpProjectViewerDock->setDir(dirName);
     mpDocumentManager->openProject(dirName);
@@ -1021,8 +1021,12 @@ void MainWindow::onNewProjectTriggered()
 
 void MainWindow::databaseConnect(QString directory)
 {
-
-    db = ConnectionGetter::getDefaultConnection( + "C:/Users/Anastasia Antonyk/Desktop/sqlite/.storagehide.db");
+    databaseFileName = directory;
+    int position = directory.lastIndexOf(QChar{pathSeparator});
+    databaseFileName += pathSeparator;
+    databaseFileName += directory.mid(position + 1);
+    databaseFileName += projectDatabaseExtension;
+    db = ConnectionGetter::getDefaultConnection(databaseFileName);
     CreateDB database;
     database.addTableFile();
     database.addTableUser();
@@ -1035,7 +1039,7 @@ void MainWindow::databaseDisconnect()
     delete db;
 }
 
-void MainWindow::restoreDatabaseFile()
+void MainWindow::restoreDatabaseFile(QString directory)
 {
    /* QFile projectFile(FileManager().getProjectFileName());
     QDataStream read(&projectFile);
@@ -1062,19 +1066,21 @@ QString str(ch2);
 qDebug()<<str;*/
 }
 
-void MainWindow::hideDatabaseFile()
+void MainWindow::hideDatabaseFile(QString directory)
 {
-    QFile fileDB("C:/Users/Anastasia Antonyk/Desktop/sqlite/storage.db");
-    QFile fileproj("C:/Users/Anastasia Antonyk/Desktop/sqlite/file.projps");
+    QFile fileDB(databaseFileName);
+    QFile fileproj(directory + pathSeparator + FileManager::getProjectFileName());
+
     fileDB.open(QIODevice::ReadOnly);
     fileproj.open(QIODevice::WriteOnly);
+
     QDataStream in(&fileDB);
     QDataStream out(&fileproj);
-    unsigned int len = fileDB.size();
-    qDebug()<<len;
-    char * ch2 = new char [len];
-    int readed =  in.readRawData(ch2,len);
-    out.writeRawData(ch2,readed);
-    QString str(ch2);
-    qDebug()<<str;
+
+    unsigned int len = static_cast<unsigned int>(fileDB.size());
+    char * dbData = new char [len];
+
+    int readed =  in.readRawData(dbData,len);
+    out.writeRawData(dbData,readed);
+
 }

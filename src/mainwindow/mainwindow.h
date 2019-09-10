@@ -65,8 +65,8 @@ private:
 
     void databaseConnect(QString directory);
     void databaseDisconnect();
-    void restoreDatabaseFile();
-    void hideDatabaseFile();
+    void restoreDatabaseFile(QString directory);
+    void hideDatabaseFile(QString directory);
 
 private slots:
     // file menu actions
@@ -122,6 +122,9 @@ public slots:
 
 private:
     friend class SettingsConfigurator;
+    QString  databaseFileName;
+    const char *projectDatabaseExtension = ".db";
+    const char pathSeparator = '/';
 
 protected:
     void closeEvent(QCloseEvent *event);
