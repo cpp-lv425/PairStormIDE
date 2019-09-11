@@ -63,10 +63,12 @@ private:
     void setDocumentFontFamily(const QString &fontFamily);
     void setDocumentFontSize(const QString &fontSize);
 
-    void databaseConnect(QString directory);
+    void databaseConnect();
     void databaseDisconnect();
-    void restoreDatabaseFile(QString directory);
-    void hideDatabaseFile(QString directory);
+    void restoreDatabaseFile();
+    void hideDatabaseFile();
+    void setDatabaseFileName();
+    void readWriteFileContent(QString fileToReadName, QString fileToWriteName);
 
 private slots:
     // file menu actions
@@ -123,6 +125,7 @@ public slots:
 private:
     friend class SettingsConfigurator;
     QString  databaseFileName;
+    QString dirName;
     const char *projectDatabaseExtension = ".db";
     const char pathSeparator = '/';
 

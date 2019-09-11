@@ -32,7 +32,6 @@
 #include "startpage.h"
 #include "utils.h"
 #include "sqliteaccess.h"
-#include <QDataStream>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -448,7 +447,7 @@ void MainWindow::onOpenProjectTriggered()
         return;
     }
 
-    QString dirName = QFileDialog::getExistingDirectory
+     dirName = QFileDialog::getExistingDirectory
             (this,
              userMessages[UserMessages::OpenDirectoryTitle],
             QDir::homePath());
@@ -470,9 +469,8 @@ void MainWindow::onOpenProjectTriggered()
                 userMessages[UserMessages::ProjectDoesNotExistMsg]);
         return;
     }
-    restoreDatabaseFile(dirName);
-    databaseConnect(dirName);
-    hideDatabaseFile(dirName);
+    restoreDatabaseFile();
+    databaseConnect();
 
     mpProjectViewerDock->setDir(dirName);
     mpDocumentManager->openProject(dirName);
@@ -540,8 +538,8 @@ void MainWindow::onCloseProjectTriggered()
     mpProjectViewerDock->setDir(QDir::currentPath());
 
     // disconnect from db
-    //
-    //
+    databaseDisconnect();
+    hideDatabaseFile();
 
     QMessageBox::information
             (this,
@@ -1011,7 +1009,7 @@ void MainWindow::onNewProjectTriggered()
         return;
     }
 
-    databaseConnect(dirName);
+    databaseConnect( );
     // document manager is sent a message about new project
     mpDocumentManager->openProject(dirName);
 
@@ -1019,13 +1017,9 @@ void MainWindow::onNewProjectTriggered()
     mpProjectViewerDock->setDir(dirName);
 }
 
-void MainWindow::databaseConnect(QString directory)
+void MainWindow::databaseConnect()
 {
-    databaseFileName = directory;
-    int position = directory.lastIndexOf(QChar{pathSeparator});
-    databaseFileName += pathSeparator;
-    databaseFileName += directory.mid(position + 1);
-    databaseFileName += projectDatabaseExtension;
+    setDatabaseFileName();
     db = ConnectionGetter::getDefaultConnection(databaseFileName);
     CreateDB database;
     database.addTableFile();
@@ -1039,56 +1033,40 @@ void MainWindow::databaseDisconnect()
     delete db;
 }
 
-void MainWindow::restoreDatabaseFile(QString directory)
+void MainWindow::restoreDatabaseFile()
 {
-   /* QFile projectFile(FileManager().getProjectFileName());
-    QDataStream read(&projectFile);
-    const char * p;
-    read.writeRawData(p,10);*/
-   // qDebug()<<p;
-    //(&projectFile, QIODevice::ReadOnly);
-   // QFile outFile( "output.txt" );
-      // outFile.open( QIODevice::WriteOnly );
-
-       //QDataStream outStream( &outFile );
-   /* QFile file("C:/Users/Anastasia Antonyk/Desktop/sqlite/file.projps");
-    unsigned int len = file.size();
-    char * ch2 = new char [len];
-    qDebug()<<len;
-    file.open(QIODevice::ReadOnly);
-    QDataStream in(&file);
-    in.readRawData(ch2,len);
-    QFile fileDB("C:/Users/Anastasia Antonyk/Desktop/sqlite/storage1.db");
-fileDB.open(QIODevice::WriteOnly);
-QDataStream out(&fileDB);
-out.writeRawData(ch2,len);
-QString str(ch2);
-qDebug()<<str;*/
+    setDatabaseFileName();
+    QString projectFileName = dirName + pathSeparator + FileManager::getProjectFileName();
+    readWriteFileContent(projectFileName, databaseFileName);
 }
 
-void MainWindow::hideDatabaseFile(QString directory)
+void MainWindow::hideDatabaseFile()
 {
-    QFile fileDB(databaseFileName);
-    QFile fileproj(directory + pathSeparator + FileManager::getProjectFileName());
+    QString projectFileName = dirName + pathSeparator + FileManager::getProjectFileName();
+    readWriteFileContent(databaseFileName, projectFileName);
+    QFile::remove(databaseFileName);
+}
 
-    fileDB.open(QIODevice::ReadOnly);
-    fileproj.open(QIODevice::WriteOnly);
+void MainWindow::setDatabaseFileName()
+{
+    databaseFileName = dirName;
+    int position = dirName.lastIndexOf(QChar{pathSeparator});
+    databaseFileName += pathSeparator;
+    databaseFileName += dirName.mid(position + 1);
+    databaseFileName += projectDatabaseExtension;
+}
 
-    QDataStream in(&fileDB);
-    QDataStream out(&fileproj);
+void MainWindow::readWriteFileContent(QString fileToReadName, QString fileToWriteName)
+{
+    QFile fileToRead(fileToReadName);
+    QFile fileToWrite(fileToWriteName);
 
-    unsigned int len = static_cast<unsigned int>(fileDB.size());
-    char * dbData = new char [len];
+    fileToRead.open(QIODevice::ReadOnly);
+    fileToWrite.open(QIODevice::WriteOnly);
 
-    int readed =  in.readRawData(dbData,len);
-    out.writeRawData(dbData,readed);
-    int position = directory.lastIndexOf(QChar{pathSeparator});
-    //QString fileName = directory.mid(position + 1) + projectDatabaseExtension;
-    fileDB.close();
-    fileproj.close();
-    qDebug()<<fileDB.exists();
-    qDebug()<<fileDB.isOpen();
-    QDir dir("C:/Users/Anastasia Antonyk/Unnamed/Unnamed.db");
-    qDebug()<< dir.isReadable();
-    dir.removeRecursively();
+    QByteArray data = fileToRead.readAll();
+    fileToWrite.write(data);
+
+    fileToRead.close();
+    fileToWrite.close();
 }
