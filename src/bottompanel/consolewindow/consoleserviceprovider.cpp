@@ -3,6 +3,7 @@
 #include "documentmanager.h"
 #include <QTextCodec>
 #include <QDebug>
+#include <QString>
 #include <QPlainTextEdit>
 #include <QtCore>
 
@@ -21,14 +22,12 @@ QString ConsoleServiceProvider::compilerPath() const
 
 void ConsoleServiceProvider::setStdOutput()
 {
-    auto errors = mConsoleProcess->readAllStandardError();
-    auto textEdit = new QPlainTextEdit;
-    textEdit->setPlainText(errors);
-    qDebug()<<"errors!";
+    qDebug()<<"set inside std";
+    QString errors = mConsoleProcess->readAllStandardError();
     if(!errors.isEmpty())
     {
-        textEdit->show();
-        textEdit->setWindowTitle("Errors!");
+        emit errorsAreOccuredAfterCompilationInCOnsoleProvider(errors);
+        qDebug()<<"errors: "<<errors;
     }
     if (QSysInfo::productType() == windowsProductType)// if it's windows console
     {

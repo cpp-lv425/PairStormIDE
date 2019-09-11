@@ -2,6 +2,7 @@
 #include "ui_consolewindow.h"
 #include <QGridLayout>
 #include <QVBoxLayout>
+#include <QDebug>
 
 ConsoleWindow::ConsoleWindow(QWidget *parent) :
     QWidget(parent),
@@ -23,6 +24,11 @@ ConsoleWindow::ConsoleWindow(QWidget *parent) :
 
     connect(consoleServiceProvider, &ConsoleServiceProvider::appendedTextIsReadyToSet,
             consoleView, &QPlainTextEdit::appendPlainText);
+
+//    connect(consoleServiceProvider, &ConsoleServiceProvider::errorsAreOccuredAfterCompilation,
+//            this, &ConsoleWindow::reSendErrors);
+    connect(consoleServiceProvider, &ConsoleServiceProvider::errorsAreOccuredAfterCompilationInCOnsoleProvider,
+            this, &ConsoleWindow::reSendErrors);
 }
 
 ConsoleWindow::~ConsoleWindow()
@@ -33,4 +39,10 @@ ConsoleWindow::~ConsoleWindow()
 void ConsoleWindow::setProjectPath(QString path)
 {
     consoleServiceProvider->setWorkingDirectory(path);
+}
+
+void ConsoleWindow::reSendErrors(QString string)
+{
+    qDebug()<<"resend!";
+    emit errorsAreOccuredAfterCompilation(string);
 }

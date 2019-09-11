@@ -19,6 +19,9 @@ public:
     ~ConsoleWindow();
 public slots:
     void setProjectPath(QString);
+    void reSendErrors(QString);
+signals:
+    void errorsAreOccuredAfterCompilation(QString);
 private:
     Ui::ConsoleWindow *ui;
     ConsoleServiceProvider *consoleServiceProvider;

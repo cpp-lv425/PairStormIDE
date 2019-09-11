@@ -17,6 +17,7 @@ public:
 signals:
     void processIsReadyToReadStandartOutput(QString);
     void appendedTextIsReadyToSet(QString);
+    void errorsAreOccuredAfterCompilationInCOnsoleProvider(QString);
 public slots:
     void runConsoleCommand(QString command);
     void setWorkingDirectory(QString);

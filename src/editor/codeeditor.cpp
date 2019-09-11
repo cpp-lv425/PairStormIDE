@@ -175,7 +175,7 @@ void CodeEditor::writeDefinitionToSource()
                  cursor.movePosition(QTextCursor::Start);
                  sourceDocument->setTextCursor(cursor);
                  int linescount = 1;
-                                      cursor.movePosition(QTextCursor::EndOfLine);
+                 cursor.movePosition(QTextCursor::EndOfLine);
                  while(linescount < static_cast<int>(mLinesCount))
                  {
                      cursor.insertText(" ");

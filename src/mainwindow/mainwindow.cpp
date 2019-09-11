@@ -23,7 +23,6 @@
 #include "classgenerator.h"
 #include "chatwindowdock.h"
 #include "newfilewizard.h"
-#include "browserdialog.h"
 #include "usermessages.h"
 #include "logindialog.h"
 #include "filemanager.h"
@@ -204,10 +203,6 @@ void MainWindow::setupMainMenu()
 
     toolsMenu->addSeparator();
 
-    // buidling solution
-    QMenu *buildSubMenu = new QMenu("&Build");
-    QAction *pBuildActoin = toolsMenu->addMenu(buildSubMenu);
-    pBuildActoin->setDisabled(true);
 
     // debugging program
     QMenu *debugSubMenu = new QMenu("&Debug");
@@ -240,6 +235,16 @@ void MainWindow::setupMainMenu()
                                                     this, &MainWindow::onReferenceTriggered, Qt::CTRL + Qt::Key_F1);
     pReferenceAction->setIcon(QIcon(":/img/REFERENCEASSISTANT.png"));
     pToolbar->addAction(pReferenceAction);
+
+
+
+
+    // buidling solution
+    QAction *pBuildAction = toolsMenu->addAction("&Build and run", this, &MainWindow::onBuildAndRunTriggered, Qt::CTRL + Qt::Key_R);
+    pBuildAction->setIcon(QIcon(":/img/COMPILERUN.png"));
+    pToolbar->addAction(pBuildAction);
+
+
 
     // user guide
     QAction *pUserGuideActoin = helpMenu->addAction("User &Guide...",
@@ -763,6 +768,12 @@ void MainWindow::onSettingsTriggered()
     Q_UNUSED(menuOptions)
 }
 
+void MainWindow::onBuildAndRunTriggered()
+{
+    // When user press compile and run the solution
+    mpBottomPanelDock->reSendProgramIsReadyToCompile();
+}
+
 void MainWindow::onAboutTriggered()
 {
     QString info = "This application has been "
@@ -775,10 +786,7 @@ void MainWindow::onAboutTriggered()
 
 void MainWindow::onReferenceTriggered()
 {
-    BrowserDialog browser(this);
-    browser.createEmptyTab();
-    browser.show();
-    browser.exec();
+    // Reference Assistant module has been cut off, so just idle
 }
 
 void MainWindow::onUserGuideTriggered()
@@ -793,10 +801,7 @@ void MainWindow::onCheckUpdatesTriggered()
 
 void MainWindow::onReferenceFromEditor(const QString &keyword)
 {
-    BrowserDialog browser(this);
-    browser.createNewTab(keyword);
-    browser.show();
-    browser.exec();
+    // Reference Assistant module has been cut off, so just idle
 }
 
 void MainWindow::onOpenFileFromProjectViewer(QString fileName)
