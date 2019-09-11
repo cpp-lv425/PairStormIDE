@@ -33,13 +33,13 @@ Meanwhile, Pair Storm has a bunch of useful features that help programmer to wri
 :high_brightness: Syntax Highlighting :high_brightness:
 =======================================================
 <img align="left" width=500 style="margin-right: 20px" src="https://user-images.githubusercontent.com/52821952/64383380-70c4b480-d03e-11e9-8eed-fe0789acc060.png">
-Native code editor is capable of displaying text in corresponding colors. This helps to make source code more readable and simpler for comprehension. Furthermore, internal highlighter recognizes invalid expressions. This feature significantly boosts development process, so that even not experienced programmers can easily write "compilable" code.
+Native code editor is capable of displaying text in corresponding colors. This helps to make source code more readable and simpler for comprehension. Furthermore, internal highlighter recognizes invalid expressions. This feature significantly boosts development process, so that even not experienced programmers can easily write "compilable" code. Among all other features, editor supports line numbering, scrolling, zooming, tabbing, etc. User can open arbitrary number of code editors in split view to work with several files simultaneously. 
 
 
 :heavy_plus_sign: Comments :heavy_plus_sign:
 ============================================
 <img align="right" width=480 style="margin-left: 20px" src="https://user-images.githubusercontent.com/52821952/64407659-8e6d3a80-d08d-11e9-94df-462c6e6eda4c.png">
-Pair Storm allows users to leave Github styled comments in the code. Commenting is significant part of the pair programming conception. Thus, in context of working with code, there are now two categories of users: developers and commenters. All comments also get's saved in the project' database. Comments are bounded to lines of code, which means that registered user can comment out certain expressions separately.
+Pair Storm allows users to leave Github styled comments in the code. Commenting is significant part of the pair programming conception. All comments also get's saved in the project' database. Comments are bounded to lines of code, which means that registered user can comment out certain expressions separately.
 
 :wrench: Settings :wrench:
 ==========================
