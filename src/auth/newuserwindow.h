@@ -46,23 +46,25 @@ private:
     const QString mTitle                            = "Create new account";
     const QString mLoginLabel                       = "GitHub login";
     const QString mTokenLabel                       = "Password or token";
-    const QString mSeparatorStyle                   = "background-color: grey;";
+    const QString mSeparatorStyle                   = "background-color: #4e7b8a;";
     const QString mUnnamedUserLabel                 = "Try without authorization";
     const int mTokenSize                            = 40;
 
     int mLabelWidth                                 = 135;
     int mEditWidth                                  = 320;
     int mBasicStretch                               = 1;
-    int mSeparatorWidth                             = 4;
+    int mSeparatorWidth                             = 2;
     int mUnnamedUserButtonWidth                     = 200;
 
     //  LabelAccounts
-    const QString mLabelLoginFontSize               = "font-size: 16px;";
+    const QString mLabelLoginFontSize               = "font-size:   16px;";
     const QString mLabelLoginFontFamily             = "font-family: Helvetica;";
-    const QString mLabelLoginFontStyle              = "font-style: italic;";
+    const QString mLabelLoginFontStyle              = "font-style: normal;";
 
     //  LineEdit
-    const QString mLineEditColor                    = "background: rgb(200, 200, 140);";
+    const QString mLineEditFontSize                 = "font-size: 17px;";
+    const QString mLabelEditFontFamily              = "font-family: Helvetica;";
+    const QString mLineEditColor                    = "background-color: #dce8eb;";
 
     //  unnamed user button
     const QString mUnnamedUserButtonFontSize        = "font-size: 16px;";
