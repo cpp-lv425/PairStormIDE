@@ -10,6 +10,7 @@
 #include <QPushButton>
 #include <QDebug>
 #include <QSettings>
+#include <QStyleFactory>
 
 NewUserWindow::NewUserWindow(QStringList &registeredUsersList, QWidget *parent)
     : QDialog(parent)
@@ -19,13 +20,28 @@ NewUserWindow::NewUserWindow(QStringList &registeredUsersList, QWidget *parent)
     setModal(true);
     setWindowTitle(mTitle);
 
-    QPalette pal(palette());
-    pal.setColor(mWindowColorRole, mWindowColor);
-    setAutoFillBackground(true);
-    setPalette(pal);
+    setMaximumSize(400, 150);
+
+    // Added "fusion" style
+    setStyle(QStyleFactory::create("Fusion"));
+    setStyleSheet("background-color: #b1c1c7");
+    setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
+
+    //QPalette pal(palette());
+    //pal.setColor(mWindowColorRole, mWindowColor);
+    //setAutoFillBackground(true);
+    //setPalette(pal);
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addStretch(mBasicStretch);
+
+    // Append new user label
+    QLabel *windowTitle = new QLabel("Adding new user");
+    QString windowTitleStyleSheet =
+            "font-size: 22px; font-family: Helvetica; font-style: bold;";
+    windowTitle->setIndent(17);
+    windowTitle->setStyleSheet(windowTitleStyleSheet);
+    mainLayout->addWidget(windowTitle);
 
     //  login parameters
     QHBoxLayout *loginLayout = new QHBoxLayout;
@@ -37,7 +53,7 @@ NewUserWindow::NewUserWindow(QStringList &registeredUsersList, QWidget *parent)
     mpEditLogin = new QLineEdit(this);
     mpEditLogin->setMinimumWidth(mEditWidth);
     mpEditLogin->setMaximumWidth(mEditWidth);
-    mpEditLogin->setStyleSheet(mLineEditColor);
+    mpEditLogin->setStyleSheet(mLineEditColor + mLineEditFontSize + mLabelEditFontFamily);
     mpEditLogin->setToolTip(mPlaceholderTextLogin);
     loginLayout->addWidget(mpLabelLogin);
     loginLayout->addWidget(mpEditLogin);
@@ -78,13 +94,17 @@ NewUserWindow::NewUserWindow(QStringList &registeredUsersList, QWidget *parent)
 
     // unnamed user button
     QHBoxLayout *unnamedButtonLayout = new QHBoxLayout;
+    //unnamedButtonLayout->
     mpUnnamedUserButton = new QPushButton(mUnnamedUserLabel, this);
+    mpUnnamedUserButton->setFlat(true);
+    mpUnnamedUserButton->setStyleSheet("border: none; font-size: 13px; color: #006199");
+    mpUnnamedUserButton->setCursor(Qt::PointingHandCursor);
     mpUnnamedUserButton->setMinimumWidth(mUnnamedUserButtonWidth);
     mpUnnamedUserButton->setMaximumWidth(mUnnamedUserButtonWidth);
-    QString styleUnnamedUserButton = mUnnamedUserButtonFontSize + mUnnamedUserButtonFontFamily
-                                   + mUnnamedUserButtonColor + mUnnamedUserButtonBackgroundColor;
-    mpUnnamedUserButton->setStyleSheet(styleUnnamedUserButton);
-    unnamedButtonLayout->addWidget(mpUnnamedUserButton);
+    //QString styleUnnamedUserButton = mUnnamedUserButtonFontSize + mUnnamedUserButtonFontFamily
+    //                               + mUnnamedUserButtonColor + mUnnamedUserButtonBackgroundColor;
+    //mpUnnamedUserButton->setStyleSheet(styleUnnamedUserButton);
+    unnamedButtonLayout->addWidget(mpUnnamedUserButton, 0, Qt::AlignRight);
     mainLayout->addLayout(unnamedButtonLayout);
     connect(mpUnnamedUserButton, &QPushButton::clicked, this, [=](){emit unnamedUser();});
     setLayout(mainLayout);
