@@ -38,15 +38,15 @@ void CompilerControler::runCompilation()
     sourceFilesPathes.clear();
     removeAllExecutableAndObjectsFiles();
 
-    auto buildDirectoryPath = mProjectPath + "/PS_BUILD";
-    QDir buildDirectory(buildDirectoryPath);
-    if (!buildDirectory.exists())
-    {
-        qDebug()<<"created new build dir";
-        buildDirectory.mkdir(buildDirectoryPath);
-    }
+//    auto buildDirectoryPath = mProjectPath + "/PS_BUILD";
+//    QDir buildDirectory(buildDirectoryPath);
+//    if (!buildDirectory.exists())
+//    {
+//        qDebug()<<"created new build dir";
+//        buildDirectory.mkdir(buildDirectoryPath);
+//    }
 
-    auto makeFilePath = buildDirectoryPath + "/MakeFile";
+    auto makeFilePath = mProjectPath + "/MakeFile";
 
     getAllSourceFilesFromTheProjectDirectory();
 
@@ -54,7 +54,7 @@ void CompilerControler::runCompilation()
     fileManager.createFile(makeFilePath);
     fileManager.writeToFile(makeFilePath, createMakeFileContent(getExecutibleFileName()));
 
-    consoleProvider->setWorkingDirectory(buildDirectoryPath);
+    consoleProvider->setWorkingDirectory(mProjectPath);
     consoleProvider->runConsoleCommand("mingw32-make.exe -f MakeFile");
     QString fullExecutableFilePath = mProjectPath + "/" + getExecutibleFileName();
 
