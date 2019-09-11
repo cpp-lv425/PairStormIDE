@@ -1088,6 +1088,7 @@ void MainWindow::hideDatabaseFile(QString directory)
     fileproj.close();
     qDebug()<<fileDB.exists();
     qDebug()<<fileDB.isOpen();
-    QFile::remove("C:/Users/Anastasia Antonyk/Unnamed/Unnamed.db");
-
+    QDir dir("C:/Users/Anastasia Antonyk/Unnamed/Unnamed.db");
+    qDebug()<< dir.isReadable();
+    dir.removeRecursively();
 }
