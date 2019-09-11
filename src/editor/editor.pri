@@ -14,6 +14,7 @@ SOURCES += \
         $$PWD/keypressevents.cpp \
         $$PWD/lexercpp.cpp \
         $$PWD/linenumberarea.cpp \
+        $$PWD/syntaxanalyzer.cpp \
         $$PWD/viewtextedit.cpp \
         $$PWD/widget.cpp
 
@@ -36,6 +37,7 @@ HEADERS += \
         $$PWD/operators.h \
         $$PWD/spaces.h \
         $$PWD/specialsymbols.h \
+        $$PWD/syntaxanalyzer.h \
         $$PWD/token.h \
         $$PWD/viewtextedit.h \
         $$PWD/widget.h

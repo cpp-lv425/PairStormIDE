@@ -10,7 +10,8 @@ const int TOP_UNUSED_PIXELS_HEIGHT = 4;
 #include"addcommentbutton.h"
 #include"addcommenttextedit.h"
 #include"ideconfiguration.h"
-#include"lexercpp.h"
+#include "lexercpp.h"
+#include "syntaxanalyzer.h"
 #include<utility>
 #include <QStringList>
 #include<QAbstractScrollArea>
@@ -86,7 +87,6 @@ private:
     void handleLinesAddition(int, int, int);
     void handleLinesDelition(int, int);
     void addToIdentifiersList(QStringList&, int);
-    void getNamesOfIdentifiers();
 
     void addButton(const int line, const QString &Comment, const QString &userName);
     void removeButtonByIndex(QVector<AddCommentButton*> &commentV, const int index);
@@ -143,10 +143,10 @@ private:
     ConfigParams mConfigParam;
     QFont mFont;
     LexerCPP *mLcpp;
+    SyntaxAnalyzer *mSyntaxAnalyzer;
     QString mFileName;
     ChangeManager *mChangeManager;
     QTimer *mTimer;
-    LexerCPP mLexer;
     AddCommentButton *mAddCommentButton;
     CommentWidget *mCommentWidget;
     QLabel *mCurrentCommentLable;
@@ -181,8 +181,7 @@ private:
 protected:
     int mCurrentZoom;
     QList<QVector<Token>> mTokensList;
-    QList<QStringList> mIdentifiersList;
-    QStringList mIdentifiersNameList;
+    QList<bool> mErrorsList;
     friend class Event;
 
     // QWidget interface

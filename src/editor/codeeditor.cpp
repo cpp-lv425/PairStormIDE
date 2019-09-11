@@ -47,6 +47,7 @@ CodeEditor::CodeEditor(QWidget *parent, const QString &fileName) : QPlainTextEdi
     mTimer = new QTimer;
     QVector<Token> firstLine;
     mTokensList.append(firstLine);
+    mErrorsList.append(true);
     mChangeManager = new ChangeManager(this->toPlainText().toUtf8().constData());
     //comment button
     mAddCommentButton = new AddCommentButton(this);
@@ -249,6 +250,7 @@ void CodeEditor::handleLinesAddition(int changeStart, int lastLineWithChange, in
     {
         changeStart = lastLineWithChange - lineDifference;
         mTokensList.removeAt(changeStart);
+        mErrorsList.removeAt(changeStart);
     }
 
     mHighlightingStart = changeStart > 0 ? changeStart - 1 : changeStart;
@@ -259,10 +261,12 @@ void CodeEditor::handleLinesAddition(int changeStart, int lastLineWithChange, in
         if (lineDifference)
         {
             mTokensList.insert(i, mLcpp->getTokens());
+            mErrorsList.insert(i, mSyntaxAnalyzer->syntaxAnalysis(mTokensList[i]));
         }
         else
         {
             mTokensList[i] = mLcpp->getTokens();
+            mErrorsList[i] = mSyntaxAnalyzer->syntaxAnalysis(mTokensList[i]);
         }
     }
 }
@@ -276,22 +280,12 @@ void CodeEditor::handleLinesDelition(int lastLineWithChange, int lineDifference)
     mLcpp->lexicalAnalysis(changedCode);
     mHighlightingStart = lastLineWithChange;
     mTokensList[lastLineWithChange] = mLcpp->getTokens();
+    mErrorsList[lastLineWithChange] = mSyntaxAnalyzer->syntaxAnalysis(mTokensList[lastLineWithChange]);
 
     for (auto i = lastLineWithChange + 1; i < lastLineWithChange + lineDifference + 1; ++i)
     {
         mTokensList.removeAt(lastLineWithChange + 1);
-    }
-}
-
-void CodeEditor::getNamesOfIdentifiers()
-{
-    mIdentifiersNameList.clear();
-    for (auto i = 0; i < mIdentifiersList.size(); ++i)
-    {
-        for (auto j = 0; j < mIdentifiersList[i].size(); ++j)
-        {
-            mIdentifiersNameList << mIdentifiersList[i][j];
-        }
+        mErrorsList.removeAt(lastLineWithChange + 1);
     }
 }
 
