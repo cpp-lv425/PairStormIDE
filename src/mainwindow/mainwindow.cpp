@@ -54,11 +54,6 @@ MainWindow::MainWindow(QWidget *parent) :
             Qt::UniqueConnection);
 
     ui->setupUi(this);
-    {
-        StartManager startManager(this);
-        connect(&startManager, &StartManager::cancel, this, [&]() {mIsFinished = true;});
-        startManager.start();
-    }
 
     // when first started main window is maximized
     setWindowState(Qt::WindowMaximized);
@@ -476,6 +471,23 @@ void MainWindow::onOpenProjectTriggered()
 
     mpProjectViewerDock->setDir(dirName);
     mpDocumentManager->openProject(dirName);
+    // Check if the user has been previously logged in
+    // Then update project-dependent stuff in the chat
+    QSettings settings;
+    if (settings.contains("userName"))
+    {
+        QString currentUserName = settings.value("userName").toString();
+        if (currentUserName != QString("unnamed"))
+        {
+            mpChatWindowDock->setUserName(currentUserName);
+            mplocalConnector->configureOnLogin(currentUserName);
+            QSettings savedSettings(QApplication::organizationName(), QApplication::applicationName());
+            QString styleName = {savedSettings.contains("style") ?
+                                 savedSettings.value("style").toString()
+                                 : "WHITE"};
+            mpChatWindowDock->updateTheme(styleName);
+        }
+    }
 }
 
 void MainWindow::onCloseProjectTriggered()
