@@ -24,6 +24,7 @@ const int TOP_UNUSED_PIXELS_HEIGHT = 4;
 #include<QVector>
 #include<QFont>
 #include<QStatusBar>
+#include <QTimer>
 #include <QList>
 #include"sqliteaccess.h"
 #include<QStringList>
@@ -145,7 +146,7 @@ private:
     LexerCPP *mLcpp;
     QString mFileName;
     ChangeManager *mChangeManager;
-    QTimer *mTimer;
+    QTimer mTimer;
     LexerCPP mLexer;
     AddCommentButton *mAddCommentButton;
     CommentWidget *mCommentWidget;

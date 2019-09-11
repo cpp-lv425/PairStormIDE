@@ -7,6 +7,7 @@
 #include <QString>
 #include <QThread>
 #include<QProcess>
+#include <QSettings>
 
 CompilerControler::CompilerControler()
 {
@@ -35,6 +36,18 @@ void CompilerControler::setProjectPath(const QString &projectPath)
 
 void CompilerControler::runCompilation()
 {
+    QString currentCompiler = "";
+    QSettings settings;
+    if (settings.contains("cppCompilersList"))
+    {
+        QStringList currentCompilers = settings.value("cppCompilersList").toStringList();
+        if (!currentCompilers.empty())
+        {
+            QString firstCompilerPath = *currentCompilers.begin();
+            currentCompiler = firstCompilerPath;
+        }
+    }
+
     sourceFilesPathes.clear();
     removeAllExecutableAndObjectsFiles();
 
@@ -55,7 +68,7 @@ void CompilerControler::runCompilation()
     fileManager.writeToFile(makeFilePath, createMakeFileContent(getExecutibleFileName()));
 
     consoleProvider->setWorkingDirectory(mProjectPath);
-    consoleProvider->runConsoleCommand("mingw32-make.exe -f MakeFile");
+    consoleProvider->runConsoleCommand(currentCompiler.append(" -f MakeFile"));
     QString fullExecutableFilePath = mProjectPath + "/" + getExecutibleFileName();
 
     QProcess process;

@@ -44,9 +44,9 @@ CodeEditor::CodeEditor(QWidget *parent, const QString &fileName) : QPlainTextEdi
 
     //create objects connected to codeEditor
     mLineNumberArea = new LineNumberArea(this);
-    mTimer = new QTimer;
+    //mTimer = new QTimer;
     mLcpp = new LexerCPP();
-    mTimer = new QTimer;
+   // mTimer = new QTimer;
     QVector<Token> firstLine;
     mTokensList.append(firstLine);
     mChangeManager = new ChangeManager(this->toPlainText().toUtf8().constData());
@@ -76,14 +76,14 @@ CodeEditor::CodeEditor(QWidget *parent, const QString &fileName) : QPlainTextEdi
     connect(this,                         &CodeEditor::textChangedInLine,                  this, &CodeEditor::handleLineChange);
     connect(this,                         &CodeEditor::runHighlighter,                     this, &CodeEditor::highlightText);
     connect(this,                         &QPlainTextEdit::updateRequest,                  this, &CodeEditor::updateLineNumberArea);
-    connect(mTimer,                       &QTimer::timeout,                                this, &CodeEditor::saveStateInTheHistory);
+    connect(&mTimer,                       &QTimer::timeout,                                this, &CodeEditor::saveStateInTheHistory);
     connect(mAddCommentButton,            &AddCommentButton::addCommentButtonPressed,      this, &CodeEditor::showCommentTextEdit);
     connect(mCommentWidget->getEditTab(), &AddCommentTextEdit::emptyCommentWasSent,        this, &CodeEditor::emptyCommentWasAdded);
     connect(mCommentWidget->getEditTab(), &AddCommentTextEdit::notEmptyCommentWasSent,     this, &CodeEditor::notEmptyCommentWasAdded);
     connect(mCommentWidget->getEditTab(), &AddCommentTextEdit::commentWasDeleted,          this, &CodeEditor::deleteComment);
     connect(this,                         &CodeEditor::linesCountUpdated,                  this, &CodeEditor::changeCommentButtonsState);
 
-    mTimer->start(CHANGE_SAVE_TIME);//save text by this time
+    mTimer.start(CHANGE_SAVE_TIME);//save text by this time
     mLinesCountCurrent = 1;
     mLinesCountPrev = 1;
 
@@ -167,9 +167,31 @@ void CodeEditor::writeDefinitionToSource()
             }
             else
             {
+//                fileManager.writeToFile(sourceFileName, sourceFileText + "\n" + definitonTest);
+//                sourceDocument->document()->setPlainText(sourceDocument->document()->toPlainText() +"\n" + definitonTest );
+//                emit openDocument(sourceFileName);
                  sourceDocument->setPlainText(sourceDocument->toPlainText() + "\n" + definitonTest);
+                 auto cursor = sourceDocument->textCursor();
+                 cursor.movePosition(QTextCursor::Start);
+                 sourceDocument->setTextCursor(cursor);
+                 int linescount = 1;
+                                      cursor.movePosition(QTextCursor::EndOfLine);
+                 while(linescount < static_cast<int>(mLinesCount))
+                 {
+                     cursor.insertText(" ");
+                     cursor.movePosition(QTextCursor::Left);
+                     cursor.deleteChar();
+                     sourceDocument->setTextCursor(cursor);
+                     linescount++;
+                     cursor.movePosition(QTextCursor::Down);
+                     cursor.movePosition(QTextCursor::EndOfLine);
+                 }
+
+                 //emit sourceDocument->handleLineChange(0);
+                 //emit sourceDocument->runHighlighter();
             }
             QMessageBox::information(this, successDefinCreateTitle, successDefinCreateMessage);
+
         }
         else
         {
@@ -299,12 +321,15 @@ void CodeEditor::getNamesOfIdentifiers()
 
 void CodeEditor::handleLineChange(int lastLineWithChange)
 {
+    qDebug()<<"opened signal. file name = "<< getFileName();
     mLcpp->clear();
 
     int changeStart = lastLineWithChange;
 
     int currentLinesCount = document()->lineCount();
     int lineDifference = currentLinesCount - mLinesCount;
+    qDebug()<<"currentLinesCount = "<<currentLinesCount;
+    qDebug()<<"lines difference = "<<lineDifference;
     mLinesCount = currentLinesCount;
 
     if (!mLcpp->isLexerWasRunning())
@@ -358,8 +383,8 @@ void CodeEditor::undo()
 
     QTextCursor cursor(this->document());
     cursor.setPosition(mChangeManager->getCursorPosPrev());
-
     this->setTextCursor(cursor);
+    emit handleLineChange(0);
 }
 
 void CodeEditor::redo()
@@ -369,8 +394,8 @@ void CodeEditor::redo()
 
     QTextCursor cursor(this->document());
     cursor.setPosition(mChangeManager->getCursorPosNext());
-
     this->setTextCursor(cursor);
+    emit handleLineChange(0);
 }
 
 bool CodeEditor::isChanged()
@@ -408,6 +433,7 @@ void CodeEditor::updateLineNumberArea(const QRect &rect, const int dy)// rectang
     if (dy)// when not all of the text is in the visible area (we scrolled it)
     {
         mLineNumberArea->scroll(0, dy);// we should scroll lines numbers in following direction
+        emit runHighlighter();
     }
     else
     {
@@ -873,6 +899,7 @@ void formating(QTextCharFormat fmt, QTextCursor &cursor, Token token, int starti
 
 void CodeEditor::highlightText()
 {
+    qDebug()<<"inside highlight text. Path = "<<getFileName();
     QTextBlock block = document()->findBlockByLineNumber(mHighlightingStart);
     QTextCursor cursor(block);
     int start = cursor.blockNumber();
