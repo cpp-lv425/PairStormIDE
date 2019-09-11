@@ -67,7 +67,7 @@ void StartManager::start()
     {
         mUserName = "unnamed";
         mToken    = QString(mTokenSize, mTokenPlaceholder);
-        messageWindow(mMessageTitle, mMessageUnauthenticated, mMessageWindowTimeOut);
+        //messageWindow(mMessageTitle, mMessageUnauthenticated, mMessageWindowTimeOut);
         break;
     }
     case userMode::RegisteredUser:
@@ -76,7 +76,7 @@ void StartManager::start()
         validateToken();
         if (mIsTokenValid)
         {
-            messageWindow(mMessageTitle, QString {mUserName + mMessageCredentialsValid}, mMessageWindowTimeOut);
+            //messageWindow(mMessageTitle, QString {mUserName + mMessageCredentialsValid}, mMessageWindowTimeOut);
             break;
         }
 
@@ -94,9 +94,9 @@ void StartManager::start()
         // user clicked button [Try without authentication] - need to do three things:
         connect(mNewUserWindow, &NewUserWindow::unnamedUser, this, &StartManager::onUnnamedUserChoice); // assign [mUserMode], [mUserName], [mToken]
         connect(mNewUserWindow, &NewUserWindow::unnamedUser, mNewUserWindow, &NewUserWindow::accept);   // terminate newUserWindow
-        connect(mNewUserWindow, &NewUserWindow::unnamedUser, this, [&](){                               // show notification window
-            messageWindow(mMessageTitle, mMessageUnauthenticated, mMessageWindowTimeOut);
-                    });
+        //connect(mNewUserWindow, &NewUserWindow::unnamedUser, this, [&](){                               // show notification window
+        //    messageWindow(mMessageTitle, mMessageUnauthenticated, mMessageWindowTimeOut);
+        //            });
 
         connect(mNewUserWindow, &NewUserWindow::newUserToken, this, &StartManager::onNewUserToken);// during registration user typed login and token
         connect(mNewUserWindow, &NewUserWindow::newUserPasssword, this, &StartManager::onNewUserPassword);// during registration user typed login and password
@@ -392,7 +392,7 @@ void StartManager::onNewUserToken(const QString &login, const QString &token)
     {
         emit cancelNewUserWindow();
 
-        messageWindow(mMessageTitle, QString {mUserName + mMessageRegistered}, mMessageWindowTimeOut);
+        //messageWindow(mMessageTitle, QString {mUserName + mMessageRegistered}, mMessageWindowTimeOut);
     }
     else // in else case NewUserWindow asking to type credentials again
     {   // set all parameters for unnamedd user in case user will click cancel
@@ -416,7 +416,7 @@ void StartManager::onNewUserPassword(const QString &login, const QString &passwo
     {
         emit cancelNewUserWindow();
 
-        messageWindow(mMessageTitle, QString {mUserName + mMessageRegistered}, mMessageWindowTimeOut);
+        //messageWindow(mMessageTitle, QString {mUserName + mMessageRegistered}, mMessageWindowTimeOut);
     }
     else // in else case NewUserWindow asking to type credentials again
     {   // set all parameters for unnamed user in case user will click cancel

@@ -9,6 +9,7 @@
 #include <QDebug>
 #include <QApplication>
 #include <QDesktopWidget>
+#include <QStyleFactory>
 
 ChoiceWindow::ChoiceWindow(const QStringList &usersFilesList, QWidget *pParent)
     : QDialog (pParent)
@@ -16,6 +17,9 @@ ChoiceWindow::ChoiceWindow(const QStringList &usersFilesList, QWidget *pParent)
     // widget parameters
     setModal(true);
     setWindowTitle(mTitle);
+
+    // Added "fusion" style
+    setStyle(QStyleFactory::create("Fusion"));
 
     QPalette pal(palette());
     pal.setColor(mWindowColorRole, mWindowColor);
