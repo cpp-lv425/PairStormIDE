@@ -21,13 +21,10 @@ int main(int argc, char *argv[])
     StartManager startManager(&w);
     w.connect(&startManager, &StartManager::cancel, &w, [&]() {w.mIsFinished = true;});
     startManager.start();
-    w.show();
-
     if (w.mIsFinished)
     {
         return 0;
     }
-
     w.show();
     w.showStartPage();
 
