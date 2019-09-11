@@ -74,6 +74,7 @@ private:
     const QString mMessageCredentialsValid    = ", your credentials are valid!";
     const QString mMessageCredentialsNotValid = ", your credentials are not valid!";
     const QString mMessageAccountAlreadyExist = "You already registered!";
+    const QString mMessageBadLoginPassword    = "Your credentials not fits GitHub policy!";
 
     //              DESIGN PARAMETERS
     //  MessageWindow

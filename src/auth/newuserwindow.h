@@ -86,6 +86,7 @@ signals:
     void newUserToken(const QString &login, const QString &token);      //  user typed login and token to registrate
     void newUserPasssword(const QString &login, const QString &passwrd);//  user typed login and password to registrate
     void accountAlreadyExist();                                         //  user typed login that already registered
+    void badLoginPasswordTyped();                                       //  user typed login or/and password than not fits GitHub policy
 };
 
 #endif // NEWUSERWINDOW_H

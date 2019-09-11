@@ -88,6 +88,7 @@ void StartManager::start()
         // create new user window mNewUserWindow
         mNewUserWindow = new NewUserWindow(mListRegisteredUsers ,this);
         connect(mNewUserWindow, &NewUserWindow::accountAlreadyExist, this, [&](){messageWindow(mMessageTitle, mMessageAccountAlreadyExist, mMessageWindowTimeOut);});  // user typed login that already exist
+        connect(mNewUserWindow, &NewUserWindow::badLoginPasswordTyped, this, [&](){messageWindow(mMessageTitle, mMessageBadLoginPassword, mMessageWindowTimeOut);});  // user typed login/password that not fits GitHub policy
         connect(mNewUserWindow, &NewUserWindow::cancel, this, [=](){emit cancel();});  // user pressed Cancel button in bottom right side
         connect(mNewUserWindow, &NewUserWindow::rejected, this, [=](){emit cancel();});// user pressed Cross button in top right side
 

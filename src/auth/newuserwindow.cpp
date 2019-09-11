@@ -1,5 +1,6 @@
 #include "newuserwindow.h"
 #include "userslistmaker.h"
+#include "validator.h"
 
 #include<QVBoxLayout>
 #include<QLabel>
@@ -127,6 +128,12 @@ void NewUserWindow::onBtnBoxClicked(QAbstractButton *button)
         {
            emit accountAlreadyExist();
            return;
+        }
+
+        if (!Validator::forGitHub(mpEditLogin->text(), mpEditToken->text()))// check GitHub' login/password policy
+        {
+            emit badLoginPasswordTyped();
+            return;
         }
 
         if (mpEditToken->text().size() == mTokenSize && mpEditLogin->text().size())// user typed token
