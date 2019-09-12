@@ -49,11 +49,11 @@ private:
     int mBasicStretch                               = 1;
 
     //  Widget Title
-    const QString mWidgetTitle                     = "Adding new user";
-    const QString mWidgetTitleFontSize             = "font-size:   22px;";
-    const QString mWidgetTitleFontFamily           = "font-family: Helvetica;";
-    const QString mWidgetTitleFontStyle            = "font-style: bold;";
-    const int mWidgetTitleIndent                   = 17;
+    const QString mWidgetTitle                      = "Adding new user";
+    const QString mWidgetTitleFontSize              = "font-size:   22px;";
+    const QString mWidgetTitleFontFamily            = "font-family: Helvetica;";
+    const QString mWidgetTitleFontStyle             = "font-style: bold;";
+    const int mWidgetTitleIndent                    = 17;
 
     // login
     const QString mPlaceholderTextLogin             = "Your GitHub login";
@@ -65,7 +65,7 @@ private:
     const QString mLabelLoginFontFamily             = "font-family: Helvetica;";
     const QString mLabelLoginFontStyle              = "font-style: normal;";
 
-    const QString mLineEditFontSize                 = "font-size: 17px;";
+    const QString mLineEditFontSize                 = "font-size: 16px;";
     const QString mLabelEditFontFamily              = "font-family: Helvetica;";
     const QString mLineEditColor                    = "background-color: #dce8eb;";
 

@@ -81,7 +81,7 @@ private:
     const int mMessageWindowFontSise          = 14;
     const bool mMessageWindowFontItalic       = false;
     const QFont::Weight mWeight               = QFont::Bold;
-    const Qt::GlobalColor mMessageWindowColor = Qt::darkYellow;
+    const QString mMessageWindowColor         = "background-color: #b1c1c7;";
     const QString mMessageWindowFont          = "Helvetica";
     const int mMessageWindowTimeOut           = 4000;                       // ms
 

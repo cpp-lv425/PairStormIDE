@@ -97,6 +97,7 @@ NewUserWindow::NewUserWindow(QStringList &registeredUsersList, QWidget *parent)
     unnamedButtonLayout->addWidget(mpUnnamedUserButton, 0, mUnnamedUserButtonAlign);
     mainLayout->addLayout(unnamedButtonLayout);
     connect(mpUnnamedUserButton, &QPushButton::clicked, this, [=](){emit unnamedUser();});
+
     setLayout(mainLayout);
     show();
 
@@ -139,11 +140,11 @@ void NewUserWindow::onBtnBoxClicked(QAbstractButton *button)
            return;
         }
 
-        if (!Validator::forGitHub(mpEditLogin->text(), mpEditToken->text()))// check GitHub' login/password policy
+        /*if (!Validator::forGitHub(mpEditLogin->text(), mpEditToken->text()))// check GitHub' login/password policy
         {
             emit badLoginPasswordTyped();
             return;
-        }
+        }*/
 
         if (mpEditToken->text().size() == mTokenSize && mpEditLogin->text().size())// user typed token
         {

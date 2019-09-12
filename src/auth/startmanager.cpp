@@ -22,6 +22,7 @@
 #include <QJsonObject>
 #include <QMessageBox>
 #include <QJsonDocument>
+#include <QStyleFactory>
 
 StartManager::StartManager(QWidget *parent) : QWidget(parent)
 {
@@ -80,8 +81,8 @@ void StartManager::start()
             break;
         }
 
-        messageWindow(mMessageTitle, QString {mUserName + mMessageCredentialsNotValid}, mMessageWindowTimeOut);
-        //break; //don't need because when token not valid switching to newUser mode
+        //messageWindow(mMessageTitle, QString {mUserName + mMessageCredentialsNotValid}, mMessageWindowTimeOut);
+        //break don't need because when token not valid switching to newUser mode
     }
     case userMode::NewUser:
     {   //  E
@@ -201,18 +202,18 @@ void StartManager::validateToken()
     }
     case respondStatus::Error:
     {
-        QMessageBox::critical(nullptr,
+        /*QMessageBox::critical(nullptr,
                               tr("Error"),
                               tr("An error while authorized is occured")
-                             );
+                             );*/
         break;
     }
     case respondStatus::Corrupted:
     {
-        QMessageBox::critical(nullptr,
+        /*QMessageBox::critical(nullptr,
                               tr("Error"),
                               tr("An error while authorized is occured. Data corrupted")
-                             );
+                             );*/
         break;
     }
     default:
@@ -294,16 +295,20 @@ void StartManager::formatTokenName(QString &name)
 void StartManager::messageWindow(const QString &title, const QString &message, int timeOut)
 {
     QEventLoop loop;
-    QMessageBox *mbox = new QMessageBox;
+    QMessageBox *mbox = new QMessageBox;mbox->setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
     mbox->setWindowTitle(title);
     QString msg {message};
     mbox->setText(msg);
     mbox->setStandardButtons(nullptr);
 
+    //const QString mWidgetStyle                      = "Fusion";
+    //setStyle(QStyleFactory::create(mWidgetStyle));
     // set background color
-    QPalette palette;
-    palette.setColor(QPalette::Background, mMessageWindowColor);
-    mbox->setPalette(palette);
+    //QPalette palette;
+    //palette.setColor(QPalette::Background, mMessageWindowColor);
+    //mbox->setPalette(palette);
+    QString styleMessageWindow = mMessageWindowColor;
+    mbox->setStyleSheet(styleMessageWindow);
 
     // set font
     QFont font(mMessageWindowFont);
@@ -398,10 +403,11 @@ void StartManager::onNewUserToken(const QString &login, const QString &token)
     {
         emit cancelNewUserWindow();
 
-        //messageWindow(mMessageTitle, QString {mUserName + mMessageRegistered}, mMessageWindowTimeOut);
+        messageWindow(mMessageTitle, QString {mUserName + mMessageRegistered}, mMessageWindowTimeOut);
     }
     else // in else case NewUserWindow asking to type credentials again
     {   // set all parameters for unnamedd user in case user will click cancel
+        //messageWindow(mMessageTitle, QString {mUserName + mMessageCredentialsNotValid}, mMessageWindowTimeOut);
         mUserMode = userMode::UnnamedUser;
         mUserName = "unnamed";
         mToken = QString(mTokenSize, mTokenPlaceholder);
@@ -422,7 +428,7 @@ void StartManager::onNewUserPassword(const QString &login, const QString &passwo
     {
         emit cancelNewUserWindow();
 
-        //messageWindow(mMessageTitle, QString {mUserName + mMessageRegistered}, mMessageWindowTimeOut);
+        messageWindow(mMessageTitle, QString {mUserName + mMessageRegistered}, mMessageWindowTimeOut);
     }
     else // in else case NewUserWindow asking to type credentials again
     {   // set all parameters for unnamed user in case user will click cancel

@@ -14,25 +14,22 @@
 ChoiceWindow::ChoiceWindow(const QStringList &usersFilesList, QWidget *pParent)
     : QDialog (pParent)
 {
-    // widget parameters
-    setModal(true);
-    setWindowTitle(mTitle);
-
-    // Added "fusion" style
-    setStyle(QStyleFactory::create("Fusion"));
-
-    QPalette pal(palette());
-    pal.setColor(mWindowColorRole, mWindowColor);
-    setAutoFillBackground(true);
-    setPalette(pal);
-
+    // main layout
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addStretch(mBasicStretch);
+
+    // widget parameters
+    setModal(true);
+    setMaximumSize(mWidgetWidth, mWidgetHeight);
+    setStyle(QStyleFactory::create(mWidgetStyle));
+    setStyleSheet(mWidgetColor);
+    setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
 
     // account's label parameters
     QLabel *mpLabelAccounts = new QLabel(mAccountsLabel, this);
     QString styleForAccounts = mLabelAccountsFontSize + mLabelAccountsFontFamily + mLabelAccountsFontStyle;
     mpLabelAccounts->setStyleSheet(styleForAccounts);
+    mpLabelAccounts->setIndent(mLabelAccountsIndent);
     mainLayout->addWidget(mpLabelAccounts);
 
     // account's list parameters
@@ -50,36 +47,57 @@ ChoiceWindow::ChoiceWindow(const QStringList &usersFilesList, QWidget *pParent)
     }
     mpUsersWidgetList->addItems(usersList);
 
-    mpUsersWidgetList->setStyleSheet( mUsersListColor);
+    mpUsersWidgetList->setStyleSheet(mUsersListColor + mUsersListFontSize + mUsersListFontFamily);
     mpUsersWidgetList->setAutoFillBackground(true);
     mpUsersWidgetList->setSelectionMode(QAbstractItemView::SingleSelection);
     mainLayout->addWidget(mpUsersWidgetList);
     connect(mpUsersWidgetList, &QListWidget::itemDoubleClicked, this, &ChoiceWindow::onListDoubleClicked);
 
+    //      Buttons: New User Cancel
+    QHBoxLayout *newUserCancelLayout = new QHBoxLayout;
     // New User Button parameters
     mpNewUserButton = new QPushButton(mNewUserLabel, this);
-    QString styleNewUserButton = mNewUserButtonFontSize + mNewUserButtonFontFamily
-                               + mNewUserButtonColor + mNewUserButtonBackgroundColor;
+    mpNewUserButton->setMinimumWidth(mNewUserButtonWidth);
+    mpNewUserButton->setMaximumWidth(mNewUserButtonWidth);
+    QString styleNewUserButton = mNewUserButtonFontSize + mNewUserButtonFontFamily;
+                               //+ mNewUserButtonColor + mNewUserButtonBackgroundColor;
     mpNewUserButton->setStyleSheet(styleNewUserButton);
+    mpNewUserButton->setStyle(QStyleFactory::create(mWidgetStyle));
 
-    mainLayout->addWidget(mpNewUserButton);
+    //mainLayout->addWidget(mpNewUserButton);
     connect(mpNewUserButton, &QPushButton::clicked, this, &ChoiceWindow::onNewUserClicked);
 
-    // Unnamed User Button parameters
-    mpUnnamedUserButton = new QPushButton(mUnnamedUserLabel, this);
-    QString styleUnnamedUserButton = mUnnamedUserButtonFontSize + mUnnamedUserButtonFontFamily
-                                   + mUnnamedUserButtonColor + mUnnamedUserButtonBackgroundColor;
-    mpUnnamedUserButton->setStyleSheet(styleUnnamedUserButton);
-    mainLayout->addWidget(mpUnnamedUserButton);
-    connect(mpUnnamedUserButton, &QPushButton::clicked, this, &ChoiceWindow::onUnnamedUserClicked);
-
-    // Button box (Cancel button) parameters
+    // Dialog button box (Cancel button) parameters
     mpButtonBox = new QDialogButtonBox(QDialogButtonBox::Cancel, this);
-    QString styleButtonBox = mButtonBoxFontSize + mButtonBoxFontFamily
-                           + mButtonBoxColor + mButtonBoxBackgroundColor;
+    QString styleButtonBox = mButtonBoxFontSize + mButtonBoxFontFamily;
     mpButtonBox->setStyleSheet(styleButtonBox);
-    mainLayout->addWidget(mpButtonBox);
+    mpButtonBox->setStyle(QStyleFactory::create(mWidgetStyle));
     connect(mpButtonBox, &QDialogButtonBox::clicked, this, &ChoiceWindow::onBtnBoxClicked);
+
+    newUserCancelLayout->addWidget(mpNewUserButton);
+    newUserCancelLayout->addWidget(mpButtonBox);
+    mainLayout->addLayout(newUserCancelLayout);
+
+    // separator
+    QFrame *line = new QFrame(this);
+    line->setFrameShape(mSeparatorType);
+    line->setFrameShadow(mSeparatorKind);
+    line->setLineWidth(mSeparatorWidth);
+    line->setStyleSheet(mSeparatorStyle);
+    mainLayout->addWidget(line);
+
+    // Unnamed User Button parameters
+    QHBoxLayout *unnamedButtonLayout = new QHBoxLayout;
+    mpUnnamedUserButton = new QPushButton(mUnnamedUserLabel, this);
+    mpUnnamedUserButton->setFlat(true);
+    mpUnnamedUserButton->setCursor(mUnnamedUserButtonCursor);
+    mpUnnamedUserButton->setMinimumWidth(mUnnamedUserButtonWidth);
+    mpUnnamedUserButton->setMaximumWidth(mUnnamedUserButtonWidth);
+    QString styleUnnamedUserButton = mUnnamedUserButtonFontSize + mUnnamedUserButtonColor + mUnnamedUserButtonBorder;
+    mpUnnamedUserButton->setStyleSheet(styleUnnamedUserButton);
+    unnamedButtonLayout->addWidget(mpUnnamedUserButton, 0, mUnnamedUserButtonAlign);
+    mainLayout->addLayout(unnamedButtonLayout);
+    connect(mpUnnamedUserButton, &QPushButton::clicked, this, &ChoiceWindow::onUnnamedUserClicked);
 
     setLayout(mainLayout);
     show();

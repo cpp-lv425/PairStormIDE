@@ -11,7 +11,7 @@ Validator::Validator()
 bool Validator::forGitHub(const QString &login, const QString &password)
 {
     // password validation
-    QRegExp rx("\\S{8,39}");    // according to GitHub rules password length in range 8 - 39 characters
+    QRegExp rx("\\S{8,40}");    // according to GitHub rules password length in range 8 - 39 characters
     QRegExpValidator v(rx, nullptr);
     QString s = password;
     int pos = 0;
