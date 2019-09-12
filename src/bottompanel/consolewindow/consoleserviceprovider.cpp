@@ -25,7 +25,11 @@ void ConsoleServiceProvider::setStdOutput()
     QString errors = mConsoleProcess->readAllStandardError();
     if(!errors.isEmpty())
     {
-        emit errorsAreOccuredAfterCompilationInCOnsoleProvider(errors);
+        emit messageAboutErrorsAfterCompilation(errors);
+    }
+    else
+    {
+        emit messageAboutErrorsAfterCompilation("No errors. Program executed with code 0.");
     }
     if (QSysInfo::productType() == windowsProductType)// if it's windows console
     {

@@ -25,7 +25,7 @@ ConsoleWindow::ConsoleWindow(QWidget *parent) :
     connect(consoleServiceProvider, &ConsoleServiceProvider::appendedTextIsReadyToSet,
             consoleView, &QPlainTextEdit::appendPlainText);
 
-    connect(consoleServiceProvider, &ConsoleServiceProvider::errorsAreOccuredAfterCompilationInCOnsoleProvider,
+    connect(consoleServiceProvider, &ConsoleServiceProvider::messageAboutErrorsAfterCompilation,
             this, &ConsoleWindow::reSendErrors);
 }
 

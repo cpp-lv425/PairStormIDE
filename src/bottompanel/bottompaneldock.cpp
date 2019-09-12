@@ -52,3 +52,8 @@ ConsoleWindow *BottomPanelDock::getPTerminalConsole() const
 {
     return pTerminalConsole;
 }
+
+void BottomPanelDock::setCompileAsCurrentTab()
+{
+    mpTabWgt->setCurrentWidget(pCompileInfo);
+}

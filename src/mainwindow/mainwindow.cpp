@@ -764,13 +764,13 @@ void MainWindow::onSettingsTriggered()
 
 void MainWindow::onBuildAndRunTriggered()
 {
-    // When user press compile and run the solution
     if (!mpDocumentManager || !mpDocumentManager->projectOpened())
     {
         return;
     }
     mpDocumentManager->saveAllDocuments();
     mpBottomPanelDock->reSendProgramIsReadyToCompile();
+    mpBottomPanelDock->setCompileAsCurrentTab();
 }
 
 void MainWindow::onAboutTriggered()
