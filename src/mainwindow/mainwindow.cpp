@@ -195,7 +195,6 @@ void MainWindow::setupMainMenu()
     // opening chat window
     QAction *pConnectAction = toolsMenu->addAction("&Connect...", this, &MainWindow::onConnectTriggered);
     pConnectAction->setIcon(QIcon(":/img/DISCONNECTED.png"));
-
     toolsMenu->addSeparator();
 
     // buidling solution
@@ -746,6 +745,23 @@ void MainWindow::onRefactorTriggered()
 
 void MainWindow::onConnectTriggered()
 {
+    // Check if the project has been previously opened
+    // Don't allow user to log in if no project is present
+    if (!mpDocumentManager->projectOpened())
+    {
+        return;
+    }
+    // Check if the user has been previously logged in
+    // If so, don't allow user to log in again
+    QSettings settings;
+    if (settings.contains("userName"))
+    {
+        QString currentUserName = settings.value("userName").toString();
+        if (currentUserName != QString("unnamed"))
+        {
+            return;
+        }
+    }
     LoginDialog loginDialog(this);
     QString userInput = loginDialog.start();
     if (userInput.isEmpty())

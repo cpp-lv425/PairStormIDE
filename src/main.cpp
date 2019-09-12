@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
     MainWindow w;
     w.hide();
     splashScreen.finish(&w);
-    StartManager startManager(&w);
+    StartManager startManager;
     w.connect(&startManager, &StartManager::cancel, &w, [&]() {w.mIsFinished = true;});
     startManager.start();
     if (w.mIsFinished)
