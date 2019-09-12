@@ -1022,10 +1022,10 @@ void MainWindow::databaseConnect()
     setDatabaseFileName();
     db = ConnectionGetter::getDefaultConnection(databaseFileName);
     CreateDB database;
-    database.addTableFile();
+    /*database.addTableFile();
     database.addTableUser();
     database.addTableComment();
-    database.addTableMessage();
+    database.addTableMessage();*/
 }
 
 void MainWindow::databaseDisconnect()
@@ -1066,7 +1066,7 @@ void MainWindow::readWriteFileContent(QString fileToReadName, QString fileToWrit
 
     QByteArray data = fileToRead.readAll();
     fileToWrite.write(data);
-
+    qDebug()<<data;
     fileToRead.close();
     fileToWrite.close();
 }
