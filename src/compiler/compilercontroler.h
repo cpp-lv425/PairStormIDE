@@ -19,6 +19,10 @@ public:
     void setProjectPath(const QString &projectPath);
     void runCompilation();
     void removeAllExecutableAndObjectsFiles();
+    void setConsoleProvider(ConsoleServiceProvider *value);
+
+    ConsoleServiceProvider *getConsoleProvider() const;
+
 private:
     QString getExecutibleFileName() const;
 public slots:

@@ -15,6 +15,7 @@
 #include "localconnectorgenerator.h"
 #include "settingsconfigurator.h"
 #include "paletteconfigurator.h"
+#include "consolewindow/consolewindow.h"
 #include "projectviewerdock.h"
 #include "newprojectwizard.h"
 #include "documentmanager.h"
@@ -335,6 +336,9 @@ void MainWindow::createButtomPanel()
 {
     // create instance of Bottom Panel
     mpBottomPanelDock = new BottomPanelDock(this);
+     qDebug()<<"compilerControle in the memory before= "<<compilerControler->getConsoleProvider();
+    compilerControler->setConsoleProvider(mpBottomPanelDock->getPTerminalConsole()->getConsoleServiceProvider());
+    qDebug()<<"compilerControle in the memory after= "<<compilerControler->getConsoleProvider();
     mpBottomPanelDock->setObjectName("mpBottomPanelDock");
     addDockWidget(Qt::BottomDockWidgetArea, mpBottomPanelDock);
     connect(this, &MainWindow::projectPathWasChanged, mpBottomPanelDock, &BottomPanelDock::reSendProjectPathChanged);

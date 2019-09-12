@@ -24,6 +24,16 @@ void CompilerControler::setCompilerPath(QString compilerPath)
     mCompilerPath = compilerPath;
 }
 
+ConsoleServiceProvider *CompilerControler::getConsoleProvider() const
+{
+    return consoleProvider;
+}
+
+void CompilerControler::setConsoleProvider(ConsoleServiceProvider *value)
+{
+    consoleProvider = value;
+}
+
 QString CompilerControler::getProjectPath() const
 {
     return mProjectPath;

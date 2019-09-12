@@ -17,6 +17,8 @@ class ConsoleWindow : public QWidget
 public:
     explicit ConsoleWindow(QWidget *parent = nullptr);
     ~ConsoleWindow();
+    ConsoleServiceProvider* getConsoleServiceProvider() const;
+
 public slots:
     void setProjectPath(QString);
     void reSendErrors(QString);

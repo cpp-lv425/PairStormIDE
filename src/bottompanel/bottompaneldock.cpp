@@ -47,3 +47,8 @@ void BottomPanelDock::reSendProgramIsReadyToCompile()
 {
     emit programIsReadyToCompile();
 }
+
+ConsoleWindow *BottomPanelDock::getPTerminalConsole() const
+{
+    return pTerminalConsole;
+}

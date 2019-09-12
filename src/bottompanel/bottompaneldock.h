@@ -16,6 +16,8 @@ class BottomPanelDock: public QDockWidget
     QTabWidget *mpTabWgt;
 public:
     explicit BottomPanelDock(QWidget *pParent = nullptr);
+    ConsoleWindow *getPTerminalConsole() const;
+
 signals:
     void projectPathWasChanged(QString);
     void programIsReadyToCompile();
