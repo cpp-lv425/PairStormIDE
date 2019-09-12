@@ -20,9 +20,13 @@ bool Validator::forGitHub(const QString &login, const QString &password)
     {
         return false;
     }
-    // [^-]\\S{2,37}[^-]
+
     // login validation
-    rx.setPattern("^(?:[_\d\w]{1}(?:(?:[_\d\w])|(?:-[^-])){6,37}[_\d\w]{1})$");// according to GitHub rules first and last characters can't be '-'
+    // Github username may only contain alphanumeric characters or hyphens.
+    // Github username cannot have multiple consecutive hyphens.
+    // Github username cannot begin or end with a hyphen.
+    // Maximum is 39 characters
+    rx.setPattern("^(?:[\\w]{1}(?:(?:[\\w])|(?:-[^-])){6,37}[\\w]?)$");
     v.setRegExp(rx);
     pos = 0;
     s = login;
