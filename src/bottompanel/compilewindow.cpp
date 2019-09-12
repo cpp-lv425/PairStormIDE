@@ -2,7 +2,7 @@
 #include "ui_compilewindow.h"
 #include "compiler/compilercontroler.h"
 #include <QGridLayout>
-
+#include <QDebug>
 CompileWindow::CompileWindow(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::CompileWindow)
@@ -22,6 +22,7 @@ CompileWindow::~CompileWindow()
 
 void CompileWindow::setCompileOutput(QString text)
 {
+    qDebug()<<"set text to compiler output";
     compileEditor->setPlainText(text);
 }
 
@@ -30,10 +31,3 @@ void CompileWindow::on_compileButton_clicked()
     emit programIsReadyToCompile();
 }
 
-/*    consoleServiceProvider = new ConsoleServiceProvider;
-    consoleView = new ConsoleView;
-
-    QGridLayout *consoleViewGridLayout = new QGridLayout (this);
-    consoleViewGridLayout->addWidget(consoleView);
-    this->setLayout(consoleViewGridLayout);
-*/

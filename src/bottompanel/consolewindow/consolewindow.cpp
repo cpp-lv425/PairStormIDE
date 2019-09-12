@@ -11,7 +11,7 @@ ConsoleWindow::ConsoleWindow(QWidget *parent) :
     ui->setupUi(this);
     consoleServiceProvider = new ConsoleServiceProvider;
     consoleView = new ConsoleView;
-
+    qDebug()<<"consoleServeceProvider inside console window = "<<consoleServiceProvider;
     QGridLayout *consoleViewGridLayout = new QGridLayout (this);
     consoleViewGridLayout->addWidget(consoleView);
     this->setLayout(consoleViewGridLayout);
@@ -25,8 +25,6 @@ ConsoleWindow::ConsoleWindow(QWidget *parent) :
     connect(consoleServiceProvider, &ConsoleServiceProvider::appendedTextIsReadyToSet,
             consoleView, &QPlainTextEdit::appendPlainText);
 
-//    connect(consoleServiceProvider, &ConsoleServiceProvider::errorsAreOccuredAfterCompilation,
-//            this, &ConsoleWindow::reSendErrors);
     connect(consoleServiceProvider, &ConsoleServiceProvider::errorsAreOccuredAfterCompilationInCOnsoleProvider,
             this, &ConsoleWindow::reSendErrors);
 }

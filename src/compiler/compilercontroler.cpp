@@ -99,7 +99,6 @@ void CompilerControler::removeAllExecutableAndObjectsFiles()
     dir.setFilter(QDir::Files);
     foreach (QString dirFile, dir.entryList())
     {
-        qDebug()<<"file ="<<dirFile;
         dir.remove(dirFile);
     }
 }

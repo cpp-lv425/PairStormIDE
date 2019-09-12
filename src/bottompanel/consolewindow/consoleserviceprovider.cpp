@@ -22,12 +22,11 @@ QString ConsoleServiceProvider::compilerPath() const
 
 void ConsoleServiceProvider::setStdOutput()
 {
-    qDebug()<<"set inside std";
     QString errors = mConsoleProcess->readAllStandardError();
     if(!errors.isEmpty())
     {
         emit errorsAreOccuredAfterCompilationInCOnsoleProvider(errors);
-        qDebug()<<"errors: "<<errors;
+        qDebug()<<"errors: "<<errors <<"\nthis = "<<this;
     }
     if (QSysInfo::productType() == windowsProductType)// if it's windows console
     {

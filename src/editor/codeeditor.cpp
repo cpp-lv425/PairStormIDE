@@ -321,15 +321,13 @@ void CodeEditor::getNamesOfIdentifiers()
 
 void CodeEditor::handleLineChange(int lastLineWithChange)
 {
-    qDebug()<<"opened signal. file name = "<< getFileName();
     mLcpp->clear();
 
     int changeStart = lastLineWithChange;
 
     int currentLinesCount = document()->lineCount();
     int lineDifference = currentLinesCount - mLinesCount;
-    qDebug()<<"currentLinesCount = "<<currentLinesCount;
-    qDebug()<<"lines difference = "<<lineDifference;
+
     mLinesCount = currentLinesCount;
 
     if (!mLcpp->isLexerWasRunning())
@@ -899,7 +897,6 @@ void formating(QTextCharFormat fmt, QTextCursor &cursor, Token token, int starti
 
 void CodeEditor::highlightText()
 {
-    qDebug()<<"inside highlight text. Path = "<<getFileName();
     QTextBlock block = document()->findBlockByLineNumber(mHighlightingStart);
     QTextCursor cursor(block);
     int start = cursor.blockNumber();
