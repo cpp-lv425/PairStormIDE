@@ -29,7 +29,7 @@ void ConsoleServiceProvider::setStdOutput()
     }
     else
     {
-        emit messageAboutErrorsAfterCompilation("No errors. Program executed with code 0.");
+        //emit messageAboutErrorsAfterCompilation("No errors. Program executed with code 0.");
     }
     if (QSysInfo::productType() == windowsProductType)// if it's windows console
     {

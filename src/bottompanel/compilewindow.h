@@ -3,6 +3,9 @@
 
 #include <QWidget>
 #include <QPlainTextEdit>
+#include <QStringList>
+#include <QListWidget>
+
 namespace Ui
 {
 class CompileWindow;
@@ -19,10 +22,11 @@ signals:
     void programIsReadyToCompile();
 public slots:
     void setCompileOutput(QString);
-
+private:
+    QStringList getAllErrorsFromCompileOutput(const QString &compileErrorsOutput);
 private:
     Ui::CompileWindow *ui;
-    QPlainTextEdit *compileOutputEditor;
+    QListWidget *compileOutputList;
 };
 
 #endif // COMPILEWINDOW_H
