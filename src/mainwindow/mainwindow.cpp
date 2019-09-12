@@ -336,9 +336,7 @@ void MainWindow::createButtomPanel()
 {
     // create instance of Bottom Panel
     mpBottomPanelDock = new BottomPanelDock(this);
-     qDebug()<<"compilerControle in the memory before= "<<compilerControler->getConsoleProvider();
     compilerControler->setConsoleProvider(mpBottomPanelDock->getPTerminalConsole()->getConsoleServiceProvider());
-    qDebug()<<"compilerControle in the memory after= "<<compilerControler->getConsoleProvider();
     mpBottomPanelDock->setObjectName("mpBottomPanelDock");
     addDockWidget(Qt::BottomDockWidgetArea, mpBottomPanelDock);
     connect(this, &MainWindow::projectPathWasChanged, mpBottomPanelDock, &BottomPanelDock::reSendProjectPathChanged);
@@ -468,14 +466,6 @@ void MainWindow::onOpenProjectTriggered()
             (this,
              userMessages[UserMessages::OpenDirectoryTitle],
             QDir::homePath());
-
-   /* Connection *db = ConnectionGetter::getDefaultConnection("C:/Users/Petro/Desktop/storage.db");
-    CreateDB database;
-    database.addTableFile();
-    database.addTableUser();
-    database.addTableComment();
-    database.addTableMessage();*/
-
 
     // check if project exists
     if (!FileManager().projectExists(dirName))
@@ -775,6 +765,11 @@ void MainWindow::onSettingsTriggered()
 void MainWindow::onBuildAndRunTriggered()
 {
     // When user press compile and run the solution
+    if (!mpDocumentManager || !mpDocumentManager->projectOpened())
+    {
+        return;
+    }
+    mpDocumentManager->saveAllDocuments();
     mpBottomPanelDock->reSendProgramIsReadyToCompile();
 }
 
@@ -1042,7 +1037,6 @@ void MainWindow::onNewProjectTriggered()
 void MainWindow::databaseConnect(QString directory)
 {
     db = ConnectionGetter::getDefaultConnection(directory + "/storage.db");
-    qDebug()<<"on databaseConnect function";
     CreateDB database;
     database.addTableFile();
     database.addTableUser();

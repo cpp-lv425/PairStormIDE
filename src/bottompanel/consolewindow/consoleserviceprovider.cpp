@@ -26,7 +26,6 @@ void ConsoleServiceProvider::setStdOutput()
     if(!errors.isEmpty())
     {
         emit errorsAreOccuredAfterCompilationInCOnsoleProvider(errors);
-        qDebug()<<"errors: "<<errors <<"\nthis = "<<this;
     }
     if (QSysInfo::productType() == windowsProductType)// if it's windows console
     {

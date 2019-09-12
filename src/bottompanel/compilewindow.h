@@ -2,7 +2,7 @@
 #define COMPILEWINDOW_H
 
 #include <QWidget>
-#include <codeeditor.h>
+#include <QPlainTextEdit>
 namespace Ui
 {
 class CompileWindow;
@@ -19,12 +19,10 @@ signals:
     void programIsReadyToCompile();
 public slots:
     void setCompileOutput(QString);
-private slots:
-    void on_compileButton_clicked();
 
 private:
     Ui::CompileWindow *ui;
-    CodeEditor *compileEditor;
+    QPlainTextEdit *compileOutputEditor;
 };
 
 #endif // COMPILEWINDOW_H

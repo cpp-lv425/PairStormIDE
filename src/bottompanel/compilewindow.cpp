@@ -8,11 +8,12 @@ CompileWindow::CompileWindow(QWidget *parent) :
     ui(new Ui::CompileWindow)
 {
     ui->setupUi(this);
-    compileEditor = new CodeEditor;
+    compileOutputEditor = new QPlainTextEdit;
+    compileOutputEditor->setReadOnly(true);
+
     QGridLayout *compileOutputLayout = new QGridLayout(this);
-    compileOutputLayout->addWidget(compileEditor);
+    compileOutputLayout->addWidget(compileOutputEditor);
     this->setLayout(compileOutputLayout);
-    //compileEditor->setReadOnly(true);
 }
 
 CompileWindow::~CompileWindow()
@@ -23,11 +24,7 @@ CompileWindow::~CompileWindow()
 void CompileWindow::setCompileOutput(QString text)
 {
     qDebug()<<"set text to compiler output";
-    compileEditor->setPlainText(text);
-}
-
-void CompileWindow::on_compileButton_clicked()
-{
-    emit programIsReadyToCompile();
+    compileOutputEditor->clear();
+    compileOutputEditor->setPlainText(text);
 }
 
