@@ -17,32 +17,24 @@ NewUserWindow::NewUserWindow(QStringList &registeredUsersList, QWidget *parent)
     : QDialog(parent)
     , mRegisteredUsersList {registeredUsersList}
 {
-    // widget parameter
-    setModal(true);
-    setWindowTitle(mTitle);
-
-    setMaximumSize(400, 150);
-
-    // Added "fusion" style
-    setStyle(QStyleFactory::create("Fusion"));
-    setStyleSheet("background-color: #b1c1c7");
-    setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
-
-    //QPalette pal(palette());
-    //pal.setColor(mWindowColorRole, mWindowColor);
-    //setAutoFillBackground(true);
-    //setPalette(pal);
-
+    // main layout
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addStretch(mBasicStretch);
 
-    // Append new user label
-    QLabel *windowTitle = new QLabel("Adding new user");
-    QString windowTitleStyleSheet =
-            "font-size: 22px; font-family: Helvetica; font-style: bold;";
-    windowTitle->setIndent(17);
-    windowTitle->setStyleSheet(windowTitleStyleSheet);
-    mainLayout->addWidget(windowTitle);
+    // Widget parameters
+    setModal(true);
+    setMaximumSize(mWidgetWidth, mWidgetHeight);
+
+    setStyle(QStyleFactory::create(mWidgetStyle));
+    setStyleSheet(mWidgetColor);
+    setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
+
+    // New user label
+    mWindowTitle = new QLabel(mWidgetTitle, this);
+    QString windowTitleStyleSheet = mWidgetTitleFontSize + mWidgetTitleFontFamily + mWidgetTitleFontStyle;
+    mWindowTitle->setStyleSheet(windowTitleStyleSheet);
+    mWindowTitle->setIndent(mWidgetTitleIndent);
+    mainLayout->addWidget(mWindowTitle);
 
     //  login parameters
     QHBoxLayout *loginLayout = new QHBoxLayout;
@@ -87,25 +79,22 @@ NewUserWindow::NewUserWindow(QStringList &registeredUsersList, QWidget *parent)
 
     // separator
     QFrame *line = new QFrame(this);
-    line->setFrameShape(QFrame::HLine);
-    line->setFrameShadow(QFrame::Sunken);
+    line->setFrameShape(mSeparatorType);
+    line->setFrameShadow(mSeparatorKind);
     line->setLineWidth(mSeparatorWidth);
     line->setStyleSheet(mSeparatorStyle);
     mainLayout->addWidget(line);
 
     // unnamed user button
     QHBoxLayout *unnamedButtonLayout = new QHBoxLayout;
-    //unnamedButtonLayout->
     mpUnnamedUserButton = new QPushButton(mUnnamedUserLabel, this);
     mpUnnamedUserButton->setFlat(true);
-    mpUnnamedUserButton->setStyleSheet("border: none; font-size: 13px; color: #006199");
-    mpUnnamedUserButton->setCursor(Qt::PointingHandCursor);
+    mpUnnamedUserButton->setCursor(mUnnamedUserButtonCursor);
     mpUnnamedUserButton->setMinimumWidth(mUnnamedUserButtonWidth);
     mpUnnamedUserButton->setMaximumWidth(mUnnamedUserButtonWidth);
-    //QString styleUnnamedUserButton = mUnnamedUserButtonFontSize + mUnnamedUserButtonFontFamily
-    //                               + mUnnamedUserButtonColor + mUnnamedUserButtonBackgroundColor;
-    //mpUnnamedUserButton->setStyleSheet(styleUnnamedUserButton);
-    unnamedButtonLayout->addWidget(mpUnnamedUserButton, 0, Qt::AlignRight);
+    QString styleUnnamedUserButton = mUnnamedUserButtonFontSize + mUnnamedUserButtonColor + mUnnamedUserButtonBorder;
+    mpUnnamedUserButton->setStyleSheet(styleUnnamedUserButton);
+    unnamedButtonLayout->addWidget(mpUnnamedUserButton, 0, mUnnamedUserButtonAlign);
     mainLayout->addLayout(unnamedButtonLayout);
     connect(mpUnnamedUserButton, &QPushButton::clicked, this, [=](){emit unnamedUser();});
     setLayout(mainLayout);

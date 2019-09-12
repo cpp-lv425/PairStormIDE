@@ -10,6 +10,7 @@
 #define NEWUSERWINDOW_H
 
 #include <QDialog>
+#include <QFrame>
 
 QT_BEGIN_NAMESPACE
 class QDialogButtonBox;
@@ -27,6 +28,7 @@ public:
 
     void unblockButtons();
 private:
+    QLabel *mWindowTitle;
     QLabel *mpLabelLogin;
     QLabel *mpLabelToken;
     QLineEdit *mpEditLogin;
@@ -39,44 +41,60 @@ private:
     QStringList mRegisteredUsersList;
 
     //          DESIGN PARAMETERS
-    const Qt::GlobalColor mWindowColor              = Qt::lightGray;
-    const QPalette::ColorRole mWindowColorRole      = QPalette::Background;
-    QString mPlaceholderTextLogin                   = "Your GitHub login";
-    QString mPlaceholderTextToken                   = "Sequence with 40 characters treats as token";
-    const QString mTitle                            = "Create new account";
-    const QString mLoginLabel                       = "GitHub login";
-    const QString mTokenLabel                       = "Password or token";
-    const QString mSeparatorStyle                   = "background-color: #4e7b8a;";
-    const QString mUnnamedUserLabel                 = "Try without authorization";
-    const int mTokenSize                            = 40;
-
-    int mLabelWidth                                 = 135;
-    int mEditWidth                                  = 320;
+    //  Widget
+    const int mWidgetWidth                          = 400;
+    const int mWidgetHeight                         = 150;
+    const QString mWidgetStyle                      = "Fusion";
+    const QString mWidgetColor                      = "background-color: #b1c1c7;";
     int mBasicStretch                               = 1;
-    int mSeparatorWidth                             = 2;
-    int mUnnamedUserButtonWidth                     = 200;
 
-    //  LabelAccounts
+    //  Widget Title
+    const QString mWidgetTitle                     = "Adding new user";
+    const QString mWidgetTitleFontSize             = "font-size:   22px;";
+    const QString mWidgetTitleFontFamily           = "font-family: Helvetica;";
+    const QString mWidgetTitleFontStyle            = "font-style: bold;";
+    const int mWidgetTitleIndent                   = 17;
+
+    // login
+    const QString mPlaceholderTextLogin             = "Your GitHub login";
+    const QString mLoginLabel                       = "GitHub login";
+    const int mLabelWidth                           = 135;
+    const int mEditWidth                            = 320;
+
     const QString mLabelLoginFontSize               = "font-size:   16px;";
     const QString mLabelLoginFontFamily             = "font-family: Helvetica;";
     const QString mLabelLoginFontStyle              = "font-style: normal;";
 
-    //  LineEdit
     const QString mLineEditFontSize                 = "font-size: 17px;";
     const QString mLabelEditFontFamily              = "font-family: Helvetica;";
     const QString mLineEditColor                    = "background-color: #dce8eb;";
 
-    //  unnamed user button
-    const QString mUnnamedUserButtonFontSize        = "font-size: 16px;";
-    const QString mUnnamedUserButtonFontFamily      = "font-family: Helvetica;";
-    const QString mUnnamedUserButtonColor           = "color: rgb(0, 0, 0);";
-    const QString mUnnamedUserButtonBackgroundColor = "background-color: grey;";
+    // password/token
+    const QString mPlaceholderTextToken             = "Sequence with 40 characters treats as token";
+    const QString mTokenLabel                       = "Password or token";    
+    const int mTokenSize                            = 40;
 
     //  dialog button box
     const QString mButtonBoxFontSize                = "font-size: 16px;";
     const QString mButtonBoxFontFamily              = "font-family: Helvetica;";
     const QString mButtonBoxColor                   = "color: rgb(0, 0, 0);";
     const QString mButtonBoxBackgroundColor         = "background-color: grey;";
+
+    // separator
+    const QString mSeparatorStyle                   = "background-color: #4e7b8a;";
+    const int mSeparatorWidth                       = 2;
+    const QFrame::Shape mSeparatorType              = QFrame::HLine;
+    const QFrame::Shadow mSeparatorKind             = QFrame::Sunken;
+
+    //  unnamed user button
+    const QString mUnnamedUserLabel                 = "Try without authorization";
+    const QString mUnnamedUserButtonFontSize        = "font-size: 13px;";
+    const QString mUnnamedUserButtonFontFamily      = "font-family: Helvetica;";
+    const QString mUnnamedUserButtonColor           = "color: #006199;";
+    const QString mUnnamedUserButtonBorder          = "border: none;";
+    const int mUnnamedUserButtonWidth               = 200;
+    const Qt::AlignmentFlag mUnnamedUserButtonAlign = Qt::AlignRight;
+    const Qt::CursorShape mUnnamedUserButtonCursor  = Qt::PointingHandCursor;
 
     bool checkInRegisteredUsers(const QString &newUser);
 public slots:
