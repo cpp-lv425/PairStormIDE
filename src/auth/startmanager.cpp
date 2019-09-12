@@ -117,6 +117,11 @@ void StartManager::start()
     }
 
     //  H
+    if (!mUserName.size())                  //  prevent creation configuration file
+    {                                       //     with empty name in case user pushed Cancel
+        mUserName = "unnamed";
+    }
+
     StoreConf conf(mUserName);
     conf.restoreConFile();
     if (mUserMode == userMode::NewUser)     //  set token to new user
