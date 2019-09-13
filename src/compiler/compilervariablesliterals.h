@@ -7,12 +7,12 @@ const QString buildFolderName = "PS_BUILD";
 const QString makeFileName = "MakeFile";
 const QString objectiveFilePrefix = "-o";
 const QString objectiveFileExtension = ".o";
-const QString sourceFileExtinsion = ".cpp";
+const QString sourceFileExtension = ".cpp";
 const QString executableFileExtension = ".exe";
 const QString compilerType = "g++";
 const QString extraFlagsForCompilerType = "CFLAGS";
 const QString extraFlagsForCompilerParams = "=-c -Wall";
-const QString clenPreviousObjectiveSufics = "rm -rf *o ";
+const QString cleanPreviousObjectiveSufics = "rm -rf *o ";
 const QString compilersListNamesInSettings = "cppCompilersList";
 
 #endif // COMPILERVARIABLESLITERALS_H

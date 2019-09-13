@@ -68,7 +68,7 @@ void CompilerControler::runCompilation()
     sourceFilesPathes.clear();
     removeAllExecutableAndObjectsFiles();
 
-    auto buildDirectoryPath = mProjectPath + buildFolderName;
+    auto buildDirectoryPath = mProjectPath + "/" + buildFolderName;
     QDir buildDirectory(buildDirectoryPath);
     if (!buildDirectory.exists())
     {
@@ -102,7 +102,7 @@ void CompilerControler::removeAllExecutableAndObjectsFiles()
 {
     QDir dir(mProjectPath);
     dir.setNameFilters(QStringList() << "*" + objectiveFileExtension
-                       << "*" + sourceFileExtension
+                       << "*" + executableFileExtension
                        << makeFileName);
     dir.setFilter(QDir::Files);
     foreach (QString dirFile, dir.entryList())
@@ -114,10 +114,6 @@ void CompilerControler::removeAllExecutableAndObjectsFiles()
 QString CompilerControler::createMakeFileContent(const QString &executibleFileName) const
 {
     QString rMakeFileContent;
-//    rMakeFileContent += QString("CC=g++\n\n") +
-//            QString("CFLAGS=-c -Wall\n\n") +
-//            QString("all: ") + executibleFileName + "\n\n" +
-//            executibleFileName + ": ";
     rMakeFileContent +=
             "CC=" + compilerType + "\n\n" +
             extraFlagsForCompilerType + extraFlagsForCompilerParams + "\n\n" +
@@ -133,17 +129,17 @@ QString CompilerControler::createMakeFileContent(const QString &executibleFileNa
     {
         rMakeFileContent += sourceFile + objectiveFileExtension + " ";
     }
-    rMakeFileContent += objectiveFilePrefix + executibleFileName + "\n\n";
+    rMakeFileContent += objectiveFilePrefix + " "+ executibleFileName + "\n\n";
 
     for (auto sourceFile: sourceFilesPathes)
     {
         rMakeFileContent += sourceFile + objectiveFileExtension + ": " +
-                mProjectPath + "/" + sourceFile + sourceFileExtinsion + "\n" +
+                mProjectPath + "/" + sourceFile + sourceFileExtension + "\n" +
                 "\t$(CC) $(CFLAGS) " + mProjectPath + "/" +
-                sourceFile + sourceFileExtinsion + "\n\n";
+                sourceFile + sourceFileExtension + "\n\n";
     }
 
-    rMakeFileContent += "clean:\n"+ cleanPreviousObjectiveSufics + executibleFileName;
+    rMakeFileContent += "clean:\n\t"+ cleanPreviousObjectiveSufics + executibleFileName;
 
     return rMakeFileContent;
 }
@@ -151,7 +147,7 @@ QString CompilerControler::createMakeFileContent(const QString &executibleFileNa
 void CompilerControler::getAllSourceFilesFromTheProjectDirectory()
 {
     QDirIterator fileInDirectoryIter(mProjectPath,
-                                    QStringList() << "*" + sourceFileExtinsion,
+                                    QStringList() << "*" + sourceFileExtension,
                                     QDir::Files,
                                     QDirIterator::Subdirectories);
 
