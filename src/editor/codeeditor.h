@@ -74,7 +74,7 @@ public:
     void readAllCommentsFromDB(QVector<Comment> mStartComments);
     QVector<Comment> getAllCommentsToDB();
 
-    CommentDb *getCommentGetter() const;
+    CommentDb getCommentGetter() const;
 
     QVector<Comment> getStartComments() const;
 
@@ -143,18 +143,18 @@ private:
     QWidget *mLineNumberArea;
     ConfigParams mConfigParam;
     QFont mFont;
-    LexerCPP *mLcpp;
+    LexerCPP mLcpp;
     QString mFileName;
-    ChangeManager *mChangeManager;
+    ChangeManager mChangeManager;
     QTimer mTimer;
     LexerCPP mLexer;
     AddCommentButton *mAddCommentButton;
-    CommentWidget *mCommentWidget;
-    QLabel *mCurrentCommentLable;
+    CommentWidget mCommentWidget;
+    QLabel mCurrentCommentLable;
     QVector<Comment> mStartComments;
     QCompleter *mCompleter;
     QStringList completerKeywords;
-    CommentDb *commentGetter;
+    CommentDb commentGetter;
     QSettings settings;
 
 
