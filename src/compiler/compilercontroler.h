@@ -20,6 +20,7 @@ public:
     void runCompilation();
     void removeAllExecutableAndObjectsFiles();
     void setConsoleProvider(ConsoleServiceProvider *value);
+    QString getCurrentCompilerName() const;
 
     ConsoleServiceProvider *getConsoleProvider() const;
 

@@ -22,6 +22,7 @@ signals:
     void programIsReadyToCompile();
 public slots:
     void setCompileOutput(QString);
+    void clearCompileOutputView();
 private:
     QStringList getAllErrorsFromCompileOutput(const QString &compileErrorsOutput);
     QString removeAllSymbolsFromString( QString &outputLine, const char &symb);

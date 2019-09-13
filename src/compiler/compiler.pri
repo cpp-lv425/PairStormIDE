@@ -1,6 +1,6 @@
 HEADERS += \
-    $$PWD/compilationstringliterals.h \
-    $$PWD/compilercontroler.h
+    $$PWD/compilercontroler.h \
+    $$PWD/compilervariablesliterals.h
 
 SOURCES += \
     $$PWD/compilercontroler.cpp

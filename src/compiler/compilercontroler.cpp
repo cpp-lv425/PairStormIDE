@@ -1,3 +1,4 @@
+#include "compilervariablesliterals.h"
 #include "compilercontroler.h"
 #include <QDirIterator>
 #include "filemanager.h"
@@ -34,6 +35,22 @@ void CompilerControler::setConsoleProvider(ConsoleServiceProvider *value)
     consoleProvider = value;
 }
 
+QString CompilerControler::getCurrentCompilerName() const
+{
+    QString rCurrentCompiler = "";
+    QSettings settings;
+    if (settings.contains(compilersListNamesInSettings))
+    {
+        QStringList currentCompilers = settings.value(compilersListNamesInSettings).toStringList();
+        if (!currentCompilers.empty())
+        {
+            QString firstCompilerPath = *currentCompilers.begin();
+            rCurrentCompiler = firstCompilerPath;
+        }
+    }
+    return rCurrentCompiler;
+}
+
 QString CompilerControler::getProjectPath() const
 {
     return mProjectPath;
@@ -46,30 +63,19 @@ void CompilerControler::setProjectPath(const QString &projectPath)
 
 void CompilerControler::runCompilation()
 {
-    QString currentCompiler = "";
-    QSettings settings;
-    if (settings.contains("cppCompilersList"))
-    {
-        QStringList currentCompilers = settings.value("cppCompilersList").toStringList();
-        if (!currentCompilers.empty())
-        {
-            QString firstCompilerPath = *currentCompilers.begin();
-            currentCompiler = firstCompilerPath;
-        }
-    }
 
+    auto currentCompilerName = getCurrentCompilerName();
     sourceFilesPathes.clear();
     removeAllExecutableAndObjectsFiles();
 
-//    auto buildDirectoryPath = mProjectPath + "/PS_BUILD";
-//    QDir buildDirectory(buildDirectoryPath);
-//    if (!buildDirectory.exists())
-//    {
-//        qDebug()<<"created new build dir";
-//        buildDirectory.mkdir(buildDirectoryPath);
-//    }
+    auto buildDirectoryPath = mProjectPath + buildFolderName;
+    QDir buildDirectory(buildDirectoryPath);
+    if (!buildDirectory.exists())
+    {
+        buildDirectory.mkdir(buildDirectoryPath);
+    }
 
-    auto makeFilePath = mProjectPath + "/MakeFile";
+    auto makeFilePath = buildDirectoryPath + "/" + makeFileName;
 
     getAllSourceFilesFromTheProjectDirectory();
 
@@ -77,8 +83,8 @@ void CompilerControler::runCompilation()
     fileManager.createFile(makeFilePath);
     fileManager.writeToFile(makeFilePath, createMakeFileContent(getExecutibleFileName()));
 
-    consoleProvider->setWorkingDirectory(mProjectPath);
-    consoleProvider->runConsoleCommand(currentCompiler.append(" -f MakeFile"));
+    consoleProvider->setWorkingDirectory(buildDirectoryPath);
+    consoleProvider->runConsoleCommand(currentCompilerName.append(" -f MakeFile"));
     QString fullExecutableFilePath = mProjectPath + "/" + getExecutibleFileName();
 
     QProcess process;
@@ -95,7 +101,9 @@ QString CompilerControler::getExecutibleFileName() const
 void CompilerControler::removeAllExecutableAndObjectsFiles()
 {
     QDir dir(mProjectPath);
-    dir.setNameFilters(QStringList() << "*.o" << "*.exe" << "MakeFile");
+    dir.setNameFilters(QStringList() << "*" + objectiveFileExtension
+                       << "*" + sourceFileExtension
+                       << makeFileName);
     dir.setFilter(QDir::Files);
     foreach (QString dirFile, dir.entryList())
     {
@@ -106,31 +114,36 @@ void CompilerControler::removeAllExecutableAndObjectsFiles()
 QString CompilerControler::createMakeFileContent(const QString &executibleFileName) const
 {
     QString rMakeFileContent;
-    rMakeFileContent += QString("CC=g++\n\n") +
-            QString("CFLAGS=-c -Wall\n\n") +
-            QString("all: ") + executibleFileName + "\n\n" +
+//    rMakeFileContent += QString("CC=g++\n\n") +
+//            QString("CFLAGS=-c -Wall\n\n") +
+//            QString("all: ") + executibleFileName + "\n\n" +
+//            executibleFileName + ": ";
+    rMakeFileContent +=
+            "CC=" + compilerType + "\n\n" +
+            extraFlagsForCompilerType + extraFlagsForCompilerParams + "\n\n" +
+            "all: " + executibleFileName + "\n\n" +
             executibleFileName + ": ";
 
     for (auto sourceFile: sourceFilesPathes)
     {
-        rMakeFileContent += sourceFile + ".o ";
+        rMakeFileContent += sourceFile + objectiveFileExtension + " ";
     }
     rMakeFileContent += "\n\t$(CC) ";
     for (auto sourceFile: sourceFilesPathes)
     {
-        rMakeFileContent += sourceFile + ".o ";
+        rMakeFileContent += sourceFile + objectiveFileExtension + " ";
     }
-    rMakeFileContent += "-o " + executibleFileName + "\n\n";
+    rMakeFileContent += objectiveFilePrefix + executibleFileName + "\n\n";
 
     for (auto sourceFile: sourceFilesPathes)
     {
-        rMakeFileContent += sourceFile + ".o: " +
-                mProjectPath + "/" + sourceFile + ".cpp\n" +
-                "\t$(CC) $(CFLAGS) " + mProjectPath + "/" + sourceFile + ".cpp\n\n";
+        rMakeFileContent += sourceFile + objectiveFileExtension + ": " +
+                mProjectPath + "/" + sourceFile + sourceFileExtinsion + "\n" +
+                "\t$(CC) $(CFLAGS) " + mProjectPath + "/" +
+                sourceFile + sourceFileExtinsion + "\n\n";
     }
 
-    rMakeFileContent += "clean:\n"
-                        "\trm -rf *o " + executibleFileName;
+    rMakeFileContent += "clean:\n"+ cleanPreviousObjectiveSufics + executibleFileName;
 
     return rMakeFileContent;
 }
@@ -138,7 +151,7 @@ QString CompilerControler::createMakeFileContent(const QString &executibleFileNa
 void CompilerControler::getAllSourceFilesFromTheProjectDirectory()
 {
     QDirIterator fileInDirectoryIter(mProjectPath,
-                                    QStringList() << "*.cpp",
+                                    QStringList() << "*" + sourceFileExtinsion,
                                     QDir::Files,
                                     QDirIterator::Subdirectories);
 

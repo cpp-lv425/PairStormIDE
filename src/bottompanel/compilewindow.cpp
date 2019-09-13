@@ -25,18 +25,16 @@ CompileWindow::~CompileWindow()
 
 void CompileWindow::setCompileOutput(QString text)
 {
-    qDebug()<<"setCompilerOut";
     compileOutputList->clear();
     auto allErrorslist = getAllErrorsFromCompileOutput(text);
     for (auto error : allErrorslist)
     {
-        qDebug()<<"out = "<<error;
         auto *errorItem = new QListWidgetItem(error);
         if (error.contains(": warning: "))//if its warnings
         {
            errorItem->setForeground(Qt::yellow);
         }
-        else if (error.contains(": error: "))
+        else
         {
            errorItem->setForeground(Qt::red);//if its error
         }
@@ -44,13 +42,14 @@ void CompileWindow::setCompileOutput(QString text)
     }
 }
 
+void CompileWindow::clearCompileOutputView()
+{
+    compileOutputList->clear();
+}
+
 QStringList CompileWindow::getAllErrorsFromCompileOutput(const QString &compileErrorsOutput)
 {
     QStringList rSeparatedErrorsList;
-    if (compileErrorsOutput == "No errors. Program executed with code 0.")
-    {
-        return rSeparatedErrorsList << compileErrorsOutput;
-    }
     auto errorsOutputLines = compileErrorsOutput.split('\n');
 
     QString separateError;

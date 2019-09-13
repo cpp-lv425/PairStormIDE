@@ -22,15 +22,10 @@ QString ConsoleServiceProvider::compilerPath() const
 
 void ConsoleServiceProvider::setStdOutput()
 {
-    qDebug()<<"set std output";
     QString errors = mConsoleProcess->readAllStandardError();
-    if(!errors.isEmpty())
+    if (!errors.isEmpty())
     {
         emit messageAboutErrorsAfterCompilation(errors);
-    }
-    else
-    {
-        emit messageAboutErrorsAfterCompilation("No errors. Program executed with code 0.");
     }
     if (QSysInfo::productType() == windowsProductType)// if it's windows' console
     {

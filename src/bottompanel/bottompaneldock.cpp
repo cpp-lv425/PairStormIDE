@@ -46,6 +46,7 @@ void BottomPanelDock::reSendProjectPathChanged(QString path)
 void BottomPanelDock::reSendProgramIsReadyToCompile()
 {
     emit programIsReadyToCompile();
+    pCompileInfo->clearCompileOutputView();
 }
 
 ConsoleWindow* BottomPanelDock::getPTerminalConsole() const
