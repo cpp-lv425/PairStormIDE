@@ -768,7 +768,6 @@ void MainWindow::onSettingsTriggered()
 
 void MainWindow::onBuildTriggered()
 {
-    qDebug() << "User try to build application";
     if (!mpDocumentManager || !mpDocumentManager->projectOpened())
     {
         return;
@@ -780,7 +779,6 @@ void MainWindow::onBuildTriggered()
 
 void MainWindow::onRunTriggered()
 {
-    qDebug() << "User try to run application";
     mpBottomPanelDock->reSendProgramIsReadyToRun();
 }
 
