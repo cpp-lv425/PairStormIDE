@@ -2,6 +2,7 @@
 #include "ui_compilewindow.h"
 #include "compiler/compilercontroler.h"
 #include <QGridLayout>
+#include <QDebug>
 #include <QListWidgetItem>
 
 CompileWindow::CompileWindow(QWidget *parent) :
@@ -24,10 +25,13 @@ CompileWindow::~CompileWindow()
 
 void CompileWindow::setCompileOutput(QString text)
 {
+    qDebug() << "try to set compilation output";
+    qDebug() << "   errors: " << text;
     compileOutputList->clear();
     auto allErrorslist = getAllErrorsFromCompileOutput(text);
     for (auto error : allErrorslist)
     {
+        qDebug() << "      error is: " << error;
         auto *errorItem = new QListWidgetItem(error);
         if (error.contains(": warning: "))//if its warnings
         {
@@ -51,11 +55,15 @@ QStringList CompileWindow::getAllErrorsFromCompileOutput(const QString &compileE
     QStringList rSeparatedErrorsList;
     auto errorsOutputLines = compileErrorsOutput.split('\n');
 
+    qDebug() << "errors inside parsing";
+    std::for_each(errorsOutputLines.cbegin(), errorsOutputLines.cend(), [](const QString & elem) {qDebug() << "   " << elem << ", ";});
+
     QString separateError;
     for (auto errorOutputLine : errorsOutputLines)
     {
         auto line = removeAllSymbolsFromString(errorOutputLine, '~').simplified();
-        if (lineContainsOnlyOneSymbol(line, '^'))
+        line = removeAllSymbolsFromString(line, '|');
+        if (line.contains('^'))//lineContainsOnlyOneSymbol(line, '^'))
         {
             rSeparatedErrorsList.push_back(separateError);
             separateError.clear();
@@ -65,6 +73,10 @@ QStringList CompileWindow::getAllErrorsFromCompileOutput(const QString &compileE
             separateError += line + "\n";
         }
     }
+
+    qDebug() << "errors inside parsing";
+    std::for_each(rSeparatedErrorsList.cbegin(), rSeparatedErrorsList.cend(), [](const QString & elem) {qDebug() << "   " << elem << ", ";});
+
     return rSeparatedErrorsList;
 }
 

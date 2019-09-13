@@ -44,6 +44,8 @@ void ConsoleWindow::setProjectPath(QString path)
 
 void ConsoleWindow::reSendErrors(QString string)
 {
+    qDebug() << "try to send errors about compilation on occurence";
+    qDebug() << "   errors: " << string;
     emit errorsAreOccuredAfterCompilation(string);
 }
 

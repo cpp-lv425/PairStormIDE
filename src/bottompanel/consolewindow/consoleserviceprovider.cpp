@@ -3,6 +3,7 @@
 #include "documentmanager.h"
 #include <QTextCodec>
 #include <QString>
+#include <QDebug>
 #include <QDir>
 
 ConsoleServiceProvider::ConsoleServiceProvider()
@@ -20,7 +21,16 @@ QString ConsoleServiceProvider::compilerPath() const
 
 void ConsoleServiceProvider::setStdOutput()
 {
+    mConsoleProcess->setReadChannel(QProcess::StandardError);
+    mConsoleProcess->waitForFinished();
+    QString outputs = mConsoleProcess->readAllStandardOutput();
     QString errors = mConsoleProcess->readAllStandardError();
+
+    qDebug() << "build ouputs are: " << outputs;
+    qDebug() << "build errors are: " << errors;
+
+
+
     if (!errors.isEmpty())
     {
         emit messageAboutErrorsAfterCompilation(errors);
