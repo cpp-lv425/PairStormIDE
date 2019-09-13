@@ -15,5 +15,6 @@
         <file>img/SETTINGS.png</file>
         <file>img/SPLASHSCREEN.png</file>
         <file>img/COMPILERUN.png</file>
+        <file>img/BUILD.png</file>
     </qresource>
 </RCC>
