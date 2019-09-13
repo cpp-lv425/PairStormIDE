@@ -37,7 +37,7 @@ void CompilerControler::setConsoleProvider(ConsoleServiceProvider *value)
 
 QString CompilerControler::getCurrentCompilerName() const
 {
-    QString rCurrentCompiler = "";
+    QString rCurrentCompiler = QString();
     QSettings settings;
     if (settings.contains(compilersListNamesInSettings))
     {
@@ -85,8 +85,6 @@ void CompilerControler::runCompilation()
 
     consoleProvider->setWorkingDirectory(buildDirectoryPath);
     consoleProvider->runConsoleCommand(currentCompilerName.append(" -f MakeFile"));
-
-
 }
 
 QString CompilerControler::getExecutibleFileName() const

@@ -3,7 +3,6 @@
 #include "compiler/compilercontroler.h"
 #include <QGridLayout>
 #include <QListWidgetItem>
-#include <QDebug>
 
 CompileWindow::CompileWindow(QWidget *parent) :
     QWidget(parent),
