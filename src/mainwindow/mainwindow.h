@@ -43,7 +43,6 @@ private:
     ProjectViewerDock *mpProjectViewerDock;
     ChatWindowDock *mpChatWindowDock;
     BottomPanelDock *mpBottomPanelDock;
-    //QScopedPointer<DocumentManager> mpDocumentManager;
     Browser *mDocumentationBrowser;
     QScopedPointer<PaletteConfigurator> mpPaletteConfigurator;
     Connection *db;
@@ -107,7 +106,8 @@ private slots:
     void onRefactorTriggered();
     void onConnectTriggered();
     void onSettingsTriggered();
-    void onBuildAndRunTriggered();
+    void onBuildTriggered();
+    void onRunTriggered();
 
     // help menu
     void onAboutTriggered();

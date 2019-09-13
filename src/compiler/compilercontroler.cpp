@@ -86,7 +86,7 @@ void CompilerControler::runCompilation()
     consoleProvider->setWorkingDirectory(buildDirectoryPath);
     consoleProvider->runConsoleCommand(currentCompilerName.append(" -f MakeFile"));
 
-    // run .exe
+
 }
 
 QString CompilerControler::getExecutibleFileName() const

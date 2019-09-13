@@ -7,7 +7,7 @@
 
 namespace Ui
 {
-class ConsoleWindow;
+    class ConsoleWindow;
 }
 
 class ConsoleWindow : public QWidget

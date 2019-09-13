@@ -167,9 +167,6 @@ void CodeEditor::writeDefinitionToSource()
             }
             else
             {
-//                fileManager.writeToFile(sourceFileName, sourceFileText + "\n" + definitonTest);
-//                sourceDocument->document()->setPlainText(sourceDocument->document()->toPlainText() +"\n" + definitonTest );
-//                emit openDocument(sourceFileName);
                  sourceDocument->setPlainText(sourceDocument->toPlainText() + "\n" + definitonTest);
                  auto cursor = sourceDocument->textCursor();
                  cursor.movePosition(QTextCursor::Start);
@@ -186,9 +183,6 @@ void CodeEditor::writeDefinitionToSource()
                      cursor.movePosition(QTextCursor::Down);
                      cursor.movePosition(QTextCursor::EndOfLine);
                  }
-
-                 //emit sourceDocument->handleLineChange(0);
-                 //emit sourceDocument->runHighlighter();
             }
             QMessageBox::information(this, successDefinCreateTitle, successDefinCreateMessage);
 

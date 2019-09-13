@@ -1,7 +1,6 @@
 #include "consolewindow.h"
 #include "ui_consolewindow.h"
 #include <QGridLayout>
-#include <QVBoxLayout>
 #include <QDebug>
 
 ConsoleWindow::ConsoleWindow(QWidget *parent) :
@@ -11,7 +10,7 @@ ConsoleWindow::ConsoleWindow(QWidget *parent) :
     ui->setupUi(this);
     consoleServiceProvider = new ConsoleServiceProvider;
     consoleView = new ConsoleView;
-    QGridLayout *consoleViewGridLayout = new QGridLayout (this);
+    QGridLayout *consoleViewGridLayout = new QGridLayout(this);
     consoleViewGridLayout->addWidget(consoleView);
     this->setLayout(consoleViewGridLayout);
 

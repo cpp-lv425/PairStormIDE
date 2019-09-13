@@ -22,9 +22,11 @@ public:
 signals:
     void projectPathWasChanged(QString);
     void programIsReadyToCompile();
+    void programIsReadyToRun();
 public slots:
     void reSendProjectPathChanged(QString);
     void reSendProgramIsReadyToCompile();
+    void reSendProgramIsReadyToRun();
 private:
     QWidget *pIssuesTab;
     CompileWindow *pCompileInfo;

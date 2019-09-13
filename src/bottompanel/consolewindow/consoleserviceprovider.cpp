@@ -3,8 +3,6 @@
 #include "documentmanager.h"
 #include <QTextCodec>
 #include <QString>
-#include <QPlainTextEdit>
-#include <QtCore>
 
 ConsoleServiceProvider::ConsoleServiceProvider()
 {
@@ -55,7 +53,7 @@ void ConsoleServiceProvider::runConsoleCommand(QString command)
     {
         executionCommand = cmdWindowsStartPath;
     }
-    executionCommand +=command;
+    executionCommand += command;
     mConsoleProcess->start(executionCommand);
 }
 

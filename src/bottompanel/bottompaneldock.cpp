@@ -3,7 +3,6 @@
 #include "mainwindow.h"
 #include "consolewindow/consolewindow.h"
 #include "compilewindow.h"
-#include <QDebug>
 
 BottomPanelDock::BottomPanelDock(QWidget *pParent): QDockWidget (pParent)
 {
@@ -47,6 +46,11 @@ void BottomPanelDock::reSendProgramIsReadyToCompile()
 {
     emit programIsReadyToCompile();
     pCompileInfo->clearCompileOutputView();
+}
+
+void BottomPanelDock::reSendProgramIsReadyToRun()
+{
+    emit programIsReadyToRun();
 }
 
 ConsoleWindow* BottomPanelDock::getPTerminalConsole() const
