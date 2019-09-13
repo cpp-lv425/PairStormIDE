@@ -247,7 +247,7 @@ void MainWindow::setupMainMenu()
 
     // buidling solution
     QAction *pRunAction = toolsMenu->addAction("&Run", this, &MainWindow::onRunTriggered, Qt::CTRL + Qt::Key_R);
-    pRunAction->setIcon(QIcon(":/img/COMPILERUN.png"));
+    pRunAction->setIcon(QIcon(":/img/RUN.png"));
     pToolbar->addAction(pRunAction);
 
 
