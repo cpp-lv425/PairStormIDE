@@ -7,24 +7,28 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    SplashScreen splashScreen;
-    splashScreen.start();
 
     QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 
     QQuickWindow::setSceneGraphBackend(QSGRendererInterface::Software);
 
-    MainWindow w;
-    w.hide();
-    splashScreen.finish(&w);
+    // Start manager must be started prior to both spalashscreen & mainwindow
+    // because is is needed to choose application' settings source
     StartManager startManager;
-    w.connect(&startManager, &StartManager::cancel, &w, [&]() {w.mIsFinished = true;});
+    bool isManagerAborted = false;
+    startManager.connect(&startManager, &StartManager::cancel, &startManager, [&]() {isManagerAborted = true;});
     startManager.start();
-    if (w.mIsFinished)
+    if (isManagerAborted)
     {
         return 0;
     }
+
+    SplashScreen splashScreen;
+    splashScreen.start();
+    MainWindow w;
+    w.hide();
+    splashScreen.finish(&w);
     w.show();
     w.showStartPage();
 
