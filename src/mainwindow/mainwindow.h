@@ -37,6 +37,7 @@ public:
     void showStartPage();
     ~MainWindow();
 
+    bool mIsFinished;
 private:
     LocalConnectorInterface *mplocalConnector;
     Ui::MainWindow *ui;
@@ -65,8 +66,12 @@ private:
     void setDocumentFontFamily(const QString &fontFamily);
     void setDocumentFontSize(const QString &fontSize);
 
-    void databaseConnect(QString directory);
+    void databaseConnect();
     void databaseDisconnect();
+    void restoreDatabaseFile();
+    void hideDatabaseFile();
+    void setDatabaseFileName();
+    void readWriteFileContent(QString fileToReadName, QString fileToWriteName);
 
 private slots:
     // file menu actions
@@ -127,6 +132,10 @@ signals:
 
 private:
     friend class SettingsConfigurator;
+    QString  databaseFileName;
+    QString dirName;
+    const char *projectDatabaseExtension = ".db";
+    const char pathSeparator = '/';
 
 protected:
     void closeEvent(QCloseEvent *event);

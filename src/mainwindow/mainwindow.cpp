@@ -25,6 +25,7 @@
 #include "chatwindowdock.h"
 #include "newfilewizard.h"
 #include "usermessages.h"
+#include "startmanager.h"
 #include "logindialog.h"
 #include "filemanager.h"
 #include "menuoptions.h"
@@ -35,7 +36,7 @@
 #include "sqliteaccess.h"
 
 MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent),
+    QMainWindow(parent), mIsFinished {false},
     ui(new Ui::MainWindow),
     // initializing palette configurator with current palette
     mpPaletteConfigurator(new PaletteConfigurator(palette())),
@@ -54,13 +55,11 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(mpDocumentManager, &DocumentManager::projectPathWasChanged,
             this, &MainWindow::reSendProjectPathChanged);
     ui->setupUi(this);
-    {
-        StoreConf conf;
-        conf.restoreConFile();
-    }
+
     compilerControler = new CompilerControler;
     connect(this, &MainWindow::projectPathWasChanged,
             compilerControler, &CompilerControler::setProjectPath);
+
     // when first started main window is maximized
     setWindowState(Qt::WindowMaximized);
 
@@ -201,7 +200,6 @@ void MainWindow::setupMainMenu()
     // opening chat window
     QAction *pConnectAction = toolsMenu->addAction("&Connect...", this, &MainWindow::onConnectTriggered);
     pConnectAction->setIcon(QIcon(":/img/DISCONNECTED.png"));
-
     toolsMenu->addSeparator();
 
 
@@ -466,7 +464,7 @@ void MainWindow::onOpenProjectTriggered()
         return;
     }
 
-    QString dirName = QFileDialog::getExistingDirectory
+     dirName = QFileDialog::getExistingDirectory
             (this,
              userMessages[UserMessages::OpenDirectoryTitle],
             QDir::homePath());
@@ -480,11 +478,28 @@ void MainWindow::onOpenProjectTriggered()
                 userMessages[UserMessages::ProjectDoesNotExistMsg]);
         return;
     }
-
-    databaseConnect(dirName);
+    restoreDatabaseFile();
+    databaseConnect();
 
     mpProjectViewerDock->setDir(dirName);
     mpDocumentManager->openProject(dirName);
+    // Check if the user has been previously logged in
+    // Then update project-dependent stuff in the chat
+    QSettings settings;
+    if (settings.contains("userName"))
+    {
+        QString currentUserName = settings.value("userName").toString();
+        if (currentUserName != QString("unnamed"))
+        {
+            mpChatWindowDock->setUserName(currentUserName);
+            mplocalConnector->configureOnLogin(currentUserName);
+            QSettings savedSettings(QApplication::organizationName(), QApplication::applicationName());
+            QString styleName = {savedSettings.contains("style") ?
+                                 savedSettings.value("style").toString()
+                                 : "WHITE"};
+            mpChatWindowDock->updateTheme(styleName);
+        }
+    }
 }
 
 void MainWindow::onCloseProjectTriggered()
@@ -549,8 +564,8 @@ void MainWindow::onCloseProjectTriggered()
     mpProjectViewerDock->setDir(QDir::currentPath());
 
     // disconnect from db
-    //
-    //
+    databaseDisconnect();
+    hideDatabaseFile();
 
     QMessageBox::information
             (this,
@@ -743,6 +758,23 @@ void MainWindow::onRefactorTriggered()
 
 void MainWindow::onConnectTriggered()
 {
+    // Check if the project has been previously opened
+    // Don't allow user to log in if no project is present
+    if (!mpDocumentManager->projectOpened())
+    {
+        return;
+    }
+    // Check if the user has been previously logged in
+    // If so, don't allow user to log in again
+    QSettings settings;
+    if (settings.contains("userName"))
+    {
+        QString currentUserName = settings.value("userName").toString();
+        if (currentUserName != QString("unnamed"))
+        {
+            return;
+        }
+    }
     LoginDialog loginDialog(this);
     QString userInput = loginDialog.start();
     if (userInput.isEmpty())
@@ -927,9 +959,17 @@ void MainWindow::closeEvent(QCloseEvent *event)
 MainWindow::~MainWindow()
 {
     saveMainWindowState();
-    StoreConf conf;
-    conf.saveConFile();
 
+    if (!mIsFinished)    //  application wasn't cancelled. in case of cancellation
+    {                   //      application don't save data from QSettings to configurattion file
+        QSettings s;
+        if (s.contains("userName"))
+        {
+            QString name = s.value("userName").toString();
+            StoreConf conf(name);
+            conf.saveConFile();
+        }
+    }
     delete ui;
 }
 
@@ -1035,7 +1075,7 @@ void MainWindow::onNewProjectTriggered()
         return;
     }
 
-    databaseConnect(dirName);
+    databaseConnect();
     // document manager is sent a message about new project
     mpDocumentManager->openProject(dirName);
 
@@ -1043,17 +1083,52 @@ void MainWindow::onNewProjectTriggered()
     mpProjectViewerDock->setDir(dirName);
 }
 
-void MainWindow::databaseConnect(QString directory)
+void MainWindow::databaseConnect()
 {
-    db = ConnectionGetter::getDefaultConnection(directory + "/storage.db");
+    setDatabaseFileName();
+    db = ConnectionGetter::getDefaultConnection(databaseFileName);
     CreateDB database;
-    database.addTableFile();
-    database.addTableUser();
-    database.addTableComment();
-    database.addTableMessage();
 }
 
 void MainWindow::databaseDisconnect()
 {
     delete db;
+}
+
+void MainWindow::restoreDatabaseFile()
+{
+    setDatabaseFileName();
+    QString projectFileName = dirName + pathSeparator + FileManager::getProjectFileName();
+    readWriteFileContent(projectFileName, databaseFileName);
+}
+
+void MainWindow::hideDatabaseFile()
+{
+    QString projectFileName = dirName + pathSeparator + FileManager::getProjectFileName();
+    readWriteFileContent(databaseFileName, projectFileName);
+    QFile::remove(databaseFileName);
+}
+
+void MainWindow::setDatabaseFileName()
+{
+    databaseFileName = dirName;
+    int position = dirName.lastIndexOf(QChar{pathSeparator});
+    databaseFileName += pathSeparator;
+    databaseFileName += dirName.mid(position + 1);
+    databaseFileName += projectDatabaseExtension;
+}
+
+void MainWindow::readWriteFileContent(QString fileToReadName, QString fileToWriteName)
+{
+    QFile fileToRead(fileToReadName);
+    QFile fileToWrite(fileToWriteName);
+
+    fileToRead.open(QIODevice::ReadOnly);
+    fileToWrite.open(QIODevice::WriteOnly);
+
+    QByteArray data = fileToRead.readAll();
+    fileToWrite.write(data);
+    qDebug()<<data;
+    fileToRead.close();
+    fileToWrite.close();
 }

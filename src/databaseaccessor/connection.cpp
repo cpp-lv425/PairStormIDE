@@ -8,7 +8,7 @@ Connection::Connection()
 
 Connection::~Connection()
 {
-    mDb.close();
+    mDb.removeDatabase(QLatin1String(QSqlDatabase::defaultConnection));
 }
 
 void Connection::openDatabase()
@@ -28,5 +28,10 @@ QString Connection::mPath = "";
 QString Connection::getPath()
 {
     return mPath;
+}
+
+void Connection::close()
+{
+    mDb.close();
 }
 
