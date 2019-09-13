@@ -23,10 +23,10 @@ void ConsoleServiceProvider::setStdOutput()
 {
     mConsoleProcess->setReadChannel(QProcess::StandardError);
     mConsoleProcess->waitForFinished();
-    QString outputs = mConsoleProcess->readAllStandardOutput();
+   // QString outputs = mConsoleProcess->readAllStandardOutput();
     QString errors = mConsoleProcess->readAllStandardError();
 
-    qDebug() << "build ouputs are: " << outputs;
+    //qDebug() << "build ouputs are: " << outputs;
     qDebug() << "build errors are: " << errors;
 
 
