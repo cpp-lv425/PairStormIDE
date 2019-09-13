@@ -162,21 +162,6 @@ void StartManager::validateToken()
     mpDownloader->get(mUserName, mUrlToCheckUser, mToken);
     loop.exec();
 
-    // output
-    qDebug() << "<Respond>";
-    foreach (QString key, mpDownloader->mRespondMap.keys()) {
-        auto value=mpDownloader->mRespondMap.value(key);
-        qDebug() << key << ":" << value;
-    }
-    qDebug() << "</Respond>";
-    qDebug() << "<Headers>";
-    foreach (QString key, mpDownloader->mHeadersMap.keys()) {
-        auto value=mpDownloader->mHeadersMap.value(key);
-        qDebug() << key << ":" << value;
-    }
-    qDebug() << "</Headers>";
-    // output
-
     // analize answer
     switch (mRespondStatus)
     {
@@ -206,6 +191,7 @@ void StartManager::validateToken()
                               tr("Error"),
                               tr("An error while authorized is occured")
                              );*/
+        messageWindow(mMessageTitle, mMessageErrorInRequest, mMessageWindowTimeOut);
         break;
     }
     case respondStatus::Corrupted:
@@ -214,6 +200,7 @@ void StartManager::validateToken()
                               tr("Error"),
                               tr("An error while authorized is occured. Data corrupted")
                              );*/
+        messageWindow(mMessageTitle, mMessageErrorInRequestCorrupt, mMessageWindowTimeOut);
         break;
     }
     default:
@@ -236,7 +223,6 @@ void StartManager::generateToken()
 
     formatTokenName(mTokenPrefix);
     QByteArray mData = "{\"scopes\":[\"repo\",\"user\"],\"note\":\"" + mTokenPrefix.toUtf8() + "\"}";
-
     mpDownloader->post(mUserName, mUrlToGetToken, mPassword, mData);
     loop.exec();
 
@@ -249,7 +235,6 @@ void StartManager::generateToken()
         {
             mToken = mpDownloader->mRespondMap["token"];
             mIsTokenGenerated = true;
-            qDebug() << "mToken" << mToken;
         }
         else
         {
@@ -258,24 +243,17 @@ void StartManager::generateToken()
         if(mpDownloader->mRespondMap.contains("note"))
         {
             QString note = mpDownloader->mRespondMap["note"];
-            qDebug() << "note" << note;
         }
         break;
     }
     case respondStatus::Error:
     {
-        QMessageBox::critical(nullptr,
-                              tr("Error"),
-                              tr("An error while token generation is occured")
-                             );
+        messageWindow(mMessageTitle, mMessageErrorInRequest, mMessageWindowTimeOut);
         break;
     }
     case respondStatus::Corrupted:
     {
-        QMessageBox::critical(nullptr,
-                              tr("Error"),
-                              tr("An error while token generation is occured. Data corrupted")
-                             );
+        messageWindow(mMessageTitle, mMessageErrorInRequestCorrupt, mMessageWindowTimeOut);
         break;
     }
     default:
