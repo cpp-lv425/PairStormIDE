@@ -130,6 +130,26 @@ void CodeEditor::setIdeType(const QString &ideType)
     setTextColors();
 }
 
+void CodeEditor::runHighlighterWithDefinition(CodeEditor *sourceDocument)
+{
+    auto cursor = sourceDocument->textCursor();
+    cursor.movePosition(QTextCursor::Start);
+    sourceDocument->setTextCursor(cursor);
+    int linescount = 1;
+    cursor.movePosition(QTextCursor::EndOfLine);
+    const int cMaxSize = 100;
+    while(linescount < cMaxSize)
+    {
+        cursor.insertText(" ");
+        cursor.movePosition(QTextCursor::Left);
+        cursor.deleteChar();
+        sourceDocument->setTextCursor(cursor);
+        linescount++;
+        cursor.movePosition(QTextCursor::Down);
+        cursor.movePosition(QTextCursor::EndOfLine);
+    }
+}
+
 void CodeEditor::writeDefinitionToSource()
 {
     if (!isFileWithExtension(getFileName(), "h"))//if current file is not header, we can't define fucntion
@@ -162,22 +182,8 @@ void CodeEditor::writeDefinitionToSource()
             }
             else
             {
-                 sourceDocument->setPlainText(sourceDocument->toPlainText() + "\n" + definitonTest);
-                 auto cursor = sourceDocument->textCursor();
-                 cursor.movePosition(QTextCursor::Start);
-                 sourceDocument->setTextCursor(cursor);
-                 int linescount = 1;
-                 cursor.movePosition(QTextCursor::EndOfLine);
-                 while(linescount < static_cast<int>(mLinesCount))
-                 {
-                     cursor.insertText(" ");
-                     cursor.movePosition(QTextCursor::Left);
-                     cursor.deleteChar();
-                     sourceDocument->setTextCursor(cursor);
-                     linescount++;
-                     cursor.movePosition(QTextCursor::Down);
-                     cursor.movePosition(QTextCursor::EndOfLine);
-                 }
+                sourceDocument->setPlainText(sourceDocument->toPlainText() + "\n" + definitonTest);
+                runHighlighterWithDefinition(sourceDocument);
             }
             QMessageBox::information(this, successDefinCreateTitle, successDefinCreateMessage);
 
@@ -881,6 +887,13 @@ void formating(QTextCharFormat fmt, QTextCursor &cursor, Token token, int starti
 {
     cursor.setPosition(startingPosition + token.mBegin, QTextCursor::MoveAnchor);
     cursor.setPosition(startingPosition + token.mEnd, QTextCursor::KeepAnchor);
+    cursor.setCharFormat(fmt);
+}
+
+void CodeEditor::highlightLine(QTextCharFormat fmt, QTextCursor &cursor, int begin, int end, int startingPosition)
+{
+    cursor.setPosition(startingPosition + begin, QTextCursor::MoveAnchor);
+    cursor.setPosition(startingPosition + end, QTextCursor::KeepAnchor);
     cursor.setCharFormat(fmt);
 }
 

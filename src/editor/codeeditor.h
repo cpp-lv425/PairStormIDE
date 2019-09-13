@@ -83,6 +83,8 @@ private:
     void setAnotherButtonLine(AddCommentButton *comment, const int diff);
     bool isInRangeIncludBoth(const int val, const int leftMargin, const int rightMargin);
     bool isInRangeIncludLast(const int val, const int leftMargin, const int rightMargin);
+    void highlightLine(QTextCharFormat fmt, QTextCursor &cursor, int begin, int end, int startingPosition);
+    void runHighlighterWithDefinition(CodeEditor *sourceDocument);
 
     void handleLinesAddition(int, int, int);
     void handleLinesDelition(int, int);
