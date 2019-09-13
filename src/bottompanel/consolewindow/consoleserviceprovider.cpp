@@ -91,12 +91,7 @@ QString ConsoleServiceProvider::getExecutableFilePath() const
     QDir dir(mConsoleProcess->workingDirectory());
     dir.setNameFilters(QStringList() << "*.exe");
     dir.setFilter(QDir::Files);
-    foreach (QString dirFile, dir.entryList())
-    {
-        qDebug()<<dirFile;
-        dir.remove(dirFile);
-    }
-    return "";
+    return dir.entryList().first();
 }
 
 ConsoleServiceProvider::~ConsoleServiceProvider() = default;

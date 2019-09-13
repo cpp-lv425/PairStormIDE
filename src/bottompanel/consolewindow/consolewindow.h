@@ -22,7 +22,7 @@ public:
 public slots:
     void setProjectPath(QString);
     void reSendErrors(QString);
-    void runProgram();
+    void runExecutableFile();
 signals:
     void errorsAreOccuredAfterCompilation(QString);
 private:
