@@ -22,6 +22,7 @@ QString ConsoleServiceProvider::compilerPath() const
 
 void ConsoleServiceProvider::setStdOutput()
 {
+    qDebug()<<"set std output";
     QString errors = mConsoleProcess->readAllStandardError();
     if(!errors.isEmpty())
     {
@@ -29,9 +30,9 @@ void ConsoleServiceProvider::setStdOutput()
     }
     else
     {
-        //emit messageAboutErrorsAfterCompilation("No errors. Program executed with code 0.");
+        emit messageAboutErrorsAfterCompilation("No errors. Program executed with code 0.");
     }
-    if (QSysInfo::productType() == windowsProductType)// if it's windows console
+    if (QSysInfo::productType() == windowsProductType)// if it's windows' console
     {
         QTextCodec *codec = QTextCodec::codecForName(codecStandart);
         emit processIsReadyToReadStandartOutput

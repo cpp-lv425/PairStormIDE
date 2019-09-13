@@ -28,7 +28,6 @@ private:
     QString mCompilerPath;
     QProcess *mConsoleProcess;
     DocumentManager *documentManager;
-
 };
 
 #endif // CONSOLESERVICEPROVIDER_H

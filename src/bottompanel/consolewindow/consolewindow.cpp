@@ -11,7 +11,6 @@ ConsoleWindow::ConsoleWindow(QWidget *parent) :
     ui->setupUi(this);
     consoleServiceProvider = new ConsoleServiceProvider;
     consoleView = new ConsoleView;
-    qDebug()<<"consoleServeceProvider inside console window = "<<consoleServiceProvider;
     QGridLayout *consoleViewGridLayout = new QGridLayout (this);
     consoleViewGridLayout->addWidget(consoleView);
     this->setLayout(consoleViewGridLayout);
@@ -46,6 +45,5 @@ void ConsoleWindow::setProjectPath(QString path)
 
 void ConsoleWindow::reSendErrors(QString string)
 {
-    qDebug()<<"resend!";
     emit errorsAreOccuredAfterCompilation(string);
 }

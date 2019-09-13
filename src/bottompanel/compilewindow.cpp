@@ -4,6 +4,7 @@
 #include <QGridLayout>
 #include <QListWidgetItem>
 #include <QDebug>
+
 CompileWindow::CompileWindow(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::CompileWindow)
@@ -24,44 +25,58 @@ CompileWindow::~CompileWindow()
 
 void CompileWindow::setCompileOutput(QString text)
 {
+    qDebug()<<"setCompilerOut";
     compileOutputList->clear();
-    auto list = getAllErrorsFromCompileOutput(text);
-    for (auto error : list)
+    auto allErrorslist = getAllErrorsFromCompileOutput(text);
+    for (auto error : allErrorslist)
     {
-        QListWidgetItem *itm = new QListWidgetItem(error);
-        if (error.contains(": warning: "))
+        qDebug()<<"out = "<<error;
+        auto *errorItem = new QListWidgetItem(error);
+        if (error.contains(": warning: "))//if its warnings
         {
-           itm->setForeground(Qt::yellow);
+           errorItem->setForeground(Qt::yellow);
         }
-        else
+        else if (error.contains(": error: "))
         {
-           itm->setForeground(Qt::red);
+           errorItem->setForeground(Qt::red);//if its error
         }
-        compileOutputList->addItem(itm);
+        compileOutputList->addItem(errorItem);
     }
 }
 
 QStringList CompileWindow::getAllErrorsFromCompileOutput(const QString &compileErrorsOutput)
 {
-    QStringList errorsOutputLines = compileErrorsOutput.split('\n');
     QStringList rSeparatedErrorsList;
+    if (compileErrorsOutput == "No errors. Program executed with code 0.")
+    {
+        return rSeparatedErrorsList << compileErrorsOutput;
+    }
+    auto errorsOutputLines = compileErrorsOutput.split('\n');
 
     QString separateError;
-    for (auto i : errorsOutputLines)
+    for (auto errorOutputLine : errorsOutputLines)
     {
-        auto line = i;
-        line = line.replace('~',' ');
-        line = line.simplified();
-        if (line == "^")
+        auto line = removeAllSymbolsFromString(errorOutputLine, '~').simplified();
+        if (lineContainsOnlyOneSymbol(line, '^'))
         {
             rSeparatedErrorsList.push_back(separateError);
             separateError.clear();
         }
         else
         {
-            separateError += line + " ";
+            separateError += line + "\n";
         }
     }
     return rSeparatedErrorsList;
 }
 
+QString CompileWindow::removeAllSymbolsFromString(QString &outputLine, const char &symb)
+{
+    return outputLine.replace(symb, ' ');
+}
+
+
+bool CompileWindow::lineContainsOnlyOneSymbol(const QString &string, const char &symb) noexcept
+{
+    return string == static_cast<QString>(symb);
+}
