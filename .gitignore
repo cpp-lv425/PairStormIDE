@@ -44,3 +44,7 @@ CMakeLists.txt.user*
 
 # res folder
 res/*
+
+# Binaries
+*.exe
+*.dll

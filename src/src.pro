@@ -31,6 +31,9 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
+# Icon of the application
+win32:RC_ICONS += PAIRSTORM.ico
+
 include($$PWD/mainwindow/mainwindow.pri)
 include($$PWD/network/network.pri)
 include($$PWD/chatwindow/chatwindow.pri)
