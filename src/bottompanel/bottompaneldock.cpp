@@ -50,7 +50,7 @@ void BottomPanelDock::reSendProgramIsReadyToCompile()
 
 void BottomPanelDock::reSendProgramIsReadyToRun()
 {
-    emit programIsReadyToRun();
+    pTerminalConsole->runExecutableFile();
 }
 
 ConsoleWindow* BottomPanelDock::getPTerminalConsole() const

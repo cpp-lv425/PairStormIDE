@@ -46,3 +46,8 @@ void ConsoleWindow::reSendErrors(QString string)
 {
     emit errorsAreOccuredAfterCompilation(string);
 }
+
+void ConsoleWindow::runExecutableFile()
+{
+    consoleServiceProvider->runExecutableFile();
+}

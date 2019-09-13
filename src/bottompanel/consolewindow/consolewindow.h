@@ -22,6 +22,7 @@ public:
 public slots:
     void setProjectPath(QString);
     void reSendErrors(QString);
+    void runProgram();
 signals:
     void errorsAreOccuredAfterCompilation(QString);
 private:

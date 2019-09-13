@@ -23,8 +23,11 @@ signals:
 public slots:
     void runConsoleCommand(QString command);
     void setWorkingDirectory(QString);
+    void runExecutableFile();
+    bool executableFileExists();
 private:
     void writeToConsole(const QString &command);
+    QString getExecutableFilePath() const;
 
 private:
     QString mCompilerPath;

@@ -241,7 +241,7 @@ void MainWindow::setupMainMenu()
 
 
     // buidling solution
-    QAction *pBuildAction = toolsMenu->addAction("&Build and run", this, &MainWindow::onBuildAndRunTriggered, Qt::CTRL + Qt::Key_R);
+    QAction *pBuildAction = toolsMenu->addAction("&Build and run", this, &MainWindow::onBuildTriggered, Qt::CTRL + Qt::Key_R);
     pBuildAction->setIcon(QIcon(":/img/COMPILERUN.png"));
     pToolbar->addAction(pBuildAction);
 
@@ -762,7 +762,7 @@ void MainWindow::onSettingsTriggered()
     Q_UNUSED(menuOptions)
 }
 
-void MainWindow::onBuildAndRunTriggered()
+void MainWindow::onBuildTriggered()
 {
     if (!mpDocumentManager || !mpDocumentManager->projectOpened())
     {
@@ -771,6 +771,11 @@ void MainWindow::onBuildAndRunTriggered()
     mpDocumentManager->saveAllDocuments();
     mpBottomPanelDock->reSendProgramIsReadyToCompile();
     mpBottomPanelDock->setCompileAsCurrentTab();
+}
+
+void MainWindow::onRunTriggered()
+{
+    mpBottomPanelDock->reSendProgramIsReadyToRun();
 }
 
 void MainWindow::onAboutTriggered()

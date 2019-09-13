@@ -3,6 +3,8 @@
 #include "documentmanager.h"
 #include <QTextCodec>
 #include <QString>
+#include <QDebug>
+#include <QDir>
 
 ConsoleServiceProvider::ConsoleServiceProvider()
 {
@@ -62,9 +64,39 @@ void ConsoleServiceProvider::setWorkingDirectory(QString directory)
     mConsoleProcess->setWorkingDirectory(directory);
 }
 
+void ConsoleServiceProvider::runExecutableFile()
+{
+    if (!executableFileExists())
+    {
+        return;
+    }
+    runConsoleCommand("start " + getExecutableFilePath());
+}
+
+bool ConsoleServiceProvider::executableFileExists()
+{
+    QDir dir(mConsoleProcess->workingDirectory());
+    dir.setNameFilters(QStringList() << "*.exe");
+    dir.setFilter(QDir::Files);
+    return !dir.entryList().isEmpty();
+}
+
 void ConsoleServiceProvider::writeToConsole(const QString &command)
 {
     emit appendedTextIsReadyToSet(command);
+}
+
+QString ConsoleServiceProvider::getExecutableFilePath() const
+{
+    QDir dir(mConsoleProcess->workingDirectory());
+    dir.setNameFilters(QStringList() << "*.exe");
+    dir.setFilter(QDir::Files);
+    foreach (QString dirFile, dir.entryList())
+    {
+        qDebug()<<dirFile;
+        dir.remove(dirFile);
+    }
+    return "";
 }
 
 ConsoleServiceProvider::~ConsoleServiceProvider() = default;
