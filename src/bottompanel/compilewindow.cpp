@@ -63,7 +63,7 @@ QStringList CompileWindow::getAllErrorsFromCompileOutput(const QString &compileE
     {
         auto line = removeAllSymbolsFromString(errorOutputLine, '~').simplified();
         line = removeAllSymbolsFromString(line, '|');
-        if (line.contains('^'))//lineContainsOnlyOneSymbol(line, '^'))
+        if (line.contains('^'))
         {
             rSeparatedErrorsList.push_back(separateError);
             separateError.clear();

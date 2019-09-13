@@ -95,6 +95,8 @@ private:
     void removeButtons(QVector<AddCommentButton*> &commentV, const int cursorLine,
                        const int startLine, const int endLine, const int diff);
 
+    void hightlightNewDocumentOnClassDefinitionAdded(CodeEditor *codeEditor);
+
     bool commentButtonExists(int line);
     AddCommentButton* getCommentButtonByIndex(const int line);
     void setNewAddedButtonSettings(AddCommentButton *commentButton);

@@ -162,22 +162,8 @@ void CodeEditor::writeDefinitionToSource()
             }
             else
             {
-                 sourceDocument->setPlainText(sourceDocument->toPlainText() + "\n" + definitonTest);
-                 auto cursor = sourceDocument->textCursor();
-                 cursor.movePosition(QTextCursor::Start);
-                 sourceDocument->setTextCursor(cursor);
-                 int linescount = 1;
-                 cursor.movePosition(QTextCursor::EndOfLine);
-                 while(linescount < static_cast<int>(mLinesCount))
-                 {
-                     cursor.insertText(" ");
-                     cursor.movePosition(QTextCursor::Left);
-                     cursor.deleteChar();
-                     sourceDocument->setTextCursor(cursor);
-                     linescount++;
-                     cursor.movePosition(QTextCursor::Down);
-                     cursor.movePosition(QTextCursor::EndOfLine);
-                 }
+                sourceDocument->setPlainText(sourceDocument->toPlainText() + "\n" + definitonTest);
+                hightlightNewDocumentOnClassDefinitionAdded(sourceDocument);
             }
             QMessageBox::information(this, successDefinCreateTitle, successDefinCreateMessage);
 
@@ -781,6 +767,25 @@ void CodeEditor::removeButtons(QVector<AddCommentButton*> &commentV, const int c
                 removeButtonByIndex(commentV, i);//the same deleting here
             }
         }
+    }
+}
+
+void CodeEditor::hightlightNewDocumentOnClassDefinitionAdded(CodeEditor *codeEditor)
+{
+    auto cursor = codeEditor->textCursor();
+    cursor.movePosition(QTextCursor::Start);
+    codeEditor->setTextCursor(cursor);
+    int linescount = 1;
+    cursor.movePosition(QTextCursor::EndOfLine);
+    while(linescount < static_cast<int>(mLinesCount))
+    {
+        cursor.insertText(" ");
+        cursor.movePosition(QTextCursor::Left);
+        cursor.deleteChar();
+        codeEditor->setTextCursor(cursor);
+        linescount++;
+        cursor.movePosition(QTextCursor::Down);
+        cursor.movePosition(QTextCursor::EndOfLine);
     }
 }
 

@@ -1,4 +1,5 @@
 #include "consoleserviceprovider.h"
+#include "compiler/compilervariablesliterals.h"
 #include "consoleliterals.h"
 #include "documentmanager.h"
 #include <QTextCodec>
@@ -23,13 +24,7 @@ void ConsoleServiceProvider::setStdOutput()
 {
     mConsoleProcess->setReadChannel(QProcess::StandardError);
     mConsoleProcess->waitForFinished();
-    QString outputs = mConsoleProcess->readAllStandardOutput();
     QString errors = mConsoleProcess->readAllStandardError();
-
-    qDebug() << "build ouputs are: " << outputs;
-    qDebug() << "build errors are: " << errors;
-
-
 
     if (!errors.isEmpty())
     {
@@ -85,7 +80,7 @@ void ConsoleServiceProvider::runExecutableFile()
 bool ConsoleServiceProvider::executableFileExists()
 {
     QDir dir(mConsoleProcess->workingDirectory());
-    dir.setNameFilters(QStringList() << "*.exe");
+    dir.setNameFilters(QStringList() << "*" + executableFileExtension);
     dir.setFilter(QDir::Files);
     return !dir.entryList().isEmpty();
 }
@@ -98,7 +93,7 @@ void ConsoleServiceProvider::writeToConsole(const QString &command)
 QString ConsoleServiceProvider::getExecutableFilePath() const
 {
     QDir dir(mConsoleProcess->workingDirectory());
-    dir.setNameFilters(QStringList() << "*.exe");
+    dir.setNameFilters(QStringList() << "*" + executableFileExtension);
     dir.setFilter(QDir::Files);
     return dir.entryList().first();
 }

@@ -84,7 +84,7 @@ void CompilerControler::runCompilation()
     fileManager.writeToFile(makeFilePath, createMakeFileContent(getExecutibleFileName()));
 
     consoleProvider->setWorkingDirectory(buildDirectoryPath);
-    consoleProvider->runConsoleCommand(currentCompilerName.append(" -f MakeFile"));
+    consoleProvider->runConsoleCommand(currentCompilerName.append(" -f " + makeFileName));
 }
 
 QString CompilerControler::getExecutibleFileName() const
@@ -130,7 +130,7 @@ QString CompilerControler::createMakeFileContent(const QString &executibleFileNa
     {
         rMakeFileContent += sourceFile + objectiveFileExtension + ": " +
                 mProjectPath + "/" + sourceFile + sourceFileExtension + "\n" +
-                "\t$(CC) $(CFLAGS) " + mProjectPath + "/" +
+                "\t$(CC) $" + extraFlagsForCompilerType + mProjectPath + "/" +
                 sourceFile + sourceFileExtension + "\n\n";
     }
 
