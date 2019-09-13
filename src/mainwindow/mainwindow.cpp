@@ -241,10 +241,14 @@ void MainWindow::setupMainMenu()
 
 
     // buidling solution
-    QAction *pBuildAction = toolsMenu->addAction("&Build and run", this, &MainWindow::onBuildTriggered, Qt::CTRL + Qt::Key_R);
-    pBuildAction->setIcon(QIcon(":/img/COMPILERUN.png"));
+    QAction *pBuildAction = toolsMenu->addAction("&Build", this, &MainWindow::onBuildTriggered, Qt::CTRL + Qt::Key_B);
+    pBuildAction->setIcon(QIcon(":/img/BUILD.png"));
     pToolbar->addAction(pBuildAction);
 
+    // buidling solution
+    QAction *pRunAction = toolsMenu->addAction("&Run", this, &MainWindow::onRunTriggered, Qt::CTRL + Qt::Key_R);
+    pRunAction->setIcon(QIcon(":/img/COMPILERUN.png"));
+    pToolbar->addAction(pRunAction);
 
 
     // user guide
@@ -764,6 +768,7 @@ void MainWindow::onSettingsTriggered()
 
 void MainWindow::onBuildTriggered()
 {
+    qDebug() << "User try to build application";
     if (!mpDocumentManager || !mpDocumentManager->projectOpened())
     {
         return;
@@ -775,6 +780,7 @@ void MainWindow::onBuildTriggered()
 
 void MainWindow::onRunTriggered()
 {
+    qDebug() << "User try to run application";
     mpBottomPanelDock->reSendProgramIsReadyToRun();
 }
 
