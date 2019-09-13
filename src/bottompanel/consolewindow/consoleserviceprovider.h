@@ -14,6 +14,8 @@ public:
     virtual ~ConsoleServiceProvider();
     QString compilerPath() const;
     void setStdOutput();
+    void closeProcessChanale();
+    void detatchCompilingProcess();
 signals:
     void processIsReadyToReadStandartOutput(QString);
     void appendedTextIsReadyToSet(QString);

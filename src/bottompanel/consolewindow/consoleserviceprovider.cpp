@@ -2,7 +2,6 @@
 #include "consoleliterals.h"
 #include "documentmanager.h"
 #include <QTextCodec>
-#include <QDebug>
 #include <QString>
 #include <QPlainTextEdit>
 #include <QtCore>
@@ -37,6 +36,16 @@ void ConsoleServiceProvider::setStdOutput()
     {
         emit processIsReadyToReadStandartOutput(mConsoleProcess->readAllStandardOutput());
     }
+}
+
+void ConsoleServiceProvider::closeProcessChanale()
+{
+    mConsoleProcess->close();
+}
+
+void ConsoleServiceProvider::detatchCompilingProcess()
+{
+    mConsoleProcess->startDetached();
 }
 
 void ConsoleServiceProvider::runConsoleCommand(QString command)

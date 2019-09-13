@@ -7,7 +7,7 @@
 #include <consolewindow/consolewindow.h>
 #include <QString>
 #include <QThread>
-#include<QProcess>
+#include <QProcess>
 #include <QSettings>
 
 CompilerControler::CompilerControler()
@@ -85,11 +85,8 @@ void CompilerControler::runCompilation()
 
     consoleProvider->setWorkingDirectory(buildDirectoryPath);
     consoleProvider->runConsoleCommand(currentCompilerName.append(" -f MakeFile"));
-    QString fullExecutableFilePath = mProjectPath + "/" + getExecutibleFileName();
 
-    QProcess process;
     // run .exe
-
 }
 
 QString CompilerControler::getExecutibleFileName() const
