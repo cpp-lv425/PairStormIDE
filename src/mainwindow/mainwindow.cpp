@@ -22,7 +22,6 @@
 #include "classgenerator.h"
 #include "chatwindowdock.h"
 #include "newfilewizard.h"
-#include "browserdialog.h"
 #include "usermessages.h"
 #include "logindialog.h"
 #include "filemanager.h"
@@ -767,10 +766,7 @@ void MainWindow::onAboutTriggered()
 
 void MainWindow::onReferenceTriggered()
 {
-    BrowserDialog browser(this);
-    browser.createEmptyTab();
-    browser.show();
-    browser.exec();
+    // Reference Assistant module has been cut off, so just idle
 }
 
 void MainWindow::onUserGuideTriggered()
@@ -785,10 +781,7 @@ void MainWindow::onCheckUpdatesTriggered()
 
 void MainWindow::onReferenceFromEditor(const QString &keyword)
 {
-    BrowserDialog browser(this);
-    browser.createNewTab(keyword);
-    browser.show();
-    browser.exec();
+    // Reference Assistant module has been cut off, so just idle
 }
 
 void MainWindow::onOpenFileFromProjectViewer(QString fileName)

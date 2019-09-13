@@ -4,6 +4,7 @@
 #include "methodspartsdefinitiongetters.h"
 #include <QRegularExpression>
 #include <QMessageBox>
+#include <QDebug>
 
 ClassGenerator::ClassGenerator(QString projectPath, QWidget *parent) :
     QWidget(parent),
