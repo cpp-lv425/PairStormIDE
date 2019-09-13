@@ -80,12 +80,12 @@ private:
 
     //              DESIGN PARAMETERS
     //  MessageWindow
-    const int mMessageWindowFontSise          = 14;
+    const int mMessageWindowFontSise          = 11;
     const bool mMessageWindowFontItalic       = false;
     const QFont::Weight mWeight               = QFont::Bold;
     const QString mMessageWindowColor         = "background-color: #b1c1c7;";
     const QString mMessageWindowFont          = "Helvetica";
-    const int mMessageWindowTimeOut           = 4000;                       // ms
+    const int mMessageWindowTimeOut           = 2900;                       // ms
 
 signals:
     void cancel();                                                          // cancel mainwindow
