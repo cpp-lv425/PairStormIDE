@@ -11,6 +11,7 @@
 #include <QStyle>
 #include <QFile>
 
+//#include "DownloaderGui.h"
 #include "localconnectorgenerator.h"
 #include "settingsconfigurator.h"
 #include "paletteconfigurator.h"
@@ -23,6 +24,7 @@
 #include "chatwindowdock.h"
 #include "newfilewizard.h"
 #include "usermessages.h"
+#include "startmanager.h"
 #include "logindialog.h"
 #include "filemanager.h"
 #include "menuoptions.h"
@@ -33,7 +35,7 @@
 #include "sqliteaccess.h"
 
 MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent),
+    QMainWindow(parent), mIsFinished {false},
     ui(new Ui::MainWindow),
     // create instance of Document Manager
     mpDocumentManager(new DocumentManager),
@@ -52,10 +54,6 @@ MainWindow::MainWindow(QWidget *parent) :
             Qt::UniqueConnection);
 
     ui->setupUi(this);
-    {
-        StoreConf conf;
-        conf.restoreConFile();
-    }
 
     // when first started main window is maximized
     setWindowState(Qt::WindowMaximized);
@@ -197,7 +195,6 @@ void MainWindow::setupMainMenu()
     // opening chat window
     QAction *pConnectAction = toolsMenu->addAction("&Connect...", this, &MainWindow::onConnectTriggered);
     pConnectAction->setIcon(QIcon(":/img/DISCONNECTED.png"));
-
     toolsMenu->addSeparator();
 
     // buidling solution
@@ -473,6 +470,23 @@ void MainWindow::onOpenProjectTriggered()
 
     mpProjectViewerDock->setDir(dirName);
     mpDocumentManager->openProject(dirName);
+    // Check if the user has been previously logged in
+    // Then update project-dependent stuff in the chat
+    QSettings settings;
+    if (settings.contains("userName"))
+    {
+        QString currentUserName = settings.value("userName").toString();
+        if (currentUserName != QString("unnamed"))
+        {
+            mpChatWindowDock->setUserName(currentUserName);
+            mplocalConnector->configureOnLogin(currentUserName);
+            QSettings savedSettings(QApplication::organizationName(), QApplication::applicationName());
+            QString styleName = {savedSettings.contains("style") ?
+                                 savedSettings.value("style").toString()
+                                 : "WHITE"};
+            mpChatWindowDock->updateTheme(styleName);
+        }
+    }
 }
 
 void MainWindow::onCloseProjectTriggered()
@@ -731,6 +745,23 @@ void MainWindow::onRefactorTriggered()
 
 void MainWindow::onConnectTriggered()
 {
+    // Check if the project has been previously opened
+    // Don't allow user to log in if no project is present
+    if (!mpDocumentManager->projectOpened())
+    {
+        return;
+    }
+    // Check if the user has been previously logged in
+    // If so, don't allow user to log in again
+    QSettings settings;
+    if (settings.contains("userName"))
+    {
+        QString currentUserName = settings.value("userName").toString();
+        if (currentUserName != QString("unnamed"))
+        {
+            return;
+        }
+    }
     LoginDialog loginDialog(this);
     QString userInput = loginDialog.start();
     if (userInput.isEmpty())
@@ -894,9 +925,17 @@ void MainWindow::closeEvent(QCloseEvent *event)
 MainWindow::~MainWindow()
 {
     saveMainWindowState();
-    StoreConf conf;
-    conf.saveConFile();
 
+    if (!mIsFinished)    //  application wasn't cancelled. in case of cancellation
+    {                   //      application don't save data from QSettings to configurattion file
+        QSettings s;
+        if (s.contains("userName"))
+        {
+            QString name = s.value("userName").toString();
+            StoreConf conf(name);
+            conf.saveConFile();
+        }
+    }
     delete ui;
 }
 

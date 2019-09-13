@@ -7,7 +7,7 @@ Item
     id: chatBody
     visible: true
 
-    readonly property string userLoginHint: "Log in to use chat"
+    readonly property string userLoginHint: "Unable to use chat"
 
     Rectangle
     {

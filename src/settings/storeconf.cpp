@@ -11,8 +11,9 @@
 
 StoreConf::StoreConf(QString userName)
 {
-    mConFile = userName;
-    mConFile += ".json";
+    mConFile                        = userName;
+    mConFile                        += ".json";
+    mFields["pathToConDir"]        = "";
     mFields["applicationName"]      = "Pair Storm";       //  default values used when json file
     mFields["applicationVersion"]   = "0.1";           //      not exist or corrupted
     mFields["organizationName"]     = "Lv-425.C++";
@@ -29,6 +30,8 @@ StoreConf::StoreConf(QString userName)
     mFields["cppCompilers"]         = "";
     mFields["cppLibraryHeaders"]    = "";
     mFields["cppLibraryBinarys"]    = "";
+    mFields["token"]                = "";
+    mFields["tokenHash"]            = "";
     separateList(mFields["cppExtentions"], mCppExtentionsList);
 }
 
@@ -66,6 +69,31 @@ void StoreConf::saveConFile()
     }
 }
 
+void StoreConf::setField(const QString key, const QString value)
+{
+    // extracting from file
+    readJson();
+    if (!mReadStatus)
+    {
+        return;
+    }
+    QJsonObject json = mJsonDoc.object();
+
+    // inserting field
+    json.insert(key, value);
+
+    // writing back to file
+    QJsonDocument jsonDoc(json);
+    QString jsonString = jsonDoc.toJson();
+
+    QFile saveFile(mPathToConFile);         // closing in destructor
+    if(!saveFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
+    {
+        return;
+    }
+    saveFile.write(jsonString.toLocal8Bit());
+}
+
 void StoreConf::getPathToConFile()
 {
     mPathToConFile = QDir::currentPath();
@@ -80,9 +108,11 @@ void StoreConf::checkConfDir(QString str)
     if (str == "exe")
     {
         QString pathToConDir = QDir::currentPath();
-        pathToConDir += "/conf";
+        pathToConDir += QDir::separator();
+        pathToConDir += "conf";
         if (!QDir(pathToConDir).exists())
             QDir().mkdir(pathToConDir);
+        mFields["pathToConDir"]        = pathToConDir;
     }
 }
 
@@ -161,6 +191,10 @@ void StoreConf::writeJson(sessionMode mode)
                 root_obj.insert(it.key(), s.value(it.key()).toString());
             break;
         }
+        default:
+        {
+            break;
+        }
         }
         ++it;
     }
@@ -193,9 +227,13 @@ void StoreConf::readJson()
     QByteArray saveData = loadFile.readAll();
     mJsonDoc = QJsonDocument::fromJson(saveData);
     if(mJsonDoc.isNull() || !mJsonDoc.isObject() || mJsonDoc.isEmpty())
+    {
         mReadStatus = false;
+    }
     else
+    {
         mReadStatus = true;
+    }
 }
 
 void StoreConf::parseJson()
