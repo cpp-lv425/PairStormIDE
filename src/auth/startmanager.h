@@ -68,13 +68,15 @@ private:
     void messageWindow(const QString &title, const QString &message, int timeOut);
 
     //  messages
-    const QString mMessageTitle               = "Welcome to Pair Storm!";
-    const QString mMessageRegistered          = ", you are successfully registered!";
-    const QString mMessageUnauthenticated     = "You entering in unauthorized mode";
-    const QString mMessageCredentialsValid    = ", your credentials are valid!";
-    const QString mMessageCredentialsNotValid = ", your credentials are not valid!";
-    const QString mMessageAccountAlreadyExist = "You already registered!";
-    const QString mMessageBadLoginPassword    = "Your credentials not fits GitHub policy!";
+    const QString mMessageTitle                 = "Welcome to Pair Storm!";
+    const QString mMessageRegistered            = ", you are successfully registered!";
+    const QString mMessageUnauthenticated       = "You entering in unauthorized mode";
+    const QString mMessageCredentialsValid      = ", your credentials are valid!";
+    const QString mMessageCredentialsNotValid   = ", your credentials are not valid!";
+    const QString mMessageAccountAlreadyExist   = "You already registered!";
+    const QString mMessageBadLoginPassword      = "Your credentials not fits GitHub policy!";
+    const QString mMessageErrorInRequest        = "Error in request to GitHub";
+    const QString mMessageErrorInRequestCorrupt = "Error in request to GitHub. Data corrupted";
 
     //              DESIGN PARAMETERS
     //  MessageWindow
