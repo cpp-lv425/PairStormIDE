@@ -20,9 +20,8 @@ ChoiceWindow::ChoiceWindow(const QStringList &usersFilesList, QWidget *pParent)
 
     // widget parameters
     setModal(true);
-    //setMaximumSize(mWidgetWidth, mWidgetHeight);
+    setMaximumSize(mWidgetWidth, mWidgetHeight);
     setMinimumSize(mWidgetWidth, mWidgetHeight);
-    setBaseSize(mWidgetWidth, mWidgetHeight);
     setStyle(QStyleFactory::create(mWidgetStyle));
     setStyleSheet(mWidgetColor);
     setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
@@ -77,10 +76,9 @@ ChoiceWindow::ChoiceWindow(const QStringList &usersFilesList, QWidget *pParent)
     connect(mpButtonBox, &QDialogButtonBox::clicked, this, &ChoiceWindow::onBtnBoxClicked);
 
     newUserCancelLayout->setContentsMargins(400, 0, 0, 0);
-    newUserCancelLayout->addWidget(mpButtonBox, 0, Qt::AlignRight);
+    newUserCancelLayout->addWidget(mpButtonBox,     0, Qt::AlignRight);
     newUserCancelLayout->addWidget(mpNewUserButton, 0, Qt::AlignRight);
-
-    mainLayout->addLayout(newUserCancelLayout, 0);
+    mainLayout->addLayout(newUserCancelLayout);
 
     // separator
     QFrame *line = new QFrame(this);
