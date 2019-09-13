@@ -37,8 +37,8 @@ private:
 
     //          DESIGN PARAMETERS
     //  Widget
-    const int mWidgetWidth                              = 400;
-    const int mWidgetHeight                             = 450;
+    const int mWidgetWidth                              = 600;
+    const int mWidgetHeight                             = 300;
     const QString mWidgetStyle                          = "Fusion";
     const QString mWidgetColor                          = "background-color: #b1c1c7;";
     int mBasicStretch                                   = 1;
@@ -59,14 +59,14 @@ private:
     const QString mUsersListFontFamily                  = "font-family: Helvetica;";
     //  new user button
     const int mNewUserButtonWidth                       = 80;
-    const QString mNewUserButtonFontSize                = "font-size: 16px;";
+    const QString mNewUserButtonFontSize                = "font-size: 13px;";
     const QString mNewUserButtonFontFamily              = "font-family: Helvetica;";
     const QString mNewUserButtonColor                   = "color: rgb(0, 0, 0);";
     const QString mNewUserButtonBackgroundColor         = "background-color: grey;";
     const QString mNewUserLabel                         = "New user";
 
     //  dialog button box
-    const QString mButtonBoxFontSize                    = "font-size: 16px;";
+    const QString mButtonBoxFontSize                    = "font-size: 13px;";
     const QString mButtonBoxFontFamily                  = "font-family: Helvetica;";
     const QString mButtonBoxColor                       = "color: rgb(0, 0, 0);";
     const QString mButtonBoxBackgroundColor             = "background-color: grey;";
