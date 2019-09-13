@@ -443,7 +443,7 @@ void MainWindow::onOpenProjectTriggered()
         return;
     }
 
-     dirName = QFileDialog::getExistingDirectory
+    QString dirName = QFileDialog::getExistingDirectory
             (this,
              userMessages[UserMessages::OpenDirectoryTitle],
             QDir::homePath());
@@ -465,8 +465,8 @@ void MainWindow::onOpenProjectTriggered()
                 userMessages[UserMessages::ProjectDoesNotExistMsg]);
         return;
     }
-    restoreDatabaseFile();
-    databaseConnect();
+
+    databaseConnect(dirName);
 
     mpProjectViewerDock->setDir(dirName);
     mpDocumentManager->openProject(dirName);
@@ -551,8 +551,8 @@ void MainWindow::onCloseProjectTriggered()
     mpProjectViewerDock->setDir(QDir::currentPath());
 
     // disconnect from db
-    databaseDisconnect();
-    hideDatabaseFile();
+    //
+    //
 
     QMessageBox::information
             (this,
@@ -1041,7 +1041,7 @@ void MainWindow::onNewProjectTriggered()
         return;
     }
 
-    databaseConnect();
+    databaseConnect(dirName);
     // document manager is sent a message about new project
     mpDocumentManager->openProject(dirName);
 
@@ -1049,52 +1049,18 @@ void MainWindow::onNewProjectTriggered()
     mpProjectViewerDock->setDir(dirName);
 }
 
-void MainWindow::databaseConnect()
+void MainWindow::databaseConnect(QString directory)
 {
-    setDatabaseFileName();
-    db = ConnectionGetter::getDefaultConnection(databaseFileName);
+    db = ConnectionGetter::getDefaultConnection(directory + "/storage.db");
+    qDebug()<<"on databaseConnect function";
     CreateDB database;
+    database.addTableFile();
+    database.addTableUser();
+    database.addTableComment();
+    database.addTableMessage();
 }
 
 void MainWindow::databaseDisconnect()
 {
     delete db;
-}
-
-void MainWindow::restoreDatabaseFile()
-{
-    setDatabaseFileName();
-    QString projectFileName = dirName + pathSeparator + FileManager::getProjectFileName();
-    readWriteFileContent(projectFileName, databaseFileName);
-}
-
-void MainWindow::hideDatabaseFile()
-{
-    QString projectFileName = dirName + pathSeparator + FileManager::getProjectFileName();
-    readWriteFileContent(databaseFileName, projectFileName);
-    QFile::remove(databaseFileName);
-}
-
-void MainWindow::setDatabaseFileName()
-{
-    databaseFileName = dirName;
-    int position = dirName.lastIndexOf(QChar{pathSeparator});
-    databaseFileName += pathSeparator;
-    databaseFileName += dirName.mid(position + 1);
-    databaseFileName += projectDatabaseExtension;
-}
-
-void MainWindow::readWriteFileContent(QString fileToReadName, QString fileToWriteName)
-{
-    QFile fileToRead(fileToReadName);
-    QFile fileToWrite(fileToWriteName);
-
-    fileToRead.open(QIODevice::ReadOnly);
-    fileToWrite.open(QIODevice::WriteOnly);
-
-    QByteArray data = fileToRead.readAll();
-    fileToWrite.write(data);
-    qDebug()<<data;
-    fileToRead.close();
-    fileToWrite.close();
 }
