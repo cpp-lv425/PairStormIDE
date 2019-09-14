@@ -764,14 +764,6 @@ void MainWindow::onAboutTriggered()
     QMessageBox::about(this, "About PairStorm", info);
 }
 
-void MainWindow::onReferenceTriggered()
-{
-    BrowserDialog browser(this);
-    browser.createEmptyTab();
-    browser.show();
-    browser.exec();
-}
-
 void MainWindow::onUserGuideTriggered()
 {
     //
@@ -780,14 +772,6 @@ void MainWindow::onUserGuideTriggered()
 void MainWindow::onCheckUpdatesTriggered()
 {
     //
-}
-
-void MainWindow::onReferenceFromEditor(const QString &keyword)
-{
-    BrowserDialog browser(this);
-    browser.createNewTab(keyword);
-    browser.show();
-    browser.exec();
 }
 
 void MainWindow::onOpenFileFromProjectViewer(QString fileName)
