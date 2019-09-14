@@ -1062,7 +1062,6 @@ void MainWindow::readWriteFileContent(QString fileToReadName, QString fileToWrit
 
     QByteArray data = fileToRead.readAll();
     fileToWrite.write(data);
-    qDebug()<<data;
     fileToRead.close();
     fileToWrite.close();
 }
