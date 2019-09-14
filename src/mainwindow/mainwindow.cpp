@@ -1009,7 +1009,7 @@ void MainWindow::onNewProjectTriggered()
         return;
     }
 
-    databaseConnect( );
+    databaseConnect();
     // document manager is sent a message about new project
     mpDocumentManager->openProject(dirName);
 
@@ -1022,10 +1022,6 @@ void MainWindow::databaseConnect()
     setDatabaseFileName();
     db = ConnectionGetter::getDefaultConnection(databaseFileName);
     CreateDB database;
-    /*database.addTableFile();
-    database.addTableUser();
-    database.addTableComment();
-    database.addTableMessage();*/
 }
 
 void MainWindow::databaseDisconnect()
