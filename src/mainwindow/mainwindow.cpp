@@ -22,7 +22,6 @@
 #include "classgenerator.h"
 #include "chatwindowdock.h"
 #include "newfilewizard.h"
-#include "browserdialog.h"
 #include "usermessages.h"
 #include "logindialog.h"
 #include "filemanager.h"
