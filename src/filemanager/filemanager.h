@@ -1,7 +1,9 @@
 #ifndef FILEMANAGER_H
 #define FILEMANAGER_H
-#include <QString>
+
 extern const char *projectFileExtension;
+
+class QString;
 
 class FileManager
 {
@@ -14,8 +16,9 @@ public:
     bool projectExists(const QString &path);
     bool sourceFileByTheSameNameExists(const QString &headerName);
     static QString getProjectFileName();
-private:
-    static QString projectFileName;
+    private:
+        static QString projectFileName;
+
 };
 
 #endif // FILEMANAGER_H

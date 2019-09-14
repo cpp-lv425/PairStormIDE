@@ -32,6 +32,7 @@ Item
 
             RowLayout
             {
+                z: 2
                 id: usersAndControlLayout
 
                 width:  parent.availableWidth
@@ -65,6 +66,7 @@ Item
         ChatComponents.MsgsLifeline
         {
             id: messagesHistory
+            z: 1
 
             Layout.alignment:  Qt.AlignCenter
             Layout.fillWidth:  true
@@ -73,6 +75,7 @@ Item
         ChatComponents.MsgInputArea
         {
             id: inputMessageArea
+            z: 2
 
             Layout.alignment:       Qt.AlignCenter
             Layout.fillWidth:       true

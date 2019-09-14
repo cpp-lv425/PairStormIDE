@@ -8,7 +8,7 @@ Connection::Connection()
 
 Connection::~Connection()
 {
-    mDb.removeDatabase(QLatin1String(QSqlDatabase::defaultConnection));
+    mDb.close();
 }
 
 void Connection::openDatabase()

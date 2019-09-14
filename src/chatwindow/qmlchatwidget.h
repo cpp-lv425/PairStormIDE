@@ -28,7 +28,6 @@ public:
     QmlChatWidget& operator=(QmlChatWidget const &) = delete;
 
     virtual void keyPressEvent(QKeyEvent *event)                         override;
-    virtual void resizeEvent  (QResizeEvent *event)                      override;
 
 public slots:
 

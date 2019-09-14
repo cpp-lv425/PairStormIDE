@@ -1,26 +1,34 @@
 #include <QApplication>
 #include <QQuickWindow>
-#include <QWebEngineSettings>
 
 #include "mainwindow.h"
 #include "splashscreen.h"
+#include "startmanager.h"
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    SplashScreen splashScreen;
-    splashScreen.start();
 
     QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 
-    QWebEngineSettings::defaultSettings()->setAttribute(QWebEngineSettings::LocalStorageEnabled, true);
-    QWebEngineSettings::defaultSettings()->setAttribute(QWebEngineSettings::DnsPrefetchEnabled, true);
-
     QQuickWindow::setSceneGraphBackend(QSGRendererInterface::Software);
 
-    MainWindow w;
-    splashScreen.finish(&w);
+    // Start manager must be started prior to both spalashscreen & mainwindow
+    // because is is needed to choose application' settings source
+    StartManager startManager;
+    bool isManagerAborted = false;
+    startManager.connect(&startManager, &StartManager::cancel, &startManager, [&]() {isManagerAborted = true;});
+    startManager.start();
+    if (isManagerAborted)
+    {
+        return 0;
+    }
 
+    SplashScreen splashScreen;
+    splashScreen.start();
+    MainWindow w;
+    w.hide();
+    splashScreen.finish(&w);
     w.show();
     w.showStartPage();
 

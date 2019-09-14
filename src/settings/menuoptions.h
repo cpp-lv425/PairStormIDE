@@ -20,7 +20,6 @@ class TabConnection;
 class TabCpp;
 class TabRepository;
 
-class QDialog;
 class QTabWidget;
 class QDialogButtonBox;
 class QAbstractButton;
