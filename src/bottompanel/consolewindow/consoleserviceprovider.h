@@ -30,7 +30,6 @@ private:
     QString getExecutableFilePath() const;
 
 private:
-    QString mCompilerPath;
     QProcess *mConsoleProcess;
     DocumentManager *documentManager;
 };

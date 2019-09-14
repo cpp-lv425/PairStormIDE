@@ -31,7 +31,7 @@ CodeEditor::CodeEditor(QWidget *parent, const QString &fileName) : QPlainTextEdi
     setLineWrapMode(QPlainTextEdit::NoWrap);// don't move cursor to the next line where it's out of visible scope
     this->setVerticalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAlwaysOn);
     this->setTabStopDistance(TAB_SPACE * fontMetrics().width(QLatin1Char('0')));//set tab distance
-    mCurrentZoom = 100;//in persents    
+    mCurrentZoom = 100;//in persents
     mLinesCount = 1;
     mCode = document()->toPlainText();
     mCodeSize = 1;
@@ -46,16 +46,26 @@ CodeEditor::CodeEditor(QWidget *parent, const QString &fileName) : QPlainTextEdi
 
     //create objects connected to codeEditor
     mLineNumberArea = new LineNumberArea(this);
+    //mTimer = new QTimer;
+    //mLcpp = new LexerCPP();
+   // mTimer = new QTimer;
     QVector<Token> firstLine;
     mTokensList.append(firstLine);
+    //mChangeManager = new ChangeManager(this->toPlainText().toUtf8().constData());
     mChangeManager = ChangeManager(this->toPlainText().toUtf8().constData());
+    //comment button
     mAddCommentButton = new AddCommentButton(this);
+   // mAddCommentButton.setParent(this);
     mAddCommentButton->setText("+");
     mAddCommentButton->setVisible(false);
     mCurrentCommentLable.setParent(this);
     setMouseTracking(true);
 
+    //widget that shows the comment to each line
+    //mCommentWidget = new CommentWidget;
     mCommentWidget.setVisible(false);
+
+    //commentGetter = new CommentDb;
 
     mStartComments = commentGetter.getAllCommentsFromFile(getFileName());
     readAllCommentsFromDB(mStartComments);
@@ -163,24 +173,8 @@ void CodeEditor::writeDefinitionToSource()
             else
             {
                  sourceDocument->setPlainText(sourceDocument->toPlainText() + "\n" + definitonTest);
-                 auto cursor = sourceDocument->textCursor();
-                 cursor.movePosition(QTextCursor::Start);
-                 sourceDocument->setTextCursor(cursor);
-                 int linescount = 1;
-                 cursor.movePosition(QTextCursor::EndOfLine);
-                 while(linescount < static_cast<int>(mLinesCount))
-                 {
-                     cursor.insertText(" ");
-                     cursor.movePosition(QTextCursor::Left);
-                     cursor.deleteChar();
-                     sourceDocument->setTextCursor(cursor);
-                     linescount++;
-                     cursor.movePosition(QTextCursor::Down);
-                     cursor.movePosition(QTextCursor::EndOfLine);
-                 }
             }
             QMessageBox::information(this, successDefinCreateTitle, successDefinCreateMessage);
-
         }
         else
         {
@@ -220,7 +214,7 @@ void CodeEditor::setFontSize(const QString &fontSize)
 }
 
 void CodeEditor::setFontStyle(const QString &fontStyle)
-{    
+{
     mConfigParam.setFontStyle(fontStyle);
     mFont.setFamily(mConfigParam.mFontStyle);
     this->setFont(mFont);

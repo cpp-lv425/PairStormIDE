@@ -14,22 +14,11 @@ ConsoleServiceProvider::ConsoleServiceProvider()
             this, &ConsoleServiceProvider::setStdOutput);
 }
 
-QString ConsoleServiceProvider::compilerPath() const
-{
-    return mCompilerPath;
-}
-
 void ConsoleServiceProvider::setStdOutput()
 {
     mConsoleProcess->setReadChannel(QProcess::StandardError);
     mConsoleProcess->waitForFinished();
-   // QString outputs = mConsoleProcess->readAllStandardOutput();
     QString errors = mConsoleProcess->readAllStandardError();
-
-    //qDebug() << "build ouputs are: " << outputs;
-    qDebug() << "build errors are: " << errors;
-
-
 
     if (!errors.isEmpty())
     {
