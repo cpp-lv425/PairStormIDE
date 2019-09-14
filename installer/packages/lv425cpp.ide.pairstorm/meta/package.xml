@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package>
+    <DisplayName>PairStorm</DisplayName>
+    <Description>IDE for advanced pair programming.</Description>
+    <Version>1.0</Version>
+    <ReleaseDate>2019-09-09</ReleaseDate>
+    <Licenses>
+        <License name="Beer Public License Agreement" file="license.txt" />
+    </Licenses>
+    <Default>true</Default>
+    <Script>installscript.qs</Script>
+</Package>

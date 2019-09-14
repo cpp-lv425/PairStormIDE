@@ -37,6 +37,7 @@ public:
     void showStartPage();
     ~MainWindow();
 
+    bool mIsFinished;
 private:
     LocalConnectorInterface *mplocalConnector;
     Ui::MainWindow *ui;

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Installer>
+    <Name>Pair Storm IDE</Name>
+    <Version>1.0</Version>
+    <Title>Pair Storm installation setup</Title>
+    <Publisher>Lv-425.C++</Publisher>
+    <ProductUrl>https://github.com/cpp-lv425/PairStormIDE/tree/release</ProductUrl>
+    <InstallerApplicationIcon>ICON</InstallerApplicationIcon>
+    <Logo>LOGO.png</Logo>
+    <WizardDefaultWidth>800</WizardDefaultWidth>
+    <WizardDefaultHeight>500</WizardDefaultHeight>
+    <MaintenanceToolName>PairStormMaintenanceTool</MaintenanceToolName>
+    <WizardStyle>Fusion</WizardStyle>
+    <TitleColor>#963D3D</TitleColor>
+    <!-- Directory name is used in component.xml -->
+    <StartMenuDir>PairStorm</StartMenuDir>
+    <TargetDir>@HomeDir@/PairStorm</TargetDir>
+</Installer>
