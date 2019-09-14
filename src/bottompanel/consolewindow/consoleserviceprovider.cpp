@@ -3,7 +3,6 @@
 #include "documentmanager.h"
 #include <QTextCodec>
 #include <QString>
-#include <QDebug>
 #include <QDir>
 
 ConsoleServiceProvider::ConsoleServiceProvider()

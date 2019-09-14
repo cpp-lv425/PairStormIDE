@@ -1,7 +1,6 @@
 #include "consolewindow.h"
 #include "ui_consolewindow.h"
 #include <QGridLayout>
-#include <QDebug>
 
 ConsoleWindow::ConsoleWindow(QWidget *parent) :
     QWidget(parent),

@@ -2,7 +2,6 @@
 #include "compilercontroler.h"
 #include <QDirIterator>
 #include "filemanager.h"
-#include <QDebug>
 #include <QPlainTextEdit>
 #include <consolewindow/consolewindow.h>
 #include <QString>
@@ -35,7 +34,7 @@ void CompilerControler::setConsoleProvider(ConsoleServiceProvider *value)
     consoleProvider = value;
 }
 
-QString CompilerControler::getCurrentCompilerName() const
+QString CompilerControler::getCurrentCompilerPath() const
 {
     QString rCurrentCompiler = QString();
     QSettings settings;
@@ -64,7 +63,7 @@ void CompilerControler::setProjectPath(const QString &projectPath)
 void CompilerControler::runCompilation()
 {
 
-    auto currentCompilerName = getCurrentCompilerName();
+    auto currentCompilerName = getCurrentCompilerPath();
     sourceFilesPathes.clear();
     removeAllExecutableAndObjectsFiles();
 
@@ -95,6 +94,7 @@ QString CompilerControler::getExecutibleFileName() const
 
 void CompilerControler::removeAllExecutableAndObjectsFiles()
 {
+    // we should remove all files which will be created during the next compilation
     QDir dir(mProjectPath);
     dir.setNameFilters(QStringList() << "*" + objectiveFileExtension
                        << "*" + executableFileExtension
