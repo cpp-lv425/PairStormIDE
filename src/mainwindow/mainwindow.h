@@ -111,10 +111,8 @@ private slots:
 
     // help menu
     void onAboutTriggered();
-    void onReferenceTriggered();
     void onUserGuideTriggered();
     void onCheckUpdatesTriggered();
-    void onReferenceFromEditor(const QString &keyword);
 
 public slots:
     void onOpenFileFromProjectViewer(QString fileName);
