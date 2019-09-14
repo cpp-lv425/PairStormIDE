@@ -36,20 +36,19 @@ public:
     void showStartPage();
     ~MainWindow();
 
-    bool mIsFinished;
 private:
     LocalConnectorInterface *mplocalConnector;
     Ui::MainWindow *ui;
     ProjectViewerDock *mpProjectViewerDock;
     ChatWindowDock *mpChatWindowDock;
     BottomPanelDock *mpBottomPanelDock;
-    QScopedPointer<DocumentManager> mpDocumentManager;    
+    QScopedPointer<DocumentManager> mpDocumentManager;
     Browser *mDocumentationBrowser;
     QScopedPointer<PaletteConfigurator> mpPaletteConfigurator;
     Connection *db;
     FileDb* dbFileManager;
 
-    void setupMainMenu();    
+    void setupMainMenu();
     void openDocument(const QString &fileName);
     void createProjectViewer();
     void createChatWindow();
@@ -64,13 +63,12 @@ private:
     void setDocumentFontFamily(const QString &fontFamily);
     void setDocumentFontSize(const QString &fontSize);
 
-    void databaseConnect(QString directory);
+    void databaseConnect();
     void databaseDisconnect();
     void restoreDatabaseFile();
     void hideDatabaseFile();
     void setDatabaseFileName();
     void readWriteFileContent(QString fileToReadName, QString fileToWriteName);
-
 
 private slots:
     // file menu actions
@@ -104,7 +102,7 @@ private slots:
     void onShowChatWindowDockTriggered();
     void onShowBottomPanel();
     void onCombineAreas();
-    void onCloseEmptyDocArea();   
+    void onCloseEmptyDocArea();
 
     // tools menu
     void onRefactorTriggered();
