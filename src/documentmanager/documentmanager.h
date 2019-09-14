@@ -26,6 +26,7 @@ public:
     explicit DocumentManager();
     QSplitter* getSplitter();
     void openProject(const QString &path);
+    bool saveDocument(CodeEditor *doc);
     const QString& getCurrentProjectPath()const;
     void closeCurrentProject();
     void openDocument(const QString &fileName, bool load = false);
@@ -75,7 +76,6 @@ private:
     QMdiArea* lastAreaInFocus();
     QMdiArea* areaInFocus();
     QMdiArea* getArea(CodeEditor *doc);
-    bool saveDocument(CodeEditor *doc);
     bool saveDocument(const QString &fileName);
     void saveDocument(const QString &fileName, const QString &fileContent);
     void setAllDocumentsNotModified();

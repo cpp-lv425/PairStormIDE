@@ -51,6 +51,7 @@ public:
     CodeEditor(QWidget *parent = nullptr, const QString &fileName = "");
     virtual ~CodeEditor();
     void specialAreasRepaintEvent(QPaintEvent *event);
+    void saveCurrentDocument();
     void repaintButtonsArea(const int bottom, const int top, const int blockNumber);
     int getLineNumberAreaWidth();
     QString& getFileName();
@@ -73,6 +74,7 @@ public:
     //DB methods
     void readAllCommentsFromDB(QVector<Comment> mStartComments);
     QVector<Comment> getAllCommentsToDB();
+    unsigned int mLinesCount;
 
     CommentDb getCommentGetter() const;
 
@@ -160,11 +162,11 @@ private:
     QSettings settings;
 
 
+
     QString mStyle;
     int mLinesCountPrev;
     int mLinesCountCurrent;
 
-    unsigned int mLinesCount;
     unsigned int mCodeSize;
     QString mCode;
 

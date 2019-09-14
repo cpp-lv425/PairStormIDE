@@ -2,6 +2,7 @@
 #include "usermessages.h"
 #include "eventbuilder.h"
 #include "filemanager.h"
+#include "documentmanager.h"
 #include "codeeditor.h"
 #include "keywords.h"
 #include "utils.h"
@@ -137,8 +138,8 @@ void CodeEditor::runHighlighterWithDefinition(CodeEditor *sourceDocument)
     sourceDocument->setTextCursor(cursor);
     int linescount = 1;
     cursor.movePosition(QTextCursor::EndOfLine);
-    const int cMaxSize = 100;
-    while(linescount < cMaxSize)
+    const int cFive = 5;
+    while(linescount < sourceDocument->mLinesCount + cFive)
     {
         cursor.insertText(" ");
         cursor.movePosition(QTextCursor::Left);
@@ -186,7 +187,9 @@ void CodeEditor::writeDefinitionToSource()
                 runHighlighterWithDefinition(sourceDocument);
             }
             QMessageBox::information(this, successDefinCreateTitle, successDefinCreateMessage);
-
+            DocumentManager documentManager;
+            documentManager.saveDocument(sourceDocument);
+            documentManager.saveDocument(this);
         }
         else
         {
