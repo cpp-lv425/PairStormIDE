@@ -231,11 +231,6 @@ void MainWindow::setupMainMenu()
     helpMenu->addAction("&About...", this, &MainWindow::onAboutTriggered);
     helpMenu->addSeparator();
 
-    // opening reference window
-    QAction *pReferenceAction = helpMenu->addAction("&Reference Assistant...", this, &MainWindow::onReferenceTriggered, Qt::CTRL + Qt::Key_F1);
-    pReferenceAction->setIcon(QIcon(":/img/REFERENCEASSISTANT.png"));
-    pToolbar->addAction(pReferenceAction);
-
     // user guide
     QAction *pUserGuideActoin = helpMenu->addAction("User &Guide...", this, &MainWindow::onUserGuideTriggered, Qt::Key_F1);
     pUserGuideActoin->setDisabled(true);
