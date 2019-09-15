@@ -81,7 +81,6 @@ bool FileManager::projectExists(const QString &path)
     int position = path.lastIndexOf(QChar{pathSeparator});
     projectFileName = path.mid(position + 1);
     projectFileName += projectFileExtension;
-    qDebug()<<"infilemanager"<<projectFileName;
     // if project file exists in specified directory
     // then true is returned
     return projectDir.exists(projectFileName);

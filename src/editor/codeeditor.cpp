@@ -113,7 +113,6 @@ CodeEditor::CodeEditor(QWidget *parent, const QString &fileName) : QPlainTextEdi
 
 CodeEditor::~CodeEditor()
 {
-    qDebug()<<getFileName();
     commentGetter->deleteCommentsFromDb(getFileName());
     commentGetter->addCommentsToDb(getAllCommentsToDB());
 }
