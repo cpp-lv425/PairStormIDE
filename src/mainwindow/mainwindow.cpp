@@ -463,11 +463,12 @@ void MainWindow::onOpenProjectTriggered()
                 userMessages[UserMessages::ProjectDoesNotExistMsg]);
         return;
     }
-    restoreDatabaseFile();
-    databaseConnect();
 
     mpProjectViewerDock->setDir(dirName);
     mpDocumentManager->openProject(dirName);
+    restoreDatabaseFile();
+    databaseConnect();
+
 }
 
 void MainWindow::onCloseProjectTriggered()
