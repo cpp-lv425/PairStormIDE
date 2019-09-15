@@ -1000,10 +1000,10 @@ void MainWindow::databaseConnect()
     setDatabaseFileName();
     db = ConnectionGetter::getDefaultConnection(databaseFileName);
     CreateDB database;
-    /*database.addTableFile();
+    database.addTableFile();
     database.addTableUser();
     database.addTableComment();
-    database.addTableMessage();*/
+    database.addTableMessage();
 }
 
 void MainWindow::databaseDisconnect()
