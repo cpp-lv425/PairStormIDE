@@ -6,7 +6,7 @@ class Accessor
 {
 public:
     Accessor();
-    ~Accessor();
+    ~Accessor() = default;
 protected:
     void setQuery(QSqlDatabase db);
     void execQuery(QString query);

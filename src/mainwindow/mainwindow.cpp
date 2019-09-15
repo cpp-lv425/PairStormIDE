@@ -1016,12 +1016,14 @@ void MainWindow::restoreDatabaseFile()
 {
     setDatabaseFileName();
     QString projectFileName = dirName + pathSeparator + FileManager::getProjectFileName();
+        qDebug()<<projectFileName;
     readWriteFileContent(projectFileName, databaseFileName);
 }
 
 void MainWindow::hideDatabaseFile()
 {
     QString projectFileName = dirName + pathSeparator + FileManager::getProjectFileName();
+    qDebug()<<projectFileName;
     readWriteFileContent(databaseFileName, projectFileName);
     QFile::remove(databaseFileName);
 }
@@ -1033,6 +1035,7 @@ void MainWindow::setDatabaseFileName()
     databaseFileName += pathSeparator;
     databaseFileName += dirName.mid(position + 1);
     databaseFileName += projectDatabaseExtension;
+    qDebug()<<databaseFileName;
 }
 
 void MainWindow::readWriteFileContent(QString fileToReadName, QString fileToWriteName)
