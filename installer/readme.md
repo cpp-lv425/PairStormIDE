@@ -8,4 +8,4 @@ First, create folder:
 Next, fill this folder with necessary dependencies (dll's, exe's, etc.)
 To create installer, type:
     
-    binarycreator.exe --offline-only -c config\config.xml -p packages PairStormInstaller.exe
+    binarycreator.exe --offline-only -c config\config.xml -p packages PairStorm.1.1_win64.exe
