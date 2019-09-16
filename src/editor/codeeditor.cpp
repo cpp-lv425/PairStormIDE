@@ -274,7 +274,6 @@ void CodeEditor::handleLinesAddition(int changeStart, int lastLineWithChange, in
     {
         changeStart = lastLineWithChange - lineDifference;
         mTokensList.removeAt(changeStart);
-//        mIdentifiersList.removeAt(changeStart);
     }
 
     mHighlightingStart = changeStart > 0 ? changeStart - 1 : changeStart;
@@ -285,12 +284,10 @@ void CodeEditor::handleLinesAddition(int changeStart, int lastLineWithChange, in
         if (lineDifference)
         {
             mTokensList.insert(i, mLcpp.getTokens());
-//            mIdentifiersList.insert(i, getIdentifiers(mTokensList[i]));
         }
         else
         {
             mTokensList[i] = mLcpp.getTokens();
-//            mIdentifiersList[i] = getIdentifiers(mTokensList[i]);
         }
     }
 }
@@ -304,12 +301,10 @@ void CodeEditor::handleLinesDelition(int lastLineWithChange, int lineDifference)
     mLcpp.lexicalAnalysis(changedCode);
     mHighlightingStart = lastLineWithChange;
     mTokensList[lastLineWithChange] = mLcpp.getTokens();
-//    mIdentifiersList[lastLineWithChange] = getIdentifiers(mTokensList[lastLineWithChange]);
 
     for (auto i = lastLineWithChange + 1; i < lastLineWithChange + lineDifference + 1; ++i)
     {
         mTokensList.removeAt(lastLineWithChange + 1);
-//        mIdentifiersList.removeAt(lastLineWithChange + 1);
     }
 }
 
@@ -337,24 +332,6 @@ void CodeEditor::handleLineChange(int lastLineWithChange)
     {
         handleLinesDelition(lastLineWithChange, lineDifference);
     }
-
-    QStringList allIdentifiers;
-//    for(int i = 0; i < mIdentifiersList.size(); ++i)
-//    {
-//        for(int j = 0; j < mIdentifiersList[i].size(); ++j)
-//        {
-//            allIdentifiers << mIdentifiersList[i][j].mName;
-//        }
-//    }
-
-//    for(int i = 0; i < mIdentifiersList.size(); ++i)
-//    {
-//        qDebug() << i;
-//        for(int j = 0; j < mIdentifiersList[i].size(); ++j)
-//        {
-//            qDebug() << mIdentifiersList[i][j].mName;
-//        }
-//    }
 
     emit runHighlighter();
 }
