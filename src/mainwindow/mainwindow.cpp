@@ -37,7 +37,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     // initializing palette configurator with current palette
-    mPaletteConfigurator(new PaletteConfigurator(palette())),
+    mpPaletteConfigurator(new PaletteConfigurator(palette())),
     mpdbFileManager(new FileDb)
 {
     // Generate default local network connector
@@ -231,12 +231,6 @@ void MainWindow::setupMainMenu()
     // info about program
     helpMenu->addAction("&About...", this, &MainWindow::onAboutTriggered);
     helpMenu->addSeparator();
-
-    // opening reference window
-    QAction *pReferenceAction = helpMenu->addAction("&Reference Assistant...",
-                                                    this, &MainWindow::onReferenceTriggered, Qt::CTRL + Qt::Key_F1);
-    pReferenceAction->setIcon(QIcon(":/img/REFERENCEASSISTANT.png"));
-    pToolbar->addAction(pReferenceAction);
 
     // buidling solution
     QAction *pBuildAction = toolsMenu->addAction("&Build", this, &MainWindow::onBuildTriggered, Qt::CTRL + Qt::Key_B);
@@ -957,7 +951,7 @@ void MainWindow::setInitialAppStyle()
 void MainWindow::setAppStyle(const QString &styleName)
 {
     // dark style palette is created & set globally
-    QPalette palette = mPaletteConfigurator->getPalette(styleName);
+    QPalette palette = mpPaletteConfigurator->getPalette(styleName);
 
     qApp->setPalette(palette);
 
@@ -1044,7 +1038,7 @@ void MainWindow::databaseConnect()
 
 void MainWindow::databaseDisconnect()
 {
-    delete mpdb;
+    delete db;
 }
 
 void MainWindow::restoreDatabaseFile()

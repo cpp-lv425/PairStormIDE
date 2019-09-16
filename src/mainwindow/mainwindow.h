@@ -43,11 +43,11 @@ private:
     ProjectViewerDock *mpProjectViewerDock;
     ChatWindowDock *mpChatWindowDock;
     BottomPanelDock *mpBottomPanelDock;
-    QScopedPointer<DocumentManager> mpDocumentManager;
+    //QScopedPointer<DocumentManager> mpDocumentManager;
     Browser *mDocumentationBrowser;
     QScopedPointer<PaletteConfigurator> mpPaletteConfigurator;
     Connection *db;
-    FileDb* dbFileManager;
+    FileDb* mpdbFileManager;
     DocumentManager *mpDocumentManager;
     CompilerControler *mpCompilerControler;
 
