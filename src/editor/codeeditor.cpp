@@ -138,6 +138,27 @@ void CodeEditor::setIdeType(const QString &ideType)
 {
     mConfigParam.setIdeType(ideType);
     setTextColors();
+    runHighlighterWithDefinition(this);
+}
+
+void CodeEditor::runHighlighterWithDefinition(CodeEditor *sourceDocument)// this is Sasha's code
+{
+    auto cursor = sourceDocument->textCursor();
+    cursor.movePosition(QTextCursor::Start);
+    sourceDocument->setTextCursor(cursor);
+    int linescount = 1;
+    cursor.movePosition(QTextCursor::EndOfLine);
+    constexpr int cFive = 5;
+    while(linescount < sourceDocument->mLinesCount + cFive)
+    {
+        cursor.insertText(" ");
+        cursor.movePosition(QTextCursor::Left);
+        cursor.deleteChar();
+        sourceDocument->setTextCursor(cursor);
+        linescount++;
+        cursor.movePosition(QTextCursor::Down);
+        cursor.movePosition(QTextCursor::EndOfLine);
+    }
 }
 
 void CodeEditor::writeDefinitionToSource()
@@ -172,9 +193,13 @@ void CodeEditor::writeDefinitionToSource()
             }
             else
             {
-                 sourceDocument->setPlainText(sourceDocument->toPlainText() + "\n" + definitonTest);
+                sourceDocument->setPlainText(sourceDocument->toPlainText() + "\n" + definitonTest);
+                runHighlighterWithDefinition(sourceDocument);
             }
             QMessageBox::information(this, successDefinCreateTitle, successDefinCreateMessage);
+            DocumentManager documentManager;
+            documentManager.saveDocument(sourceDocument);
+            documentManager.saveDocument(this);
         }
         else
         {

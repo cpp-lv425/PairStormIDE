@@ -17,6 +17,7 @@ const int TOP_UNUSED_PIXELS_HEIGHT = 4;
 #include<QSettings>
 #include<QApplication>
 #include<QPlainTextEdit>
+#include<documentmanager.h>
 #include<QObject>
 #include<QMouseEvent>
 #include<QLabel>
@@ -99,6 +100,7 @@ private:
     AddCommentButton* getCommentButtonByIndex(const int line);
     void setNewAddedButtonSettings(AddCommentButton *commentButton);
     CodeEditor* getOpenedDocument(const QString &fileName);
+    void runHighlighterWithDefinition(CodeEditor *sourceDocument);
 
 protected:
     void resizeEvent(QResizeEvent *event)override;
