@@ -25,8 +25,8 @@ class DocumentManager: public QObject
 public:
     explicit DocumentManager();
     QSplitter* getSplitter();
-    void openProject(const QString &path);
     bool saveDocument(CodeEditor *doc);
+    void openProject(const QString &path);
     const QString& getCurrentProjectPath()const;
     void closeCurrentProject();
     void openDocument(const QString &fileName, bool load = false);

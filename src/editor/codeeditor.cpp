@@ -131,9 +131,10 @@ void CodeEditor::setIdeType(const QString &ideType)
 {
     mConfigParam.setIdeType(ideType);
     setTextColors();
+    runHighlighterWithDefinition(this);
 }
 
-void CodeEditor::runHighlighterWithDefinition(CodeEditor *sourceDocument)
+void CodeEditor::runHighlighterWithDefinition(CodeEditor *sourceDocument)// this is Sasha's code
 {
     auto cursor = sourceDocument->textCursor();
     cursor.movePosition(QTextCursor::Start);
@@ -141,7 +142,7 @@ void CodeEditor::runHighlighterWithDefinition(CodeEditor *sourceDocument)
     int linescount = 1;
     cursor.movePosition(QTextCursor::EndOfLine);
     constexpr int cFive = 5;
-    while(linescount < sourceDocument->mLinesCount + cFive)
+    while (linescount < sourceDocument->mLinesCount + cFive)
     {
         cursor.insertText(" ");
         cursor.movePosition(QTextCursor::Left);
@@ -369,22 +370,20 @@ void CodeEditor::undo()
 {
     QString text = QString::fromStdString(this->mChangeManager.undo());
     this->document()->setPlainText(text);
-
+    emit handleLineChange(0);
     QTextCursor cursor(this->document());
     cursor.setPosition(mChangeManager.getCursorPosPrev());
     this->setTextCursor(cursor);
-    emit handleLineChange(0);
 }
 
 void CodeEditor::redo()
 {
     QString text = QString::fromStdString(this->mChangeManager.redo());
     this->document()->setPlainText(text);
-
+    emit handleLineChange(0);
     QTextCursor cursor(this->document());
     cursor.setPosition(mChangeManager.getCursorPosNext());
     this->setTextCursor(cursor);
-    emit handleLineChange(0);
 }
 
 bool CodeEditor::isChanged()

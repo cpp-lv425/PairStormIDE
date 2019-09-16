@@ -17,6 +17,7 @@ const int TOP_UNUSED_PIXELS_HEIGHT = 4;
 #include<QSettings>
 #include<QApplication>
 #include<QPlainTextEdit>
+#include<documentmanager.h>
 #include<QObject>
 #include<QMouseEvent>
 #include<QLabel>
