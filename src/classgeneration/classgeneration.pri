@@ -13,6 +13,3 @@ SOURCES += \
 
 FORMS += \
     $$PWD/classgenerator.ui
-
-RESOURCES += \
-    $$PWD/img.qrc

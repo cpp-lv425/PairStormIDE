@@ -11,7 +11,8 @@
 #include <QStyle>
 #include <QFile>
 
-//#include "DownloaderGui.h"
+#include "consolewindow/consolewindow.h"
+#include "compiler/compilercontroler.h"
 #include "localconnectorgenerator.h"
 #include "settingsconfigurator.h"
 #include "paletteconfigurator.h"
@@ -23,6 +24,7 @@
 #include "classgenerator.h"
 #include "chatwindowdock.h"
 #include "newfilewizard.h"
+#include "sqliteaccess.h"
 #include "usermessages.h"
 #include "startmanager.h"
 #include "logindialog.h"
@@ -32,16 +34,13 @@
 #include "storeconf.h"
 #include "startpage.h"
 #include "utils.h"
-#include "sqliteaccess.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent), mIsFinished {false},
     ui(new Ui::MainWindow),
-    // create instance of Document Manager
-    mpDocumentManager(new DocumentManager),
     // initializing palette configurator with current palette
-    mpPaletteConfigurator(new PaletteConfigurator(palette())),
-    dbFileManager(new FileDb)
+    mPaletteConfigurator(new PaletteConfigurator(palette())),
+    mpdbFileManager(new FileDb)
 {
     // Generate default local network connector
     mplocalConnector =
@@ -52,8 +51,14 @@ MainWindow::MainWindow(QWidget *parent) :
             this,
             &MainWindow::onConnectionStatusChanged,
             Qt::UniqueConnection);
-
+    mpDocumentManager = new DocumentManager;
+    connect(mpDocumentManager, &DocumentManager::projectPathWasChanged,
+            this, &MainWindow::reSendProjectPathChanged);
     ui->setupUi(this);
+
+    mpCompilerControler = new CompilerControler;
+    connect(this, &MainWindow::projectPathWasChanged,
+            mpCompilerControler, &CompilerControler::setProjectPath);
 
     // when first started main window is maximized
     setWindowState(Qt::WindowMaximized);
@@ -197,10 +202,6 @@ void MainWindow::setupMainMenu()
     pConnectAction->setIcon(QIcon(":/img/DISCONNECTED.png"));
     toolsMenu->addSeparator();
 
-    // buidling solution
-    QMenu *buildSubMenu = new QMenu("&Build");
-    QAction *pBuildActoin = toolsMenu->addMenu(buildSubMenu);
-    pBuildActoin->setDisabled(true);
 
     // debugging program
     QMenu *debugSubMenu = new QMenu("&Debug");
@@ -229,12 +230,25 @@ void MainWindow::setupMainMenu()
     helpMenu->addSeparator();
 
     // opening reference window
-    QAction *pReferenceAction = helpMenu->addAction("&Reference Assistant...", this, &MainWindow::onReferenceTriggered, Qt::CTRL + Qt::Key_F1);
+    QAction *pReferenceAction = helpMenu->addAction("&Reference Assistant...",
+                                                    this, &MainWindow::onReferenceTriggered, Qt::CTRL + Qt::Key_F1);
     pReferenceAction->setIcon(QIcon(":/img/REFERENCEASSISTANT.png"));
     pToolbar->addAction(pReferenceAction);
 
+    // buidling solution
+    QAction *pBuildAction = toolsMenu->addAction("&Build", this, &MainWindow::onBuildTriggered, Qt::CTRL + Qt::Key_B);
+    pBuildAction->setIcon(QIcon(":/img/BUILD.png"));
+    pToolbar->addAction(pBuildAction);
+
+    // buidling solution
+    QAction *pRunAction = toolsMenu->addAction("&Run", this, &MainWindow::onRunTriggered, Qt::CTRL + Qt::Key_R);
+    pRunAction->setIcon(QIcon(":/img/RUN.png"));
+    pToolbar->addAction(pRunAction);
+
+
     // user guide
-    QAction *pUserGuideActoin = helpMenu->addAction("User &Guide...", this, &MainWindow::onUserGuideTriggered, Qt::Key_F1);
+    QAction *pUserGuideActoin = helpMenu->addAction("User &Guide...",
+                                                    this, &MainWindow::onUserGuideTriggered, Qt::Key_F1);
     pUserGuideActoin->setDisabled(true);
     helpMenu->addSeparator();
 
@@ -321,8 +335,12 @@ void MainWindow::createButtomPanel()
 {
     // create instance of Bottom Panel
     mpBottomPanelDock = new BottomPanelDock(this);
+    mpCompilerControler->setConsoleProvider(mpBottomPanelDock->getPTerminalConsole()->getConsoleServiceProvider());
     mpBottomPanelDock->setObjectName("mpBottomPanelDock");
     addDockWidget(Qt::BottomDockWidgetArea, mpBottomPanelDock);
+    connect(this, &MainWindow::projectPathWasChanged, mpBottomPanelDock, &BottomPanelDock::reSendProjectPathChanged);
+    connect(mpBottomPanelDock, &BottomPanelDock::programIsReadyToCompile,
+            mpCompilerControler, &CompilerControler::runCompilation);
 }
 
 void MainWindow::onNewFileTriggered()
@@ -350,7 +368,7 @@ void MainWindow::onNewFileTriggered()
         // name of newly created file is received
         newFileName = newFileDialog.start();
         File newfile(newFileName);
-        dbFileManager->addFileToDb(newfile);
+        mpdbFileManager->addFileToDb(newfile);
     }
     catch (const QException&)
     {
@@ -447,14 +465,6 @@ void MainWindow::onOpenProjectTriggered()
             (this,
              userMessages[UserMessages::OpenDirectoryTitle],
             QDir::homePath());
-
-   /* Connection *db = ConnectionGetter::getDefaultConnection("C:/Users/Petro/Desktop/storage.db");
-    CreateDB database;
-    database.addTableFile();
-    database.addTableUser();
-    database.addTableComment();
-    database.addTableMessage();*/
-
 
     // check if project exists
     if (!FileManager().projectExists(dirName))
@@ -785,6 +795,22 @@ void MainWindow::onSettingsTriggered()
     Q_UNUSED(menuOptions)
 }
 
+void MainWindow::onBuildTriggered()
+{
+    if (!mpDocumentManager || !mpDocumentManager->projectOpened())
+    {
+        return;
+    }
+    mpDocumentManager->saveAllDocuments();
+    mpBottomPanelDock->reSendProgramIsReadyToCompile();
+    mpBottomPanelDock->setCompileAsCurrentTab();
+}
+
+void MainWindow::onRunTriggered()
+{
+    mpBottomPanelDock->reSendProgramIsReadyToRun();
+}
+
 void MainWindow::onAboutTriggered()
 {
     QString info = "This application has been "
@@ -865,6 +891,11 @@ void MainWindow::openCreatedClassFiles(QString headerFile, QString sourceFile)
 {
     openDocument(headerFile);
     openDocument(sourceFile);
+}
+
+void MainWindow::reSendProjectPathChanged(QString str)
+{
+   emit projectPathWasChanged(str);
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
@@ -975,7 +1006,7 @@ void MainWindow::setInitialAppStyle()
 void MainWindow::setAppStyle(const QString &styleName)
 {
     // dark style palette is created & set globally
-    QPalette palette = mpPaletteConfigurator->getPalette(styleName);
+    QPalette palette = mPaletteConfigurator->getPalette(styleName);
 
     qApp->setPalette(palette);
 
@@ -1051,8 +1082,7 @@ void MainWindow::onNewProjectTriggered()
 
 void MainWindow::databaseConnect(QString directory)
 {
-    db = ConnectionGetter::getDefaultConnection(directory + "/storage.db");
-    qDebug()<<"on databaseConnect function";
+    mpdb = ConnectionGetter::getDefaultConnection(directory + "/storage.db");
     CreateDB database;
     database.addTableFile();
     database.addTableUser();
@@ -1062,5 +1092,5 @@ void MainWindow::databaseConnect(QString directory)
 
 void MainWindow::databaseDisconnect()
 {
-    delete db;
+    delete mpdb;
 }

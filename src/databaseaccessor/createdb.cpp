@@ -1,5 +1,4 @@
 #include "createdb.h"
-#include <QDebug>
 
 CreateDB::CreateDB(): Accessor ()
 {
