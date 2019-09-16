@@ -39,7 +39,7 @@ public:
 
     bool mIsFinished;
 private:
-    LocalConnectorInterface *mplocalConnector;
+    LocalConnectorInterface *mpLocalConnector;
     Ui::MainWindow *ui;
     ProjectViewerDock *mpProjectViewerDock;
     ChatWindowDock *mpChatWindowDock;

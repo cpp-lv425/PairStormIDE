@@ -43,10 +43,10 @@ MainWindow::MainWindow(QWidget *parent) :
     dbFileManager(new FileDb)
 {
     // Generate default local network connector
-    mplocalConnector =
+    mpLocalConnector =
             LocalConnectorGenerator::getDefaultConnector();
     // And output its state in case of changes
-    connect(mplocalConnector,
+    connect(mpLocalConnector,
             &LocalConnectorInterface::serviceStatusChanged,
             this,
             &MainWindow::onConnectionStatusChanged,
@@ -309,24 +309,24 @@ void MainWindow::createChatWindow()
     mpChatWindowDock = new ChatWindowDock(this);
 
     // Add updating users list on discovering new users and connecting new users
-    connect(mplocalConnector, &LocalConnectorInterface::onlineUsersUpdated,
+    connect(mpLocalConnector, &LocalConnectorInterface::onlineUsersUpdated,
             mpChatWindowDock, &ChatWindowDock::updateOnlineUsersOnChange,
             Qt::UniqueConnection);
-    connect(mplocalConnector, &LocalConnectorInterface::connectedUsersUpdated,
+    connect(mpLocalConnector, &LocalConnectorInterface::connectedUsersUpdated,
             mpChatWindowDock, &ChatWindowDock::updateConnectedUsersOnChange,
             Qt::UniqueConnection);
     // Allow start sharing and stop sharing on user input
     connect(mpChatWindowDock, &ChatWindowDock::startSharingWithUser,
-            mplocalConnector, &LocalConnectorInterface::startSharing,
+            mpLocalConnector, &LocalConnectorInterface::startSharing,
             Qt::UniqueConnection);
     connect(mpChatWindowDock, &ChatWindowDock::stopSharingWithUser,
-            mplocalConnector, &LocalConnectorInterface::stopSharing,
+            mpLocalConnector, &LocalConnectorInterface::stopSharing,
             Qt::UniqueConnection);
     // Allow sending and displaying messages
     connect(mpChatWindowDock, &ChatWindowDock::shareMessage,
-            mplocalConnector, &LocalConnectorInterface::shareMessage,
+            mpLocalConnector, &LocalConnectorInterface::shareMessage,
             Qt::UniqueConnection);
-    connect(mplocalConnector, &LocalConnectorInterface::messageReceived,
+    connect(mpLocalConnector, &LocalConnectorInterface::messageReceived,
             mpChatWindowDock, &ChatWindowDock::pushMessageToChat,
             Qt::UniqueConnection);
 
@@ -492,7 +492,7 @@ void MainWindow::onOpenProjectTriggered()
         if (currentUserName != QString("unnamed"))
         {
             mpChatWindowDock->setUserName(currentUserName);
-            mplocalConnector->configureOnLogin(currentUserName);
+            mpLocalConnector->configureOnLogin(currentUserName);
             QSettings savedSettings(QApplication::organizationName(), QApplication::applicationName());
             QString styleName = {savedSettings.contains("style") ?
                                  savedSettings.value("style").toString()
@@ -782,7 +782,7 @@ void MainWindow::onConnectTriggered()
         return;
     }
     mpChatWindowDock->setUserName(userInput);
-    mplocalConnector->configureOnLogin(userInput);
+    mpLocalConnector->configureOnLogin(userInput);
     QSettings savedSettings(QApplication::organizationName(), QApplication::applicationName());
     QString styleName = {savedSettings.contains("style") ?
                          savedSettings.value("style").toString()
