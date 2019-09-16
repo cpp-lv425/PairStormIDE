@@ -1,5 +1,5 @@
 #include "connection.h"
-#include <QDebug>
+
 
 Connection::Connection()
 {

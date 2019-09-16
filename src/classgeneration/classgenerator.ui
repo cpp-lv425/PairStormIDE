@@ -137,16 +137,28 @@
      <item>
       <widget class="QLabel" name="label_5">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
+        <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+         <horstretch>106</horstretch>
+         <verstretch>200</verstretch>
         </sizepolicy>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>280</width>
+         <height>300</height>
+        </size>
        </property>
        <property name="text">
         <string/>
        </property>
        <property name="pixmap">
-        <pixmap resource="../editor/editoricons.qrc">:/img/comment.ico</pixmap>
+        <pixmap resource="../globalresources.qrc">:/img/NEWCLASS.png</pixmap>
+       </property>
+       <property name="scaledContents">
+        <bool>true</bool>
+       </property>
+       <property name="wordWrap">
+        <bool>false</bool>
        </property>
       </widget>
      </item>
@@ -155,7 +167,7 @@
   </layout>
  </widget>
  <resources>
-  <include location="../editor/editoricons.qrc"/>
+  <include location="../globalresources.qrc"/>
  </resources>
  <connections/>
 </ui>

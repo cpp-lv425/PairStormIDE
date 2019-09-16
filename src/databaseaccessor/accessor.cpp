@@ -1,6 +1,7 @@
 #include "accessor.h"
 #include <QDebug>
 #include <QSqlError>
+
 Accessor::Accessor()
 {
     database = ConnectionGetter::getDefaultConnection();

@@ -9,6 +9,7 @@
 #include<QTextCursor>
 #include<QPainter>
 #include<QTextCharFormat>
+#include <QCompleter>
 #include<QFontDatabase>
 #include<QScrollBar>
 #include<QLineEdit>
@@ -16,8 +17,11 @@
 #include<iostream>
 #include<QLabel>
 #include"classgenerator.h"
+#include "autocodecompleter.h"
 #include"methodspartsdefinitiongetters.h"
+#include "compiler/compilercontroler.h"
 #include"classgenerationliterals.h"
+#include "documentmanager.h"
 #include<QMenu>
 #include <QVector>
 
@@ -27,7 +31,7 @@ CodeEditor::CodeEditor(QWidget *parent, const QString &fileName) : QPlainTextEdi
     setLineWrapMode(QPlainTextEdit::NoWrap);// don't move cursor to the next line where it's out of visible scope
     this->setVerticalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAlwaysOn);
     this->setTabStopDistance(TAB_SPACE * fontMetrics().width(QLatin1Char('0')));//set tab distance
-    mCurrentZoom = 100;//in persents    
+    mCurrentZoom = 100;//in persents
     mLinesCount = 1;
     mCode = document()->toPlainText();
     mCodeSize = 1;
@@ -42,26 +46,20 @@ CodeEditor::CodeEditor(QWidget *parent, const QString &fileName) : QPlainTextEdi
 
     //create objects connected to codeEditor
     mLineNumberArea = new LineNumberArea(this);
-    mTimer = new QTimer;
-    mLcpp = new LexerCPP();
-    mTimer = new QTimer;
     QVector<Token> firstLine;
     mTokensList.append(firstLine);
-    mChangeManager = new ChangeManager(this->toPlainText().toUtf8().constData());
-    //comment button
+    mChangeManager = ChangeManager(this->toPlainText().toUtf8().constData());
+
     mAddCommentButton = new AddCommentButton(this);
     mAddCommentButton->setText("+");
     mAddCommentButton->setVisible(false);
-    mCurrentCommentLable = new QLabel(this);
+    mCurrentCommentLable.setParent(this);
     setMouseTracking(true);
 
-    //widget that shows the comment to each line
-    mCommentWidget = new CommentWidget;
-    mCommentWidget->setVisible(false);
+    mCommentWidget.setVisible(false);
 
-    commentGetter = new CommentDb;
 
-    mStartComments = commentGetter->getAllCommentsFromFile(getFileName());
+    mStartComments = commentGetter.getAllCommentsFromFile(getFileName());
     readAllCommentsFromDB(mStartComments);
 
 
@@ -74,14 +72,14 @@ CodeEditor::CodeEditor(QWidget *parent, const QString &fileName) : QPlainTextEdi
     connect(this,                         &CodeEditor::textChangedInLine,                  this, &CodeEditor::handleLineChange);
     connect(this,                         &CodeEditor::runHighlighter,                     this, &CodeEditor::highlightText);
     connect(this,                         &QPlainTextEdit::updateRequest,                  this, &CodeEditor::updateLineNumberArea);
-    connect(mTimer,                       &QTimer::timeout,                                this, &CodeEditor::saveStateInTheHistory);
+    connect(&mTimer,                       &QTimer::timeout,                                this, &CodeEditor::saveStateInTheHistory);
     connect(mAddCommentButton,            &AddCommentButton::addCommentButtonPressed,      this, &CodeEditor::showCommentTextEdit);
-    connect(mCommentWidget->getEditTab(), &AddCommentTextEdit::emptyCommentWasSent,        this, &CodeEditor::emptyCommentWasAdded);
-    connect(mCommentWidget->getEditTab(), &AddCommentTextEdit::notEmptyCommentWasSent,     this, &CodeEditor::notEmptyCommentWasAdded);
-    connect(mCommentWidget->getEditTab(), &AddCommentTextEdit::commentWasDeleted,          this, &CodeEditor::deleteComment);
+    connect(mCommentWidget.getEditTab(), &AddCommentTextEdit::emptyCommentWasSent,        this, &CodeEditor::emptyCommentWasAdded);
+    connect(mCommentWidget.getEditTab(), &AddCommentTextEdit::notEmptyCommentWasSent,     this, &CodeEditor::notEmptyCommentWasAdded);
+    connect(mCommentWidget.getEditTab(), &AddCommentTextEdit::commentWasDeleted,          this, &CodeEditor::deleteComment);
     connect(this,                         &CodeEditor::linesCountUpdated,                  this, &CodeEditor::changeCommentButtonsState);
 
-    mTimer->start(CHANGE_SAVE_TIME);//save text by this time
+    mTimer.start(CHANGE_SAVE_TIME);//save text by this time
     mLinesCountCurrent = 1;
     mLinesCountPrev = 1;
 
@@ -113,8 +111,9 @@ CodeEditor::CodeEditor(QWidget *parent, const QString &fileName) : QPlainTextEdi
 
 CodeEditor::~CodeEditor()
 {
-    commentGetter->deleteCommentsFromDb(getFileName());
-    commentGetter->addCommentsToDb(getAllCommentsToDB());
+    commentGetter.deleteCommentsFromDb(getFileName());
+    commentGetter.addCommentsToDb(getAllCommentsToDB());
+    delete mCompleter;
 }
 
 void CodeEditor::setTextColors()
@@ -181,7 +180,7 @@ QVector<Comment> CodeEditor::getStartComments() const
     return mStartComments;
 }
 
-CommentDb *CodeEditor::getCommentGetter() const
+CommentDb CodeEditor::getCommentGetter() const
 {
     return commentGetter;
 }
@@ -207,7 +206,7 @@ void CodeEditor::setFontSize(const QString &fontSize)
 }
 
 void CodeEditor::setFontStyle(const QString &fontStyle)
-{    
+{
     mConfigParam.setFontStyle(fontStyle);
     mFont.setFamily(mConfigParam.mFontStyle);
     this->setFont(mFont);
@@ -255,14 +254,14 @@ void CodeEditor::handleLinesAddition(int changeStart, int lastLineWithChange, in
     for (auto i = changeStart; i <= lastLineWithChange; ++i)
     {
         changedCode = document()->findBlockByLineNumber(i).text();
-        mLcpp->lexicalAnalysis(changedCode);
+        mLcpp.lexicalAnalysis(changedCode);
         if (lineDifference)
         {
-            mTokensList.insert(i, mLcpp->getTokens());
+            mTokensList.insert(i, mLcpp.getTokens());
         }
         else
         {
-            mTokensList[i] = mLcpp->getTokens();
+            mTokensList[i] = mLcpp.getTokens();
         }
     }
 }
@@ -273,9 +272,9 @@ void CodeEditor::handleLinesDelition(int lastLineWithChange, int lineDifference)
     lineDifference = -lineDifference;
     changedCode = document()->findBlockByLineNumber(lastLineWithChange).text();
 
-    mLcpp->lexicalAnalysis(changedCode);
+    mLcpp.lexicalAnalysis(changedCode);
     mHighlightingStart = lastLineWithChange;
-    mTokensList[lastLineWithChange] = mLcpp->getTokens();
+    mTokensList[lastLineWithChange] = mLcpp.getTokens();
 
     for (auto i = lastLineWithChange + 1; i < lastLineWithChange + lineDifference + 1; ++i)
     {
@@ -297,15 +296,16 @@ void CodeEditor::getNamesOfIdentifiers()
 
 void CodeEditor::handleLineChange(int lastLineWithChange)
 {
-    mLcpp->clear();
+    mLcpp.clear();
 
     int changeStart = lastLineWithChange;
 
     int currentLinesCount = document()->lineCount();
     int lineDifference = currentLinesCount - mLinesCount;
+
     mLinesCount = currentLinesCount;
 
-    if (!mLcpp->isLexerWasRunning())
+    if (!mLcpp.isLexerWasRunning())
     {
         lastLineWithChange += lineDifference;
     }
@@ -351,24 +351,24 @@ std::pair<const QString&, const QString&> CodeEditor::getChangedFileInfo()
 
 void CodeEditor::undo()
 {
-    QString text = QString::fromStdString(this->mChangeManager->undo());
+    QString text = QString::fromStdString(this->mChangeManager.undo());
     this->document()->setPlainText(text);
 
     QTextCursor cursor(this->document());
-    cursor.setPosition(mChangeManager->getCursorPosPrev());
-
+    cursor.setPosition(mChangeManager.getCursorPosPrev());
     this->setTextCursor(cursor);
+    emit handleLineChange(0);
 }
 
 void CodeEditor::redo()
 {
-    QString text = QString::fromStdString(this->mChangeManager->redo());
+    QString text = QString::fromStdString(this->mChangeManager.redo());
     this->document()->setPlainText(text);
 
     QTextCursor cursor(this->document());
-    cursor.setPosition(mChangeManager->getCursorPosNext());
-
+    cursor.setPosition(mChangeManager.getCursorPosNext());
     this->setTextCursor(cursor);
+    emit handleLineChange(0);
 }
 
 bool CodeEditor::isChanged()
@@ -406,6 +406,7 @@ void CodeEditor::updateLineNumberArea(const QRect &rect, const int dy)// rectang
     if (dy)// when not all of the text is in the visible area (we scrolled it)
     {
         mLineNumberArea->scroll(0, dy);// we should scroll lines numbers in following direction
+        emit runHighlighter();
     }
     else
     {
@@ -426,7 +427,7 @@ void CodeEditor::resizeEvent(QResizeEvent *e)
 
 void CodeEditor::specialAreasRepaintEvent(QPaintEvent *event)
 {
-    QPainter painter(mLineNumberArea);
+    QPainter painter (mLineNumberArea);
     painter.fillRect(event->rect(), mConfigParam.textColors.mLineCounterAreaColor);
 
     QTextBlock block = firstVisibleBlock();//area of first numeration block from linecounter
@@ -473,7 +474,7 @@ void CodeEditor::repaintButtonsArea(const int bottom, const int top, const int b
 void CodeEditor::saveStateInTheHistory()
 {
     std::string newFileState = this->toPlainText().toUtf8().constData();
-    mChangeManager->writeChange(newFileState);
+    mChangeManager.writeChange(newFileState);
 }
 
 void CodeEditor::zoom(const int val)
@@ -517,16 +518,16 @@ void CodeEditor::setNewAddedButtonSettings(AddCommentButton *commentButton)
     if (mStartComments.size())//if this is first comments set from DB
     {
         //in this case we already have comment in the button field, so we should read the data from it
-        mCommentWidget->getEditTab()->setText(commentButton->getCommentString());
+        mCommentWidget.getEditTab()->setText(commentButton->getCommentString());
     }
     else
     {
         //if we add comment from commentwidget ui
-        commentButton->setCommentString(mCommentWidget->getEditTab()->getText());
+        commentButton->setCommentString(mCommentWidget.getEditTab()->getText());
     }
-    mCommentWidget->setViewText(1);//set text to view. because it doens't set automiticaly when we do it to the edit
-    commentButton->setToolTip(mCommentWidget->getViewTab()->getText());
-    mCommentWidget->setVisible(false);
+    mCommentWidget.setViewText(1);//set text to view. because it doens't set automiticaly when we do it to the edit
+    commentButton->setToolTip(mCommentWidget.getViewTab()->getText());
+    mCommentWidget.setVisible(false);
 }
 
 CodeEditor* CodeEditor::getOpenedDocument(const QString &fileName)
@@ -569,30 +570,30 @@ QVector<Comment> CodeEditor::getAllCommentsToDB()
 
 void CodeEditor::showCommentTextEdit(int line)
 {
-    mCommentWidget->setPosition(this, mAddCommentButton);
-    mCommentWidget->setVisible(true);
-    mCommentWidget->setCommentButtonGeometry(mAddCommentButton->geometry());
-    mCommentWidget->setCommentLine(line);
+    mCommentWidget.setPosition(this, mAddCommentButton);
+    mCommentWidget.setVisible(true);
+    mCommentWidget.setCommentButtonGeometry(mAddCommentButton->geometry());
+    mCommentWidget.setCommentLine(line);
 
     QString userName;
     auto commentButton = getCommentButtonByIndex(line);
     if (commentButton)//if comment button by passed in the parametr line which exists
     {
-        mCommentWidget->getEditTab()->setText(commentButton->getCommentString());//set text from this button text
+        mCommentWidget.getEditTab()->setText(commentButton->getCommentString());//set text from this button text
         userName = commentButton->getUser();
     }
     else
     {
-        mCommentWidget->getEditTab()->setText("");
+        mCommentWidget.getEditTab()->setText("");
         userName = settings.value("UserName").toString();
     }
-    mCommentWidget->setWindowTitle("Comment to " + QString::number(line) + " line by " + userName);
+    mCommentWidget.setWindowTitle("Comment to " + QString::number(line) + " line by " + userName);
 }
 
 void CodeEditor::emptyCommentWasAdded()
 {
-    mCommentWidget->setVisible(false);
-    auto commentButton = getCommentButtonByIndex(mCommentWidget->getCommentLine());
+    mCommentWidget.setVisible(false);
+    auto commentButton = getCommentButtonByIndex(mCommentWidget.getCommentLine());
     if (commentButton)
     {
         removeButtomByValue(mCommentsVector, commentButton);
@@ -601,28 +602,28 @@ void CodeEditor::emptyCommentWasAdded()
 
 void CodeEditor::notEmptyCommentWasAdded()
 {
-    if (commentButtonExists(mCommentWidget->getCommentLine()))//if button was existing, just reset text
+    if (commentButtonExists(mCommentWidget.getCommentLine()))//if button was existing, just reset text
     {
-        auto commentButon = getCommentButtonByIndex(mCommentWidget->getCommentLine());
+        auto commentButon = getCommentButtonByIndex(mCommentWidget.getCommentLine());
         commentButon->setUser(settings.value("UserName").toString());
         setNewAddedButtonSettings(commentButon);
     }
     else
     {
-        addButton(mCommentWidget->getCommentLine(),
-                  mCommentWidget->getEditTab()->getText(),
+        addButton(mCommentWidget.getCommentLine(),
+                  mCommentWidget.getEditTab()->getText(),
                   settings.value("UserName").toString());// create new button
     }
 }
 
 void CodeEditor::deleteComment()
 {
-    auto commentButon = getCommentButtonByIndex(mCommentWidget->getCommentLine());
+    auto commentButon = getCommentButtonByIndex(mCommentWidget.getCommentLine());
     if (commentButon)
     {
         removeButtomByValue(mCommentsVector, commentButon);
     }
-    mCommentWidget->setVisible(false);
+    mCommentWidget.setVisible(false);
 }
 
 void CodeEditor::changeCommentButtonsState()
@@ -696,7 +697,7 @@ bool CodeEditor::isInRangeIncludLast(const int val, const int leftMargin, const 
 void CodeEditor::addButton(const int line, const QString &comment, const QString &userName)
 {
     AddCommentButton *commentButtonNew = new AddCommentButton(this);
-    commentButtonNew->setGeometry(mCommentWidget->getCommentButtonGeometry());
+    commentButtonNew->setGeometry(mCommentWidget.getCommentButtonGeometry());
     commentButtonNew->setCurrentLine(line);
     commentButtonNew->setCommentString(comment);
     commentButtonNew->setUser(userName);
@@ -803,16 +804,16 @@ void CodeEditor::mouseMoveEvent(QMouseEvent *event)
                                                                                   commentBottonYpos + TOP_UNUSED_PIXELS_HEIGHT , side, side);
                 mAddCommentButton->setVisible(true);
                 //label for line showing
-                mCurrentCommentLable->setGeometry(mAddCommentButton->x() - getLineNumberAreaWidth(), mAddCommentButton->y(),
+                mCurrentCommentLable.setGeometry(mAddCommentButton->x() - getLineNumberAreaWidth(), mAddCommentButton->y(),
                                                   getLineNumberAreaWidth(), mAddCommentButton->height());
-                mCurrentCommentLable->setText(QString::number(mAddCommentButton->getCurrentLine()));
-                mCurrentCommentLable->setVisible(true);
+                mCurrentCommentLable.setText(QString::number(mAddCommentButton->getCurrentLine()));
+                mCurrentCommentLable.setVisible(true);
             }
         }
         else
         {
             mAddCommentButton->setVisible(false);
-            mCurrentCommentLable->setVisible(false);
+            mCurrentCommentLable.setVisible(false);
         }
     }
     QPlainTextEdit::mouseMoveEvent(event);

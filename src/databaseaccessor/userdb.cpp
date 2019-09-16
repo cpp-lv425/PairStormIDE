@@ -1,4 +1,5 @@
 #include "userdb.h"
+
 UserDb::UserDb(): Accessor()
 {
 }
