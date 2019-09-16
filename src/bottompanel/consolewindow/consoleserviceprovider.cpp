@@ -23,6 +23,10 @@ void ConsoleServiceProvider::setStdOutput()
     {
         emit messageAboutErrorsAfterCompilation(errors);
     }
+    else
+    {
+        emit messageAboutNoErrorsAfterCompilation();
+    }
     if (QSysInfo::productType() == windowsProductType)// if it's windows' console
     {
         QTextCodec *codec = QTextCodec::codecForName(codecStandart);

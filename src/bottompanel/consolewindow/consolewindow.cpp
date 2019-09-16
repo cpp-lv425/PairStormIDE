@@ -24,6 +24,9 @@ ConsoleWindow::ConsoleWindow(QWidget *parent) :
 
     connect(mpConsoleServiceProvider, &ConsoleServiceProvider::messageAboutErrorsAfterCompilation,
             this, &ConsoleWindow::reSendErrors);
+
+    connect(mpConsoleServiceProvider, &ConsoleServiceProvider::messageAboutNoErrorsAfterCompilation,
+            this, &ConsoleWindow::reSendSuccess);
 }
 
 ConsoleWindow::~ConsoleWindow()
@@ -44,6 +47,11 @@ void ConsoleWindow::setProjectPath(QString path)
 void ConsoleWindow::reSendErrors(QString string)
 {
     emit errorsAreOccuredAfterCompilation(string);
+}
+
+void ConsoleWindow::reSendSuccess()
+{
+    emit messageAboutNoErrorsAfterCompilation();
 }
 
 void ConsoleWindow::runExecutableFile()

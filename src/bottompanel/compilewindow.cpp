@@ -3,6 +3,7 @@
 #include "compiler/compilercontroler.h"
 #include <QGridLayout>
 #include <QListWidgetItem>
+#include <QDebug>
 
 CompileWindow::CompileWindow(QWidget *parent) :
     QWidget(parent),
@@ -22,9 +23,8 @@ CompileWindow::~CompileWindow()
     delete ui;
 }
 
-void CompileWindow::setCompileOutput(QString text)
+void CompileWindow::setCompileErrorsOutput(QString text)
 {
-    mpCompileOutputList->clear();
     auto allErrorslist = getAllErrorsFromCompileOutput(text);
     for (auto error : allErrorslist)
     {
@@ -37,6 +37,15 @@ void CompileWindow::setCompileOutput(QString text)
         {
            errorItem->setForeground(Qt::red);//if its error
         }
+        mpCompileOutputList->addItem(errorItem);
+    }
+}
+
+void CompileWindow::setCompileSuccessOutput()
+{
+    if (!mpCompileOutputList->count())
+    {
+        auto *errorItem = new QListWidgetItem("The build went without any errors and warnings!");
         mpCompileOutputList->addItem(errorItem);
     }
 }

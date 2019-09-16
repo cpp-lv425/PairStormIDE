@@ -20,6 +20,7 @@ signals:
     void processIsReadyToReadStandartOutput(QString);
     void appendedTextIsReadyToSet(QString);
     void messageAboutErrorsAfterCompilation(QString);
+    void messageAboutNoErrorsAfterCompilation();
 public slots:
     void runConsoleCommand(QString command);
     void setWorkingDirectory(QString);

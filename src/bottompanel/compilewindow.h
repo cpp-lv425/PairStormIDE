@@ -21,7 +21,8 @@ public:
 signals:
     void programIsReadyToCompile();
 public slots:
-    void setCompileOutput(QString);
+    void setCompileErrorsOutput(QString);
+    void setCompileSuccessOutput();
     void clearCompileOutputView();
 private:
     QStringList getAllErrorsFromCompileOutput(const QString &compileErrorsOutput);
