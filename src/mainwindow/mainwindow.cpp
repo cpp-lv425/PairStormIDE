@@ -41,10 +41,10 @@ MainWindow::MainWindow(QWidget *parent) :
     mpdbFileManager(new FileDb)
 {
     // Generate default local network connector
-    mplocalConnector =
+    mpLocalConnector =
             LocalConnectorGenerator::getDefaultConnector();
     // And output its state in case of changes
-    connect(mplocalConnector,
+    connect(mpLocalConnector,
             &LocalConnectorInterface::serviceStatusChanged,
             this,
             &MainWindow::onConnectionStatusChanged,
@@ -53,10 +53,6 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(mpDocumentManager, &DocumentManager::projectPathWasChanged,
             this, &MainWindow::reSendProjectPathChanged);
     ui->setupUi(this);
-    {
-        StoreConf conf;
-        conf.restoreConFile();
-    }
 
     mpCompilerControler = new CompilerControler;
     connect(this, &MainWindow::projectPathWasChanged,
@@ -232,6 +228,12 @@ void MainWindow::setupMainMenu()
     helpMenu->addAction("&About...", this, &MainWindow::onAboutTriggered);
     helpMenu->addSeparator();
 
+    // opening reference window
+    QAction *pReferenceAction = helpMenu->addAction("&Reference Assistant...", this, &MainWindow::onReferenceTriggered, Qt::CTRL + Qt::Key_F1);
+    pReferenceAction->setIcon(QIcon(":/img/REFERENCEASSISTANT.png"));
+    pToolbar->addAction(pReferenceAction);
+
+
     // buidling solution
     QAction *pBuildAction = toolsMenu->addAction("&Build", this, &MainWindow::onBuildTriggered, Qt::CTRL + Qt::Key_B);
     pBuildAction->setIcon(QIcon(":/img/BUILD.png"));
@@ -302,24 +304,24 @@ void MainWindow::createChatWindow()
     mpChatWindowDock = new ChatWindowDock(this);
 
     // Add updating users list on discovering new users and connecting new users
-    connect(mplocalConnector, &LocalConnectorInterface::onlineUsersUpdated,
+    connect(mpLocalConnector, &LocalConnectorInterface::onlineUsersUpdated,
             mpChatWindowDock, &ChatWindowDock::updateOnlineUsersOnChange,
             Qt::UniqueConnection);
-    connect(mplocalConnector, &LocalConnectorInterface::connectedUsersUpdated,
+    connect(mpLocalConnector, &LocalConnectorInterface::connectedUsersUpdated,
             mpChatWindowDock, &ChatWindowDock::updateConnectedUsersOnChange,
             Qt::UniqueConnection);
     // Allow start sharing and stop sharing on user input
     connect(mpChatWindowDock, &ChatWindowDock::startSharingWithUser,
-            mplocalConnector, &LocalConnectorInterface::startSharing,
+            mpLocalConnector, &LocalConnectorInterface::startSharing,
             Qt::UniqueConnection);
     connect(mpChatWindowDock, &ChatWindowDock::stopSharingWithUser,
-            mplocalConnector, &LocalConnectorInterface::stopSharing,
+            mpLocalConnector, &LocalConnectorInterface::stopSharing,
             Qt::UniqueConnection);
     // Allow sending and displaying messages
     connect(mpChatWindowDock, &ChatWindowDock::shareMessage,
-            mplocalConnector, &LocalConnectorInterface::shareMessage,
+            mpLocalConnector, &LocalConnectorInterface::shareMessage,
             Qt::UniqueConnection);
-    connect(mplocalConnector, &LocalConnectorInterface::messageReceived,
+    connect(mpLocalConnector, &LocalConnectorInterface::messageReceived,
             mpChatWindowDock, &ChatWindowDock::pushMessageToChat,
             Qt::UniqueConnection);
 
@@ -477,6 +479,23 @@ void MainWindow::onOpenProjectTriggered()
     restoreDatabaseFile();
     databaseConnect();
 
+    // Check if the user has been previously logged in
+    // Then update project-dependent stuff in the chat
+    QSettings settings;
+    if (settings.contains("userName"))
+    {
+        QString currentUserName = settings.value("userName").toString();
+        if (currentUserName != QString("unnamed"))
+        {
+            mpChatWindowDock->setUserName(currentUserName);
+            mpLocalConnector->configureOnLogin(currentUserName);
+            QSettings savedSettings(QApplication::organizationName(), QApplication::applicationName());
+            QString styleName = {savedSettings.contains("style") ?
+                                 savedSettings.value("style").toString()
+                                 : "WHITE"};
+            mpChatWindowDock->updateTheme(styleName);
+        }
+    }
 }
 
 void MainWindow::onCloseProjectTriggered()
@@ -735,6 +754,24 @@ void MainWindow::onRefactorTriggered()
 
 void MainWindow::onConnectTriggered()
 {
+    // Check if the project has been previously opened
+    // Don't allow user to log in if no project is present
+    if (!mpDocumentManager->projectOpened())
+    {
+        return;
+    }
+    // Check if the user has been previously logged in
+    // If so, don't allow user to log in again
+    QSettings settings;
+    if (settings.contains("userName"))
+    {
+        QString currentUserName = settings.value("userName").toString();
+        if (currentUserName != QString("unnamed"))
+        {
+            return;
+        }
+    }
+
     LoginDialog loginDialog(this);
     QString userInput = loginDialog.start();
     if (userInput.isEmpty())
@@ -742,7 +779,7 @@ void MainWindow::onConnectTriggered()
         return;
     }
     mpChatWindowDock->setUserName(userInput);
-    mplocalConnector->configureOnLogin(userInput);
+    mpLocalConnector->configureOnLogin(userInput);
     QSettings savedSettings(QApplication::organizationName(), QApplication::applicationName());
     QString styleName = {savedSettings.contains("style") ?
                          savedSettings.value("style").toString()
@@ -784,6 +821,12 @@ void MainWindow::onAboutTriggered()
     QMessageBox::about(this, "About PairStorm", info);
 }
 
+void MainWindow::onReferenceTriggered()
+{
+    // Reference Assistant module has been cut off, so just idle
+}
+
+
 void MainWindow::onUserGuideTriggered()
 {
     //
@@ -793,6 +836,12 @@ void MainWindow::onCheckUpdatesTriggered()
 {
     //
 }
+
+void MainWindow::onReferenceFromEditor(const QString &keyword)
+{
+    // Reference Assistant module has been cut off, so just idle
+}
+
 
 void MainWindow::onOpenFileFromProjectViewer(QString fileName)
 {
@@ -909,8 +958,15 @@ void MainWindow::closeEvent(QCloseEvent *event)
 MainWindow::~MainWindow()
 {
     saveMainWindowState();
-    StoreConf conf;
-    conf.saveConFile();
+
+    QSettings s;
+    if (s.contains("userName"))
+    {
+        QString name = s.value("userName").toString();
+        StoreConf conf(name);
+        conf.saveConFile();
+    }
+
 
     delete ui;
 }

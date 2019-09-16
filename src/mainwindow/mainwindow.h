@@ -38,12 +38,11 @@ public:
     ~MainWindow();
 
 private:
-    LocalConnectorInterface *mplocalConnector;
+    LocalConnectorInterface *mpLocalConnector;
     Ui::MainWindow *ui;
     ProjectViewerDock *mpProjectViewerDock;
     ChatWindowDock *mpChatWindowDock;
     BottomPanelDock *mpBottomPanelDock;
-    //QScopedPointer<DocumentManager> mpDocumentManager;
     Browser *mDocumentationBrowser;
     QScopedPointer<PaletteConfigurator> mpPaletteConfigurator;
     Connection *db;
@@ -116,8 +115,10 @@ private slots:
 
     // help menu
     void onAboutTriggered();
+    void onReferenceTriggered();
     void onUserGuideTriggered();
     void onCheckUpdatesTriggered();
+    void onReferenceFromEditor(const QString &keyword);
 
 public slots:
     void onOpenFileFromProjectViewer(QString fileName);
