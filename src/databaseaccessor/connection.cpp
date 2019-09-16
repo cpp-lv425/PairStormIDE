@@ -30,3 +30,8 @@ QString Connection::getPath()
     return mPath;
 }
 
+void Connection::close()
+{
+    mDb.close();
+}
+

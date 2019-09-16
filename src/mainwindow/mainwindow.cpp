@@ -10,7 +10,6 @@
 #include <QSplitter>
 #include <QStyle>
 #include <QFile>
-
 #include "consolewindow/consolewindow.h"
 #include "compiler/compilercontroler.h"
 #include "localconnectorgenerator.h"
@@ -26,7 +25,6 @@
 #include "newfilewizard.h"
 #include "sqliteaccess.h"
 #include "usermessages.h"
-#include "startmanager.h"
 #include "logindialog.h"
 #include "filemanager.h"
 #include "menuoptions.h"
@@ -36,7 +34,7 @@
 #include "utils.h"
 
 MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent), mIsFinished {false},
+    QMainWindow(parent),
     ui(new Ui::MainWindow),
     // initializing palette configurator with current palette
     mPaletteConfigurator(new PaletteConfigurator(palette())),
@@ -55,6 +53,10 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(mpDocumentManager, &DocumentManager::projectPathWasChanged,
             this, &MainWindow::reSendProjectPathChanged);
     ui->setupUi(this);
+    {
+        StoreConf conf;
+        conf.restoreConFile();
+    }
 
     mpCompilerControler = new CompilerControler;
     connect(this, &MainWindow::projectPathWasChanged,
@@ -200,6 +202,7 @@ void MainWindow::setupMainMenu()
     // opening chat window
     QAction *pConnectAction = toolsMenu->addAction("&Connect...", this, &MainWindow::onConnectTriggered);
     pConnectAction->setIcon(QIcon(":/img/DISCONNECTED.png"));
+
     toolsMenu->addSeparator();
 
 
@@ -244,7 +247,6 @@ void MainWindow::setupMainMenu()
     QAction *pRunAction = toolsMenu->addAction("&Run", this, &MainWindow::onRunTriggered, Qt::CTRL + Qt::Key_R);
     pRunAction->setIcon(QIcon(":/img/RUN.png"));
     pToolbar->addAction(pRunAction);
-
 
     // user guide
     QAction *pUserGuideActoin = helpMenu->addAction("User &Guide...",
@@ -344,7 +346,7 @@ void MainWindow::createButtomPanel()
 }
 
 void MainWindow::onNewFileTriggered()
-{    
+{
     // check if project is opened
     if (!mpDocumentManager->projectOpened())
     {
@@ -461,7 +463,7 @@ void MainWindow::onOpenProjectTriggered()
         return;
     }
 
-    QString dirName = QFileDialog::getExistingDirectory
+     dirName = QFileDialog::getExistingDirectory
             (this,
              userMessages[UserMessages::OpenDirectoryTitle],
             QDir::homePath());
@@ -476,27 +478,11 @@ void MainWindow::onOpenProjectTriggered()
         return;
     }
 
-    databaseConnect(dirName);
-
     mpProjectViewerDock->setDir(dirName);
     mpDocumentManager->openProject(dirName);
-    // Check if the user has been previously logged in
-    // Then update project-dependent stuff in the chat
-    QSettings settings;
-    if (settings.contains("userName"))
-    {
-        QString currentUserName = settings.value("userName").toString();
-        if (currentUserName != QString("unnamed"))
-        {
-            mpChatWindowDock->setUserName(currentUserName);
-            mplocalConnector->configureOnLogin(currentUserName);
-            QSettings savedSettings(QApplication::organizationName(), QApplication::applicationName());
-            QString styleName = {savedSettings.contains("style") ?
-                                 savedSettings.value("style").toString()
-                                 : "WHITE"};
-            mpChatWindowDock->updateTheme(styleName);
-        }
-    }
+    restoreDatabaseFile();
+    databaseConnect();
+
 }
 
 void MainWindow::onCloseProjectTriggered()
@@ -527,7 +513,7 @@ void MainWindow::onCloseProjectTriggered()
         case QDialogButtonBox::StandardButton::YesToAll:
         {
             try
-            {                
+            {
                 // saving changes to opened documents
                 mpDocumentManager->saveAllDocuments();
             } catch (const FileOpeningFailure&)
@@ -541,11 +527,11 @@ void MainWindow::onCloseProjectTriggered()
             break;
         }
         case QDialogButtonBox::StandardButton::NoToAll:
-        {           
+        {
             break;
         }
         case QDialogButtonBox::StandardButton::Cancel:
-        {            
+        {
             return;
         }
         default:
@@ -561,8 +547,8 @@ void MainWindow::onCloseProjectTriggered()
     mpProjectViewerDock->setDir(QDir::currentPath());
 
     // disconnect from db
-    //
-    //
+    databaseDisconnect();
+    hideDatabaseFile();
 
     QMessageBox::information
             (this,
@@ -602,7 +588,7 @@ void MainWindow::onSaveFileAsTriggered()
 
     // if there are no opened documents
     if (!pCurrentDocument)
-    {        
+    {
         return;
     }
 
@@ -658,7 +644,7 @@ void MainWindow::onSaveAllFilesTriggered()
 }
 
 void MainWindow::onCloseFileTriggered()
-{    
+{
     mpDocumentManager->closeCurrentDocument();
 }
 
@@ -698,7 +684,7 @@ void MainWindow::onPasteTriggered()
 }
 
 void MainWindow::onSelectAllTriggered()
-{    
+{
     std::function<void(CodeEditor*)> functor = &CodeEditor::selectAll;
     mpDocumentManager->applyChangesToCurrentDocument(functor);
 }
@@ -755,23 +741,6 @@ void MainWindow::onRefactorTriggered()
 
 void MainWindow::onConnectTriggered()
 {
-    // Check if the project has been previously opened
-    // Don't allow user to log in if no project is present
-    if (!mpDocumentManager->projectOpened())
-    {
-        return;
-    }
-    // Check if the user has been previously logged in
-    // If so, don't allow user to log in again
-    QSettings settings;
-    if (settings.contains("userName"))
-    {
-        QString currentUserName = settings.value("userName").toString();
-        if (currentUserName != QString("unnamed"))
-        {
-            return;
-        }
-    }
     LoginDialog loginDialog(this);
     QString userInput = loginDialog.start();
     if (userInput.isEmpty())
@@ -821,11 +790,6 @@ void MainWindow::onAboutTriggered()
     QMessageBox::about(this, "About PairStorm", info);
 }
 
-void MainWindow::onReferenceTriggered()
-{
-    // Reference Assistant module has been cut off, so just idle
-}
-
 void MainWindow::onUserGuideTriggered()
 {
     //
@@ -836,13 +800,8 @@ void MainWindow::onCheckUpdatesTriggered()
     //
 }
 
-void MainWindow::onReferenceFromEditor(const QString &keyword)
-{
-    // Reference Assistant module has been cut off, so just idle
-}
-
 void MainWindow::onOpenFileFromProjectViewer(QString fileName)
-{    
+{
     // check if project is opened
     if (!mpDocumentManager->getCurrentProjectPath().size())
     {
@@ -956,17 +915,9 @@ void MainWindow::closeEvent(QCloseEvent *event)
 MainWindow::~MainWindow()
 {
     saveMainWindowState();
+    StoreConf conf;
+    conf.saveConFile();
 
-    if (!mIsFinished)    //  application wasn't cancelled. in case of cancellation
-    {                   //      application don't save data from QSettings to configurattion file
-        QSettings s;
-        if (s.contains("userName"))
-        {
-            QString name = s.value("userName").toString();
-            StoreConf conf(name);
-            conf.saveConFile();
-        }
-    }
     delete ui;
 }
 
@@ -1027,7 +978,7 @@ void MainWindow::setDocumentFontFamily(const QString &fontFamily)
 }
 
 void MainWindow::setDocumentFontSize(const QString &fontSize)
-{    
+{
     std::function<void(DocumentManager*, CodeEditor*, const QString&)> functor
             (&DocumentManager::setFontSize);
 
@@ -1072,7 +1023,7 @@ void MainWindow::onNewProjectTriggered()
         return;
     }
 
-    databaseConnect(dirName);
+    databaseConnect( );
     // document manager is sent a message about new project
     mpDocumentManager->openProject(dirName);
 
@@ -1080,9 +1031,10 @@ void MainWindow::onNewProjectTriggered()
     mpProjectViewerDock->setDir(dirName);
 }
 
-void MainWindow::databaseConnect(QString directory)
+void MainWindow::databaseConnect()
 {
-    mpdb = ConnectionGetter::getDefaultConnection(directory + "/storage.db");
+    setDatabaseFileName();
+    db = ConnectionGetter::getDefaultConnection(databaseFileName);
     CreateDB database;
     database.addTableFile();
     database.addTableUser();
@@ -1093,4 +1045,45 @@ void MainWindow::databaseConnect(QString directory)
 void MainWindow::databaseDisconnect()
 {
     delete mpdb;
+}
+
+void MainWindow::restoreDatabaseFile()
+{
+    setDatabaseFileName();
+    QString projectFileName = dirName + pathSeparator + FileManager::getProjectFileName();
+        qDebug()<<projectFileName;
+    readWriteFileContent(projectFileName, databaseFileName);
+}
+
+void MainWindow::hideDatabaseFile()
+{
+    QString projectFileName = dirName + pathSeparator + FileManager::getProjectFileName();
+    qDebug()<<projectFileName;
+    readWriteFileContent(databaseFileName, projectFileName);
+    QFile::remove(databaseFileName);
+}
+
+void MainWindow::setDatabaseFileName()
+{
+    databaseFileName = dirName;
+    int position = dirName.lastIndexOf(QChar{pathSeparator});
+    databaseFileName += pathSeparator;
+    databaseFileName += dirName.mid(position + 1);
+    databaseFileName += projectDatabaseExtension;
+    qDebug()<<databaseFileName;
+}
+
+void MainWindow::readWriteFileContent(QString fileToReadName, QString fileToWriteName)
+{
+    QFile fileToRead(fileToReadName);
+    QFile fileToWrite(fileToWriteName);
+
+    fileToRead.open(QIODevice::ReadOnly);
+    fileToWrite.open(QIODevice::WriteOnly);
+
+    QByteArray data = fileToRead.readAll();
+    fileToWrite.write(data);
+    qDebug()<<data;
+    fileToRead.close();
+    fileToWrite.close();
 }
