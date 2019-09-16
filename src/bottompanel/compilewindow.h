@@ -26,10 +26,9 @@ public slots:
 private:
     QStringList getAllErrorsFromCompileOutput(const QString &compileErrorsOutput);
     QString removeAllSymbolsFromString( QString &outputLine, const char &symb);
-    bool lineContainsOnlyOneSymbol(const QString &string, const char &symb) noexcept;
 private:
     Ui::CompileWindow *ui;
-    QListWidget *compileOutputList;
+    QListWidget *mpCompileOutputList;
 };
 
 #endif // COMPILEWINDOW_H

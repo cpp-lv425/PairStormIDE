@@ -1,6 +1,6 @@
 #include "filedb.h"
 
-FileDb::FileDb(): Accessor ()
+FileDb::FileDb(): Accessor()
 {
 }
 

@@ -2,6 +2,7 @@
 #include "usermessages.h"
 #include "eventbuilder.h"
 #include "filemanager.h"
+#include "documentmanager.h"
 #include "codeeditor.h"
 #include "keywords.h"
 #include "utils.h"
@@ -46,26 +47,19 @@ CodeEditor::CodeEditor(QWidget *parent, const QString &fileName) : QPlainTextEdi
 
     //create objects connected to codeEditor
     mLineNumberArea = new LineNumberArea(this);
-    //mTimer = new QTimer;
-    //mLcpp = new LexerCPP();
-   // mTimer = new QTimer;
     QVector<Token> firstLine;
     mTokensList.append(firstLine);
-    //mChangeManager = new ChangeManager(this->toPlainText().toUtf8().constData());
+    mIdentifiersList.append(firstLine);
     mChangeManager = ChangeManager(this->toPlainText().toUtf8().constData());
-    //comment button
+
     mAddCommentButton = new AddCommentButton(this);
-   // mAddCommentButton.setParent(this);
     mAddCommentButton->setText("+");
     mAddCommentButton->setVisible(false);
     mCurrentCommentLable.setParent(this);
     setMouseTracking(true);
 
-    //widget that shows the comment to each line
-    //mCommentWidget = new CommentWidget;
     mCommentWidget.setVisible(false);
 
-    //commentGetter = new CommentDb;
 
     mStartComments = commentGetter.getAllCommentsFromFile(getFileName());
     readAllCommentsFromDB(mStartComments);
@@ -106,13 +100,12 @@ CodeEditor::CodeEditor(QWidget *parent, const QString &fileName) : QPlainTextEdi
     setTextColors();
 
     //completer
-    QStringList keywordsStringList;
     for (auto &i :cKeywords)
     {
-        keywordsStringList.append(i);
+        mKeywordsStringList.append(i);
     }
 
-    mCompleter = new AutoCodeCompleter(keywordsStringList, this);
+    mCompleter = new AutoCodeCompleter(mKeywordsStringList, this);
     mCompleter->setCaseSensitivity(Qt::CaseInsensitive);
     mCompleter->setWidget(this);
 }
@@ -149,7 +142,7 @@ void CodeEditor::runHighlighterWithDefinition(CodeEditor *sourceDocument)// this
     int linescount = 1;
     cursor.movePosition(QTextCursor::EndOfLine);
     constexpr int cFive = 5;
-    while(linescount < sourceDocument->mLinesCount + cFive)
+    while (linescount < sourceDocument->mLinesCount + cFive)
     {
         cursor.insertText(" ");
         cursor.movePosition(QTextCursor::Left);
@@ -262,15 +255,18 @@ void CodeEditor::handleLinesSwap(const int firstLine, const int secondLine)
     mTokensList[secondLine] = tmp;
 }
 
-void CodeEditor::addToIdentifiersList(QStringList &identifiersName, int line)
+QVector<Token> CodeEditor::getIdentifiers(QVector<Token> &tokensOnLine) const
 {
-    for (auto j = 0; j < mTokensList[line].size(); ++j)
+    QVector<Token> identifiers;
+    for (auto i = 0; i < tokensOnLine.size(); ++i)
     {
-        if(mTokensList[line][j].mType == State::ID)
+        if(tokensOnLine[i].mType == State::ID)
         {
-            identifiersName << mTokensList[line][j].mName;
+            identifiers.append(tokensOnLine[i]);
         }
     }
+
+    return identifiers;
 }
 
 void CodeEditor::handleLinesAddition(int changeStart, int lastLineWithChange, int lineDifference)
@@ -312,18 +308,6 @@ void CodeEditor::handleLinesDelition(int lastLineWithChange, int lineDifference)
     for (auto i = lastLineWithChange + 1; i < lastLineWithChange + lineDifference + 1; ++i)
     {
         mTokensList.removeAt(lastLineWithChange + 1);
-    }
-}
-
-void CodeEditor::getNamesOfIdentifiers()
-{
-    mIdentifiersNameList.clear();
-    for (auto i = 0; i < mIdentifiersList.size(); ++i)
-    {
-        for (auto j = 0; j < mIdentifiersList[i].size(); ++j)
-        {
-            mIdentifiersNameList << mIdentifiersList[i][j];
-        }
     }
 }
 
@@ -386,22 +370,20 @@ void CodeEditor::undo()
 {
     QString text = QString::fromStdString(this->mChangeManager.undo());
     this->document()->setPlainText(text);
-
+    emit handleLineChange(0);
     QTextCursor cursor(this->document());
     cursor.setPosition(mChangeManager.getCursorPosPrev());
     this->setTextCursor(cursor);
-    emit handleLineChange(0);
 }
 
 void CodeEditor::redo()
 {
     QString text = QString::fromStdString(this->mChangeManager.redo());
     this->document()->setPlainText(text);
-
+    emit handleLineChange(0);
     QTextCursor cursor(this->document());
     cursor.setPosition(mChangeManager.getCursorPosNext());
     this->setTextCursor(cursor);
-    emit handleLineChange(0);
 }
 
 bool CodeEditor::isChanged()
@@ -900,6 +882,13 @@ void formating(QTextCharFormat fmt, QTextCursor &cursor, Token token, int starti
 {
     cursor.setPosition(startingPosition + token.mBegin, QTextCursor::MoveAnchor);
     cursor.setPosition(startingPosition + token.mEnd, QTextCursor::KeepAnchor);
+    cursor.setCharFormat(fmt);
+}
+
+void CodeEditor::highlightLine(QTextCharFormat fmt, QTextCursor &cursor, int begin, int end, int startingPosition)
+{
+    cursor.setPosition(startingPosition + begin, QTextCursor::MoveAnchor);
+    cursor.setPosition(startingPosition + end, QTextCursor::KeepAnchor);
     cursor.setCharFormat(fmt);
 }
 

@@ -7,17 +7,17 @@
 
 ConsoleServiceProvider::ConsoleServiceProvider()
 {
-    mConsoleProcess = new QProcess(this);
-    documentManager = new DocumentManager;
-    connect(mConsoleProcess, &QProcess::readyReadStandardOutput,
+    mpConsoleProcess = new QProcess(this);
+    mpDocumentManager = new DocumentManager;
+    connect(mpConsoleProcess, &QProcess::readyReadStandardOutput,
             this, &ConsoleServiceProvider::setStdOutput);
 }
 
 void ConsoleServiceProvider::setStdOutput()
 {
-    mConsoleProcess->setReadChannel(QProcess::StandardError);
-    mConsoleProcess->waitForFinished();
-    QString errors = mConsoleProcess->readAllStandardError();
+    mpConsoleProcess->setReadChannel(QProcess::StandardError);
+    mpConsoleProcess->waitForFinished();
+    QString errors = mpConsoleProcess->readAllStandardError();
 
     if (!errors.isEmpty())
     {
@@ -27,22 +27,22 @@ void ConsoleServiceProvider::setStdOutput()
     {
         QTextCodec *codec = QTextCodec::codecForName(codecStandart);
         emit processIsReadyToReadStandartOutput
-                (codec->toUnicode(mConsoleProcess->readAllStandardOutput()));
+                (codec->toUnicode(mpConsoleProcess->readAllStandardOutput()));
     }
     else
     {
-        emit processIsReadyToReadStandartOutput(mConsoleProcess->readAllStandardOutput());
+        emit processIsReadyToReadStandartOutput(mpConsoleProcess->readAllStandardOutput());
     }
 }
 
 void ConsoleServiceProvider::closeProcessChanale()
 {
-    mConsoleProcess->close();
+    mpConsoleProcess->close();
 }
 
 void ConsoleServiceProvider::detatchCompilingProcess()
 {
-    mConsoleProcess->startDetached();
+    mpConsoleProcess->startDetached();
 }
 
 void ConsoleServiceProvider::runConsoleCommand(QString command)
@@ -53,12 +53,12 @@ void ConsoleServiceProvider::runConsoleCommand(QString command)
         executionCommand = cmdWindowsStartPath;
     }
     executionCommand += command;
-    mConsoleProcess->start(executionCommand);
+    mpConsoleProcess->start(executionCommand);
 }
 
 void ConsoleServiceProvider::setWorkingDirectory(QString directory)
 {
-    mConsoleProcess->setWorkingDirectory(directory);
+    mpConsoleProcess->setWorkingDirectory(directory);
 }
 
 void ConsoleServiceProvider::runExecutableFile()
@@ -72,7 +72,7 @@ void ConsoleServiceProvider::runExecutableFile()
 
 bool ConsoleServiceProvider::executableFileExists()
 {
-    QDir dir(mConsoleProcess->workingDirectory());
+    QDir dir(mpConsoleProcess->workingDirectory());
     dir.setNameFilters(QStringList() << "*.exe");
     dir.setFilter(QDir::Files);
     return !dir.entryList().isEmpty();
@@ -85,7 +85,7 @@ void ConsoleServiceProvider::writeToConsole(const QString &command)
 
 QString ConsoleServiceProvider::getExecutableFilePath() const
 {
-    QDir dir(mConsoleProcess->workingDirectory());
+    QDir dir(mpConsoleProcess->workingDirectory());
     dir.setNameFilters(QStringList() << "*.exe");
     dir.setFilter(QDir::Files);
     return dir.entryList().first();

@@ -1,5 +1,4 @@
 #include "createdb.h"
-#include <QDebug>
 
 CreateDB::CreateDB(): Accessor ()
 {
@@ -50,7 +49,7 @@ QString CreateDB::tableCommentQuery()
 {
     return "CREATE TABLE IF NOT EXISTS Comment ("
         "line   INT, "
-        "idFile          REFERENCES File (ID) NOT NULL, "
+        "idFile          REFERENCES File (id) NOT NULL, "
         "idUser INTEGER  REFERENCES User (id) NOT NULL, "
         "text   TEXT, "
         "time   DATETIME DEFAULT (datetime('now') ), "

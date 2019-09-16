@@ -25,13 +25,12 @@ public slots:
     void setWorkingDirectory(QString);
     void runExecutableFile();
     bool executableFileExists();
+
 private:
     void writeToConsole(const QString &command);
     QString getExecutableFilePath() const;
-
-private:
-    QProcess *mConsoleProcess;
-    DocumentManager *documentManager;
+    QProcess *mpConsoleProcess;
+    DocumentManager *mpDocumentManager;
 };
 
 #endif // CONSOLESERVICEPROVIDER_H

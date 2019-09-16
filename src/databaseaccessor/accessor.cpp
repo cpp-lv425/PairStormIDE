@@ -1,5 +1,6 @@
 #include "accessor.h"
 #include <QDebug>
+#include <QSqlError>
 
 Accessor::Accessor()
 {
@@ -18,6 +19,6 @@ void Accessor::execQuery(QString queryStr)
    query.prepare(queryStr);
    if (!query.exec())
       {
-           qDebug()<<"not executed query";
+           qDebug() << query.lastError().databaseText();
       }
 }

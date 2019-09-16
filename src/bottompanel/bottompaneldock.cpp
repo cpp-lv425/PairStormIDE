@@ -10,28 +10,28 @@ BottomPanelDock::BottomPanelDock(QWidget *pParent): QDockWidget (pParent)
     mpTabWgt = new QTabWidget;
 
     // issues
-    pIssuesTab = new QWidget;
-    mpTabWgt->addTab(pIssuesTab, tr("Issues"));
+    mpIssuesTab = new QWidget;
+    mpTabWgt->addTab(mpIssuesTab, tr("Issues"));
 
     // compilation information
-    pCompileInfo = new CompileWindow;
-    mpTabWgt->addTab(pCompileInfo, tr("Compile Output"));
-    connect(pCompileInfo, &CompileWindow::programIsReadyToCompile,
+    mpCompileInfo = new CompileWindow;
+    mpTabWgt->addTab(mpCompileInfo, tr("Compile Output"));
+    connect(mpCompileInfo, &CompileWindow::programIsReadyToCompile,
             this, &BottomPanelDock::reSendProgramIsReadyToCompile);
 
     // debugging
-    pDebugConsole = new QWidget;
-    mpTabWgt->addTab(pDebugConsole, tr("Debugger Console"));
+    mpDebugConsole = new QWidget;
+    mpTabWgt->addTab(mpDebugConsole, tr("Debugger Console"));
 
     // version control and console
-    pTerminalConsole = new ConsoleWindow;
-    mpTabWgt->addTab(pTerminalConsole, tr("Terminal"));
+    mpTerminalConsole = new ConsoleWindow;
+    mpTabWgt->addTab(mpTerminalConsole, tr("Terminal"));
 
     connect(this, &BottomPanelDock::projectPathWasChanged,
-            pTerminalConsole, &ConsoleWindow::setProjectPath);
+            mpTerminalConsole, &ConsoleWindow::setProjectPath);
 
-    connect(pTerminalConsole, &ConsoleWindow::errorsAreOccuredAfterCompilation,
-            pCompileInfo, &CompileWindow::setCompileOutput);
+    connect(mpTerminalConsole, &ConsoleWindow::errorsAreOccuredAfterCompilation,
+            mpCompileInfo, &CompileWindow::setCompileOutput);
 
 
     setWidget(mpTabWgt);
@@ -45,20 +45,20 @@ void BottomPanelDock::reSendProjectPathChanged(QString path)
 void BottomPanelDock::reSendProgramIsReadyToCompile()
 {
     emit programIsReadyToCompile();
-    pCompileInfo->clearCompileOutputView();
+    mpCompileInfo->clearCompileOutputView();
 }
 
 void BottomPanelDock::reSendProgramIsReadyToRun()
 {
-    pTerminalConsole->runExecutableFile();
+    mpTerminalConsole->runExecutableFile();
 }
 
 ConsoleWindow* BottomPanelDock::getPTerminalConsole() const
 {
-    return pTerminalConsole;
+    return mpTerminalConsole;
 }
 
 void BottomPanelDock::setCompileAsCurrentTab()
 {
-    mpTabWgt->setCurrentWidget(pCompileInfo);
+    mpTabWgt->setCurrentWidget(mpCompileInfo);
 }

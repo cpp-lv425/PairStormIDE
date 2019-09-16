@@ -11,7 +11,7 @@
 
 CompilerControler::CompilerControler()
 {
-    consoleProvider = new ConsoleServiceProvider;
+    mpConsoleProvider = new ConsoleServiceProvider;
 }
 
 QString CompilerControler::compilerPath() const
@@ -26,12 +26,12 @@ void CompilerControler::setCompilerPath(QString compilerPath)
 
 ConsoleServiceProvider *CompilerControler::getConsoleProvider() const
 {
-    return consoleProvider;
+    return mpConsoleProvider;
 }
 
 void CompilerControler::setConsoleProvider(ConsoleServiceProvider *value)
 {
-    consoleProvider = value;
+    mpConsoleProvider = value;
 }
 
 QString CompilerControler::getCurrentCompilerPath() const
@@ -82,8 +82,8 @@ void CompilerControler::runCompilation()
     fileManager.createFile(makeFilePath);
     fileManager.writeToFile(makeFilePath, createMakeFileContent(getExecutibleFileName()));
 
-    consoleProvider->setWorkingDirectory(buildDirectoryPath);
-    consoleProvider->runConsoleCommand(currentCompilerName.append(" -f MakeFile"));
+    mpConsoleProvider->setWorkingDirectory(buildDirectoryPath);
+    mpConsoleProvider->runConsoleCommand(currentCompilerName.append(" -f MakeFile"));
 }
 
 QString CompilerControler::getExecutibleFileName() const
