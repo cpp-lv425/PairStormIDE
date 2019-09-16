@@ -91,7 +91,7 @@ private:
     void handleLinesAddition(int, int, int);
     void handleLinesDelition(int, int);
     void addToIdentifiersList(QStringList&, int);
-    void getNamesOfIdentifiers();
+    QVector<Token> getIdentifiers(QVector<Token>& tokensOnLine) const;
 
     void addButton(const int line, const QString &Comment, const QString &userName);
     void removeButtonByIndex(QVector<AddCommentButton*> &commentV, const int index);
@@ -186,8 +186,8 @@ private:
 protected:
     int mCurrentZoom;
     QList<QVector<Token>> mTokensList;
-    QList<QStringList> mIdentifiersList;
-    QStringList mIdentifiersNameList;
+    QList<QVector<Token>> mIdentifiersList;
+    QStringList mKeywordsStringList;
     friend class Event;
 
     // QWidget interface

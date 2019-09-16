@@ -7,19 +7,19 @@ inline bool LexerCPP::isKeyword(const QString &lexem)
 
 inline bool LexerCPP::isIdentifier(const QString &lexem)
 {
-    const QRegExp cRx("[A-Za-z_][A-Za-z0-9_]*");
+    static const QRegExp cRx("[A-Za-z_][A-Za-z0-9_]*");
     return cRx.exactMatch(lexem);
 }
 
 inline bool LexerCPP::isNumber(const QString &lexem)
 {
-    const QRegExp cRx("[0-9]+|[0-9]+[UuLl]?");
+    static const QRegExp cRx("[0-9]+|[0-9]+[UuLl]?");
     return cRx.exactMatch(lexem);
 }
 
 inline bool LexerCPP::isFloatNumber(const QString &lexem)
 {
-    const QRegExp cRx("[0-9]+\\.[0-9]+");
+    static const QRegExp cRx("[0-9]+\\.[0-9]+");
     return cRx.exactMatch(lexem);
 }
 
@@ -30,25 +30,25 @@ inline bool LexerCPP::isOperator(const QString &lexem)
 
 inline bool LexerCPP::isSymbolLiteral(const QString &lexem)
 {
-    const QRegExp cRx("'.'|'\.+'");
+    static const QRegExp cRx("'.'|'\.+'");
     return cRx.exactMatch(lexem);
 }
 
 inline bool LexerCPP::isStringLiteral(const QString &lexem)
 {
-    const QRegExp cRx("\".*\"");
+    static const QRegExp cRx("\".*\"");
     return cRx.exactMatch(lexem);
 }
 
 inline bool LexerCPP::isOneLineComment(const QString &lexem)
 {
-    const QRegExp cRx("\\/\\/.*");
+    static const QRegExp cRx("\\/\\/.*");
     return cRx.exactMatch(lexem);
 }
 
 inline bool LexerCPP::isBlockComments(const QString &lexem)
 {
-    const QRegExp cRx("/\\*[\\s\\S]*\\*/");
+    static const QRegExp cRx("/\\*[\\s\\S]*\\*/");
     return cRx.exactMatch(lexem);
 }
 
@@ -60,13 +60,13 @@ inline bool LexerCPP::isSpace(const QChar& sym)
 inline bool LexerCPP::isLetter(const QChar& sym)
 
 {
-    const QRegExp cRx("[A-Za-z]");
+    static const QRegExp cRx("[A-Za-z]");
     return cRx.exactMatch(sym);
 }
 
 inline bool LexerCPP::isDigit(const QChar& sym)
 {
-    const QRegExp cRx("[0-9]");
+    static const QRegExp cRx("[0-9]");
     return cRx.exactMatch(sym);
 }
 

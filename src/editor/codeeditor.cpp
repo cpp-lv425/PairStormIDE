@@ -49,6 +49,7 @@ CodeEditor::CodeEditor(QWidget *parent, const QString &fileName) : QPlainTextEdi
     mLineNumberArea = new LineNumberArea(this);
     QVector<Token> firstLine;
     mTokensList.append(firstLine);
+    mIdentifiersList.append(firstLine);
     mChangeManager = ChangeManager(this->toPlainText().toUtf8().constData());
     mAddCommentButton = new AddCommentButton(this);
     mAddCommentButton->setText("+");
@@ -97,13 +98,12 @@ CodeEditor::CodeEditor(QWidget *parent, const QString &fileName) : QPlainTextEdi
     setTextColors();
 
     //completer
-    QStringList keywordsStringList;
     for (auto &i :cKeywords)
     {
-        keywordsStringList.append(i);
+        mKeywordsStringList.append(i);
     }
 
-    mCompleter = new AutoCodeCompleter(keywordsStringList, this);
+    mCompleter = new AutoCodeCompleter(mKeywordsStringList, this);
     mCompleter->setCaseSensitivity(Qt::CaseInsensitive);
     mCompleter->setWidget(this);
 }
@@ -138,7 +138,7 @@ void CodeEditor::runHighlighterWithDefinition(CodeEditor *sourceDocument)
     sourceDocument->setTextCursor(cursor);
     int linescount = 1;
     cursor.movePosition(QTextCursor::EndOfLine);
-    const int cFive = 5;
+    constexpr int cFive = 5;
     while(linescount < sourceDocument->mLinesCount + cFive)
     {
         cursor.insertText(" ");
@@ -252,15 +252,18 @@ void CodeEditor::handleLinesSwap(const int firstLine, const int secondLine)
     mTokensList[secondLine] = tmp;
 }
 
-void CodeEditor::addToIdentifiersList(QStringList &identifiersName, int line)
+QVector<Token> CodeEditor::getIdentifiers(QVector<Token> &tokensOnLine) const
 {
-    for (auto j = 0; j < mTokensList[line].size(); ++j)
+    QVector<Token> identifiers;
+    for (auto i = 0; i < tokensOnLine.size(); ++i)
     {
-        if(mTokensList[line][j].mType == State::ID)
+        if(tokensOnLine[i].mType == State::ID)
         {
-            identifiersName << mTokensList[line][j].mName;
+            identifiers.append(tokensOnLine[i]);
         }
     }
+
+    return identifiers;
 }
 
 void CodeEditor::handleLinesAddition(int changeStart, int lastLineWithChange, int lineDifference)
@@ -271,6 +274,7 @@ void CodeEditor::handleLinesAddition(int changeStart, int lastLineWithChange, in
     {
         changeStart = lastLineWithChange - lineDifference;
         mTokensList.removeAt(changeStart);
+        mIdentifiersList.removeAt(changeStart);
     }
 
     mHighlightingStart = changeStart > 0 ? changeStart - 1 : changeStart;
@@ -281,10 +285,12 @@ void CodeEditor::handleLinesAddition(int changeStart, int lastLineWithChange, in
         if (lineDifference)
         {
             mTokensList.insert(i, mLcpp.getTokens());
+            mIdentifiersList.insert(i, getIdentifiers(mTokensList[i]));
         }
         else
         {
             mTokensList[i] = mLcpp.getTokens();
+            mIdentifiersList[i] = getIdentifiers(mTokensList[i]);
         }
     }
 }
@@ -298,22 +304,12 @@ void CodeEditor::handleLinesDelition(int lastLineWithChange, int lineDifference)
     mLcpp.lexicalAnalysis(changedCode);
     mHighlightingStart = lastLineWithChange;
     mTokensList[lastLineWithChange] = mLcpp.getTokens();
+    mIdentifiersList[lastLineWithChange] = getIdentifiers(mTokensList[lastLineWithChange]);
 
     for (auto i = lastLineWithChange + 1; i < lastLineWithChange + lineDifference + 1; ++i)
     {
         mTokensList.removeAt(lastLineWithChange + 1);
-    }
-}
-
-void CodeEditor::getNamesOfIdentifiers()
-{
-    mIdentifiersNameList.clear();
-    for (auto i = 0; i < mIdentifiersList.size(); ++i)
-    {
-        for (auto j = 0; j < mIdentifiersList[i].size(); ++j)
-        {
-            mIdentifiersNameList << mIdentifiersList[i][j];
-        }
+        mIdentifiersList.removeAt(lastLineWithChange + 1);
     }
 }
 
@@ -341,6 +337,24 @@ void CodeEditor::handleLineChange(int lastLineWithChange)
     {
         handleLinesDelition(lastLineWithChange, lineDifference);
     }
+
+    QStringList allIdentifiers;
+    for(int i = 0; i < mIdentifiersList.size(); ++i)
+    {
+        for(int j = 0; j < mIdentifiersList[i].size(); ++j)
+        {
+            allIdentifiers << mIdentifiersList[i][j].mName;
+        }
+    }
+
+//    for(int i = 0; i < mIdentifiersList.size(); ++i)
+//    {
+//        qDebug() << i;
+//        for(int j = 0; j < mIdentifiersList[i].size(); ++j)
+//        {
+//            qDebug() << mIdentifiersList[i][j].mName;
+//        }
+//    }
 
     emit runHighlighter();
 }
