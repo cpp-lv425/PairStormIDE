@@ -31,6 +31,9 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
+# Icon of the application
+win32:RC_ICONS += PAIRSTORM.ico
+
 include($$PWD/mainwindow/mainwindow.pri)
 include($$PWD/network/network.pri)
 include($$PWD/chatwindow/chatwindow.pri)
@@ -39,6 +42,7 @@ include($$PWD/filemanager/filemanager.pri)
 include($$PWD/editor/editor.pri)
 include($$PWD/bottompanel/bottompanel.pri)
 include($$PWD/settings/settings.pri)
+include($$PWD/auth/auth.pri)
 include($$PWD/startpage/startpage.pri)
 include($$PWD/projectviewer/projectviewer.pri)
 include($$PWD/newfilewizard/newfilewizard.pri)

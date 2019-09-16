@@ -32,7 +32,7 @@ CodeEditor::CodeEditor(QWidget *parent, const QString &fileName) : QPlainTextEdi
     setLineWrapMode(QPlainTextEdit::NoWrap);// don't move cursor to the next line where it's out of visible scope
     this->setVerticalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAlwaysOn);
     this->setTabStopDistance(TAB_SPACE * fontMetrics().width(QLatin1Char('0')));//set tab distance
-    mCurrentZoom = 100;//in persents    
+    mCurrentZoom = 100;//in persents
     mLinesCount = 1;
     mCode = document()->toPlainText();
     mCodeSize = 1;
@@ -51,6 +51,7 @@ CodeEditor::CodeEditor(QWidget *parent, const QString &fileName) : QPlainTextEdi
     mTokensList.append(firstLine);
     mIdentifiersList.append(firstLine);
     mChangeManager = ChangeManager(this->toPlainText().toUtf8().constData());
+
     mAddCommentButton = new AddCommentButton(this);
     mAddCommentButton->setText("+");
     mAddCommentButton->setVisible(false);
@@ -58,6 +59,7 @@ CodeEditor::CodeEditor(QWidget *parent, const QString &fileName) : QPlainTextEdi
     setMouseTracking(true);
 
     mCommentWidget.setVisible(false);
+
 
     mStartComments = commentGetter.getAllCommentsFromFile(getFileName());
     readAllCommentsFromDB(mStartComments);
@@ -229,7 +231,7 @@ void CodeEditor::setFontSize(const QString &fontSize)
 }
 
 void CodeEditor::setFontStyle(const QString &fontStyle)
-{    
+{
     mConfigParam.setFontStyle(fontStyle);
     mFont.setFamily(mConfigParam.mFontStyle);
     this->setFont(mFont);

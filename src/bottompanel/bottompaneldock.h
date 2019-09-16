@@ -28,10 +28,10 @@ public slots:
     void reSendProgramIsReadyToCompile();
     void reSendProgramIsReadyToRun();
 private:
-    QWidget *pIssuesTab;
-    CompileWindow *pCompileInfo;
-    QWidget *pDebugConsole;
-    ConsoleWindow *pTerminalConsole;
+    QWidget *mpIssuesTab;
+    CompileWindow *mpCompileInfo;
+    QWidget *mpDebugConsole;
+    ConsoleWindow *mpTerminalConsole;
 };
 
 #endif // BOTTOMPANELDOCK_H

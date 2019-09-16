@@ -27,8 +27,8 @@ signals:
     void errorsAreOccuredAfterCompilation(QString);
 private:
     Ui::ConsoleWindow *ui;
-    ConsoleServiceProvider *consoleServiceProvider;
-    ConsoleView *consoleView;
+    ConsoleServiceProvider *mpConsoleServiceProvider;
+    ConsoleView *mpConsoleView;
 };
 
 #endif // CONSOLEWINDOW_H

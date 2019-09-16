@@ -2,7 +2,6 @@
 #include "compilercontroler.h"
 #include <QDirIterator>
 #include "filemanager.h"
-#include <QDebug>
 #include <QPlainTextEdit>
 #include <consolewindow/consolewindow.h>
 #include <QString>
@@ -12,7 +11,7 @@
 
 CompilerControler::CompilerControler()
 {
-    consoleProvider = new ConsoleServiceProvider;
+    mpConsoleProvider = new ConsoleServiceProvider;
 }
 
 QString CompilerControler::compilerPath() const
@@ -27,15 +26,15 @@ void CompilerControler::setCompilerPath(QString compilerPath)
 
 ConsoleServiceProvider *CompilerControler::getConsoleProvider() const
 {
-    return consoleProvider;
+    return mpConsoleProvider;
 }
 
 void CompilerControler::setConsoleProvider(ConsoleServiceProvider *value)
 {
-    consoleProvider = value;
+    mpConsoleProvider = value;
 }
 
-QString CompilerControler::getCurrentCompilerName() const
+QString CompilerControler::getCurrentCompilerPath() const
 {
     QString rCurrentCompiler = QString();
     QSettings settings;
@@ -64,7 +63,7 @@ void CompilerControler::setProjectPath(const QString &projectPath)
 void CompilerControler::runCompilation()
 {
 
-    auto currentCompilerName = getCurrentCompilerName();
+    auto currentCompilerName = getCurrentCompilerPath();
     sourceFilesPathes.clear();
     removeAllExecutableAndObjectsFiles();
 
@@ -83,8 +82,8 @@ void CompilerControler::runCompilation()
     fileManager.createFile(makeFilePath);
     fileManager.writeToFile(makeFilePath, createMakeFileContent(getExecutibleFileName()));
 
-    consoleProvider->setWorkingDirectory(buildDirectoryPath);
-    consoleProvider->runConsoleCommand(currentCompilerName.append(" -f MakeFile"));
+    mpConsoleProvider->setWorkingDirectory(buildDirectoryPath);
+    mpConsoleProvider->runConsoleCommand(currentCompilerName.append(" -f MakeFile"));
 }
 
 QString CompilerControler::getExecutibleFileName() const
@@ -95,6 +94,7 @@ QString CompilerControler::getExecutibleFileName() const
 
 void CompilerControler::removeAllExecutableAndObjectsFiles()
 {
+    // we should remove all files which will be created during the next compilation
     QDir dir(mProjectPath);
     dir.setNameFilters(QStringList() << "*" + objectiveFileExtension
                        << "*" + executableFileExtension

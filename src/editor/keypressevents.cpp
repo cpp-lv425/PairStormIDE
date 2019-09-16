@@ -1,5 +1,4 @@
 #include "keypressevents.h"
-#include <QPlainTextEdit>
 
 //EventDefault
 void EventDefault::operator()(CodeEditor *codeEditor, QKeyEvent *e)

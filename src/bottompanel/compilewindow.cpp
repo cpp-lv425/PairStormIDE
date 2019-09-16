@@ -2,7 +2,6 @@
 #include "ui_compilewindow.h"
 #include "compiler/compilercontroler.h"
 #include <QGridLayout>
-#include <QDebug>
 #include <QListWidgetItem>
 
 CompileWindow::CompileWindow(QWidget *parent) :
@@ -10,11 +9,11 @@ CompileWindow::CompileWindow(QWidget *parent) :
     ui(new Ui::CompileWindow)
 {
     ui->setupUi(this);
-    compileOutputList = new QListWidget;
-    compileOutputList->setLayoutMode(QListView::Batched);
+    mpCompileOutputList = new QListWidget;
+    mpCompileOutputList->setLayoutMode(QListView::Batched);
 
     QGridLayout *compileOutputLayout = new QGridLayout(this);
-    compileOutputLayout->addWidget(compileOutputList);
+    compileOutputLayout->addWidget(mpCompileOutputList);
     this->setLayout(compileOutputLayout);
 }
 
@@ -25,13 +24,10 @@ CompileWindow::~CompileWindow()
 
 void CompileWindow::setCompileOutput(QString text)
 {
-    qDebug() << "try to set compilation output";
-    qDebug() << "   errors: " << text;
-    compileOutputList->clear();
+    mpCompileOutputList->clear();
     auto allErrorslist = getAllErrorsFromCompileOutput(text);
     for (auto error : allErrorslist)
     {
-        qDebug() << "      error is: " << error;
         auto *errorItem = new QListWidgetItem(error);
         if (error.contains(": warning: "))//if its warnings
         {
@@ -41,13 +37,13 @@ void CompileWindow::setCompileOutput(QString text)
         {
            errorItem->setForeground(Qt::red);//if its error
         }
-        compileOutputList->addItem(errorItem);
+        mpCompileOutputList->addItem(errorItem);
     }
 }
 
 void CompileWindow::clearCompileOutputView()
 {
-    compileOutputList->clear();
+    mpCompileOutputList->clear();
 }
 
 QStringList CompileWindow::getAllErrorsFromCompileOutput(const QString &compileErrorsOutput)
@@ -55,15 +51,12 @@ QStringList CompileWindow::getAllErrorsFromCompileOutput(const QString &compileE
     QStringList rSeparatedErrorsList;
     auto errorsOutputLines = compileErrorsOutput.split('\n');
 
-    qDebug() << "errors inside parsing";
-    std::for_each(errorsOutputLines.cbegin(), errorsOutputLines.cend(), [](const QString & elem) {qDebug() << "   " << elem << ", ";});
-
     QString separateError;
     for (auto errorOutputLine : errorsOutputLines)
     {
         auto line = removeAllSymbolsFromString(errorOutputLine, '~').simplified();
         line = removeAllSymbolsFromString(line, '|');
-        if (line.contains('^'))//lineContainsOnlyOneSymbol(line, '^'))
+        if (line.contains('^'))
         {
             rSeparatedErrorsList.push_back(separateError);
             separateError.clear();
@@ -74,9 +67,6 @@ QStringList CompileWindow::getAllErrorsFromCompileOutput(const QString &compileE
         }
     }
 
-    qDebug() << "errors inside parsing";
-    std::for_each(rSeparatedErrorsList.cbegin(), rSeparatedErrorsList.cend(), [](const QString & elem) {qDebug() << "   " << elem << ", ";});
-
     return rSeparatedErrorsList;
 }
 
@@ -85,8 +75,3 @@ QString CompileWindow::removeAllSymbolsFromString(QString &outputLine, const cha
     return outputLine.replace(symb, ' ');
 }
 
-
-bool CompileWindow::lineContainsOnlyOneSymbol(const QString &string, const char &symb) noexcept
-{
-    return string == static_cast<QString>(symb);
-}

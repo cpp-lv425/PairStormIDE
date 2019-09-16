@@ -12,7 +12,6 @@ class ConsoleView: public QPlainTextEdit
 public:
     ConsoleView(QWidget *parent = nullptr);
     ~ConsoleView() override;
-
 signals:
     void commandWasInputed(QString);
     void projectPathWasChanged(QString);

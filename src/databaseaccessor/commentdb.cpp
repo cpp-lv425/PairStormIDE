@@ -1,5 +1,5 @@
 #include "commentdb.h"
-#include <QDebug>
+
 CommentDb::CommentDb(): Accessor()
 {
 }
@@ -34,7 +34,6 @@ QVector<Comment> CommentDb::getAllCommentsFromFile(const QString filename)
       execQuery(numberOfCommentInFileQuery(filename));
       query.first();
       int count_of_messages =query.value(0).toInt();
-      qDebug()<<count_of_messages;
       QVector<Comment> comments(count_of_messages);
       execQuery(allCommentInFileQuery(filename));
       int counter = 0;
@@ -91,7 +90,6 @@ void CommentDb::fillStructComment(Comment &comment)
     comment.mText = query.record().value(1).toString();
     comment.mUser = query.record().value(2).toString();
     comment.mFile = query.record().value(3).toString();
-    qDebug()<<comment.mText;
 }
 
 QString CommentDb::numberOfCommentInFileQuery(const QString filename)

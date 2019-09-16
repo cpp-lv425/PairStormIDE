@@ -20,9 +20,9 @@ public:
     void runCompilation();
     void removeAllExecutableAndObjectsFiles();
     void setConsoleProvider(ConsoleServiceProvider *value);
-    QString getCurrentCompilerName() const;
+    QString getCurrentCompilerPath() const;
 
-    ConsoleServiceProvider *getConsoleProvider() const;
+    ConsoleServiceProvider* getConsoleProvider() const;
 
 private:
     QString getExecutibleFileName() const;
@@ -32,7 +32,7 @@ private:
     QString mCompilerPath;
     QStringList sourceFilesPathes;
     QString mProjectPath;
-    ConsoleServiceProvider *consoleProvider;
+    ConsoleServiceProvider *mpConsoleProvider;
 };
 
 #endif // COMPILERCONTROLER_H

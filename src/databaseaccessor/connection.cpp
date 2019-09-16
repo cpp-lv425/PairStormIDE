@@ -1,5 +1,5 @@
 #include "connection.h"
-#include <QDebug>
+
 
 Connection::Connection()
 {
@@ -28,5 +28,10 @@ QString Connection::mPath = "";
 QString Connection::getPath()
 {
     return mPath;
+}
+
+void Connection::close()
+{
+    mDb.close();
 }
 
