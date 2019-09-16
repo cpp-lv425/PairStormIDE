@@ -32,7 +32,7 @@ private:
     QString mCompilerPath;
     QStringList sourceFilesPathes;
     QString mProjectPath;
-    ConsoleServiceProvider *consoleProvider;
+    ConsoleServiceProvider *mpConsoleProvider;
 };
 
 #endif // COMPILERCONTROLER_H

@@ -46,26 +46,18 @@ CodeEditor::CodeEditor(QWidget *parent, const QString &fileName) : QPlainTextEdi
 
     //create objects connected to codeEditor
     mLineNumberArea = new LineNumberArea(this);
-    //mTimer = new QTimer;
-    //mLcpp = new LexerCPP();
-   // mTimer = new QTimer;
     QVector<Token> firstLine;
     mTokensList.append(firstLine);
-    //mChangeManager = new ChangeManager(this->toPlainText().toUtf8().constData());
     mChangeManager = ChangeManager(this->toPlainText().toUtf8().constData());
-    //comment button
+
     mAddCommentButton = new AddCommentButton(this);
-   // mAddCommentButton.setParent(this);
     mAddCommentButton->setText("+");
     mAddCommentButton->setVisible(false);
     mCurrentCommentLable.setParent(this);
     setMouseTracking(true);
 
-    //widget that shows the comment to each line
-    //mCommentWidget = new CommentWidget;
     mCommentWidget.setVisible(false);
 
-    //commentGetter = new CommentDb;
 
     mStartComments = commentGetter.getAllCommentsFromFile(getFileName());
     readAllCommentsFromDB(mStartComments);

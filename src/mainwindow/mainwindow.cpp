@@ -39,8 +39,8 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent), mIsFinished {false},
     ui(new Ui::MainWindow),
     // initializing palette configurator with current palette
-    mpPaletteConfigurator(new PaletteConfigurator(palette())),
-    dbFileManager(new FileDb)
+    mPaletteConfigurator(new PaletteConfigurator(palette())),
+    mpdbFileManager(new FileDb)
 {
     // Generate default local network connector
     mplocalConnector =
@@ -56,9 +56,9 @@ MainWindow::MainWindow(QWidget *parent) :
             this, &MainWindow::reSendProjectPathChanged);
     ui->setupUi(this);
 
-    compilerControler = new CompilerControler;
+    mpCompilerControler = new CompilerControler;
     connect(this, &MainWindow::projectPathWasChanged,
-            compilerControler, &CompilerControler::setProjectPath);
+            mpCompilerControler, &CompilerControler::setProjectPath);
 
     // when first started main window is maximized
     setWindowState(Qt::WindowMaximized);
@@ -235,9 +235,6 @@ void MainWindow::setupMainMenu()
     pReferenceAction->setIcon(QIcon(":/img/REFERENCEASSISTANT.png"));
     pToolbar->addAction(pReferenceAction);
 
-
-
-
     // buidling solution
     QAction *pBuildAction = toolsMenu->addAction("&Build", this, &MainWindow::onBuildTriggered, Qt::CTRL + Qt::Key_B);
     pBuildAction->setIcon(QIcon(":/img/BUILD.png"));
@@ -338,12 +335,12 @@ void MainWindow::createButtomPanel()
 {
     // create instance of Bottom Panel
     mpBottomPanelDock = new BottomPanelDock(this);
-    compilerControler->setConsoleProvider(mpBottomPanelDock->getPTerminalConsole()->getConsoleServiceProvider());
+    mpCompilerControler->setConsoleProvider(mpBottomPanelDock->getPTerminalConsole()->getConsoleServiceProvider());
     mpBottomPanelDock->setObjectName("mpBottomPanelDock");
     addDockWidget(Qt::BottomDockWidgetArea, mpBottomPanelDock);
     connect(this, &MainWindow::projectPathWasChanged, mpBottomPanelDock, &BottomPanelDock::reSendProjectPathChanged);
     connect(mpBottomPanelDock, &BottomPanelDock::programIsReadyToCompile,
-            compilerControler, &CompilerControler::runCompilation);
+            mpCompilerControler, &CompilerControler::runCompilation);
 }
 
 void MainWindow::onNewFileTriggered()
@@ -371,7 +368,7 @@ void MainWindow::onNewFileTriggered()
         // name of newly created file is received
         newFileName = newFileDialog.start();
         File newfile(newFileName);
-        dbFileManager->addFileToDb(newfile);
+        mpdbFileManager->addFileToDb(newfile);
     }
     catch (const QException&)
     {
@@ -1009,7 +1006,7 @@ void MainWindow::setInitialAppStyle()
 void MainWindow::setAppStyle(const QString &styleName)
 {
     // dark style palette is created & set globally
-    QPalette palette = mpPaletteConfigurator->getPalette(styleName);
+    QPalette palette = mPaletteConfigurator->getPalette(styleName);
 
     qApp->setPalette(palette);
 
@@ -1085,7 +1082,7 @@ void MainWindow::onNewProjectTriggered()
 
 void MainWindow::databaseConnect(QString directory)
 {
-    db = ConnectionGetter::getDefaultConnection(directory + "/storage.db");
+    mpdb = ConnectionGetter::getDefaultConnection(directory + "/storage.db");
     CreateDB database;
     database.addTableFile();
     database.addTableUser();
@@ -1095,5 +1092,5 @@ void MainWindow::databaseConnect(QString directory)
 
 void MainWindow::databaseDisconnect()
 {
-    delete db;
+    delete mpdb;
 }

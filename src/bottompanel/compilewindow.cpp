@@ -9,11 +9,11 @@ CompileWindow::CompileWindow(QWidget *parent) :
     ui(new Ui::CompileWindow)
 {
     ui->setupUi(this);
-    compileOutputList = new QListWidget;
-    compileOutputList->setLayoutMode(QListView::Batched);
+    mpCompileOutputList = new QListWidget;
+    mpCompileOutputList->setLayoutMode(QListView::Batched);
 
     QGridLayout *compileOutputLayout = new QGridLayout(this);
-    compileOutputLayout->addWidget(compileOutputList);
+    compileOutputLayout->addWidget(mpCompileOutputList);
     this->setLayout(compileOutputLayout);
 }
 
@@ -24,7 +24,7 @@ CompileWindow::~CompileWindow()
 
 void CompileWindow::setCompileOutput(QString text)
 {
-    compileOutputList->clear();
+    mpCompileOutputList->clear();
     auto allErrorslist = getAllErrorsFromCompileOutput(text);
     for (auto error : allErrorslist)
     {
@@ -37,13 +37,13 @@ void CompileWindow::setCompileOutput(QString text)
         {
            errorItem->setForeground(Qt::red);//if its error
         }
-        compileOutputList->addItem(errorItem);
+        mpCompileOutputList->addItem(errorItem);
     }
 }
 
 void CompileWindow::clearCompileOutputView()
 {
-    compileOutputList->clear();
+    mpCompileOutputList->clear();
 }
 
 QStringList CompileWindow::getAllErrorsFromCompileOutput(const QString &compileErrorsOutput)
@@ -75,8 +75,3 @@ QString CompileWindow::removeAllSymbolsFromString(QString &outputLine, const cha
     return outputLine.replace(symb, ' ');
 }
 
-
-bool CompileWindow::lineContainsOnlyOneSymbol(const QString &string, const char &symb) noexcept
-{
-    return string == static_cast<QString>(symb);
-}

@@ -44,12 +44,12 @@ private:
     ProjectViewerDock *mpProjectViewerDock;
     ChatWindowDock *mpChatWindowDock;
     BottomPanelDock *mpBottomPanelDock;
-    Browser *mDocumentationBrowser;
-    QScopedPointer<PaletteConfigurator> mpPaletteConfigurator;
-    Connection *db;
+    Browser *mpDocumentationBrowser;
+    QScopedPointer<PaletteConfigurator> mPaletteConfigurator;
+    Connection *mpdb;
     DocumentManager *mpDocumentManager;
-    FileDb* dbFileManager;
-    CompilerControler * compilerControler;
+    FileDb* mpdbFileManager;
+    CompilerControler *mpCompilerControler;
 
     void setupMainMenu();    
     void openDocument(const QString &fileName);
