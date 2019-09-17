@@ -1,9 +1,8 @@
 #include "compilewindow.h"
 #include "ui_compilewindow.h"
 #include "compiler/compilercontroler.h"
-#include <QGridLayout>
 #include <QListWidgetItem>
-#include <QDebug>
+#include <QGridLayout>
 
 CompileWindow::CompileWindow(QWidget *parent) :
     QWidget(parent),
