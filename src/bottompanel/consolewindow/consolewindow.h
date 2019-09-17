@@ -22,9 +22,11 @@ public:
 public slots:
     void setProjectPath(QString);
     void reSendErrors(QString);
+    void reSendSuccess();
     void runExecutableFile();
 signals:
     void errorsAreOccuredAfterCompilation(QString);
+    void messageAboutNoErrorsAfterCompilation();
 private:
     Ui::ConsoleWindow *ui;
     ConsoleServiceProvider *mpConsoleServiceProvider;

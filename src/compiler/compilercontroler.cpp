@@ -5,7 +5,6 @@
 #include <QPlainTextEdit>
 #include <consolewindow/consolewindow.h>
 #include <QString>
-#include <QThread>
 #include <QProcess>
 #include <QSettings>
 

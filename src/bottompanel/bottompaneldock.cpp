@@ -31,8 +31,10 @@ BottomPanelDock::BottomPanelDock(QWidget *pParent): QDockWidget (pParent)
             mpTerminalConsole, &ConsoleWindow::setProjectPath);
 
     connect(mpTerminalConsole, &ConsoleWindow::errorsAreOccuredAfterCompilation,
-            mpCompileInfo, &CompileWindow::setCompileOutput);
+            mpCompileInfo, &CompileWindow::setCompileErrorsOutput);
 
+    connect(mpTerminalConsole, &ConsoleWindow::messageAboutNoErrorsAfterCompilation,
+            mpCompileInfo, &CompileWindow::setCompileSuccessOutput);
 
     setWidget(mpTabWgt);
 }
