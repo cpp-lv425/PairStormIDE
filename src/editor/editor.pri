@@ -34,6 +34,7 @@ HEADERS += \
         $$PWD/lexercpp.h \
         $$PWD/linenumberarea.h \
         $$PWD/operators.h \
+        $$PWD/settingsliterals.h \
         $$PWD/spaces.h \
         $$PWD/specialsymbols.h \
         $$PWD/token.h \
