@@ -6,7 +6,8 @@ ChatUsersController::ChatUsersController(const QString &userName, QObject *paren
     QObject(parent), mDatabaseUsers()
 {
     QVector<User> superUsers = mDatabaseUsers.getAllUsersFromDb();
-    mDatabaseUsers.addUserToDb(userName);
+    User currentUser (userName);
+    mDatabaseUsers.addUserToDb(currentUser);
     // TODO fill chat users & implement additional states behavior
 }
 // ==========================================================================================
