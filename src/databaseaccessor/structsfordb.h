@@ -6,11 +6,8 @@
 struct Message
 {
     Message() = default;
-    Message(QString body, QString user, QString time)
+    explicit Message(QString body, QString user, QString time): mBody{body}, mUser{user}, mTime{time}
     {
-        mBody = body;
-        mUser = user;
-        mTime = time;
     }
 
     QString mBody;
@@ -21,9 +18,8 @@ struct Message
 struct User
 {
     User() = default;
-    User(QString nickname)
+    explicit User(QString nickname): mNickname{nickname}
     {
-        mNickname = nickname;
     }
 
     QString mNickname;
@@ -32,9 +28,8 @@ struct User
 struct File
 {
     File() = default;
-    File(QString name)
+    explicit File(QString name): mName{name}
     {
-        mName = name;
     }
 
     QString mName;
@@ -43,12 +38,8 @@ struct File
 struct Comment
 {
     Comment() = default;
-    Comment(int line, QString text, QString user, QString file)
+    explicit Comment(int line, QString text, QString user, QString file): mLine{line}, mText{text}, mUser{user}, mFile{file}
     {
-        mLine = line;
-        mText = text;
-        mUser = user;
-        mFile = file;
     }
 
     int mLine;
