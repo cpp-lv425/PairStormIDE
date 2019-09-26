@@ -57,10 +57,16 @@ struct ServerData
         // Fill object with needed values
         jsonAttrib["name"] = mName;
         QJsonArray jsonIpArr;
-        for (const auto &ip : mIps)
+        std::transform(mIps.cbegin(), mIps.cend(),
+                       std::back_inserter(jsonIpArr),
+                       [](const QHostAddress &ip)
+                       {
+                           return ip.toString();
+                       });
+        /*for (const auto &ip : mIps)
         {
             jsonIpArr.push_back(ip.toString());
-        }
+        }*/
         jsonAttrib["ips"]  = jsonIpArr;
         jsonAttrib["port"] = mPort;
 
@@ -99,10 +105,12 @@ struct ServerData
         mName = jsonAttrib.value("name").toString();
         mPort = static_cast<quint16>(jsonAttrib.value("port").toInt());
         QJsonArray jsonIpArr = jsonAttrib.value("ips").toArray();
-        for (const auto ip : jsonIpArr)
-        {
-            mIps.push_back(QHostAddress(ip.toString()));
-        }
+        std::transform(jsonIpArr.cbegin(), jsonIpArr.cend(),
+                       std::back_inserter(mIps),
+                       [](const QVariant &ip)
+                       {
+                           return QHostAddress(ip.toString());
+                       });
     }
 
     bool empty() const
