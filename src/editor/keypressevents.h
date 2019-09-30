@@ -137,7 +137,7 @@ public:
     const QString COMMENT_BLOCK_START = "/*";
     const QString COMMENT_BLOCK_END = "*/";
 
-    void selectText(QTextCursor &cursor, int start, int end);
+    static void selectText(QTextCursor &cursor, int start, int end);
     void insertMultilineComment(CodeEditor *editor, QTextCursor &cursor, int start, int end);
     void removeMultilineComment(CodeEditor *editor, QTextCursor &cursor, int start, int end);
 

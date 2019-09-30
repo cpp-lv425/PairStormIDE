@@ -11,10 +11,10 @@ public:
     User getUserFromDb(const int idUser);
     QVector<User> getAllUsersFromDb();
 private:
-    QString addUserQuery(const User &user);
-    QString getUserQuery(const int idUser);
+    static QString addUserQuery(const User &user);
+    static QString getUserQuery(const int idUser);
     void fillStructUser(User &user);
-    QString numberOfUser();
+    static QString numberOfUser();
 };
 
 #endif // USERDB_H

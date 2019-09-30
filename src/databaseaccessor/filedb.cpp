@@ -15,14 +15,6 @@ void FileDb::addFileToDb(const File &file)
     query.finish();
 }
 
-File FileDb::getFileFromDb(const int idFile)
-{
-    execQuery(getFileQuery(idFile));
-    File rFile;
-    fillStructureFile(rFile);
-    return rFile;
-}
-
 void FileDb::deleteFileFromDb(const QString filename)
 {
     execQuery(deleteFileQuery(filename));
@@ -32,12 +24,6 @@ QString FileDb::addFileQuery(const File &file)
 {
     return "INSERT INTO File (name) VALUES ('"
             +file.mName + "')";
-}
-
-QString FileDb::getFileQuery(const int idFile)
-{
-    return "SELECT name from File WHERE ID = "
-            + QString::number(idFile);
 }
 
 QString FileDb::deleteFileQuery(const QString filename)

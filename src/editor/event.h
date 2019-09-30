@@ -9,10 +9,10 @@ public:
 
 protected:
     void eventInsertSymbol(CodeEditor *codeEditor, QKeyEvent *e, QString s);
-    bool IsInsideBracket(CodeEditor *codeEditor);
-    void plainTextPressEvent(CodeEditor *codeEditor, QKeyEvent *e);
-    int editorCurrentZoom(CodeEditor *codeEditor);
-    QList<QVector<Token>> editorTokens(CodeEditor *codeEditor);
+    static bool IsInsideBracket(CodeEditor *codeEditor);
+    static void plainTextPressEvent(CodeEditor *codeEditor, QKeyEvent *e);
+    static int editorCurrentZoom(CodeEditor *codeEditor);
+    static QList<QVector<Token>> editorTokens(CodeEditor *codeEditor);
     static QString sTabs;
     static bool sIsSleshPressed;
 

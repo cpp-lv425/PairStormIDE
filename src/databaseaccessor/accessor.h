@@ -9,7 +9,7 @@ public:
     ~Accessor() = default;
 protected:
     void setQuery(QSqlDatabase db);
-    void execQuery(QString query);
+    void execQuery(QString queryStr);
     QSqlQuery query;
 private:
     Connection *database;
