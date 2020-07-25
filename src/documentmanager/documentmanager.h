@@ -25,6 +25,7 @@ class DocumentManager: public QObject
 public:
     explicit DocumentManager();
     QSplitter* getSplitter();
+    bool saveDocument(CodeEditor *doc);
     void openProject(const QString &path);
     const QString& getCurrentProjectPath()const;
     void closeCurrentProject();
@@ -61,6 +62,8 @@ public slots:
     void onFocusChanged(QWidget *old, QWidget *now);
     void onCloseDocument(CodeEditor *doc);
     void onOpenDocument(const QString &fileName);
+signals:
+    void projectPathWasChanged(QString);
 
 private:
     void splitWindow();
@@ -73,7 +76,6 @@ private:
     QMdiArea* lastAreaInFocus();
     QMdiArea* areaInFocus();
     QMdiArea* getArea(CodeEditor *doc);
-    bool saveDocument(CodeEditor *doc);
     bool saveDocument(const QString &fileName);
     void saveDocument(const QString &fileName, const QString &fileContent);
     void setAllDocumentsNotModified();

@@ -17,6 +17,7 @@ const int TOP_UNUSED_PIXELS_HEIGHT = 4;
 #include<QSettings>
 #include<QApplication>
 #include<QPlainTextEdit>
+#include<documentmanager.h>
 #include<QObject>
 #include<QMouseEvent>
 #include<QLabel>
@@ -24,6 +25,7 @@ const int TOP_UNUSED_PIXELS_HEIGHT = 4;
 #include<QVector>
 #include<QFont>
 #include<QStatusBar>
+#include <QTimer>
 #include <QList>
 #include"sqliteaccess.h"
 #include<QStringList>
@@ -48,8 +50,9 @@ class CodeEditor : public QPlainTextEdit
     Q_OBJECT
 public:
     CodeEditor(QWidget *parent = nullptr, const QString &fileName = "");
-    virtual ~CodeEditor();
+    virtual ~CodeEditor() override;
     void specialAreasRepaintEvent(QPaintEvent *event);
+    void saveCurrentDocument();
     void repaintButtonsArea(const int bottom, const int top, const int blockNumber);
     int getLineNumberAreaWidth();
     QString& getFileName();
@@ -72,8 +75,9 @@ public:
     //DB methods
     void readAllCommentsFromDB(QVector<Comment> mStartComments);
     QVector<Comment> getAllCommentsToDB();
+    unsigned int mLinesCount;
 
-    CommentDb *getCommentGetter() const;
+    CommentDb getCommentGetter() const;
 
     QVector<Comment> getStartComments() const;
 
@@ -82,11 +86,13 @@ private:
     void setAnotherButtonLine(AddCommentButton *comment, const int diff);
     bool isInRangeIncludBoth(const int val, const int leftMargin, const int rightMargin);
     bool isInRangeIncludLast(const int val, const int leftMargin, const int rightMargin);
+    void highlightLine(QTextCharFormat fmt, QTextCursor &cursor, int begin, int end, int startingPosition);
+    void runHighlighterWithDefinition(CodeEditor *sourceDocument);
 
     void handleLinesAddition(int, int, int);
     void handleLinesDelition(int, int);
     void addToIdentifiersList(QStringList&, int);
-    void getNamesOfIdentifiers();
+    QVector<Token> getIdentifiers(QVector<Token>& tokensOnLine) const;
 
     void addButton(const int line, const QString &Comment, const QString &userName);
     void removeButtonByIndex(QVector<AddCommentButton*> &commentV, const int index);
@@ -142,26 +148,26 @@ private:
     QWidget *mLineNumberArea;
     ConfigParams mConfigParam;
     QFont mFont;
-    LexerCPP *mLcpp;
+    LexerCPP mLcpp;
     QString mFileName;
-    ChangeManager *mChangeManager;
-    QTimer *mTimer;
+    ChangeManager mChangeManager;
+    QTimer mTimer;
     LexerCPP mLexer;
     AddCommentButton *mAddCommentButton;
-    CommentWidget *mCommentWidget;
-    QLabel *mCurrentCommentLable;
+    CommentWidget mCommentWidget;
+    QLabel mCurrentCommentLable;
     QVector<Comment> mStartComments;
     QCompleter *mCompleter;
     QStringList completerKeywords;
-    CommentDb *commentGetter;
+    CommentDb commentGetter;
     QSettings settings;
+
 
 
     QString mStyle;
     int mLinesCountPrev;
     int mLinesCountCurrent;
 
-    unsigned int mLinesCount;
     unsigned int mCodeSize;
     QString mCode;
 
@@ -181,8 +187,8 @@ private:
 protected:
     int mCurrentZoom;
     QList<QVector<Token>> mTokensList;
-    QList<QStringList> mIdentifiersList;
-    QStringList mIdentifiersNameList;
+    QList<QVector<Token>> mIdentifiersList;
+    QStringList mKeywordsStringList;
     friend class Event;
 
     // QWidget interface

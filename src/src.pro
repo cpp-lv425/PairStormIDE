@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui quickwidgets webenginewidgets network quick quickcontrols2 sql
+QT       += core gui quickwidgets network quick quickcontrols2 sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -31,6 +31,9 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
+# Icon of the application
+win32:RC_ICONS += PAIRSTORM.ico
+
 include($$PWD/mainwindow/mainwindow.pri)
 include($$PWD/network/network.pri)
 include($$PWD/chatwindow/chatwindow.pri)
@@ -39,10 +42,10 @@ include($$PWD/filemanager/filemanager.pri)
 include($$PWD/editor/editor.pri)
 include($$PWD/bottompanel/bottompanel.pri)
 include($$PWD/settings/settings.pri)
+include($$PWD/auth/auth.pri)
 include($$PWD/startpage/startpage.pri)
 include($$PWD/projectviewer/projectviewer.pri)
 include($$PWD/newfilewizard/newfilewizard.pri)
-include($$PWD/documentation/documentation.pri)
 include($$PWD/logindialog/logindialog.pri)
 include($$PWD/splashscreen/splashscreen.pri)
 include($$PWD/utils/utils.pri)
@@ -52,6 +55,7 @@ include($$PWD/settingsconfigurator/settingsconfigurator.pri)
 include($$PWD/savefilesdialog/savefilesdialog.pri)
 include($$PWD/classgeneration/classgeneration.pri)
 include($$PWD/newprojectwizard/newprojectwizard.pri)
+include($$PWD/compiler/compiler.pri)
 
 RESOURCES += \
     globalresources.qrc

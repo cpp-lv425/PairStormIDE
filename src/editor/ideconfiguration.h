@@ -24,7 +24,7 @@ public:
     void setFontStyle(const QString &fontStyle);
     int getFontSize() const;
     void setFontSize(const QString fontSize);
-    QString ConfigParams::getIdeType();
+    QString getIdeType();
     void setIdeType(const QString &ideType);
     void setConfigParams(const QString fontStyle, const QString fontSize, const QString ideType);
 };

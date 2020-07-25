@@ -24,6 +24,7 @@ class CodeEditor;
 class Browser;
 class Connection;
 class FileDb;
+class CompilerControler;
 QT_END_NAMESPACE
 
 class MainWindow : public QMainWindow
@@ -37,18 +38,19 @@ public:
     ~MainWindow();
 
 private:
-    LocalConnectorInterface *mplocalConnector;
+    LocalConnectorInterface *mpLocalConnector;
     Ui::MainWindow *ui;
     ProjectViewerDock *mpProjectViewerDock;
     ChatWindowDock *mpChatWindowDock;
     BottomPanelDock *mpBottomPanelDock;
-    QScopedPointer<DocumentManager> mpDocumentManager;    
     Browser *mDocumentationBrowser;
     QScopedPointer<PaletteConfigurator> mpPaletteConfigurator;
     Connection *db;
-    FileDb* dbFileManager;
+    FileDb* mpdbFileManager;
+    DocumentManager *mpDocumentManager;
+    CompilerControler *mpCompilerControler;
 
-    void setupMainMenu();    
+    void setupMainMenu();
     void openDocument(const QString &fileName);
     void createProjectViewer();
     void createChatWindow();
@@ -63,8 +65,12 @@ private:
     void setDocumentFontFamily(const QString &fontFamily);
     void setDocumentFontSize(const QString &fontSize);
 
-    void databaseConnect(QString directory);
+    void databaseConnect();
     void databaseDisconnect();
+    void restoreDatabaseFile();
+    void hideDatabaseFile();
+    void setDatabaseFileName();
+    void readWriteFileContent(QString fileToReadName, QString fileToWriteName);
 
 private slots:
     // file menu actions
@@ -98,12 +104,14 @@ private slots:
     void onShowChatWindowDockTriggered();
     void onShowBottomPanel();
     void onCombineAreas();
-    void onCloseEmptyDocArea();   
+    void onCloseEmptyDocArea();
 
     // tools menu
     void onRefactorTriggered();
     void onConnectTriggered();
     void onSettingsTriggered();
+    void onBuildTriggered();
+    void onRunTriggered();
 
     // help menu
     void onAboutTriggered();
@@ -117,9 +125,16 @@ public slots:
     void onConnectionStatusChanged(bool status);
     void onSettingsChanged(std::map<QString, QString> newValues);
     void openCreatedClassFiles(QString headerFile, QString sourceFile);
+    void reSendProjectPathChanged(QString);
+signals:
+    void projectPathWasChanged(QString);
 
 private:
     friend class SettingsConfigurator;
+    QString  databaseFileName;
+    QString dirName;
+    const char *projectDatabaseExtension = ".db";
+    const char pathSeparator = '/';
 
 protected:
     void closeEvent(QCloseEvent *event);

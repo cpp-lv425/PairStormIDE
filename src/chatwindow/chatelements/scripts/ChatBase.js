@@ -50,6 +50,21 @@ function chatUserMessageColor(themeName)
     }
 }
 
+function chatUserMessageDateColor(themeName)
+{
+    switch(themeName)
+    {
+    case gWhiteThemeName:
+        return "#8aafe2";
+    case gBlueThemeName:
+        return "#5db8e6";
+    case gDarkThemeName:
+        return "#2d556c";
+    default:
+        return "#8aafe2";
+    }
+}
+
 function chatAuthorMessageColor(themeName)
 {
     switch(themeName)
@@ -65,6 +80,21 @@ function chatAuthorMessageColor(themeName)
     }
 }
 
+function chatAuthorMessageDateColor(themeName)
+{
+    switch(themeName)
+    {
+    case gWhiteThemeName:
+        return "#88a2bc";
+    case gBlueThemeName:
+        return "#6bb2ef";
+    case gDarkThemeName:
+        return "#305f80";
+    default:
+        return "#88a2bc";
+    }
+}
+
 function chatSystemMessageColor(themeName)
 {
     switch(themeName)
@@ -77,6 +107,21 @@ function chatSystemMessageColor(themeName)
         return "#65b0c3";
     default:
         return "#438497";
+    }
+}
+
+function chatSystemMessageDateColor(themeName)
+{
+    switch(themeName)
+    {
+    case gWhiteThemeName:
+        return "#7ec5d9";
+    case gBlueThemeName:
+        return "#91bf60";
+    case gDarkThemeName:
+        return "#3b7482";
+    default:
+        return "#7ec5d9";
     }
 }
 

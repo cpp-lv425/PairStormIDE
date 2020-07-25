@@ -27,6 +27,8 @@ public:
 
     void restoreConFile();          //  restoring settings from last session
     void saveConFile();             //  saving settings at the end of current session
+
+    void setField(const QString key, const QString value); // set [value] with [key] in configuration file
 private:
     void getPathToConFile();        //  search configuration file. if not exist - create it with default parameters
 
@@ -41,7 +43,7 @@ private:
     QStringList mCppLibraryBinarysList; //  all included library binarys in C++ mode
 
     void checkConfDir(QString str = "exe");    //  check existance directory <conf>, create if not exist
-                                               //  str = "exe" - directory in same dir as execution file
+                                               //  QString str = "exe" - directory in same dir as execution file by default
     void writeJson(sessionMode mode = sessionMode::Start);     //  on application start: if conf.json not exist - creates it in conf directory
                                                //  on application quit:  rewrite json with values from QSettings
     void readJson();                //  read configuration file to [loadDoc]. status write to [readStatus]

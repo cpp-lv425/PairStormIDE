@@ -79,9 +79,8 @@ bool FileManager::projectExists(const QString &path)
 
     // construct project file name
     int position = path.lastIndexOf(QChar{pathSeparator});
-    QString projectFileName = path.mid(position + 1);
+    projectFileName = path.mid(position + 1);
     projectFileName += projectFileExtension;
-
     // if project file exists in specified directory
     // then true is returned
     return projectDir.exists(projectFileName);
@@ -90,4 +89,11 @@ bool FileManager::projectExists(const QString &path)
 bool FileManager::sourceFileByTheSameNameExists(const QString &headerName)
 {
     return (QFileInfo::exists(removeExtension(headerName,2).append(".cpp")));
+}
+
+QString FileManager::projectFileName =QString();
+
+QString FileManager::getProjectFileName()
+{
+    return projectFileName;
 }
