@@ -1,13 +1,13 @@
 #ifndef ADDCOMMENTTEXTEDIT_H
 #define ADDCOMMENTTEXTEDIT_H
 
-#include <QFont>
+#include <QRegularExpression>
+#include <QPlainTextEdit>
+#include <QTextDocument>
+#include <QTextCursor>
+#include <QPushButton>
 #include <QString>
-#include<QPushButton>
-#include<QTextCursor>
-#include<QRegularExpression>
-#include<QTextDocument>
-#include<QPlainTextEdit>
+#include <QFont>
 
 namespace Ui
 {

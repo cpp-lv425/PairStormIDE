@@ -48,8 +48,8 @@ void CommentWidget::setPosition(QPlainTextEdit *editor, AddCommentButton *commen
     //calculate the geometry of code editor in the global screen
     auto globalParentPos = editor->mapToGlobal(QPoint(0,0));
 
-    //width should be == 1/2 of the codeEditor width
-    //hight should be == 1/3 of the codeEditor hight
+//    width should be == 1/2 of the codeEditor width
+//    hight should be == 1/3 of the codeEditor hight
     this->setGeometry(globalParentPos.x() + commentButton->x() - editor->width()/2,
                       globalParentPos.y() + commentButton->y(),
                       editor->width() /  2,
