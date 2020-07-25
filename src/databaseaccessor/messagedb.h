@@ -11,9 +11,9 @@ public:
     void addMessageToDb(const Message& message);
     QVector <Message> getMessageFromDb(const QString startTime);
 private:
-    QString addMessageQuery(const Message& message);
-    QString getMessageQuery(const QString startTime);
-    QString numberOfMessages(const QString startTime);
+    static QString addMessageQuery(const Message& message);
+    static QString getMessageQuery(const QString startTime);
+    static QString numberOfMessages(const QString startTime);
     void fillStructMessage(Message &message);
 };
 

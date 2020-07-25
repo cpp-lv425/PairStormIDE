@@ -12,10 +12,10 @@ public:
     void addTableComment();
     void addTableFile();
 private:
-    QString tableUserQuery();
-    QString tableMessageQuery();
-    QString tableCommentQuery();
-    QString tableFileQuery();
+    static QString tableUserQuery();
+    static QString tableMessageQuery();
+    static QString tableCommentQuery();
+    static QString tableFileQuery();
 };
 
 #endif // CREATEDB_H

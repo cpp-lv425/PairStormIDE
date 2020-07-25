@@ -11,7 +11,6 @@ public:
     void openDatabase();
     ~Connection();
     QSqlDatabase getDatabase();
-    static QString getPath();
     void close();
 private:
     Connection();

@@ -18,12 +18,6 @@ void CommentDb::addCommentsToDb(const QVector<Comment> &comments)
     query.finish();
 }
 
-void CommentDb::deleteCommentFromDb(const int commentLine, const QString commentFile)
-{
-    execQuery(deleteCommentQuery(commentLine, commentFile));
-    query.finish();
-}
-
 void CommentDb::deleteCommentsFromDb(const QString& commentFile)
 {
     execQuery(deleteAllCommentsInFileQuery(commentFile));
@@ -44,16 +38,6 @@ QVector<Comment> CommentDb::getAllCommentsFromFile(const QString filename)
       }
       query.finish();
       return comments;
-}
-
-Comment CommentDb::getCommentFromDb(const int commentLine, const QString commentFile)
-{
-    execQuery(getCommentQuery(commentLine, commentFile));
-    query.first();
-    Comment rComment;
-    fillStructComment(rComment);
-    query.finish();
-    return rComment;
 }
 
 QString CommentDb::addCommentQuery(const Comment &comment)
@@ -110,7 +94,7 @@ QString CommentDb::allCommentInFileQuery(const QString filename)
             + filename + "')";
 }
 
-QString CommentDb::deleteAllCommentsInFileQuery(const QString filename)
+QString CommentDb::deleteAllCommentsInFileQuery(const QString commentFile)
 {
-    return "Delete from Comment where Comment.idFile = (Select id from File where name = '" + filename + "')";
+    return "Delete from Comment where Comment.idFile = (Select id from File where name = '" + commentFile + "')";
 }
